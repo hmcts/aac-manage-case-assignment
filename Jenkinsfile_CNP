@@ -1,0 +1,27 @@
+#!groovy
+properties(
+  [[$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/manage-case-assignment'],
+   pipelineTriggers([[$class: 'GitHubPushTrigger']])]
+)
+
+@Library("Infrastructure")
+
+def product = "ccd"
+def component = "manage-case-assignment"
+
+withPipeline("java", product, component) {
+  onMaster {
+    enableSlackNotifications('#ccd-master-builds')
+  }
+  onDemo {
+    enableSlackNotifications('#ccd-demo-builds')
+  }
+  onPR {
+    enableSlackNotifications('#ccd-pr-builds')
+  }
+
+  installCharts()
+  enableAksStagingDeployment()
+  disableLegacyDeployment()
+
+}

@@ -1,17 +1,13 @@
-variable "product" {}
-
-variable "component" {}
-
-variable "location" {
-  default = "UK South"
+// Infrastructural variables
+variable "product" {
+  type = "string"
 }
 
-variable "env" {}
+variable "component" {
+  type = "string"
+}
 
-variable "subscription" {}
-
-variable "deployment_namespace" {}
-
-variable "common_tags" {
-  type = "map"
+variable "env" {
+  type = "string"
+  description = "(Required) The environment in which to deploy the application infrastructure."
 }

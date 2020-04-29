@@ -209,7 +209,7 @@ mainClassName = 'uk.gov.hmcts.reform.managecase.Application'
 
 bootJar {
   getArchiveFileName().set(provider {
-    '.jar'
+    'manage-case-assignment.jar'
   })
 
   manifest {

@@ -1,8 +1,4 @@
 #!groovy
-properties(
-  [[$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/manage-case-assignment'],
-   pipelineTriggers([[$class: 'GitHubPushTrigger']])]
-)
 
 @Library("Infrastructure")
 

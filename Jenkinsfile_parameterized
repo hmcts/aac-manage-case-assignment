@@ -1,5 +1,6 @@
 #!groovy
-@Library("Infrastructure") _
+
+@Library("Infrastructure")
 
 properties([
   parameters([

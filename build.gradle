@@ -14,8 +14,8 @@ group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 allprojects {
-  sourceCompatibility = '1.8'
-  targetCompatibility = '1.8'
+  sourceCompatibility = '11'
+  targetCompatibility = '11'
 }
 
 sourceSets {

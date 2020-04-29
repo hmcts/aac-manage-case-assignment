@@ -1,0 +1,6 @@
+java:
+  applicationPort: 4454
+  image: 'hmctspublic.azurecr.io/aac/manage-case-assignment:latest'
+  ingressHost: manage-case-assignment-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  aadIdentityName: ccd
+  environment:

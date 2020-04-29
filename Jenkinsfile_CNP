@@ -6,7 +6,7 @@ properties(
 
 @Library("Infrastructure")
 
-def product = "ccd"
+def product = "aac"
 def component = "manage-case-assignment"
 
 withPipeline("java", product, component) {

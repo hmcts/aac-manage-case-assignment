@@ -2,8 +2,12 @@
 
 @Library("Infrastructure")
 
+import uk.gov.hmcts.contino.GradleBuilder
+
 def product = "aac"
 def component = "manage-case-assignment"
+
+GradleBuilder builder = new GradleBuilder(this, product)
 
 withPipeline("java", product, component) {
   after('test') {

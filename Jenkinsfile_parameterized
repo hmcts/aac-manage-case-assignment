@@ -2,6 +2,8 @@
 
 @Library("Infrastructure")
 
+import uk.gov.hmcts.contino.GradleBuilder
+
 properties([
   parameters([
     string(name: 'PRODUCT_NAME', defaultValue: 'aac', description: ''),
@@ -11,6 +13,8 @@ properties([
     choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
   ])
 ])
+
+GradleBuilder builder = new GradleBuilder(this, "aac")
 
 withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {
   after('test') {

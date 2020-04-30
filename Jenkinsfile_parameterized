@@ -13,6 +13,8 @@ properties([
 ])
 
 withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {
+  after('test') {
+    builder.gradle('integration')
+  }
   enableSlackNotifications('#ccd-master-builds')
-  loadVaultSecrets(secrets)
 }

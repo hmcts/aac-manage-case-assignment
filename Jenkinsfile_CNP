@@ -6,6 +6,9 @@ def product = "aac"
 def component = "manage-case-assignment"
 
 withPipeline("java", product, component) {
+  after('test') {
+    builder.gradle('integration')
+  }
   onMaster {
     enableSlackNotifications('#ccd-master-builds')
   }

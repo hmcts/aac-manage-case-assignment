@@ -8,6 +8,7 @@ class RootControllerTest {
 
     @Test
     void testNothing() {
-        assertTrue(true);
+        boolean result = true;
+        assertTrue(result, "should be true");
     }
 }

@@ -150,6 +150,7 @@ dependencyManagement {
     dependencySet(group: 'com.google.guava', version: '29.0-jre') {
       entry 'guava'
     }
+    // CVE-2020-9488 
     dependencySet(group: 'org.apache.logging.log4j', version: '2.13.2') {
       entry 'log4j-api'
     }

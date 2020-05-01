@@ -188,6 +188,7 @@ dependencies {
   }
 
   testImplementation 'io.rest-assured:rest-assured:4.3.0'
+  testImplementation 'io.rest-assured:json-path:4.3.0'
   
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath

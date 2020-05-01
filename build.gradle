@@ -154,7 +154,8 @@ def versions = [
   junitPlatform   : '1.6.2',
   reformLogging   : '5.1.1',
   springBoot      : springBoot.class.package.implementationVersion,
-  springfoxSwagger: '2.9.2'
+  springfoxSwagger: '2.9.2',
+  restAssured    : '4.2.0'
 ]
 
 ext.libraries = [
@@ -187,9 +188,10 @@ dependencies {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
-  testImplementation 'io.rest-assured:rest-assured:4.3.0'
-  testImplementation 'io.rest-assured:json-path:4.3.0'
-  
+  testImplementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
+  testImplementation group: 'io.rest-assured', name: 'json-path', version: versions.restAssured
+  testImplementation group: 'io.rest-assured', name: 'xml-path', version: versions.restAssured
+
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 

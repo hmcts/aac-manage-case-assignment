@@ -150,6 +150,9 @@ dependencyManagement {
     dependencySet(group: 'com.google.guava', version: '29.0-jre') {
       entry 'guava'
     }
+    dependencySet(group: 'org.apache.logging.log4j', version: '2.13.2') {
+      entry 'log4j-api'
+    }
   }
 }
 
@@ -185,7 +188,6 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: '0.0.5'
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.2'
   
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging

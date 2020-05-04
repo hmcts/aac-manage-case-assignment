@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    propertiesvolume:
+      prefixed: false
+      paths: /mnt/secrets/aac
+      aliases:
+        AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key

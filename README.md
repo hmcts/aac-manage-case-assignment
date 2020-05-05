@@ -1,84 +1,59 @@
 # Manage Case Assignment
 
-## Building and deploying the application
+This micro-service provides a set of APIs to manage case access. 
 
-### Building the application
+**TODO**: add more description / architecture diagram etc 
 
+## Getting Started
+
+### Prerequisites
+- [JDK 11](https://java.com)
+
+### Building
 The project uses [Gradle](https://gradle.org) as a build tool. It already contains
 `./gradlew` wrapper script, so there's no need to install gradle.
 
 To build the project execute the following command:
-
 ```bash
-  ./gradlew build
+./gradlew build
 ```
 
-### Running the application
-
-Create the image of the application by executing the following command:
-
+### Running
+Run the application by executing:
 ```bash
-  ./gradlew assemble
+./gradlew bootRun
 ```
 
-Create docker image:
+### Consuming this service locally
+This image is available in the HMCTS azure container registry. Image url is: `hmctspublic.azurecr.io/aac/manage-case-assignment`  
+See required config in: [docker-compose.yml](docker-compose.yml)
 
+
+## API documentation
+API documentation is provided with Swagger.  
+You can view the json spec here: [http://localhost:4454/v2/api-docs](http://localhost:4454/v2/api-docs)  
+Swagger UI is available here: [http://localhost:4454/swagger-ui.html](http://localhost:4454/swagger-ui.html)  
+
+## Developing
+
+### Unit tests
+To run all unit tests execute the following command:
 ```bash
-  docker-compose build
+./gradlew test
 ```
 
-Run the distribution (created in `build/install/` directory)
-by executing the following command:
-
+### Integration tests
+To run all integration tests execute the following command:
 ```bash
-  docker-compose up
+./gradlew integration
 ```
 
-This will start the API container exposing the application's port
-(set to `4454` in this template app).
-
-In order to test if the application is up, you can call its health endpoint:
-
+### Code quality checks
+We use [checkstyle](http://checkstyle.sourceforge.net/) and [PMD](https://pmd.github.io/).  
+To run all checks execute the following command:
 ```bash
-  curl http://localhost:4454/health
+./gradlew clean checkstyleMain checkstyleTest checkstyleIntegrationTest pmdMain pmdTest pmdIntegrationTest
 ```
-
-You should get a response similar to this:
-
-```
-  {"status":"UP","diskSpace":{"status":"UP","total":249644974080,"free":137188298752,"threshold":10485760}}
-```
-
-### Alternative script to run application
-
-To skip all the setting up and building, just execute the following command:
-
-```bash
-./bin/run-in-docker.sh
-```
-
-For more information:
-
-```bash
-./bin/run-in-docker.sh -h
-```
-
-Script includes bare minimum environment variables necessary to start api instance. Whenever any variable is changed or any other script regarding docker image/container build, the suggested way to ensure all is cleaned up properly is by this command:
-
-```bash
-docker-compose rm
-```
-
-It clears stopped containers correctly. Might consider removing clutter of images too, especially the ones fiddled with:
-
-```bash
-docker images
-
-docker image rm <image-id>
-```
-
-There is no need to remove postgres and java or similar core images.
 
 ## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.

@@ -4,8 +4,6 @@
     <notes><![CDATA[
      It's a false positive - spring-security version is 5.3.x (see: https://pivotal.io/security/cve-2018-1258)
    ]]></notes>
-    <gav regex="true">^org\.springframework\.security</gav>
-    <cpe>cpe:/a:pivotal_software:spring_security</cpe>
     <cve>CVE-2018-1258</cve>
   </suppress>
 

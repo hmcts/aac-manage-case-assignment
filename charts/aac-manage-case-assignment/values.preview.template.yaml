@@ -3,7 +3,7 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   keyVaults:
-    ccd:
+    aac:
       secrets:
         - aac-manage-case-s2s-secret
   environment:

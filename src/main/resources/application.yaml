@@ -5,6 +5,8 @@ management:
   endpoint:
     health:
       show-details: "always"
+      cache:
+        time-to-live: 10s
   endpoints:
     web:
       base-path: /

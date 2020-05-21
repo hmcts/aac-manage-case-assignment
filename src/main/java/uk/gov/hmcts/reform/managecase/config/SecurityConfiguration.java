@@ -36,6 +36,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final ServiceAuthFilter serviceAuthFilter;
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
+    private static final String[] AUTH_WHITELIST = {
+        "/swagger-ui.html",
+        "/webjars/springfox-swagger-ui/**",
+        "/swagger-resources/**",
+        "/v2/api-docs",
+        "/health",
+        "/health/liveness",
+        "/info",
+        "/favicon.ico",
+        "/"
+    };
+
     @Autowired
     public SecurityConfiguration(final ServiceAuthFilter serviceAuthFilter,
                                  final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter) {
@@ -46,14 +58,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/swagger-ui.html",
-            "/webjars/springfox-swagger-ui/**",
-            "/swagger-resources/**",
-            "/v2/api-docs",
-            "/health",
-            "/health/liveness",
-            "/");
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers(AUTH_WHITELIST);
     }
 
     @Override

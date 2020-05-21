@@ -43,6 +43,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/v2/api-docs",
         "/health",
         "/health/liveness",
+        "/health/readiness",
         "/info",
         "/favicon.ico",
         "/"

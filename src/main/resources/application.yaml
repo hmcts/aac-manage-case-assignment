@@ -10,7 +10,9 @@ management:
       base-path: /
       exposure:
         include: health, info, prometheus
-
+  health:
+    probes:
+      enabled: true
 spring:
   application:
     name: Manage Case Assignment

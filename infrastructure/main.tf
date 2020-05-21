@@ -37,3 +37,18 @@ resource "azurerm_application_insights" "appinsights" {
 
   tags = "${var.common_tags}"
 }
+
+data "azurerm_key_vault" "s2s_vault" {
+  name = "s2s-${var.env}"
+  resource_group_name = "rpe-service-auth-provider-${var.env}"
+}
+data "azurerm_key_vault_secret" "manage-case-s2s-vault-secret" {
+  name = "microservicekey-aac-manage-case-assignment"
+  key_vault_id = "${data.azurerm_key_vault.s2s_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "aac-manage-case-s2s-secret" {
+  name = "aac-manage-case-s2s-secret"
+  value = "${data.azurerm_key_vault_secret.manage-case-s2s-vault-secret.value}"
+  key_vault_id = "${module.key-vault.key_vault_id}"
+}

@@ -14,3 +14,36 @@ management:
 spring:
   application:
     name: Manage Case Assignment
+  main:
+    allow-bean-definition-overriding: true
+  cache:
+    cache-names: userInfoCache
+    caffeine:
+      spec: expireAfterAccess=3600s
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${idam.api.url}/o
+        registration:
+          oidc:
+            client-id: internal
+            client-secret: internal
+idam:
+  api:
+    url: ${IDAM_URL:https://idam-web-public.aat.platform.hmcts.net}
+  s2s-auth:
+    microservice: aac_mca
+    totp_secret: ${MANAGE_CASE_S2S_KEY:AAAAAAAAAAAAAAAA}
+    url: ${S2S_URL:http://localhost:4502}
+  s2s-authorised:
+    services: ${MANAGE_CASE_S2S_AUTHORISED_SERVICES:ccd_data}
+oidc:
+  issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
+
+ccd:
+  data-store:
+    host: ${CCD_DATA_STORE_HOST:http://localhost:4452}
+prd:
+  host: ${PRD_HOST:http://localhost:4455}

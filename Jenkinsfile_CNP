@@ -22,9 +22,6 @@ withPipeline("java", product, component) {
   onPR {
     enableSlackNotifications('#ccd-pr-builds')
   }
-
-  installCharts()
   enableAksStagingDeployment()
   disableLegacyDeployment()
-
 }

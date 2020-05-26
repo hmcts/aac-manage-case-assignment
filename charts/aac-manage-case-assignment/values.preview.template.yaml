@@ -1,5 +1,10 @@
 java:
-  environment:
   # Don't modify below here
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+  keyVaults:
+    aac:
+      secrets:
+        - aac-manage-case-s2s-secret
+  environment:
+    S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal

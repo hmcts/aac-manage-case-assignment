@@ -2,7 +2,10 @@
 /build/
 !gradle/wrapper/gradle-wrapper.jar
 *.class
-bin/main/application.yaml
+
+# BEFTA temp locations
+bin/
+definition_files/
 
 ### STS ###
 .apt_generated

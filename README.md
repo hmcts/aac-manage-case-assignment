@@ -48,6 +48,32 @@ To run all integration tests execute the following command:
 ./gradlew integration
 ```
 
+### Functional tests
+These are the tests run against an environment. For example if you would like to test your local
+ environment you'll need to export the following variables on your `.bash_profile` script.
+
+```bash
+#Functional Tests
+export TEST_URL=http://localhost:3100
+export S2S_URL=http://localhost:4502
+export IDAM_URL=http://localhost:5000
+export BEFTA_S2S_CLIENT_ID=ccd_gw
+export BEFTA_S2S_CLIENT_SECRET=AAAAAAAAAAAAAAAC
+export CCD_CASEWORKER_AUTOTEST_EMAIL=someemail@blob.com
+export CCD_CASEWORKER_AUTOTEST_PASSWORD=XYZT
+export CCD_IMPORT_AUTOTEST_EMAIL=someemail@blob.com
+export CCD_IMPORT_AUTOTEST_PASSWORD=XYZT
+```
+
+> Note: For details of the emails and passwords to use in a local environment see the 
+ [Create users and roles](https://github.com/hmcts/ccd-docker#3-create-users-and-roles) steps in
+ [ccd-docker](https://github.com/hmcts/ccd-docker) project.
+
+These tests can be run using:
+```bash
+./gradlew functional
+```
+
 ### Code quality checks
 We use [checkstyle](http://checkstyle.sourceforge.net/) and [PMD](https://pmd.github.io/).  
 To run all checks execute the following command:

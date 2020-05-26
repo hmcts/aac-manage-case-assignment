@@ -79,6 +79,8 @@ task functional(type: Test) {
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = ['--plugin', "json:$project.buildDir/reports/tests/befta/cucumber.json", '--tags', 'not @Ignore', '--glue',
               'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features']
+      // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
+      jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
     }
   }
 }
@@ -232,6 +234,10 @@ dependencies {
   testImplementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
   testImplementation group: 'io.rest-assured', name: 'json-path', version: versions.restAssured
   testImplementation group: 'io.rest-assured', name: 'xml-path', version: versions.restAssured
+
+  // groovy v3.* added to avoid 'WARNING: Illegal reflective access by org.codehaus.groovy.reflection.CachedClass'
+  // in groovy:2.5.* when running functional/befta tests
+  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.3'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath

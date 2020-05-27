@@ -50,6 +50,11 @@ env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 withPipeline("java", product, component) {
   after('test') {
     builder.gradle('integration')
+
+    // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
+
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
   }
   onMaster {
     enableSlackNotifications('#ccd-master-builds')
@@ -66,12 +71,6 @@ withPipeline("java", product, component) {
 
   enableAksStagingDeployment()
   disableLegacyDeployment()
-
-  after('test'){
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
-    // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
-  }
 
   after('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/befta/**/*', excludes: '**/reports/tests/befta/**/*.json'

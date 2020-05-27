@@ -24,7 +24,8 @@
   "expectedResponse": {
     "_extends_" : "Common_200_Response",
     "headers": {
-      "Content-Type": "application/vnd.spring-boot.actuator.v3+json"
+      "Content-Type": "application/vnd.spring-boot.actuator.v3+json",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
     },
     "body": {
       "status": "UP",

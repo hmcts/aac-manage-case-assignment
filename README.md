@@ -54,7 +54,7 @@ These are the tests run against an environment. For example if you would like to
 
 ```bash
 #Functional Tests
-export TEST_URL=http://localhost:3100
+export TEST_URL=http://localhost:4454
 export S2S_URL=http://localhost:4502
 export IDAM_URL=http://localhost:5000
 export BEFTA_S2S_CLIENT_ID=ccd_gw

@@ -3,14 +3,19 @@ package uk.gov.hmcts.reform.managecase.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
+import springfox.documentation.service.Parameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import uk.gov.hmcts.reform.managecase.Application;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableSwagger2
@@ -23,8 +28,9 @@ public class SwaggerConfiguration {
             .select()
             .apis(RequestHandlerSelectors.basePackage(Application.class.getPackage().getName() + ".controllers"))
             .paths(PathSelectors.any())
-            .build()
-            .apiInfo(apiInfo());
+            .build().useDefaultResponseMessages(false)
+            .apiInfo(apiInfo())
+            .globalOperationParameters(Arrays.asList(headerAuthorization(), headerServiceAuthorization()));
     }
 
     private ApiInfo apiInfo() {
@@ -36,6 +42,26 @@ public class SwaggerConfiguration {
                 "https://tools.hmcts.net/confluence/display/RCCD/Reform%3A+Core+Case+Data+Home",
                 "corecasedatateam@hmcts.net"))
             .termsOfServiceUrl("")
+            .build();
+    }
+
+    private Parameter headerAuthorization() {
+        return new ParameterBuilder()
+            .name("Authorization")
+            .description("IDAM Bearer token")
+            .modelRef(new ModelRef("string"))
+            .parameterType("header")
+            .required(true)
+            .build();
+    }
+
+    private Parameter headerServiceAuthorization() {
+        return new ParameterBuilder()
+            .name("ServiceAuthorization")
+            .description("S2S Bearer token of a whitelisted micro-service")
+            .modelRef(new ModelRef("string"))
+            .parameterType("header")
+            .required(true)
             .build();
     }
 }

@@ -218,7 +218,7 @@ dependencies {
   implementation "org.springframework.security:spring-security-config"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
-  implementation "com.nimbusds:nimbus-jose-jwt:7.9"
+  implementation "com.nimbusds:nimbus-jose-jwt:8.17.1"
   implementation "io.github.openfeign:feign-httpclient:10.7.0"
   implementation "com.github.ben-manes.caffeine:caffeine:2.7.0"
 

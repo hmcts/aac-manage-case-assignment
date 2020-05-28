@@ -1,0 +1,7 @@
+{
+	"_guid_": "Common_Response_Headers",
+
+	"Date": "[[ANYTHING_PRESENT]]",
+	"Request-Context": "[[ANY_STRING_NULLABLE]]",
+	"Content-Type": "application/json"
+}

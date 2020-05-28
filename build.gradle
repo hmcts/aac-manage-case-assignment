@@ -219,7 +219,7 @@ dependencies {
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
   implementation "com.nimbusds:nimbus-jose-jwt:7.9"
-  implementation "io.github.openfeign:feign-httpclient:10.7.0"
+  implementation "io.github.openfeign:feign-httpclient:11.0"
   implementation "com.github.ben-manes.caffeine:caffeine:2.7.0"
 
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.managecase.client;
+package uk.gov.hmcts.reform.managecase.client.datastore;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;

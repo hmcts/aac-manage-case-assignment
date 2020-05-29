@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.managecase.controllers;
+package uk.gov.hmcts.reform.managecase.api.controller;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.managecase.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Builder
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class CaseAssignment {
 
     private String caseId;

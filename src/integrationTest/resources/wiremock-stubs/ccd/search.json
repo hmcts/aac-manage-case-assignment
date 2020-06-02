@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/searchCases"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "reference": "1583841721773828",
+        "jurisdiction": "AUTOTEST1",
+        "case_type_id": "MAPPER",
+        "state": "TODO",
+        "case_data": {
+            "TextField": "aTestField",
+            "EmailField": "abc@mail.com"
+        }
+      }
+    ]
+  }
+}

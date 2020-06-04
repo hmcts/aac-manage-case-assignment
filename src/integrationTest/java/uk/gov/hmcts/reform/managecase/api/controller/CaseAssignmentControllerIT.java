@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.managecase.api.controller.V1.MediaType.CASE_AS
 @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
 public class CaseAssignmentControllerIT extends BaseTest {
 
+    private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
     private static final String ASSIGNEE_ID = "0a5874a4-3f38-4bbd-ba4c";
     private static final String CASE_ID = "12345678";
 
@@ -29,7 +30,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
     @DisplayName("Should welcome upon root request with 200 response code")
     @Test
     void shouldAssignCaseAccess() throws Exception {
-        CaseAssignmentRequest request = new CaseAssignmentRequest(CASE_ID, ASSIGNEE_ID);
+        CaseAssignmentRequest request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, ASSIGNEE_ID);
 
         this.mockMvc.perform(put("/case-assignments")
             .contentType(MediaType.APPLICATION_JSON)

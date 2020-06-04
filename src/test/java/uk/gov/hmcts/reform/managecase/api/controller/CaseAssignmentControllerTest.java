@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.managecase.api.controller.V1.MediaType.CASE_AS
 public class CaseAssignmentControllerTest {
 
     private static final String ASSIGNEE_ID = "0a5874a4-3f38-4bbd-ba4c";
+    private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
     private static final String CASE_ID = "12345678";
     public static final String CASE_ASSIGNMENTS = "/case-assignments";
 
@@ -57,7 +58,7 @@ public class CaseAssignmentControllerTest {
 
     @BeforeEach
     void setUp() {
-        request = new CaseAssignmentRequest(CASE_ID, ASSIGNEE_ID);
+        request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, ASSIGNEE_ID);
     }
 
     @DisplayName("should assign case successfully for a valid request")
@@ -87,10 +88,23 @@ public class CaseAssignmentControllerTest {
         assertThat(captor.getValue().getAssigneeId()).isEqualTo(ASSIGNEE_ID);
     }
 
+    @DisplayName("should fail with 400 bad request when case type id is null")
+    @Test
+    void shouldFailWithBadRequestWhenCaseTypeIdIsNull() throws Exception {
+        request = new CaseAssignmentRequest(null,CASE_ID, ASSIGNEE_ID);
+
+        this.mockMvc.perform(put(CASE_ASSIGNMENTS)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errors", hasSize(1)))
+            .andExpect(jsonPath("$.errors", hasItem("Case type ID can not be empty")));
+    }
+
     @DisplayName("should fail with 400 bad request when case id is null")
     @Test
     void shouldFailWithBadRequestWhenCaseIdIsNull() throws Exception {
-        request = new CaseAssignmentRequest(null, ASSIGNEE_ID);
+        request = new CaseAssignmentRequest(CASE_TYPE_ID,null, ASSIGNEE_ID);
 
         this.mockMvc.perform(put(CASE_ASSIGNMENTS)
             .contentType(MediaType.APPLICATION_JSON)
@@ -103,7 +117,7 @@ public class CaseAssignmentControllerTest {
     @DisplayName("should fail with 400 bad request when assignee id is null")
     @Test
     void shouldFailWithBadRequestWhenAssigneeIdIsNull() throws Exception {
-        request = new CaseAssignmentRequest(CASE_ID, null);
+        request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, null);
 
         this.mockMvc.perform(put(CASE_ASSIGNMENTS)
              .contentType(MediaType.APPLICATION_JSON)

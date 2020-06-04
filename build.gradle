@@ -174,6 +174,9 @@ repositories {
   maven {
     url 'https://dl.bintray.com/hmcts/hmcts-maven'
   }
+  maven {
+    url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/'
+  }
 }
 
 def versions = [
@@ -181,7 +184,7 @@ def versions = [
   junitPlatform   : '1.6.2',
   reformLogging   : '5.1.1',
   springBoot      : springBoot.class.package.implementationVersion,
-  springfoxSwagger: '2.9.2',
+  springfoxSwagger: '3.0.0-SNAPSHOT',
   restAssured    : '4.2.0',
   lombok  : '1.18.8'
 ]
@@ -206,6 +209,7 @@ dependencies {
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
+  implementation group: 'io.springfox', name: 'springfox-spring-webmvc', version: versions.springfoxSwagger
 
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -217,7 +221,7 @@ dependencies {
 
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.1'
-  implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.3.1'
+  implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.5.3'
 
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.security:spring-security-config"

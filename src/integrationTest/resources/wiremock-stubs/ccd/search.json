@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "POST",
-    "url": "/searchCases"
+    "url": "/searchCases?ctid=TEST_CASE_TYPE"
   },
   "response": {
     "status": 200,
@@ -12,7 +12,7 @@
       {
         "reference": "1583841721773828",
         "jurisdiction": "AUTOTEST1",
-        "case_type_id": "MAPPER",
+        "case_type_id": "TEST_CASE_TYPE",
         "state": "TODO",
         "case_data": {
             "TextField": "aTestField",

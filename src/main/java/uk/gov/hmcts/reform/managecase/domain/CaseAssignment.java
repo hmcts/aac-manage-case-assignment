@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CaseAssignment {
 
+    private String caseTypeId;
     private String caseId;
     private String assigneeId;
 }

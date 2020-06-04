@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
+import java.util.List;
+
 @Service
 public class CaseAssignmentService {
 
@@ -21,9 +23,22 @@ public class CaseAssignmentService {
     }
 
     @SuppressWarnings("PMD")
-    public String assignCaseAccess(final CaseAssignment caseAssignment) {
-        CaseDetails caseDetails = dataStoreRepository.findCaseById(caseAssignment.getCaseId());
+    public String assignCaseAccess(CaseAssignment assignment) {
+        CaseDetails caseDetails = dataStoreRepository.findCaseBy(assignment.getCaseTypeId(), assignment.getCaseId());
         UserInfo invoker = securityUtils.getUserInfo();
+        List<String> invokerRoles = invoker.getRoles();
+        // TODO : all validation and invoke final assign data-store api
+        // 1. IDAM admin role
+        /* if (!(invokerRoles.contains("caseworker-caa") ||
+            invokerRoles.contains("solicitor-" + caseDetails.getJurisdiction()))) {
+            return "403 - The user is neither a case access administrator nor a solicitor"
+                + " with access to the jurisdiction of the case.";
+
+        } */
+        // 2. check organization match
+
+        String invokerOrganization = "sdds";
+
         // TODO : all validation and invoke final assign data-store api
         return "Success";
     }

@@ -12,13 +12,13 @@ import springfox.documentation.service.Contact;
 import springfox.documentation.service.Parameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 import uk.gov.hmcts.reform.managecase.Application;
 
 import java.util.Arrays;
 
 @Configuration
-@EnableSwagger2
+@EnableSwagger2WebMvc
 public class SwaggerConfiguration {
 
     @Bean
@@ -26,7 +26,7 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
             .useDefaultResponseMessages(false)
             .select()
-            .apis(RequestHandlerSelectors.basePackage(Application.class.getPackage().getName() + ".controllers"))
+            .apis(RequestHandlerSelectors.basePackage(Application.class.getPackage().getName() + ".api.controller"))
             .paths(PathSelectors.any())
             .build().useDefaultResponseMessages(false)
             .apiInfo(apiInfo())

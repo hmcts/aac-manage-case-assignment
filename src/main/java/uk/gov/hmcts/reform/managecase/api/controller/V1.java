@@ -17,7 +17,6 @@ public final class V1 {
     public final class Error {
 
         public static final String CASE_NOT_FOUND = "Case not found";
-        public static final String CASE_ID_INVALID = "Case ID is not valid";
 
         private Error() {
         }

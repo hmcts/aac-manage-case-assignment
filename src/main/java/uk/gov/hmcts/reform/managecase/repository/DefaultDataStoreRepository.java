@@ -30,8 +30,8 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public CaseDetails findCaseById(String caseId) {
-        List<CaseDetails> caseDetails = dataStoreApi.searchCases(String.format(ES_QUERY, caseId));
+    public CaseDetails findCaseBy(String caseTypeId, String caseId) {
+        List<CaseDetails> caseDetails = dataStoreApi.searchCases(caseTypeId, String.format(ES_QUERY, caseId));
         // TODO : size should be one otherwise throw error
         return caseDetails.get(0);
     }

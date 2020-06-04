@@ -5,11 +5,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 
 import javax.inject.Named;
 
 @Named
 public class SecurityUtils {
+
+    public static final String BEARER = "Bearer ";
 
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamRepository idamRepository;
@@ -21,12 +24,12 @@ public class SecurityUtils {
     }
 
     public String getS2SToken() {
-        return authTokenGenerator.generate();
+        return BEARER + authTokenGenerator.generate();
     }
 
     public String getUserToken() {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return jwt.getTokenValue();
+        return BEARER + jwt.getTokenValue();
     }
 
     public UserInfo getUserInfo() {

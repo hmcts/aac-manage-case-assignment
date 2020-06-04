@@ -1,0 +1,35 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/refdata/external/v1/organisations/users"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "users": [
+        {
+          "userIdentifier": "d423286f-659e-465e-b4dd-ce5480edba7d",
+          "firstName": "auto",
+          "lastName": "test",
+          "email": "auto.test.cnp@gmail.com",
+          "idamStatus": "ACTIVE",
+          "idamStatusCode": "",
+          "idamMessage": ""
+        },
+        {
+          "userIdentifier": "ae2eb34c-816a-4eea-b714-6654d022fcef",
+          "firstName": "auto",
+          "lastName": "test2",
+          "email": "auto.test2.cnp@gmail.com",
+          "idamStatus": "ACTIVE",
+          "idamStatusCode": "",
+          "idamMessage": ""
+        }
+      ]
+    }
+  }
+}
+

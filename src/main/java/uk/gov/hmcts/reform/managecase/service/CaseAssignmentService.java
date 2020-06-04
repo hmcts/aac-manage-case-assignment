@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
+import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import java.util.List;
@@ -14,11 +16,17 @@ import java.util.List;
 public class CaseAssignmentService {
 
     private final DataStoreRepository dataStoreRepository;
+    private final PrdRepository prdRepository;
     private final SecurityUtils securityUtils;
 
     @Autowired
-    public CaseAssignmentService(DataStoreRepository dataStoreRepository, SecurityUtils securityUtils) {
+    public CaseAssignmentService(
+        DataStoreRepository dataStoreRepository,
+        PrdRepository prdRepository,
+        SecurityUtils securityUtils
+    ) {
         this.dataStoreRepository = dataStoreRepository;
+        this.prdRepository = prdRepository;
         this.securityUtils = securityUtils;
     }
 
@@ -38,6 +46,8 @@ public class CaseAssignmentService {
         // 2. check organization match
 
         String invokerOrganization = "sdds";
+
+        List<ProfessionalUser> users = prdRepository.findUsersByOrganisation();
 
         // TODO : all validation and invoke final assign data-store api
         return "Success";

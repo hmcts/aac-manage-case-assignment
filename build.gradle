@@ -220,7 +220,7 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.0.4'
 
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
-  implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.1'
+  implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.5.3'
 
   implementation "org.springframework.security:spring-security-web"
@@ -228,7 +228,7 @@ dependencies {
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
   implementation "com.nimbusds:nimbus-jose-jwt:7.9"
-  implementation "io.github.openfeign:feign-httpclient:10.7.0"
+  implementation "io.github.openfeign:feign-httpclient:11.0"
   implementation "com.github.ben-manes.caffeine:caffeine:2.7.0"
 
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'

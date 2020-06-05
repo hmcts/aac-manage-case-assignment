@@ -8,10 +8,17 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.TestPropertySource;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.mockito.Mockito.when;
 
@@ -39,10 +46,18 @@ public class BaseTest {
     }
 
     private Jwt dummyJwt() {
-        return Jwt.withTokenValue("Bearer a jwt token")
+        return Jwt.withTokenValue("a dummy jwt token")
                 .claim("aClaim", "aClaim")
                 .header("aHeader", "aHeader")
                 .build();
+    }
+
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    protected void setSecurityAuthorities(String... authorities) {
+        Collection<? extends GrantedAuthority> authorityCollection = Stream.of(authorities)
+            .map(a -> new SimpleGrantedAuthority(a))
+            .collect(Collectors.toCollection(ArrayList::new));
+        when(authentication.getAuthorities()).thenAnswer(invocationOnMock -> authorityCollection);
     }
 
 }

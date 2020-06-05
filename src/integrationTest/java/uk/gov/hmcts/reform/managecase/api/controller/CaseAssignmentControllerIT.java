@@ -18,7 +18,7 @@ import static uk.gov.hmcts.reform.managecase.api.controller.V1.MediaType.CASE_AS
 public class CaseAssignmentControllerIT extends BaseTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
-    private static final String ASSIGNEE_ID = "0a5874a4-3f38-4bbd-ba4c";
+    private static final String ASSIGNEE_ID = "ae2eb34c-816a-4eea-b714-6654d022fcef";
     private static final String CASE_ID = "12345678";
 
     @Autowired

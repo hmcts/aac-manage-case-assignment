@@ -5,4 +5,7 @@ spring:
       paths: /mnt/secrets/aac
       aliases:
         aac-manage-case-s2s-secret: MANAGE_CASE_S2S_KEY
+        idam-mca-client-secret: IDAM_CLIENT_SECRET
+        idam-mca-system-user-username: IDAM_SYSTEM_USER_USERNAME
+        idam-mca-system-user-password: IDAM_SYSTEM_USER_PASSWORD
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key

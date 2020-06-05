@@ -9,17 +9,16 @@ import javax.inject.Singleton;
 @Singleton
 public class ApplicationParams {
 
-    @Value("${ccd.data-store.host}")
-    private String dataStoreHost;
+    @Value("${idam.system-user.username}")
+    private String idamSystemUserId;
+    @Value("${idam.system-user.password}")
+    private String idamSystemUserPassword;
 
-    @Value("${prd.host}")
-    private String referenceDataHost;
-
-    public String getDataStoreHost() {
-        return dataStoreHost;
+    public String getIdamSystemUserId() {
+        return idamSystemUserId;
     }
 
-    public String getReferenceDataHost() {
-        return referenceDataHost;
+    public String getIdamSystemUserPassword() {
+        return idamSystemUserPassword;
     }
 }

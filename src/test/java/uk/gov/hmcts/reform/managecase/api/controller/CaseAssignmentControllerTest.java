@@ -64,14 +64,14 @@ public class CaseAssignmentControllerTest {
     @DisplayName("should assign case successfully for a valid request")
     @Test
     void shouldAssignCaseAccess() throws Exception {
-        given(service.assignCaseAccess(any(CaseAssignment.class))).willReturn("Success");
+        given(service.assignCaseAccess(any(CaseAssignment.class))).willReturn("Assigned-Role");
 
         this.mockMvc.perform(put(CASE_ASSIGNMENTS)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
             .andExpect(content().contentType(CASE_ASSIGNMENT_RESPONSE))
-            .andExpect(content().json("{\"status_message\":\"Success\"}"));
+            .andExpect(content().json("{\"status_message\":\"Assigned-Role\"}"));
     }
 
     @DisplayName("should delegate to service domain for a valid request")
@@ -114,10 +114,10 @@ public class CaseAssignmentControllerTest {
             .andExpect(jsonPath("$.errors", hasItem("Case ID can not be empty")));
     }
 
-    @DisplayName("should fail with 400 bad request when assignee id is null")
+    @DisplayName("should fail with 400 bad request when assignee id is empty")
     @Test
     void shouldFailWithBadRequestWhenAssigneeIdIsNull() throws Exception {
-        request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, null);
+        request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, "");
 
         this.mockMvc.perform(put(CASE_ASSIGNMENTS)
              .contentType(MediaType.APPLICATION_JSON)

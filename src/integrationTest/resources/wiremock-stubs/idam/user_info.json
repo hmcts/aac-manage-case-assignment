@@ -12,7 +12,6 @@
       "sub": "user@hmcts.net",
       "uid": "445",
       "roles": [
-        "caseworker-caa",
         "caseworker-test"
       ],
       "name": "Cloud Strife",

@@ -1,0 +1,57 @@
+package uk.gov.hmcts.reform.managecase.fixtures;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
+
+import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.okForJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static java.net.HttpURLConnection.HTTP_OK;
+import static org.assertj.core.util.Lists.list;
+
+public final class WiremockFixtures {
+
+    private static final ObjectMapper OBJECT_MAPPER = new Jackson2ObjectMapperBuilder()
+        .modules(new Jdk8Module())
+        .build();
+
+    private WiremockFixtures() {
+    }
+
+    public static void stubInvokerWithRoles(String... roles) {
+        UserInfo userInfo = UserInfo.builder().roles(list(roles)).build();
+        stubFor(WireMock.get(urlEqualTo("/o/userinfo")).willReturn(okForJson(userInfo)));
+    }
+
+    public static void stubGetUsersByOrganisation(FindUsersByOrganisationResponse response) {
+        stubFor(WireMock.get(urlEqualTo("/refdata/external/v1/organisations/users")).willReturn(okForJson(response)));
+    }
+
+    public static void stubGetUserByIdWithRoles(String userId, String... roles) {
+        UserDetails userDetails = UserDetails.builder().roles(list(roles)).build();
+        stubFor(WireMock.get(urlEqualTo("/api/v1/users/" + userId)).willReturn(
+            aResponse().withStatus(HTTP_OK).withBody(getJsonString(userDetails))
+                .withHeader("Content-Type", "application/json")));
+    }
+
+    public static void stubSearchCase(String caseTypeId, String caseId, CaseDetails caseDetails) {
+        stubFor(WireMock.post(urlEqualTo("/searchCases?ctid=" + caseTypeId)).willReturn(okForJson(list(caseDetails))));
+    }
+
+    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
+    private static String getJsonString(Object object) {
+        try { // Required as wiremock's Json.getObjectMapper().registerModule(..); not working
+            return OBJECT_MAPPER.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}

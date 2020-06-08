@@ -39,7 +39,7 @@ public class BaseTest {
     protected Authentication authentication;
 
     @BeforeEach
-    void setUp() {
+    void init() {
         Jwt jwt = dummyJwt();
         when(authentication.getPrincipal()).thenReturn(jwt);
         SecurityContextHolder.setContext(new SecurityContextImpl(authentication));

@@ -60,7 +60,7 @@ public class CaseAssignmentService {
         // TODO : other validations and invoke final assign data-store api
         // 4.Validate that the case record contains at least 1 organisation policy field with the invoker's organisation
         // 5. Call Grant Case Roles operation of CCD Data Store API
-        return "Success";
+        return "Assigned-Role";
     }
 
     private void validateAssigneeOrganisation(CaseAssignment assignment) {

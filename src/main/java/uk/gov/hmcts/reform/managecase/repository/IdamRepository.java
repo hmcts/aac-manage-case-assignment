@@ -26,13 +26,12 @@ public class IdamRepository {
         return idamClient.getUserInfo(bearerToken);
     }
 
-    // TODO : has to cache with expiry of token or a value less than idam token expiry ??
+    @Cacheable("systemUserAccessTokenCache")
     public String getSystemUserAccessToken() {
         return idamClient.getAccessToken(appParams.getIdamSystemUserId(), appParams.getIdamSystemUserPassword());
     }
 
-    public UserDetails getUserByUserId(String userId) {
-        String bearerToken = getSystemUserAccessToken();
+    public UserDetails getUserByUserId(String bearerToken, String userId) {
         return idamClient.getUserByUserId(bearerToken, userId);
     }
 }

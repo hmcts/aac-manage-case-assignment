@@ -43,12 +43,16 @@ public final class WiremockFixtures {
     }
 
     public static void stubSearchCase(String caseTypeId, String caseId, CaseDetails caseDetails) {
-        stubFor(WireMock.post(urlEqualTo("/searchCases?ctid=" + caseTypeId)).willReturn(okForJson(list(caseDetails))));
+        stubFor(WireMock.post(urlEqualTo("/searchCases?ctid=" + caseTypeId)).willReturn(
+            aResponse().withStatus(HTTP_OK).withBody(getJsonString(list(caseDetails)))
+                .withHeader("Content-Type", "application/json")));
     }
 
     @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
+    // Required as wiremock's Json.getObjectMapper().registerModule(..); not working
+    // see https://github.com/tomakehurst/wiremock/issues/1127
     private static String getJsonString(Object object) {
-        try { // Required as wiremock's Json.getObjectMapper().registerModule(..); not working
+        try {
             return OBJECT_MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

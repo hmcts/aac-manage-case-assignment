@@ -6,14 +6,22 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
+@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CaseDetails {
+
+    public static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "orgPolicyCaseAssignedRole";
 
     private String reference;
     private String jurisdiction;
@@ -22,4 +30,11 @@ public class CaseDetails {
     private String caseTypeId;
     @JsonProperty("case_data")
     private Map<String, JsonNode> data;
+
+    public List<JsonNode> findOrganisationPolicyNodes() {
+        return getData().values().stream()
+            .map(node -> node.findParents(ORG_POLICY_CASE_ASSIGNED_ROLE))
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
+    }
 }

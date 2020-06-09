@@ -32,7 +32,7 @@ public class CaseAssignmentController {
     }
 
     @PutMapping(path = "/case-assignments", produces = CASE_ASSIGNMENT_RESPONSE)
-    @ApiOperation(value = "Assign access to a case", notes = "Assign Access within Organisation")
+    @ApiOperation(value = "Assign Access within Organisation", notes = "Assign Access within Organisation")
     @ApiResponses({
         @ApiResponse(
             code = 200,
@@ -62,7 +62,8 @@ public class CaseAssignmentController {
                 + "2) The user is neither a case access administrator nor a solicitor with access to the jurisdiction"
         )
     })
-    public CaseAssignmentResponse assignCaseAccess(@Valid @RequestBody CaseAssignmentRequest requestPayload) {
+    public CaseAssignmentResponse assignAccessWithinOrganisation(
+            @Valid @RequestBody CaseAssignmentRequest requestPayload) {
         CaseAssignment caseAssignment = mapper.map(requestPayload, CaseAssignment.class);
         String role = caseAssignmentService.assignCaseAccess(caseAssignment);
         return new CaseAssignmentResponse(role);

@@ -12,8 +12,10 @@ public class CaseUserRole {
 
     @JsonProperty("case_id")
     private String caseId;
+
     @JsonProperty("user_id")
     private String userId;
+
     @JsonProperty("case_role")
     private String caseRole;
 }

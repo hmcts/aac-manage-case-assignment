@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.managecase.api.errorhandling;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
+
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -17,8 +17,4 @@ public class ApiError {
     private String message;
     private List<String> errors;
 
-    public ApiError(final HttpStatus status, final String message) {
-        this.status = status;
-        this.message = message;
-    }
 }

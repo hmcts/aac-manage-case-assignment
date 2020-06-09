@@ -6,12 +6,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.config.SecurityConfiguration;
@@ -37,6 +39,7 @@ import static uk.gov.hmcts.reform.managecase.api.controller.V1.MediaType.CASE_AS
     excludeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes =
         { SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class }))
 @AutoConfigureMockMvc(addFilters = false)
+@ImportAutoConfiguration(TestIdamConfiguration.class)
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert"})
 public class CaseAssignmentControllerTest {
 

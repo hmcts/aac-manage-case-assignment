@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
@@ -16,8 +14,6 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
-@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CaseDetails {
 

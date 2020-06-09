@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.CoreMatchers.is;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -32,6 +35,7 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUs
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisation;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubInvokerWithRoles;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubAssignCase;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals"})
@@ -64,6 +68,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
         stubGetUserByIdWithRoles(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor");
         stubGetUsersByOrganisation(usersByOrganisation(professionalUsers(ASSIGNEE_ID, ANOTHER_USER)));
         stubSearchCase(CASE_TYPE_ID, CASE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
+        stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE);
     }
 
     @DisplayName("CAA successfully sharing case access with another solicitor in their org")
@@ -77,7 +82,9 @@ public class CaseAssignmentControllerIT extends BaseTest {
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
             .andExpect(content().contentType(CASE_ASSIGNMENT_RESPONSE))
-            .andExpect(jsonPath("$.status_message", is("caseworker-probate")));
+            .andExpect(jsonPath("$.status_message", is(ORG_POLICY_ROLE)));
+
+        verify(postRequestedFor(urlEqualTo("/case-users")));
     }
 
     @DisplayName("Solicitor successfully sharing case access with another solicitor in their org")
@@ -91,7 +98,9 @@ public class CaseAssignmentControllerIT extends BaseTest {
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
             .andExpect(content().contentType(CASE_ASSIGNMENT_RESPONSE))
-            .andExpect(jsonPath("$.status_message", is("caseworker-probate")));
+            .andExpect(jsonPath("$.status_message", is(ORG_POLICY_ROLE)));
+
+        verify(postRequestedFor(urlEqualTo("/case-users")));
     }
 
     @DisplayName("Must return 400 bad request response if assignee doesn't exist in invoker's organisation")

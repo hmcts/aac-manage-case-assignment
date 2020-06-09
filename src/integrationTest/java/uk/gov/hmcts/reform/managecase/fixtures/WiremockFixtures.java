@@ -8,10 +8,13 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 
 import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.okForJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -35,16 +38,24 @@ public final class WiremockFixtures {
         stubFor(WireMock.get(urlEqualTo("/refdata/external/v1/organisations/users")).willReturn(okForJson(response)));
     }
 
-    public static void stubGetUserByIdWithRoles(String userId, String... roles) {
-        UserDetails userDetails = UserDetails.builder().roles(list(roles)).build();
-        stubFor(WireMock.get(urlEqualTo("/api/v1/users/" + userId)).willReturn(
-            aResponse().withStatus(HTTP_OK).withBody(getJsonString(userDetails))
-                .withHeader("Content-Type", "application/json")));
+    public static void stubAssignCase(String caseId, String userId, String caseRole) {
+        stubFor(WireMock.post(urlEqualTo("/case-users"))
+                    .withRequestBody(matchingJsonPath("$.case_id", equalTo(caseId)))
+                    .withRequestBody(matchingJsonPath("$.case_role", equalTo(caseRole)))
+                    .withRequestBody(matchingJsonPath("$.user_id", equalTo(userId)))
+            .willReturn(aResponse().withStatus(HTTP_OK)));
     }
 
     public static void stubSearchCase(String caseTypeId, String caseId, CaseDetails caseDetails) {
         stubFor(WireMock.post(urlEqualTo("/searchCases?ctid=" + caseTypeId)).willReturn(
-            aResponse().withStatus(HTTP_OK).withBody(getJsonString(list(caseDetails)))
+            aResponse().withStatus(HTTP_OK).withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
+                .withHeader("Content-Type", "application/json")));
+    }
+
+    public static void stubGetUserByIdWithRoles(String userId, String... roles) {
+        UserDetails userDetails = UserDetails.builder().roles(list(roles)).build();
+        stubFor(WireMock.get(urlEqualTo("/api/v1/users/" + userId)).willReturn(
+            aResponse().withStatus(HTTP_OK).withBody(getJsonString(userDetails))
                 .withHeader("Content-Type", "application/json")));
     }
 

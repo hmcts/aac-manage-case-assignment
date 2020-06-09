@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.managecase.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -14,9 +13,11 @@ import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
+import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,6 +27,7 @@ public class CaseAssignmentService {
     public static final String SOLICITOR_ROLE = "caseworker-%s-solicitor";
     public static final String CASEWORKER_CAA = "caseworker-caa";
 
+    public static final String CASE_NOT_FOUND = "Case ID has to be for an existing case accessible by the invoker.";
     public static final String INVOKER_ROLE_ERROR = "The user is neither a case access administrator"
         + " nor a solicitor with access to the jurisdiction of the case.";
     public static final String ASSIGNEE_ROLE_ERROR = "Intended assignee has to be a solicitor "
@@ -39,36 +41,43 @@ public class CaseAssignmentService {
     private final PrdRepository prdRepository;
     private final IdamRepository idamRepository;
     private final SecurityUtils securityUtils;
-    private final ObjectMapper objectMapper;
+    private final JacksonUtils jacksonUtils;
 
     @Autowired
     public CaseAssignmentService(SecurityUtils securityUtils,
                                  IdamRepository idamRepository,
                                  PrdRepository prdRepository,
                                  DataStoreRepository dataStoreRepository,
-                                 ObjectMapper objectMapper) {
+                                 JacksonUtils jacksonUtils) {
         this.dataStoreRepository = dataStoreRepository;
         this.idamRepository = idamRepository;
         this.prdRepository = prdRepository;
         this.securityUtils = securityUtils;
-        this.objectMapper = objectMapper;
+        this.jacksonUtils = jacksonUtils;
     }
 
     @SuppressWarnings("PMD")
     public String assignCaseAccess(CaseAssignment assignment) {
-        CaseDetails caseDetails = dataStoreRepository.findCaseBy(assignment.getCaseTypeId(), assignment.getCaseId());
+        CaseDetails caseDetails = getCase(assignment);
         String solicitorRole = String.format(SOLICITOR_ROLE, caseDetails.getJurisdiction());
-        // 1. Validate invoker's roles
+
+        // There is no generic pattern for these validations - still worth to extract to a Validator class??
         validateInvokerRoles(CASEWORKER_CAA, solicitorRole);
-        // 2. validate assignee's roles
         validateAssigneeRoles(assignment.getAssigneeId(), solicitorRole);
-        // 3. validate invoker's organisation has assignee
         validateAssigneeOrganisation(assignment);
-        // 4.Validate that the case record contains at least 1 organisation policy field with the invoker's organisation
-        String invokerOrganisation = "dummyOrg"; // TODO
+        String invokerOrganisation = "dummyOrg"; // TODO : fetch value from PRD api
         OrganisationPolicy invokerPolicy = findInvokerOrgPolicy(caseDetails, invokerOrganisation);
-        // TODO : 5. Call Grant Case Roles operation of CCD Data Store API
+
+        dataStoreRepository.assignCase(
+            assignment.getCaseId(), invokerPolicy.getOrgPolicyCaseAssignedRole(), assignment.getAssigneeId()
+        );
         return invokerPolicy.getOrgPolicyCaseAssignedRole();
+    }
+
+    private CaseDetails getCase(CaseAssignment assignment) {
+        Optional<CaseDetails> caseOptional =
+            dataStoreRepository.findCaseBy(assignment.getCaseTypeId(), assignment.getCaseId());
+        return caseOptional.orElseThrow(() -> new ValidationException(CASE_NOT_FOUND));
     }
 
     private OrganisationPolicy findInvokerOrgPolicy(CaseDetails caseDetails, String invokerOrganisation) {
@@ -82,7 +91,7 @@ public class CaseAssignmentService {
     private List<OrganisationPolicy> findPolicies(CaseDetails caseDetails) {
         List<JsonNode> policyNodes = caseDetails.findOrganisationPolicyNodes();
         return policyNodes.stream()
-            .map(node -> objectMapper.convertValue(node, OrganisationPolicy.class))
+            .map(node -> jacksonUtils.convertValue(node, OrganisationPolicy.class))
             .collect(Collectors.toList());
     }
 

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.managecase.api.errorhandling;
 
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,6 +12,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ValidationException;
+import java.util.List;
 
 @RestControllerAdvice
 @Slf4j
@@ -44,7 +44,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> toResponseEntity(HttpStatus status, String errorMessage, String... errors) {
-        ApiError apiError = new ApiError(status, errorMessage, errors == null ? null : Lists.newArrayList(errors));
+        ApiError apiError = new ApiError(status, errorMessage, errors == null ? null : List.of(errors));
         return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
     }
 }

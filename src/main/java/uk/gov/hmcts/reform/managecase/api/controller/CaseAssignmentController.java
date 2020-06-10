@@ -41,15 +41,19 @@ public class CaseAssignmentController {
         @ApiResponse(
             code = 400,
             message = "One of the following reasons.\n"
-                + "1. Case ID is not valid \n"
-                + "2. Case type ID is not valid \n"
-                + "3. Assignee IDAM ID is not valid \n"
+                + "1. Case ID can not be empty \n"
+                + "2. Case type ID can not be empty \n"
+                + "3. Assignee IDAM ID can not be empty \n"
                 + "4. Intended assignee has to be in the same organisation as that of the invoker. \n"
-                + "5. Case ID has to be one for which a case role is represented by the invoker's organisation.",
-            examples = @Example({@ExampleProperty(
-                value = "{\"errorCode\": \"E001\" }",
-                mediaType = CASE_ASSIGNMENT_RESPONSE
-            )})
+                + "5. Case ID has to be one for which a case role is represented by the invoker's organisation. \n"
+                + "6. Case ID has to be for an existing case accessible by the invoker. \n"
+                + "7. Intended assignee has to be a solicitor enabled in the jurisdiction of the case. \n",
+            examples = @Example({
+                    @ExampleProperty(
+                            value = "{\"message\": \"Intended assignee has to be in the same organisation of invoker\","
+                                    + " \"status\": \"BAD_REQUEST\" }",
+                            mediaType = CASE_ASSIGNMENT_RESPONSE )
+            })
         ),
         @ApiResponse(
             code = 401,

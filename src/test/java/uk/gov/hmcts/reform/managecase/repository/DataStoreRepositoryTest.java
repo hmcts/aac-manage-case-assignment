@@ -82,7 +82,7 @@ class DataStoreRepositoryTest {
         CaseUserRole caseUserRole = captor.getValue();
 
         assertThat(caseUserRole.getCaseId()).isEqualTo(CASE_ID);
-        assertThat(caseUserRole.getCaseRole()).isEqualTo(ROLE);
+        assertThat(caseUserRole.getCaseRole()).containsExactly(ROLE);
         assertThat(caseUserRole.getUserId()).isEqualTo(ASSIGNEE_ID);
     }
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -40,7 +41,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     @Override
     public void assignCase(String caseId, String caseRole, String userId) {
         CaseUserRole caseUserRole = CaseUserRole.builder()
-            .caseRole(caseRole)
+            .caseRole(Lists.newArrayList(caseRole))
             .caseId(caseId)
             .userId(userId)
             .build();

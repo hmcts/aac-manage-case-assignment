@@ -18,5 +18,6 @@ public class ProfessionalUser {
     private String lastName;
     private String email;
     private List<String> roles;
+    private String organisationIdentifier;
 
 }

@@ -35,7 +35,7 @@ public class CaseAssignmentService {
     public static final String ASSIGNEE_ORGA_ERROR = "Intended assignee has to be in the same organisation"
         + " as that of the invoker.";
     public static final String ORGA_POLICY_ERROR = "Case ID has to be one for which a case role is "
-        + "represented by the invoker's organisation";
+        + "represented by the invoker's organisation.";
 
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
@@ -64,9 +64,9 @@ public class CaseAssignmentService {
         // There is no generic pattern for these validations - still worth to extract to a Validator class??
         validateInvokerRoles(CASEWORKER_CAA, solicitorRole);
         validateAssigneeRoles(assignment.getAssigneeId(), solicitorRole);
-        validateAssigneeOrganisation(assignment);
-        String invokerOrganisation = "dummyOrg"; // TODO : fetch value from PRD api
-        OrganisationPolicy invokerPolicy = findInvokerOrgPolicy(caseDetails, invokerOrganisation);
+
+        String organisation = findAndVerifyAssigneeOrganisation(assignment);
+        OrganisationPolicy invokerPolicy = findInvokerOrgPolicy(caseDetails, organisation);
 
         dataStoreRepository.assignCase(
             assignment.getCaseId(), invokerPolicy.getOrgPolicyCaseAssignedRole(), assignment.getAssigneeId()
@@ -74,16 +74,15 @@ public class CaseAssignmentService {
         return invokerPolicy.getOrgPolicyCaseAssignedRole();
     }
 
-    private CaseDetails getCase(CaseAssignment assignment) {
-        Optional<CaseDetails> caseOptional =
-            dataStoreRepository.findCaseBy(assignment.getCaseTypeId(), assignment.getCaseId());
+    private CaseDetails getCase(CaseAssignment input) {
+        Optional<CaseDetails> caseOptional = dataStoreRepository.findCaseBy(input.getCaseTypeId(), input.getCaseId());
         return caseOptional.orElseThrow(() -> new ValidationException(CASE_NOT_FOUND));
     }
 
-    private OrganisationPolicy findInvokerOrgPolicy(CaseDetails caseDetails, String invokerOrganisation) {
+    private OrganisationPolicy findInvokerOrgPolicy(CaseDetails caseDetails, String organisation) {
         List<OrganisationPolicy> policies = findPolicies(caseDetails);
         return policies.stream()
-            .filter(policy -> invokerOrganisation.equalsIgnoreCase(policy.getOrganisation().getOrganisationID()))
+            .filter(policy -> organisation.equalsIgnoreCase(policy.getOrganisation().getOrganisationID()))
             .findFirst()
             .orElseThrow(() -> new ValidationException(ORGA_POLICY_ERROR));
     }
@@ -95,11 +94,12 @@ public class CaseAssignmentService {
             .collect(Collectors.toList());
     }
 
-    private void validateAssigneeOrganisation(CaseAssignment assignment) {
-        List<ProfessionalUser> users = prdRepository.findUsersByOrganisation();
-        if (isAssigneeExists(assignment, users)) {
-            throw new ValidationException(ASSIGNEE_ORGA_ERROR);
-        }
+    private String findAndVerifyAssigneeOrganisation(CaseAssignment assignment) {
+        ProfessionalUser assignee = prdRepository.findUsersByOrganisation().stream()
+                .filter(user -> user.getUserIdentifier().equals(assignment.getAssigneeId()))
+                .findFirst()
+                .orElseThrow(() -> new ValidationException(ASSIGNEE_ORGA_ERROR));
+        return assignee.getOrganisationIdentifier();
     }
 
     private void validateAssigneeRoles(String assigneeId, String inputRole) {
@@ -117,7 +117,4 @@ public class CaseAssignmentService {
         }
     }
 
-    private boolean isAssigneeExists(CaseAssignment assignment, List<ProfessionalUser> users) {
-        return users.stream().noneMatch(user -> user.getUserIdentifier().equals(assignment.getAssigneeId()));
-    }
 }

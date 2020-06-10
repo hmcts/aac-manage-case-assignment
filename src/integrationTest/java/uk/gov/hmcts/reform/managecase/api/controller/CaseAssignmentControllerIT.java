@@ -47,7 +47,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
     private static final String CASE_ID = "12345678";
     private static final String JURISDICTION = "AUTOTEST1";
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
-    private static final String ORGANIZATION_ID = "dummyOrg";
+    private static final String ORGANIZATION_ID = "TEST_ORG";
 
     public static final String PATH = "/case-assignments";
     public static final String CASEWORKER_CAA = "caseworker-caa";
@@ -66,7 +66,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
         // Positive stub mappings - individual tests override again for a specific scenario.
         stubInvokerWithRoles(CASEWORKER_CAA);
         stubGetUserByIdWithRoles(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor");
-        stubGetUsersByOrganisation(usersByOrganisation(professionalUsers(ASSIGNEE_ID, ANOTHER_USER)));
+        stubGetUsersByOrganisation(usersByOrganisation(professionalUsers(ORGANIZATION_ID, ASSIGNEE_ID, ANOTHER_USER)));
         stubSearchCase(CASE_TYPE_ID, CASE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
         stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE);
     }
@@ -107,7 +107,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
     @Test
     void shouldReturn400_whenAssigneeNotExistsInInvokersOrg() throws Exception {
 
-        stubGetUsersByOrganisation(usersByOrganisation(professionalUsers(ANOTHER_USER)));
+        stubGetUsersByOrganisation(usersByOrganisation(professionalUsers(ORGANIZATION_ID, ANOTHER_USER)));
 
         this.mockMvc.perform(put(PATH)
             .contentType(MediaType.APPLICATION_JSON)
@@ -153,15 +153,14 @@ public class CaseAssignmentControllerIT extends BaseTest {
     @Test
     void shouldReturn400_whenInvokersOrgIsNotPresentInCaseData() throws Exception {
 
-        // TODO : fix with correct stubbing after service implementation.
-        stubGetUsersByOrganisation(usersByOrganisation(professionalUsers(ANOTHER_USER)));
+        stubSearchCase(CASE_TYPE_ID, CASE_ID, caseDetails("ANOTHER_ORGANIZATION_ID", ORG_POLICY_ROLE));
 
         this.mockMvc.perform(put(PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
                                  .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message",
-                                is("Intended assignee has to be in the same organisation as that of the invoker.")));
+            .andExpect(jsonPath("$.message", is("Case ID has to be one for which a case role"
+                    + " is represented by the invoker's organisation.")));
     }
 
     // Move these to individual Fixtures / Test builders
@@ -186,11 +185,12 @@ public class CaseAssignmentControllerIT extends BaseTest {
         return FindUsersByOrganisationResponse.builder().users(users).build();
     }
 
-    private List<ProfessionalUser> professionalUsers(String... userIdentifiers) {
+    private List<ProfessionalUser> professionalUsers(String organisationId, String... userIdentifiers) {
         return Stream.of(userIdentifiers)
             .map(u -> ProfessionalUser.builder()
-                .userIdentifier(u)
-                .build())
+                    .userIdentifier(u)
+                    .organisationIdentifier(organisationId)
+                    .build())
             .collect(Collectors.toList());
     }
 

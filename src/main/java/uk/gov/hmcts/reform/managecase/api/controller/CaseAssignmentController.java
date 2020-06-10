@@ -52,7 +52,7 @@ public class CaseAssignmentController {
                     @ExampleProperty(
                             value = "{\"message\": \"Intended assignee has to be in the same organisation of invoker\","
                                     + " \"status\": \"BAD_REQUEST\" }",
-                            mediaType = CASE_ASSIGNMENT_RESPONSE )
+                            mediaType = CASE_ASSIGNMENT_RESPONSE)
             })
         ),
         @ApiResponse(

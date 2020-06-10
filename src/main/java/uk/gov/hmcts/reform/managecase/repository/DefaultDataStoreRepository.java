@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public class DefaultDataStoreRepository implements DataStoreRepository {
 
-    private static final String ES_QUERY = "{\n"
+    public static final String ES_QUERY = "{\n"
         + "   \"query\":{\n"
         + "      \"bool\":{\n"
         + "         \"filter\":{\n"

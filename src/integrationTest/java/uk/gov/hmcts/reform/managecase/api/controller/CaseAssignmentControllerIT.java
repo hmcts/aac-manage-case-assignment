@@ -46,8 +46,8 @@ public class CaseAssignmentControllerIT extends BaseTest {
     private static final String ANOTHER_USER = "vcd345cvs-816a-4eea-b714-6654d022fcef";
     private static final String CASE_ID = "12345678";
     private static final String JURISDICTION = "AUTOTEST1";
-    public static final String ORG_POLICY_ROLE = "caseworker-probate";
-    public static final String ORGANIZATION_ID = "dummyOrg";
+    private static final String ORG_POLICY_ROLE = "caseworker-probate";
+    private static final String ORGANIZATION_ID = "dummyOrg";
 
     public static final String PATH = "/case-assignments";
     public static final String CASEWORKER_CAA = "caseworker-caa";

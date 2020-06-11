@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
-import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
@@ -39,18 +37,15 @@ public class CaseAssignmentService {
 
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
-    private final IdamRepository idamRepository;
     private final SecurityUtils securityUtils;
     private final JacksonUtils jacksonUtils;
 
     @Autowired
     public CaseAssignmentService(SecurityUtils securityUtils,
-                                 IdamRepository idamRepository,
                                  PrdRepository prdRepository,
                                  DataStoreRepository dataStoreRepository,
                                  JacksonUtils jacksonUtils) {
         this.dataStoreRepository = dataStoreRepository;
-        this.idamRepository = idamRepository;
         this.prdRepository = prdRepository;
         this.securityUtils = securityUtils;
         this.jacksonUtils = jacksonUtils;
@@ -63,11 +58,15 @@ public class CaseAssignmentService {
 
         // There is no generic pattern for these validations - still worth to extract to a Validator class??
         validateInvokerRoles(CASEWORKER_CAA, solicitorRole);
-        validateAssigneeRoles(assignment.getAssigneeId(), solicitorRole);
 
-        String organisation = findAndVerifyAssigneeOrganisation(assignment);
-        OrganisationPolicy invokerPolicy = findInvokerOrgPolicy(caseDetails, organisation);
+        Optional<ProfessionalUser> userOptional = prdRepository.findUserBy(assignment.getAssigneeId());
+        ProfessionalUser assignee = userOptional.orElseThrow(() -> new ValidationException(ASSIGNEE_ORGA_ERROR));
 
+        if (!assignee.getRoles().contains(solicitorRole)) {
+            throw new ValidationException(ASSIGNEE_ROLE_ERROR);
+        }
+
+        OrganisationPolicy invokerPolicy = findInvokerOrgPolicy(caseDetails, assignee.getOrganisationIdentifier());
         dataStoreRepository.assignCase(
             assignment.getCaseId(), invokerPolicy.getOrgPolicyCaseAssignedRole(), assignment.getAssigneeId()
         );
@@ -92,22 +91,6 @@ public class CaseAssignmentService {
         return policyNodes.stream()
             .map(node -> jacksonUtils.convertValue(node, OrganisationPolicy.class))
             .collect(Collectors.toList());
-    }
-
-    private String findAndVerifyAssigneeOrganisation(CaseAssignment assignment) {
-        ProfessionalUser assignee = prdRepository.findUsersByOrganisation().stream()
-                .filter(user -> user.getUserIdentifier().equals(assignment.getAssigneeId()))
-                .findFirst()
-                .orElseThrow(() -> new ValidationException(ASSIGNEE_ORGA_ERROR));
-        return assignee.getOrganisationIdentifier();
-    }
-
-    private void validateAssigneeRoles(String assigneeId, String inputRole) {
-        String accessToken = idamRepository.getSystemUserAccessToken();
-        UserDetails assignee = idamRepository.getUserByUserId(accessToken, assigneeId);
-        if (!assignee.getRoles().contains(inputRole)) {
-            throw new ValidationException(ASSIGNEE_ROLE_ERROR);
-        }
     }
 
     private void validateInvokerRoles(String... inputRoles) {

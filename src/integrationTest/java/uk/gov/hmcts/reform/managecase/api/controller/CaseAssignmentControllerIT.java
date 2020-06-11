@@ -18,24 +18,20 @@ import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.CoreMatchers.is;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.api.controller.V1.MediaType.CASE_ASSIGNMENT_RESPONSE;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUserByIdWithRoles;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubAssignCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisation;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubInvokerWithRoles;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubAssignCase;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals"})
@@ -65,8 +61,8 @@ public class CaseAssignmentControllerIT extends BaseTest {
         request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, ASSIGNEE_ID);
         // Positive stub mappings - individual tests override again for a specific scenario.
         stubInvokerWithRoles(CASEWORKER_CAA);
-        stubGetUserByIdWithRoles(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor");
-        stubGetUsersByOrganisation(usersByOrganisation(professionalUsers(ORGANIZATION_ID, ASSIGNEE_ID, ANOTHER_USER)));
+        stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor"),
+                user(ANOTHER_USER)));
         stubSearchCase(CASE_TYPE_ID, CASE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
         stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE);
     }
@@ -107,7 +103,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
     @Test
     void shouldReturn400_whenAssigneeNotExistsInInvokersOrg() throws Exception {
 
-        stubGetUsersByOrganisation(usersByOrganisation(professionalUsers(ORGANIZATION_ID, ANOTHER_USER)));
+        stubGetUsersByOrganisation(usersByOrganisation(user(ANOTHER_USER)));
 
         this.mockMvc.perform(put(PATH)
             .contentType(MediaType.APPLICATION_JSON)
@@ -122,7 +118,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
     @Test
     void shouldReturn400_whenAssigneeNotHaveCorrectJurisdictionRole() throws Exception {
 
-        stubGetUserByIdWithRoles(ASSIGNEE_ID, "caseworker-JUD2-solicitor");
+        stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID, "caseworker-JUD2-solicitor")));
 
         this.mockMvc.perform(put(PATH)
             .contentType(MediaType.APPLICATION_JSON)
@@ -181,17 +177,16 @@ public class CaseAssignmentControllerIT extends BaseTest {
         return objectMapper.convertValue(policy, JsonNode.class);
     }
 
-    private FindUsersByOrganisationResponse usersByOrganisation(List<ProfessionalUser> users) {
-        return FindUsersByOrganisationResponse.builder().users(users).build();
+    private FindUsersByOrganisationResponse usersByOrganisation(ProfessionalUser... users) {
+        return new FindUsersByOrganisationResponse(List.of(users));
     }
 
-    private List<ProfessionalUser> professionalUsers(String organisationId, String... userIdentifiers) {
-        return Stream.of(userIdentifiers)
-            .map(u -> ProfessionalUser.builder()
-                    .userIdentifier(u)
-                    .organisationIdentifier(organisationId)
-                    .build())
-            .collect(Collectors.toList());
+    private ProfessionalUser user(String userIdentifier, String... roles) {
+        return ProfessionalUser.builder()
+                .userIdentifier(userIdentifier)
+                .organisationIdentifier(ORGANIZATION_ID)
+                .roles(List.of(roles))
+                .build();
     }
 
 }

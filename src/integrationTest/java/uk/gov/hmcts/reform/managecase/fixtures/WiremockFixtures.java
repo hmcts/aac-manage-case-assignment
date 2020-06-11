@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
@@ -35,15 +34,8 @@ public final class WiremockFixtures {
     }
 
     public static void stubGetUsersByOrganisation(FindUsersByOrganisationResponse response) {
-        stubFor(WireMock.get(urlEqualTo("/refdata/external/v1/organisations/users")).willReturn(okForJson(response)));
-    }
-
-    public static void stubAssignCase(String caseId, String userId, String caseRole) {
-        stubFor(WireMock.post(urlEqualTo("/case-users"))
-                    .withRequestBody(matchingJsonPath("$.case_id", equalTo(caseId)))
-                    .withRequestBody(matchingJsonPath("$.case_role[0]", equalTo(caseRole)))
-                    .withRequestBody(matchingJsonPath("$.user_id", equalTo(userId)))
-            .willReturn(aResponse().withStatus(HTTP_OK)));
+        stubFor(WireMock.get(urlEqualTo("/refdata/external/v1/organisations/users?status=Active"))
+                .willReturn(okForJson(response)));
     }
 
     public static void stubSearchCase(String caseTypeId, String caseId, CaseDetails caseDetails) {
@@ -52,11 +44,12 @@ public final class WiremockFixtures {
                 .withHeader("Content-Type", "application/json")));
     }
 
-    public static void stubGetUserByIdWithRoles(String userId, String... roles) {
-        UserDetails userDetails = UserDetails.builder().roles(list(roles)).build();
-        stubFor(WireMock.get(urlEqualTo("/api/v1/users/" + userId)).willReturn(
-            aResponse().withStatus(HTTP_OK).withBody(getJsonString(userDetails))
-                .withHeader("Content-Type", "application/json")));
+    public static void stubAssignCase(String caseId, String userId, String caseRole) {
+        stubFor(WireMock.post(urlEqualTo("/case-users"))
+                .withRequestBody(matchingJsonPath("$.case_id", equalTo(caseId)))
+                .withRequestBody(matchingJsonPath("$.case_role[0]", equalTo(caseRole)))
+                .withRequestBody(matchingJsonPath("$.user_id", equalTo(userId)))
+                .willReturn(aResponse().withStatus(HTTP_OK)));
     }
 
     @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")

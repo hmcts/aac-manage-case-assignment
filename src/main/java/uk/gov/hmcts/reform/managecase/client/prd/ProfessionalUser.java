@@ -17,6 +17,7 @@ public class ProfessionalUser {
     private String firstName;
     private String lastName;
     private String email;
+    private String idamStatus;
     private List<String> roles;
     private String organisationIdentifier;
 

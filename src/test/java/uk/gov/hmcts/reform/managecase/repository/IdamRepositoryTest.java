@@ -7,9 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.managecase.ApplicationParams;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -20,8 +18,6 @@ class IdamRepositoryTest {
 
     @Mock
     private IdamClient idamClient;
-    @Mock
-    private ApplicationParams appParams;
 
     @InjectMocks
     private IdamRepository idamRepository;
@@ -38,32 +34,6 @@ class IdamRepositoryTest {
         given(idamClient.getUserInfo(TEST_BEAR_TOKEN)).willReturn(userInfo);
         UserInfo result = idamRepository.getUserInfo(TEST_BEAR_TOKEN);
         assertThat(result).isSameAs(userInfo);
-    }
-
-    @Test
-    @DisplayName("Get user by id with system user token")
-    void shouldGetUserByUserId() {
-        String userId = "TestUser";
-        UserDetails userDetails = new UserDetails();
-        given(idamClient.getUserByUserId(TEST_BEAR_TOKEN, userId)).willReturn(userDetails);
-
-        UserDetails result = idamRepository.getUserByUserId(TEST_BEAR_TOKEN, userId);
-
-        assertThat(result).isSameAs(userDetails);
-    }
-
-    @Test
-    @DisplayName("Get access token")
-    void shouldGetAccessToken() {
-        String userId = "TestUser";
-        String password = "aPassword";
-        given(appParams.getIdamSystemUserId()).willReturn(userId);
-        given(appParams.getIdamSystemUserPassword()).willReturn(password);
-        given(idamClient.getAccessToken(userId, password)).willReturn(TEST_BEAR_TOKEN);
-
-        String token = idamRepository.getSystemUserAccessToken();
-
-        assertThat(token).isEqualTo(TEST_BEAR_TOKEN);
     }
 }
 

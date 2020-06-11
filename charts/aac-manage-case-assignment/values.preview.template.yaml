@@ -6,8 +6,5 @@ java:
     aac:
       secrets:
         - aac-manage-case-s2s-secret
-        - idam-mca-client-secret
-        - idam-mca-system-user-username
-        - idam-mca-system-user-password
   environment:
     S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal

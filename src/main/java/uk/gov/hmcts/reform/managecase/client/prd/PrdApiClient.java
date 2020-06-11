@@ -13,10 +13,5 @@ import uk.gov.hmcts.reform.managecase.client.ApiClientConfig;
 public interface PrdApiClient {
 
     @GetMapping("/refdata/external/v1/organisations/users")
-    FindUsersByOrganisationResponse findUsersByOrganisation(
-        @RequestParam(value = "showDeleted", required = false) String showDeleted,
-        @RequestParam(value = "status", required = false) String status,
-        @RequestParam(value = "page", required = false) Integer page,
-        @RequestParam(value = "size", required = false) Integer size
-    );
+    FindUsersByOrganisationResponse findUsersByOrganisation(@RequestParam("status") String status);
 }

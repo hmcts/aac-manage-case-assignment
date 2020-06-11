@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.managecase;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,8 +32,6 @@ public class BaseTest {
 
     @Value("${wiremock.server.port}")
     protected Integer wiremockPort;
-    @Autowired
-    protected ApplicationParams applicationParams;
     @Mock
     protected Authentication authentication;
 

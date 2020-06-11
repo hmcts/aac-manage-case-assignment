@@ -59,7 +59,7 @@ public class CaseAssignmentService {
         // There is no generic pattern for these validations - still worth to extract to a Validator class??
         validateInvokerRoles(CASEWORKER_CAA, solicitorRole);
 
-        Optional<ProfessionalUser> userOptional = prdRepository.findUserBy(assignment.getAssigneeId());
+        Optional<ProfessionalUser> userOptional = findUserBy(assignment.getAssigneeId());
         ProfessionalUser assignee = userOptional.orElseThrow(() -> new ValidationException(ASSIGNEE_ORGA_ERROR));
 
         if (!assignee.getRoles().contains(solicitorRole)) {
@@ -98,6 +98,12 @@ public class CaseAssignmentService {
         if (Stream.of(inputRoles).noneMatch(invokerRoles::contains)) {
             throw new AccessDeniedException(INVOKER_ROLE_ERROR);
         }
+    }
+
+    private Optional<ProfessionalUser> findUserBy(String assigneeId) {
+        return prdRepository.findUsersByOrganisation().stream()
+                .filter(user -> assigneeId.equalsIgnoreCase(user.getUserIdentifier()))
+                .findFirst();
     }
 
 }

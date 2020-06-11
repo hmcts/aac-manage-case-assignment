@@ -21,9 +21,9 @@ spring:
   main:
     allow-bean-definition-overriding: true
   cache:
-    cache-names: userInfoCache
+    cache-names: userInfoCache,usersByOrganisation
     caffeine:
-      spec: expireAfterAccess=3600s
+      spec: expireAfterAccess=1800s
   security:
     oauth2:
       client:

@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -33,6 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.MESSAGE;
 
 @WebMvcTest(controllers = CaseAssignmentController.class,
     includeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes = MapperConfig.class),
@@ -74,7 +76,7 @@ public class CaseAssignmentControllerTest {
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
             .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-            .andExpect(content().json("{\"status_message\":\"Assigned-Role\"}"));
+            .andExpect(jsonPath("$.status_message", is(String.format(MESSAGE, "Assigned-Role"))));
     }
 
     @DisplayName("should delegate to service domain for a valid request")

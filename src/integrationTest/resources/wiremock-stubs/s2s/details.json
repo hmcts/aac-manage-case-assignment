@@ -8,7 +8,7 @@
     "headers": {
       "Content-Type": "application/json"
     },
-    "body": "ccd_gw"
+    "body": "xui_webapp"
   }
 }
 

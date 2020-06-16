@@ -57,7 +57,7 @@ These are the tests run against an environment. For example if you would like to
 export TEST_URL=http://localhost:4454
 export S2S_URL=http://localhost:4502
 export IDAM_URL=http://localhost:5000
-export BEFTA_S2S_CLIENT_ID=ccd_gw
+export BEFTA_S2S_CLIENT_ID=xui_webapp
 export BEFTA_S2S_CLIENT_SECRET=AAAAAAAAAAAAAAAC
 export CCD_CASEWORKER_AUTOTEST_EMAIL=someemail@blob.com
 export CCD_CASEWORKER_AUTOTEST_PASSWORD=XYZT

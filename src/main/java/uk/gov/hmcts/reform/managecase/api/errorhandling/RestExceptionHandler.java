@@ -29,11 +29,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> handleAccessDeniedException(Exception ex) {
+        log.warn("Access denied due to:", ex);
         return toResponseEntity(HttpStatus.FORBIDDEN, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<Object> handleValidationException(Exception ex) {
+        log.debug("Validation exception:", ex);
         return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
     }
 

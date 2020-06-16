@@ -12,7 +12,8 @@ import lombok.Getter;
 public class CaseAssignmentResponse {
 
     @JsonProperty("status_message")
-    @ApiModelProperty(value = "Domain Status Message", required = true, example = "[Defendant]")
+    @ApiModelProperty(value = "Domain Status Message", required = true,
+            example = "Role [Defendant] from the organisation policy successfully assigned to the assignee.")
     private String status;
 
 }

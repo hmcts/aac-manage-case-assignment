@@ -23,6 +23,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Validated
 public class CaseAssignmentController {
 
+    public static final String MESSAGE = "Role %s from the organisation policy successfully assigned to the assignee.";
+
     private final CaseAssignmentService caseAssignmentService;
     private final ModelMapper mapper;
 
@@ -70,6 +72,6 @@ public class CaseAssignmentController {
             @Valid @RequestBody CaseAssignmentRequest requestPayload) {
         CaseAssignment caseAssignment = mapper.map(requestPayload, CaseAssignment.class);
         String role = caseAssignmentService.assignCaseAccess(caseAssignment);
-        return new CaseAssignmentResponse(role);
+        return new CaseAssignmentResponse(String.format(MESSAGE, role));
     }
 }

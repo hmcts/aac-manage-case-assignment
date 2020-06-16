@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.MESSAGE;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubAssignCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisation;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubInvokerWithRoles;
@@ -77,7 +78,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status_message", is(ORG_POLICY_ROLE)));
+            .andExpect(jsonPath("$.status_message", is(String.format(MESSAGE, ORG_POLICY_ROLE))));
 
         verify(postRequestedFor(urlEqualTo("/case-users")));
     }
@@ -93,7 +94,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
             .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.status_message", is(ORG_POLICY_ROLE)));
+            .andExpect(jsonPath("$.status_message", is(String.format(MESSAGE, ORG_POLICY_ROLE))));
 
         verify(postRequestedFor(urlEqualTo("/case-users")));
     }

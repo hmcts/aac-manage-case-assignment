@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
-import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
-
-import java.util.List;
+import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 
 public interface PrdRepository {
 
-    List<ProfessionalUser> findUsersByOrganisation();
+    FindUsersByOrganisationResponse findUsersByOrganisation();
 }

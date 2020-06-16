@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 
 import javax.validation.Valid;
 
-import static uk.gov.hmcts.reform.managecase.api.controller.V1.MediaType.CASE_ASSIGNMENT_RESPONSE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @Validated
@@ -31,7 +31,7 @@ public class CaseAssignmentController {
         this.mapper = mapper;
     }
 
-    @PutMapping(path = "/case-assignments", produces = CASE_ASSIGNMENT_RESPONSE)
+    @PutMapping(path = "/case-assignments", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Assign Access within Organisation", notes = "Assign Access within Organisation")
     @ApiResponses({
         @ApiResponse(
@@ -52,7 +52,7 @@ public class CaseAssignmentController {
                     @ExampleProperty(
                             value = "{\"message\": \"Intended assignee has to be in the same organisation of invoker\","
                                     + " \"status\": \"BAD_REQUEST\" }",
-                            mediaType = CASE_ASSIGNMENT_RESPONSE)
+                            mediaType = APPLICATION_JSON_VALUE)
             })
         ),
         @ApiResponse(

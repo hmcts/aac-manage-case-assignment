@@ -41,10 +41,10 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     @Override
     public void assignCase(String caseId, String caseRole, String userId) {
         CaseUserRole caseUserRole = CaseUserRole.builder()
-            .caseRole(List.of(caseRole))
+            .caseRole(caseRole)
             .caseId(caseId)
             .userId(userId)
             .build();
-        dataStoreApi.assignCase(caseUserRole);
+        dataStoreApi.assignCase(List.of(caseUserRole));
     }
 }

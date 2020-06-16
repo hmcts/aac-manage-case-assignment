@@ -1,19 +1,21 @@
 package uk.gov.hmcts.reform.managecase.client.prd;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-import static java.util.Collections.emptyList;
+import static com.fasterxml.jackson.annotation.Nulls.AS_EMPTY;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FindUsersByOrganisationResponse {
 
-    private List<ProfessionalUser> users = emptyList();
+    @JsonSetter(nulls = AS_EMPTY)
+    private List<ProfessionalUser> users;
+
+    private String organisationIdentifier;
 }

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
@@ -59,14 +60,16 @@ public class CaseAssignmentService {
         // There is no generic pattern for these validations - still worth to extract to a Validator class??
         validateInvokerRoles(CASEWORKER_CAA, solicitorRole);
 
-        Optional<ProfessionalUser> userOptional = findUserBy(assignment.getAssigneeId());
+        FindUsersByOrganisationResponse usersByOrg = prdRepository.findUsersByOrganisation();
+
+        Optional<ProfessionalUser> userOptional = findUserBy(usersByOrg.getUsers(), assignment.getAssigneeId());
         ProfessionalUser assignee = userOptional.orElseThrow(() -> new ValidationException(ASSIGNEE_ORGA_ERROR));
 
         if (!assignee.getRoles().contains(solicitorRole)) {
             throw new ValidationException(ASSIGNEE_ROLE_ERROR);
         }
 
-        OrganisationPolicy invokerPolicy = findInvokerOrgPolicy(caseDetails, assignee.getOrganisationIdentifier());
+        OrganisationPolicy invokerPolicy = findInvokerOrgPolicy(caseDetails, usersByOrg.getOrganisationIdentifier());
         dataStoreRepository.assignCase(
             assignment.getCaseId(), invokerPolicy.getOrgPolicyCaseAssignedRole(), assignment.getAssigneeId()
         );
@@ -100,8 +103,8 @@ public class CaseAssignmentService {
         }
     }
 
-    private Optional<ProfessionalUser> findUserBy(String assigneeId) {
-        return prdRepository.findUsersByOrganisation().stream()
+    private Optional<ProfessionalUser> findUserBy(List<ProfessionalUser> users, String assigneeId) {
+        return users.stream()
                 .filter(user -> assigneeId.equalsIgnoreCase(user.getUserIdentifier()))
                 .findFirst();
     }

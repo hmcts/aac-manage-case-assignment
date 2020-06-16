@@ -13,7 +13,6 @@ import springfox.documentation.service.Parameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
-import uk.gov.hmcts.reform.managecase.Application;
 
 import java.util.Arrays;
 
@@ -26,7 +25,7 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
             .useDefaultResponseMessages(false)
             .select()
-            .apis(RequestHandlerSelectors.basePackage(Application.class.getPackage().getName() + ".api.controller"))
+            .apis(RequestHandlerSelectors.basePackage(this.getClass().getPackage().getName() + ".api.controller"))
             .paths(PathSelectors.any())
             .build().useDefaultResponseMessages(false)
             .apiInfo(apiInfo())
@@ -58,7 +57,7 @@ public class SwaggerConfiguration {
     private Parameter headerServiceAuthorization() {
         return new ParameterBuilder()
             .name("ServiceAuthorization")
-            .description("S2S Bearer token of a whitelisted micro-service")
+            .description("S2S Bearer token of a allowed-list micro-service")
             .modelRef(new ModelRef("string"))
             .parameterType("header")
             .required(true)

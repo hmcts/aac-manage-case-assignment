@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
 @Builder
 @AllArgsConstructor
@@ -19,5 +17,5 @@ public class CaseUserRole {
     private String userId;
 
     @JsonProperty("case_role")
-    private List<String> caseRole;
+    private String caseRole;
 }

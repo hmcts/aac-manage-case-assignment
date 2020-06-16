@@ -23,11 +23,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.managecase.api.controller.V1.MediaType.CASE_ASSIGNMENT_RESPONSE;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubAssignCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisation;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubInvokerWithRoles;
@@ -77,7 +77,6 @@ public class CaseAssignmentControllerIT extends BaseTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(CASE_ASSIGNMENT_RESPONSE))
             .andExpect(jsonPath("$.status_message", is(ORG_POLICY_ROLE)));
 
         verify(postRequestedFor(urlEqualTo("/case-users")));
@@ -93,7 +92,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(CASE_ASSIGNMENT_RESPONSE))
+            .andExpect(content().contentType(APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.status_message", is(ORG_POLICY_ROLE)));
 
         verify(postRequestedFor(urlEqualTo("/case-users")));
@@ -178,13 +177,12 @@ public class CaseAssignmentControllerIT extends BaseTest {
     }
 
     private FindUsersByOrganisationResponse usersByOrganisation(ProfessionalUser... users) {
-        return new FindUsersByOrganisationResponse(List.of(users));
+        return new FindUsersByOrganisationResponse(List.of(users), ORGANIZATION_ID);
     }
 
     private ProfessionalUser user(String userIdentifier, String... roles) {
         return ProfessionalUser.builder()
                 .userIdentifier(userIdentifier)
-                .organisationIdentifier(ORGANIZATION_ID)
                 .roles(List.of(roles))
                 .build();
     }

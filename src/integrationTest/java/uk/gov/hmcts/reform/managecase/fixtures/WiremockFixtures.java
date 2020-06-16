@@ -46,9 +46,9 @@ public final class WiremockFixtures {
 
     public static void stubAssignCase(String caseId, String userId, String caseRole) {
         stubFor(WireMock.post(urlEqualTo("/case-users"))
-                .withRequestBody(matchingJsonPath("$.case_id", equalTo(caseId)))
-                .withRequestBody(matchingJsonPath("$.case_role[0]", equalTo(caseRole)))
-                .withRequestBody(matchingJsonPath("$.user_id", equalTo(userId)))
+                .withRequestBody(matchingJsonPath("$.[0].case_id", equalTo(caseId)))
+                .withRequestBody(matchingJsonPath("$.[0].case_role", equalTo(caseRole)))
+                .withRequestBody(matchingJsonPath("$.[0].user_id", equalTo(userId)))
                 .willReturn(aResponse().withStatus(HTTP_OK)));
     }
 

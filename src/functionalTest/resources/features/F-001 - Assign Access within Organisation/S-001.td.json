@@ -1,0 +1,45 @@
+{
+	"_guid_": "S-001",
+	"title": "Solicitor successfully sharing case access with another solicitor in their org (happy path)",
+
+	"productName": "Manage Case Assignment Microservice",
+	"operationName": "Assign Access within Organisation",
+
+	"specs": [
+		"S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation",
+		"S2 - with a solicitor role within the same organisation who doesn't have but will receive access to a case from S1",
+		"CW1 - to initially grant access to S1 for a case he/she will create",
+		"intends to assign access within the same organisation for S2 by S1"
+	],
+
+	"method": "PUT",
+	"uri": "/case-assignments",
+
+	"users": {
+		"invokingUser": {
+			"username": "befta.solicitor.1@gmail.com",
+			"password": "[[$CCD_BEFTA_SOLICITOR1_PWD]]"
+		},
+		"assigneeUser": {
+			"username": "befta.solicitor.2@gmail.com",
+			"password": "[[$CCD_BEFTA_SOLICITOR2_PWD]]"
+		}
+	},
+
+	"request": {
+	    "_extends_": "Common_Request",
+		"body": {
+			"case_id": "..",
+			"assignee_id": "..",
+			"case_type_id": ".."
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"body": {
+			"status_message": "Role [Defendant] from the organisation policy successfully assigned to the assignee."
+		}
+	}
+
+}

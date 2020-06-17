@@ -1,0 +1,11 @@
+{
+	"_guid_": "S2_Querying_Their_Access_Over_C1",
+	"title": "S2 Querying Their Access Over C1",
+	"productName": "CCD Data Store API",
+	"operationName": "Get Case-Assigned Users and Roles",
+	"specs": [
+		"by S2 to query his/her case roles granted over C1"
+	],
+	"expectedResponse": {
+	}
+}

@@ -6,10 +6,10 @@
 	"operationName": "Assign Access within Organisation",
 
 	"specs": [
-		"S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation",
-		"S2 - with a solicitor role within the same organisation who doesn't have but will receive access to a case from S1",
-		"CW1 - to initially grant access to S1 for a case he/she will create",
-		"intends to assign access within the same organisation for S2 by S1"
+		"CW1 - to create a case and initially grant access to a solicitor on it",
+		"S1 - with a solicitor role under an organisation to receive initial access from CW1",
+		"S2 - with a solicitor role within the same organisation, with whome S1 will share the case C1 with an assignment within organisation",
+		"is to be invoked by S1 to assign access over C1 for S2 within the same organisation"
 	],
 
 	"method": "PUT",
@@ -32,9 +32,9 @@
 	"request": {
 	    "_extends_": "Common_Request",
 		"body": {
-			"case_id": "..",
-			"assignee_id": "..",
-			"case_type_id": ".."
+			"case_id": "11",
+			"assignee_id": "22",
+			"case_type_id": "33"
 		}
 	},
 

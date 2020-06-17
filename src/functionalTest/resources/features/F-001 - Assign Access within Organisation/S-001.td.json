@@ -6,9 +6,9 @@
 	"operationName": "Assign Access within Organisation",
 
 	"specs": [
-		"CW1 - to create a case and initially grant access to a solicitor on it",
-		"S1 - with a solicitor role under an organisation to receive initial access from CW1",
-		"S2 - with a solicitor role within the same organisation, with whome S1 will share the case C1 with an assignment within organisation",
+		"S1 - with a solicitor role under an organisation to receive initial access on a case from a case worker",
+		"S2 - with a solicitor role within the same organisation, with whome S1 will share a case with an assignment within organisation",
+		"CW1 - to create a case and initially grant access for S1 on it",
 		"is to be invoked by S1 to assign access over C1 for S2 within the same organisation"
 	],
 
@@ -19,13 +19,17 @@
     "oauth2ClientId": "[[$BEFTA_OAUTH2_CLIENT_ID_OF_XUIWEBAPP]]",
  
 	"users": {
-		"invokingUser": {
+		"S1": {
 			"username": "befta.caseworker.2.solicitor.1@gmail.com",
 			"password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
 		},
-		"assigneeUser": {
+		"S2": {
 			"username": "befta.caseworker.2.solicitor.2@gmail.com",
 			"password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+		},
+		"CW1": {
+			"username": "befta.caseworker.3@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
 		}
 	},
 

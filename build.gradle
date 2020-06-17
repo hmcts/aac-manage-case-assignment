@@ -75,7 +75,7 @@ task functional(type: Test) {
   doFirst {
     generateCucumberReports.enabled = true
     javaexec {
-      main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseBeftaMain"
+      main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = ['--plugin', "json:$project.buildDir/reports/tests/befta/cucumber.json", '--tags', 'not @Ignore', '--glue',
               'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features']

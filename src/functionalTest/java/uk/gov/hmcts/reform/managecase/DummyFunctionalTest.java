@@ -8,8 +8,8 @@ public class DummyFunctionalTest {
 
     @Test
     public void emptyTest() {
-        int x = 0;
-        assertThat(x == 0);
+        int dummyVariable = 0;
+        assertThat(dummyVariable == 0);
     }
 
 }

@@ -19,6 +19,7 @@ def secrets = [
   ],
   's2s-${env}': [
     secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET')
+    secret('microservicekey-xui-webapp', 'API_CLIENT_XUI_WEBAPP_SECRET')
   ]
 ]
 
@@ -36,12 +37,13 @@ def vaultOverrides = [
 ]
 
 // vars needed for functional tests
-env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
 env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-env.BEFTA_S2S_CLIENT_ID = "xui_webapp"
-env.OAUTH2_CLIENT_ID = "ccd_gateway"
+env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+env.OAUTH2_CLIENT_ID = "xui_webapp"
 env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal"
+env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
+env.API_CLIENT_XUI_WEBAPP_ID = "xui_webapp"
 
 // temporary workaround for platform changes: turn BEFTA header checks to warning mode
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"

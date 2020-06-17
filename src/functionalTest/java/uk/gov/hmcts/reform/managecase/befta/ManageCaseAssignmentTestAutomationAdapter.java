@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.managecase.befta;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 
-public class ManageCaseTestAutomationAdapter extends DefaultTestAutomationAdapter {
+public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
     private final TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
 

@@ -15,6 +15,9 @@
 	"method": "PUT",
 	"uri": "/case-assignments",
 
+    "s2sClientId": "[[$BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP]]",
+    "oauth2ClientId": "[[$BEFTA_OAUTH2_CLIENT_ID_OF_XUIWEBAPP]]",
+ 
 	"users": {
 		"invokingUser": {
 			"username": "befta.solicitor.1@gmail.com",

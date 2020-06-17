@@ -47,6 +47,7 @@ env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect
 
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
+env.BEFTA_OAUTH2_CLIENT_ID_OF_XUIWEBAPP = "xuiwebapp"
 env.BEFTA_OAUTH2_REDIRECT_URI_OF_XUIWEBAPP = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
 
 // temporary workaround for platform changes: turn BEFTA header checks to warning mode

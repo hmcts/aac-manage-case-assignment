@@ -6,13 +6,13 @@ Feature: F-001: Assign Access within Organisation
 
   @S-001
   Scenario: Solicitor successfully sharing case access with another solicitor in their org (happy path)
-    Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
-    And   a user [S2 - with a solicitor role within the same organisation who doesn't have but will receive access to a case from S1],   
-    And   a user [CW1 - to initially grant access to S1 for a case he/she will create],   
+    Given a user [CW1 - to create a case and initially grant access to a solicitor on it],
+    And   a user [S1 - with a solicitor role under an organisation to receive initial access from CW1],
+    And   a user [S2 - with a solicitor role within the same organisation, with whome S1 will share the case C1 with an assignment within organisation],  
     And   a successful call [to create a case - C1] as in [Prerequisite_Case_Creation_C1],
     And   a successful call [to grant access to C1 for S1] as in [Prerequisite_Access_Grant_by_CW1_for_S1_on_C1],
     When  a request is prepared with appropriate values,
-    And   the request [intends to assign access within the same organisation for S2 by S1],
+    And   the request [is to be invoked by S1 to assign access over C1 for S2 within the same organisation],
     And   it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
     Then  a positive response is received,
     And   the response has all other details as expected,

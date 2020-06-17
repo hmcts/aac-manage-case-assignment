@@ -6,6 +6,7 @@ public class DummyFunctionalTest {
 
     @Test
     public void emptyTest() {
+        System.out.println("Dummy test passed.");
     }
 
 }

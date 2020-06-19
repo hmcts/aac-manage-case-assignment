@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter.*;
 import static uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter.TOKEN_NAME;
 
 class JwtGrantedAuthoritiesConverterTest {
@@ -63,7 +64,7 @@ class JwtGrantedAuthoritiesConverterTest {
         UserInfo userInfo = mock(UserInfo.class);
         List<String> roles = new ArrayList<>();
         when(userInfo.getRoles()).thenReturn(roles);
-        when(idamRepository.getUserInfo(ACCESS_TOKEN)).thenReturn(userInfo);
+        when(idamRepository.getUserInfo(BEARER + ACCESS_TOKEN)).thenReturn(userInfo);
         Collection<GrantedAuthority> authorities = converter.convert(jwt);
         assertEquals(0, authorities.size(), "size must be empty");
     }

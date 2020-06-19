@@ -20,6 +20,7 @@ import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterN
 public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
     public static final String TOKEN_NAME = "tokenName";
+    public static final String BEARER = "Bearer ";
 
     private final IdamRepository idamRepository;
 
@@ -31,7 +32,7 @@ public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
         if (jwt.containsClaim(TOKEN_NAME) && jwt.getClaim(TOKEN_NAME).equals(ACCESS_TOKEN)) {
-            UserInfo userInfo = idamRepository.getUserInfo(jwt.getTokenValue());
+            UserInfo userInfo = idamRepository.getUserInfo(BEARER + jwt.getTokenValue());
             return extractAuthorityFromClaims(userInfo.getRoles());
         }
         return Collections.emptyList();

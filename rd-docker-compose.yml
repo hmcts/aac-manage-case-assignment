@@ -1,0 +1,72 @@
+---
+version: '2.4'
+
+services:
+
+  rd-professional-api:
+    image: "hmctspublic.azurecr.io/rd/professional-api:latest"
+    environment:
+      SERVER_PORT: 8090
+      POSTGRES_USERNAME: "${DB_USERNAME}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_NAME: dbrefdata
+      POSTGRES_HOST: rd-database
+      POSTGRES_PORT: 5432
+      S2S_URL: http://service-auth-provider-api:8080
+      S2S_SECRET: "AAAAAAAAAAAAAAAA"
+      PRD_S2S_AUTHORISED_SERVICES: aac_manage_case_assignment
+      USER_PROFILE_URL: http://rd-user-profile-api:8091
+      CCD_URL: http://ccd-user-profile-api:4453
+      OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
+      IDAM_URL: https://idam-web-public.aat.platform.hmcts.net
+      #prdEnumRoleType: ADMIN_ROLE,JURISD_ID,CCD_ROLE
+    ports:
+      - 8090:8090
+    depends_on:
+      ccd-shared-database:
+        condition: service_started
+    networks:
+      - aca-network
+
+  rd-user-profile-api:
+    image: "hmctspublic.azurecr.io/rd/user-profile-api:latest"
+    environment:
+      SERVER_PORT: 8091
+      POSTGRES_USERNAME: "${DB_USERNAME}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_NAME: dbuserprofile
+      POSTGRES_HOST: rd-database
+      POSTGRES_PORT: 5432
+      S2S_URL: http://service-auth-provider-api:8080
+      OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
+      IDAM_URL: https://idam-web-public.aat.platform.hmcts.net
+    ports:
+      - 8091:8091
+    depends_on:
+      ccd-shared-database:
+        condition: service_started
+    networks:
+      - aca-network
+
+  # once postgres docker is up first please create user and databases manually
+  # CREATE USER rduser WITH PASSWORD 'rdpassword';
+  # CREATE DATABASE dbrefdata WITH OWNER = rduser ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+  # CREATE DATABASE dbuserprofile WITH OWNER = rduser ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+  rd-database:
+    build:
+      context: database
+    image: hmcts/rd-professional-db
+    container_name: rd-professional-db
+    volumes:
+      - rd-db-volume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD="${DB_USERNAME:-rduser}"
+      - POSTGRES_USERNAME="${DB_PASSWORD:-rdpassword}"
+    ports:
+      - 5428:5432
+networks:
+  aca-network:
+    external: true
+
+volumes:
+  rd-db-volume:

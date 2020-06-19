@@ -95,12 +95,12 @@ Feature: F-001: Assign Access within Organisation
   @S-008 @Ignore
   Scenario: Must return a negative response when the case doesn't contain an assignment for the invoker's organisation
     Given a user [U1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
-    And   a successful call [to create a case - C1 - without an assignment for U1's organisation] as in [Prerequisite Case Creation Call for Case Assignment],
+    And   a successful call [to create a case - C1 - without an assignment for U1s organisation] as in [Prerequisite Case Creation Call for Case Assignment],
     And   a successful call [to grant access to C1 for U1] as in [Prerequisite Case Creation Call for Case Assignment],
     And   a user [U2 - with a solicitor role within the same organisation who doesn't have access to C1],
     When  a request is prepared with appropriate values,
-    And the request [intends to assign access within the same organisation for U2 by U1],
-    And it is submitted to call the [Assign Access within Organisation] operation of [Case Assignment Microservice],
-    Then a negative response is received,
-    And the response has all the details as expected,
-    And a call [by U2 to access C1] will get the expected response as in [they are unable to access the case]. 
+    And   the request [intends to assign access within the same organisation for U2 by U1],
+    And   it is submitted to call the [Assign Access within Organisation] operation of [Case Assignment Microservice],
+    Then  a negative response is received,
+    And   the response has all the details as expected,
+    And   a call [by U2 to access C1] will get the expected response as in [they are unable to access the case]. 

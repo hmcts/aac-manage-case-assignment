@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.managecase.befta;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 
 import io.cucumber.junit.Cucumber;
@@ -18,12 +18,12 @@ public class ManageCaseAssignmentsBeftaRunner {
         // default constructor (squid:S1118)
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         BeftaMain.setUp(new ManageCaseAssignmentTestAutomationAdapter());
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() {
         BeftaMain.tearDown();
     }

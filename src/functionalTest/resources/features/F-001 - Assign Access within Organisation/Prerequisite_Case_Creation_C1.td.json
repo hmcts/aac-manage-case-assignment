@@ -1,17 +1,256 @@
 {
 	"_guid_": "Prerequisite_Case_Creation_C1",
-	"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Creation_Data_solicitor_1",
 
 	"uri": "{{DATA_STORE_HOST}}/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
-
 	"specs": [
 		"to create a case - C1"
 	],
-
 	"users": {
 		"invokingUser": {
 			"username": "master.caseworker@gmail.com",
 			"password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
 		}
+	},
+	"request": {
+		"body": {
+			"event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1_Token_Creation][testData][actualResponse][body][token]}",
+			"data": {
+				"TextField": "Case Created for FTA",
+				"TextAreaField": "multi line\ninput \nfor test",
+				"DateField": "1977-01-01",
+				"PhoneField": "+447541710866",
+				"NumberField": "234",
+				"YesNoField": "No",
+				"CollectionField": [
+					{
+						"id": null,
+						"value": "value in collection element - 1"
+					},
+					{
+						"id": null,
+						"value": "value in collection element - 2"
+					}
+				],
+				"AddressUKField": {
+					"AddressLine1": null,
+					"AddressLine2": null,
+					"AddressLine3": null,
+					"PostTown": null,
+					"County": null,
+					"PostCode": null,
+					"Country": null
+				},
+				"MarritalStatus": "MARRIAGE",
+				"MoneyField": "20000",
+				"EmailField": "info@ccd.hmcts.net",
+				"MultiSelectField": [
+					"OXFORD",
+					"CARDIFF"
+				],
+				"DynamicList": {
+					"value": {
+						"code": "List7",
+						"label": "List 7"
+					},
+					"list_items": [
+						{
+							"code": "List1",
+							"label": " List 1"
+						},
+						{
+							"code": "List2",
+							"label": " List 2"
+						},
+						{
+							"code": "List3",
+							"label": " List 3"
+						},
+						{
+							"code": "List4",
+							"label": " List 4"
+						},
+						{
+							"code": "List5",
+							"label": " List 5"
+						},
+						{
+							"code": "List6",
+							"label": " List 6"
+						},
+						{
+							"code": "List7",
+							"label": " List 7"
+						}
+					]
+				},
+				"AddressField": {
+					"AddressLine1": "ABC Street",
+					"AddressLine2": "DEF Avenue",
+					"AddressLine3": null,
+					"Country": "UK"
+				},
+				"DocumentField": {
+					"document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4",
+					"document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4/binary",
+					"document_filename": "Sample.pdf"
+				}
+			},
+			"event": {
+				"id": "createCase",
+				"summary": "",
+				"description": ""
+			},
+			"ignore_warning": false,
+			"draft_id": null
+		}
+	},
+	"expectedResponse": {
+		"_links": {
+			"self": {
+				"href": "http://gateway-ccd.aat.platform.hmcts.net/case-types/FT_MasterCaseType/cases?ignore-warning=false"
+			}
+		},
+		"id": "1592846706804885",
+		"jurisdiction": "BEFTA_MASTER",
+		"case_type": "FT_MasterCaseType",
+		"created_on": "2020-06-22T17:25:06.888",
+		"last_modified_on": "2020-06-22T17:25:06.888",
+		"last_state_modified_on": "2020-06-22T17:25:06.888",
+		"state": "CaseCreated",
+		"security_classification": "PUBLIC",
+		"data": {
+			"AddressField": {
+				"AddressLine1": "ABC Street",
+				"AddressLine2": "DEF Avenue",
+				"AddressLine3": null,
+				"Country": "UK"
+			},
+			"AddressUKField": {
+				"AddressLine1": null,
+				"AddressLine2": null,
+				"AddressLine3": null,
+				"PostTown": null,
+				"County": null,
+				"PostCode": null,
+				"Country": null
+			},
+			"DocumentField": {
+				"document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4",
+				"document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4/binary",
+				"document_filename": "Sample.pdf"
+			},
+			"MoneyField": "20000",
+			"DynamicList": {
+				"value": {
+					"code": "List7",
+					"label": "List 7"
+				},
+				"list_items": [
+					{
+						"code": "List1",
+						"label": " List 1"
+					},
+					{
+						"code": "List2",
+						"label": " List 2"
+					},
+					{
+						"code": "List3",
+						"label": " List 3"
+					},
+					{
+						"code": "List4",
+						"label": " List 4"
+					},
+					{
+						"code": "List5",
+						"label": " List 5"
+					},
+					{
+						"code": "List6",
+						"label": " List 6"
+					},
+					{
+						"code": "List7",
+						"label": " List 7"
+					}
+				]
+			},
+			"MarritalStatus": "MARRIAGE",
+			"NumberField": "234",
+			"MultiSelectField": [
+				"OXFORD",
+				"CARDIFF"
+			],
+			"YesNoField": "No",
+			"EmailField": "info@ccd.hmcts.net",
+			"TextField": "Case Created for FTA",
+			"PhoneField": "+447541710866",
+			"DateField": "1977-01-01",
+			"TextAreaField": "multi line\ninput \nfor test",
+			"CollectionField": [
+				{
+					"value": "value in collection element - 1",
+					"id": "3974dee5-d281-4b07-8806-90372405eda6"
+				},
+				{
+					"value": "value in collection element - 2",
+					"id": "0cd0f9ac-c194-438d-b9bb-007689dd34d9"
+				}
+			]
+		},
+		"data_classification": {
+			"AddressField": {
+				"classification": "PUBLIC",
+				"value": {
+					"AddressLine1": "PUBLIC",
+					"AddressLine2": "PUBLIC",
+					"AddressLine3": "PUBLIC",
+					"Country": "PUBLIC"
+				}
+			},
+			"AddressUKField": {
+				"classification": "PUBLIC",
+				"value": {
+					"AddressLine1": "PUBLIC",
+					"AddressLine2": "PUBLIC",
+					"AddressLine3": "PUBLIC",
+					"PostTown": "PUBLIC",
+					"County": "PUBLIC",
+					"PostCode": "PUBLIC",
+					"Country": "PUBLIC"
+				}
+			},
+			"DocumentField": "PUBLIC",
+			"MoneyField": "PUBLIC",
+			"DynamicList": "PUBLIC",
+			"MarritalStatus": "PUBLIC",
+			"NumberField": "PUBLIC",
+			"MultiSelectField": "PUBLIC",
+			"YesNoField": "PUBLIC",
+			"EmailField": "PUBLIC",
+			"TextField": "PUBLIC",
+			"PhoneField": "PUBLIC",
+			"DateField": "PUBLIC",
+			"TextAreaField": "PUBLIC",
+			"CollectionField": {
+				"classification": "PUBLIC",
+				"value": [
+					{
+						"id": "3974dee5-d281-4b07-8806-90372405eda6",
+						"classification": "PUBLIC"
+					},
+					{
+						"id": "0cd0f9ac-c194-438d-b9bb-007689dd34d9",
+						"classification": "PUBLIC"
+					}
+				]
+			}
+		},
+		"after_submit_callback_response": null,
+		"callback_response_status_code": null,
+		"callback_response_status": null,
+		"delete_draft_response_status_code": null,
+		"delete_draft_response_status": null
 	}
 }

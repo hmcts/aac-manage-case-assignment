@@ -15,7 +15,12 @@
 			"etid": "createCase"
 		}
 	},
-	"expectedResponse": {
+
+	"request": {
+	    "_extends_": "Common_Request"
+	},
+	
+   "expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {
 			"Content-Encoding": "gzip",

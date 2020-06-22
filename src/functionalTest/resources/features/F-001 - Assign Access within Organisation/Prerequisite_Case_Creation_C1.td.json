@@ -12,6 +12,7 @@
 		}
 	},
 	"request": {
+        "_extends_": "Common_Request",
 		"body": {
 			"event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1_Token_Creation][testData][actualResponse][body][token]}",
 			"data": {

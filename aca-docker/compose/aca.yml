@@ -10,7 +10,7 @@ services:
       IDAM_URL: http://idam-api:5000
       S2S_URL: http://service-auth-provider-api:8080
       MANAGE_CASE_S2S_KEY: "${S2S_KEY_MANAGE_CASE_ASSIGNMENT}"
-      MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp,ccd_gw
+      MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp
       CCD_DATA_STORE_HOST: http://ccd-data-store-api:4452
       PRD_HOST: http://wiremock:8765
     ports:

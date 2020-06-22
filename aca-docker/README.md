@@ -1,4 +1,4 @@
-# ACA full stack docker :whale:
+# ACA fullstack docker :whale:
 
 - [Prerequisites](#prerequisites)
 - [ACA Scripts](#ACA)
@@ -14,7 +14,7 @@
   ```
   Please enable and start elasticsearch along with other ccd components.
   ```
-  ./ccd enable backend frontend sidam sidam-local sidam-local-ccd elasticsearch
+  ./ccd enable backend sidam sidam-local sidam-local-ccd elasticsearch
   ```
 *Memory and CPU allocations may need to be increased for successful execution of ccd applications altogether*
 

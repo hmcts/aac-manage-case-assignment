@@ -1,0 +1,15 @@
+{
+	"_guid_": "Prerequisite_Case_Creation_C1",
+	"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Creation_Data_solicitor_1",
+
+	"specs": [
+		"to create a case - C1"
+	],
+
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.3@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+		}
+	}
+}

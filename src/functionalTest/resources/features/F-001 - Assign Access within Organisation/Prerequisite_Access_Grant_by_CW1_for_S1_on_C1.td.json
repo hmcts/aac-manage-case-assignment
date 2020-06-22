@@ -31,6 +31,12 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_201_Response"
+		"_extends_": "Common_201_Response",
+		"headers": {
+            "Strict-Transport-Security": "[[ANY_NULLABLE]]",
+            "Content-Type": "[[ANY_NULLABLE]]",
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
+		}
 	}
 }

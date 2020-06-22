@@ -105,6 +105,7 @@
 		}
 	},
 	"expectedResponse": {
+		"_extends_": "Common_201_Response",
 		"_links": {
 			"self": {
 				"href": "http://gateway-ccd.aat.platform.hmcts.net/case-types/FT_MasterCaseType/cases?ignore-warning=false"

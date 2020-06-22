@@ -2,6 +2,8 @@
 	"_guid_": "Prerequisite_Case_Creation_C1",
 	"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Creation_Data_solicitor_1",
 
+	"uri": "{{DATA_STORE_HOST}}/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+
 	"specs": [
 		"to create a case - C1"
 	],

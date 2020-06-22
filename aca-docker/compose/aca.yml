@@ -1,0 +1,39 @@
+---
+version: '2.4'
+
+services:
+
+  manage-case-assignment:
+    image: "hmctspublic.azurecr.io/aac/manage-case-assignment:latest"
+    environment:
+      SERVER_PORT: 4454
+      IDAM_URL: http://idam-api:5000
+      S2S_URL: http://service-auth-provider-api:8080
+      MANAGE_CASE_S2S_KEY: "${S2S_KEY_MANAGE_CASE_ASSIGNMENT}"
+      MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp,ccd_gw
+      CCD_DATA_STORE_HOST: http://ccd-data-store-api:4452
+      PRD_HOST: http://wiremock:8765
+    ports:
+      - 4454:4454
+    depends_on:
+      # Uncomment this line to enable ccd test stub service
+      #     ccd-test-stubs-service:
+      #       condition: service_started
+      idam-api:
+        condition: service_started
+    networks:
+      - ccd-network
+
+  wiremock:
+    container_name: wiremock
+    image: rodolpheche/wiremock
+    volumes:
+      - ./../mocks/wiremock:/home/wiremock:rw
+    ports:
+      - 8765:8080
+    networks:
+      - ccd-network
+
+networks:
+  ccd-network:
+    external: true

@@ -5,7 +5,7 @@
 	"operationName": "Grant access to case",
 
 	"method": "POST",
-	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
+	"uri": "{{DATA_STORE_HOST}}/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
 
 	"specs": [
 		"to grant access to C1 for S1"

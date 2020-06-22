@@ -9,7 +9,7 @@ Feature: F-001: Assign Access within Organisation
     Given a user [S1 - with a solicitor role under an organisation to receive initial access on a case from a case worker],
     And   a user [S2 - with a solicitor role within the same organisation, with whome S1 will share a case with an assignment within organisation],  
     And   a user [CW1 - to create a case and initially grant access for S1 on it],
-    And   a successful call [to create a case - C1] as in [Prerequisite_Case_Creation_C1],
+    And   a case [C1, which has just been] created as in [Prerequisite_Case_Creation_C1],
     And   a successful call [to grant access to C1 for S1] as in [Prerequisite_Access_Grant_by_CW1_for_S1_on_C1],
     When  a request is prepared with appropriate values,
     And   the request [is to be invoked by S1 to assign access over C1 for S2 within the same organisation],

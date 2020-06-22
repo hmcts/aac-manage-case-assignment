@@ -31,8 +31,8 @@
    "expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {
-			"Content-Encoding": "gzip",
-			"Content-Length": "[[ANYTHING_PRESENT]]"
+			"Strict-Transport-Security": "max-age=31536000 ; includeSubDomains",
+			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
 		},
 		"body": {
 			"token": "[[ANY_STRING_NOT_NULLABLE]]",
@@ -46,20 +46,14 @@
 				"last_modified": null,
 				"last_state_modified_date": null,
 				"security_classification": null,
-				"case_data": {
-					
-				},
-				"data_classification": {
-					
-				},
+				"case_data": "[[ANYTHING_PRESENT]]",
+				"data_classification": "[[ANYTHING_PRESENT]]",
 				"after_submit_callback_response": null,
 				"callback_response_status_code": null,
 				"callback_response_status": null,
 				"delete_draft_response_status_code": null,
 				"delete_draft_response_status": null,
-				"security_classifications": {
-					
-				}
+				"security_classifications": "[[ANYTHING_PRESENT]]"
 			},
 			"event_id": "createCase"
 		}

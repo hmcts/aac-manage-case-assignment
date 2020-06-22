@@ -15,8 +15,8 @@
 	"method": "PUT",
 	"uri": "/case-assignments",
 
-    "s2sClientId": "[[$BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP]]",
-    "oauth2ClientId": "[[$BEFTA_OAUTH2_CLIENT_ID_OF_XUIWEBAPP]]",
+    "s2sClientId": "xui_webapp",
+    "oauth2ClientId": "xuiwebapp",
  
 	"users": {
 		"S1": {

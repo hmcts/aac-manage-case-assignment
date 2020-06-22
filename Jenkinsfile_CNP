@@ -57,6 +57,7 @@ env.BEFTA_OAUTH2_REDIRECT_URI_OF_XUIWEBAPP = "https://www-ccd.aat.platform.hmcts
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal"
+env.DATA_STORE_HOST = "http://ccd-data-store-api-pr-601.service.core-compute-preview.internal"
 
 withPipeline("java", product, component) {
   after('test') {

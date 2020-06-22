@@ -31,7 +31,7 @@
    "expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {
-			"Strict-Transport-Security": "max-age=31536000 ; includeSubDomains",
+			"Content-Encoding": "gzip",
 			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
 		},
 		"body": {

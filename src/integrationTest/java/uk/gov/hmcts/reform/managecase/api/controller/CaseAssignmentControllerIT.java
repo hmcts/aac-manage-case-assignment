@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,13 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.BaseTest;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
-import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
-import uk.gov.hmcts.reform.managecase.domain.Organisation;
-import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
-
-import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
@@ -28,6 +19,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.usersByOrganisation;
 import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.MESSAGE;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubAssignCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisation;
@@ -42,7 +36,6 @@ public class CaseAssignmentControllerIT extends BaseTest {
     private static final String ASSIGNEE_ID = "ae2eb34c-816a-4eea-b714-6654d022fcef";
     private static final String ANOTHER_USER = "vcd345cvs-816a-4eea-b714-6654d022fcef";
     private static final String CASE_ID = "12345678";
-    private static final String JURISDICTION = "AUTOTEST1";
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
     private static final String ORGANIZATION_ID = "TEST_ORG";
 
@@ -157,35 +150,6 @@ public class CaseAssignmentControllerIT extends BaseTest {
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message", is("Case ID has to be one for which a case role"
                     + " is represented by the invoker's organisation.")));
-    }
-
-    // Move these to individual Fixtures / Test builders
-    private CaseDetails caseDetails(String organizationId, String orgPolicyRole) {
-        return CaseDetails.builder()
-            .caseTypeId(CASE_TYPE_ID)
-            .reference(CASE_ID)
-            .jurisdiction(JURISDICTION)
-            .data(Maps.newHashMap("OrganisationPolicy1", jsonNode(organizationId, orgPolicyRole)))
-            .build();
-    }
-
-    private JsonNode jsonNode(String organizationId, String orgPolicyRole) {
-        OrganisationPolicy policy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole(orgPolicyRole)
-            .organisation(new Organisation(organizationId, organizationId))
-            .build();
-        return objectMapper.convertValue(policy, JsonNode.class);
-    }
-
-    private FindUsersByOrganisationResponse usersByOrganisation(ProfessionalUser... users) {
-        return new FindUsersByOrganisationResponse(List.of(users), ORGANIZATION_ID);
-    }
-
-    private ProfessionalUser user(String userIdentifier, String... roles) {
-        return ProfessionalUser.builder()
-                .userIdentifier(userIdentifier)
-                .roles(List.of(roles))
-                .build();
     }
 
 }

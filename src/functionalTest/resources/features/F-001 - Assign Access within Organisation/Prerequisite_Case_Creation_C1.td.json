@@ -114,21 +114,28 @@
 	},
 	"expectedResponse": {
 		"_extends_": "Common_201_Response",
+		"headers": {
+			"Strict-Transport-Security": "[[ANY_NULLABLE]]",
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]",
+			"Vary": "accept-encoding"
+		},
 		"body": {
-			"_links": {
-				"self": {
-					"href": "http://gateway-ccd.aat.platform.hmcts.net/case-types/FT_MasterCaseType/cases?ignore-warning=false"
-				}
-			},
-			"id": "1592846706804885",
+			"id": "[[ANY_LONG_NOT_NULLABLE]]",
 			"jurisdiction": "BEFTA_MASTER",
-			"case_type": "FT_MasterCaseType",
-			"created_on": "2020-06-22T17:25:06.888",
-			"last_modified_on": "2020-06-22T17:25:06.888",
-			"last_state_modified_on": "2020-06-22T17:25:06.888",
+			"case_type_id": "FT_MasterCaseType",
 			"state": "CaseCreated",
+			"version": 0,
+			"created_date": "2020-06-22T21:50:46.982",
+			"last_modified": "2020-06-22T21:50:46.982",
+			"last_state_modified_date": "2020-06-22T21:50:46.982",
 			"security_classification": "PUBLIC",
-			"data": {
+			"after_submit_callback_response": null,
+			"callback_response_status_code": null,
+			"callback_response_status": null,
+			"delete_draft_response_status_code": null,
+			"delete_draft_response_status": null,
+		    "case_data": {
 				"AddressField": {
 					"AddressLine1": "ABC Street",
 					"AddressLine2": "DEF Avenue",
@@ -209,6 +216,54 @@
 					}
 				]
 			},
+			"security_classifications": {
+				"AddressField": {
+					"classification": "PUBLIC",
+					"value": {
+						"AddressLine1": "PUBLIC",
+						"AddressLine2": "PUBLIC",
+						"AddressLine3": "PUBLIC",
+						"Country": "PUBLIC"
+					}
+				},
+				"AddressUKField": {
+					"classification": "PUBLIC",
+					"value": {
+						"AddressLine1": "PUBLIC",
+						"AddressLine2": "PUBLIC",
+						"AddressLine3": "PUBLIC",
+						"PostTown": "PUBLIC",
+						"County": "PUBLIC",
+						"PostCode": "PUBLIC",
+						"Country": "PUBLIC"
+					}
+				},
+				"DocumentField": "PUBLIC",
+				"MoneyField": "PUBLIC",
+				"DynamicList": "PUBLIC",
+				"MarritalStatus": "PUBLIC",
+				"NumberField": "PUBLIC",
+				"MultiSelectField": "PUBLIC",
+				"YesNoField": "PUBLIC",
+				"EmailField": "PUBLIC",
+				"TextField": "PUBLIC",
+				"PhoneField": "PUBLIC",
+				"DateField": "PUBLIC",
+				"TextAreaField": "PUBLIC",
+				"CollectionField": {
+					"classification": "PUBLIC",
+					"value": [
+						{
+							"id": "0f7b2a3e-ec34-4d5e-8dee-33d04263f46a",
+							"classification": "PUBLIC"
+						},
+						{
+							"id": "4b00008a-aab0-4675-8b51-d7cd48354660",
+							"classification": "PUBLIC"
+						}
+					]
+				}
+			},
 			"data_classification": {
 				"AddressField": {
 					"classification": "PUBLIC",
@@ -247,21 +302,16 @@
 					"classification": "PUBLIC",
 					"value": [
 						{
-							"id": "3974dee5-d281-4b07-8806-90372405eda6",
+							"id": "[[ANY_STRING_NOT_NULLABLE]]",
 							"classification": "PUBLIC"
 						},
 						{
-							"id": "0cd0f9ac-c194-438d-b9bb-007689dd34d9",
+							"id": "[[ANY_STRING_NOT_NULLABLE]]",
 							"classification": "PUBLIC"
 						}
 					]
 				}
-			},
-			"after_submit_callback_response": null,
-			"callback_response_status_code": null,
-			"callback_response_status": null,
-			"delete_draft_response_status_code": null,
-			"delete_draft_response_status": null
+			}
 		}
 	}
 }

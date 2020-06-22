@@ -1,23 +1,31 @@
 {
 	"_guid_": "Prerequisite_Case_Creation_C1_Token_Creation",
+
+    "productName": "CCD Data Store",
+    "operationName": "Start event creation as Case worker",
+
+	"method": "GET",
 	"uri": "{{DATA_STORE_HOST}}/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+
 	"specs": [
 		"to create a token for case creation"
 	],
+
 	"users": {
-		"headers": {
-			"_extends_": "Common_Request_Headers"
-		},
+		"invokingUser": {
+			"username": "master.caseworker@gmail.com",
+			"password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+		}
+	},
+
+	"request": {
+	    "_extends_": "Common_Request",
 		"pathVariables": {
 			"uid": "[[DEFAULT_AUTO_VALUE]]",
 			"jid": "BEFTA_MASTER",
 			"ctid": "FT_MasterCaseType",
 			"etid": "createCase"
 		}
-	},
-
-	"request": {
-	    "_extends_": "Common_Request"
 	},
 	
    "expectedResponse": {

@@ -1,16 +1,23 @@
 {
 	"_guid_": "Prerequisite_Case_Creation_C1",
 
+	"productName": "CCD Data Store",
+	"operationName": "Submit case creation as Case worker",
+
+	"method": "POST",
 	"uri": "{{DATA_STORE_HOST}}/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+
 	"specs": [
 		"to create a case - C1"
 	],
+
 	"users": {
 		"invokingUser": {
 			"username": "master.caseworker@gmail.com",
 			"password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
 		}
 	},
+
 	"request": {
         "_extends_": "Common_Request",
 		"body": {
@@ -105,6 +112,7 @@
 			"draft_id": null
 		}
 	},
+
 	"expectedResponse": {
 		"_extends_": "Common_201_Response",
 		"_links": {

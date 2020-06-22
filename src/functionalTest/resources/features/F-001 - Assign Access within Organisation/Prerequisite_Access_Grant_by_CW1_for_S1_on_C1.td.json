@@ -1,0 +1,35 @@
+{
+	"_guid_": "Prerequisite_Access_Grant_by_CW1_for_S1_on_C1",
+
+	"productName": "CCD Data Store",
+	"operationName": "Grant access to case",
+
+	"method": "POST",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
+
+	"specs": [
+		"to grant access to C1 for S1"
+	],
+
+	"user": {
+		"username": "master.caseworker@gmail.com",
+		"password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+	},
+
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "BEFTA_MASTER",
+			"ctid": "FT_MasterCaseType",
+			"cid": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
+		},
+		"body": {
+			"id": "${[scenarioContext][parentContext][testData][users][S1][id]}"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_201_Response"
+	}
+}

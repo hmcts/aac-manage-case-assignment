@@ -4,7 +4,7 @@ Feature: F-001: Assign Access within Organisation
   Background:
     Given an appropriate test context as detailed in the test data source
 
-  @S-001  @Smoke
+  @S-001
   Scenario: Solicitor successfully sharing case access with another solicitor in their org (happy path)
     Given a user [S1 - with a solicitor role under an organisation to receive initial access on a case from a case worker],
     And   a user [S2 - with a solicitor role within the same organisation, with whome S1 will share a case with an assignment within organisation],  

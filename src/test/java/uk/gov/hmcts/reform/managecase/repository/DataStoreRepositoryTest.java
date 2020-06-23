@@ -10,13 +10,14 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -73,15 +74,14 @@ class DataStoreRepositoryTest {
 
     @Test
     @DisplayName("Find case by caseTypeId and caseId")
-    @SuppressWarnings("unchecked")
     void assignCase() {
-        doNothing().when(dataStoreApi).assignCase(anyList());
+        doNothing().when(dataStoreApi).assignCase(any(CaseUserRolesRequest.class));
 
         repository.assignCase(CASE_ID, ROLE, ASSIGNEE_ID);
 
-        ArgumentCaptor<List<CaseUserRole>> captor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<CaseUserRolesRequest> captor = ArgumentCaptor.forClass(CaseUserRolesRequest.class);
         verify(dataStoreApi).assignCase(captor.capture());
-        List<CaseUserRole> caseUserRoles = captor.getValue();
+        List<CaseUserRole> caseUserRoles = captor.getValue().getCaseUsers();
 
         assertThat(caseUserRoles.size()).isEqualTo(1);
         CaseUserRole caseUserRole = caseUserRoles.get(0);

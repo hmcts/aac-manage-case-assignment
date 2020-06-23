@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 
 import java.util.List;
@@ -45,6 +46,6 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
             .caseId(caseId)
             .userId(userId)
             .build();
-        dataStoreApi.assignCase(List.of(caseUserRole));
+        dataStoreApi.assignCase(new CaseUserRolesRequest(List.of(caseUserRole)));
     }
 }

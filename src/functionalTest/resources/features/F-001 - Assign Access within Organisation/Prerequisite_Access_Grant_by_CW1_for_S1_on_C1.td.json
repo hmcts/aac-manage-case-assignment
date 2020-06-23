@@ -31,7 +31,8 @@
 		"_extends_": "Common_204_Response",
 		"headers": {
 			"Strict-Transport-Security": "[[ANY_NULLABLE]]",
-			"Content-Type": "[[ANY_NULLABLE]]"
+			"Content-Type": "[[ANY_NULLABLE]]",
+			"vary": "[[ANY_NULLABLE]]"
 		}
 	}
 }

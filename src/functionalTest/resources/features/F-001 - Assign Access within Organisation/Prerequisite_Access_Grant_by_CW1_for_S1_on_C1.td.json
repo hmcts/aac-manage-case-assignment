@@ -1,39 +1,35 @@
 {
 	"_guid_": "Prerequisite_Access_Grant_by_CW1_for_S1_on_C1",
-
 	"productName": "CCD Data Store",
 	"operationName": "Grant access to case",
-
-	"method": "POST",
-	"uri": "{{DATA_STORE_HOST}}/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
-
+	"method": "PUT",
+	"uri": "{{DATA_STORE_HOST}}/cases/{caseReference}/users",
 	"specs": [
 		"to grant access to C1 for S1"
 	],
-
 	"user": {
-	    "username": "master.caseworker@gmail.com",
-	    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+		"username": "master.caseworker@gmail.com",
+		"password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
 	},
-
 	"request": {
 		"_extends_": "Common_Request",
 		"pathVariables": {
-			"uid": "[[DEFAULT_AUTO_VALUE]]",
-			"jid": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1][testData][request][pathVariables][jid]}",
-			"ctid": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1][testData][request][pathVariables][ctid]}",
-			"cid": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
+			"caseReference": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
 		},
 		"body": {
-			"id": "${[scenarioContext][parentContext][testData][users][S1][id]}"
+			"user_id": "${[scenarioContext][parentContext][testData][users][S1][id]}",
+			"case_roles": [
+				"[ClaimantSolicitor]",
+				"[DefendantSolicitor]",
+				"[CREATOR]"
+			]
 		}
 	},
-
 	"expectedResponse": {
 		"_extends_": "Common_201_Response",
 		"headers": {
-            "Strict-Transport-Security": "[[ANY_NULLABLE]]",
-            "Content-Type": "[[ANY_NULLABLE]]",
+			"Strict-Transport-Security": "[[ANY_NULLABLE]]",
+			"Content-Type": "[[ANY_NULLABLE]]",
 			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
 		}
 	}

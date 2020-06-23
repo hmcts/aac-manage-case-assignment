@@ -20,16 +20,18 @@
 		"body": {
 			"user_id": "${[scenarioContext][parentContext][testData][users][S1][id]}",
 			"case_roles": [
-				"[CREATOR]"
+				"[CLAIMANTSOLICITOR]",
+				"[DEFENDANTSOLICITOR]",
+				"[CREATOR]",
+				"[COLLABORATOR]"
 			]
 		}
 	},
 	"expectedResponse": {
-		"_extends_": "Common_201_Response",
+		"_extends_": "Common_204_Response",
 		"headers": {
 			"Strict-Transport-Security": "[[ANY_NULLABLE]]",
-			"Content-Type": "[[ANY_NULLABLE]]",
-			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
+			"Content-Type": "[[ANY_NULLABLE]]"
 		}
 	}
 }

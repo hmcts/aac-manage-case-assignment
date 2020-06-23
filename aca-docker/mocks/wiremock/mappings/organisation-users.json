@@ -4,7 +4,7 @@
     "urlPath": "/refdata/external/v1/organisations/users",
     "queryParameters": {
       "status": {
-        "equalTo": "ACTIVE"
+        "equalTo": "Active"
       }
     }
   },

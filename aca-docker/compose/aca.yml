@@ -4,7 +4,7 @@ version: '2.4'
 services:
 
   manage-case-assignment:
-    image: "hmctspublic.azurecr.io/aac/manage-case-assignment:latest"
+    image: "hmctspublic.azurecr.io/aac/manage-case-assignment:pr-23-79ef4f3b"
     environment:
       SERVER_PORT: 4454
       IDAM_URL: http://idam-api:5000

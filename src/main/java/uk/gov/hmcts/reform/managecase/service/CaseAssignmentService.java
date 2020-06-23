@@ -65,7 +65,7 @@ public class CaseAssignmentService {
         Optional<ProfessionalUser> userOptional = findUserBy(usersByOrg.getUsers(), assignment.getAssigneeId());
         ProfessionalUser assignee = userOptional.orElseThrow(() -> new ValidationException(ASSIGNEE_ORGA_ERROR));
 
-        if (!assignee.getRoles().contains(solicitorRole)) {
+        if (!containsIgnoreCase(assignee.getRoles(), solicitorRole)) {
             throw new ValidationException(ASSIGNEE_ROLE_ERROR);
         }
 
@@ -96,9 +96,10 @@ public class CaseAssignmentService {
             .collect(Collectors.toList());
     }
 
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis") // false positive
     private void validateInvokerRoles(String... inputRoles) {
         List<String> invokerRoles = securityUtils.getUserInfo().getRoles();
-        if (Stream.of(inputRoles).noneMatch(invokerRoles::contains)) {
+        if (Stream.of(inputRoles).noneMatch(role -> containsIgnoreCase(invokerRoles, role))) {
             throw new AccessDeniedException(INVOKER_ROLE_ERROR);
         }
     }
@@ -107,6 +108,10 @@ public class CaseAssignmentService {
         return users.stream()
                 .filter(user -> assigneeId.equalsIgnoreCase(user.getUserIdentifier()))
                 .findFirst();
+    }
+
+    private boolean containsIgnoreCase(List<String> list, String value) {
+        return list.stream().anyMatch(value::equalsIgnoreCase);
     }
 
 }

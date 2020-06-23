@@ -38,7 +38,7 @@ idam:
   api:
     url: ${IDAM_URL:http://localhost:5000}
   s2s-auth:
-    microservice: aac_mca
+    microservice: aac_manage_case_assignment
     totp_secret: ${MANAGE_CASE_S2S_KEY:AAAAAAAAAAAAAAAA}
     url: ${S2S_URL:http://localhost:4502}
   s2s-authorised:

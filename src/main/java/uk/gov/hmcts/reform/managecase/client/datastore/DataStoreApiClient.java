@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.managecase.client.ApiClientConfig;
 
 import java.util.List;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @FeignClient(
     name = "data-store-api",
     url = "${ccd.data-store.host}",
@@ -15,9 +17,9 @@ import java.util.List;
 )
 public interface DataStoreApiClient {
 
-    @PostMapping("/searchCases")
+    @PostMapping(value = "/searchCases", consumes = APPLICATION_JSON_VALUE)
     CaseSearchResponse searchCases(@RequestParam("ctid") String caseTypeId,  @RequestBody String jsonSearchRequest);
 
-    @PostMapping("/case-users")
+    @PostMapping(value = "/case-users", consumes = APPLICATION_JSON_VALUE)
     void assignCase(@RequestBody List<CaseUserRole> caseAssignedRoles);
 }

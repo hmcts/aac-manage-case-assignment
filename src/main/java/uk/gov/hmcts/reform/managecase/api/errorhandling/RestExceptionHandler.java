@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.managecase.api.errorhandling;
 
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,10 +21,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
-        MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+            MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         String[] errors = ex.getBindingResult().getFieldErrors().stream()
-            .map(e -> e.getDefaultMessage())
-            .toArray(String[]::new);
+                .map(e -> e.getDefaultMessage())
+                .toArray(String[]::new);
         return toResponseEntity(status, ex.getLocalizedMessage(), errors);
     }
 
@@ -37,6 +38,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleValidationException(Exception ex) {
         log.debug("Validation exception:", ex);
         return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
+    }
+
+    @ExceptionHandler(FeignException.class)
+    public ResponseEntity<Object> handleFeignStatusException(FeignException ex) {
+        log.error(ex.getMessage(), ex);
+        ex.responseBody().ifPresent(response -> log.error(new String(response.array())));
+        return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(Exception.class)

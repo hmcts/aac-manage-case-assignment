@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.managecase.client.ApiClientConfig;
 
-import java.util.List;
-
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @FeignClient(
@@ -21,5 +19,5 @@ public interface DataStoreApiClient {
     CaseSearchResponse searchCases(@RequestParam("ctid") String caseTypeId,  @RequestBody String jsonSearchRequest);
 
     @PostMapping(value = "/case-users", consumes = APPLICATION_JSON_VALUE)
-    void assignCase(@RequestBody List<CaseUserRole> caseAssignedRoles);
+    void assignCase(@RequestBody CaseUserRolesRequest userRolesRequest);
 }

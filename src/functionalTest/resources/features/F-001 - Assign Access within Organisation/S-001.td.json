@@ -36,13 +36,12 @@
 	"request": {
 	    "_extends_": "Common_Request",
 		"body": {
-			"case_id": "11",
-			"assignee_id": "22",
-			"case_type_id": "33"
+			"case_type_id": "${[scenarioContext][childContexts][Prerequisite_Case_Creation_C1][testData][actualResponse][body][case_type_id]}",
+			"case_id": "${[scenarioContext][childContexts][Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+			"assignee_id": "${[scenarioContext][testData][users][S2][id]}"
 		}
 	},
-
-	"expectedResponse": {
+    "expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"body": {
 			"status_message": "Role [Defendant] from the organisation policy successfully assigned to the assignee."

@@ -3,7 +3,7 @@
 	"productName": "CCD Data Store",
 	"operationName": "Grant access to case",
 	"method": "PUT",
-	"uri": "{{DATA_STORE_HOST}}/cases/{caseReference}/users",
+	"uri": "{{DATA_STORE_HOST}}/cases/{caseReference}/users/{userId}",
 	"specs": [
 		"to grant access to C1 for S1"
 	],
@@ -14,7 +14,8 @@
 	"request": {
 		"_extends_": "Common_Request",
 		"pathVariables": {
-			"caseReference": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
+			"caseReference": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+			"userId": "${[scenarioContext][parentContext][testData][users][S1][id]}"
 		},
 		"body": {
 			"user_id": "${[scenarioContext][parentContext][testData][users][S1][id]}",

@@ -24,7 +24,7 @@ public class SecurityUtils {
     }
 
     public String getS2SToken() {
-        return BEARER + authTokenGenerator.generate();
+        return authTokenGenerator.generate();
     }
 
     public String getUserToken() {

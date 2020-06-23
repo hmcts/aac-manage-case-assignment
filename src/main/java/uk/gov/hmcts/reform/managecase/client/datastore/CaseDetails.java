@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CaseDetails {
 
-    public static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "orgPolicyCaseAssignedRole";
+    public static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
 
     private String reference;
     private String jurisdiction;

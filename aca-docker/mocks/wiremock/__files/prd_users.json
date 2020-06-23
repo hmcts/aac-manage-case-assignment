@@ -1,10 +1,10 @@
 {
   "users": [
     {
-      "userIdentifier": "025aa1c2-0ff2-411f-8342-4f2560858ff2",
+      "userIdentifier": "9192e9c1-859d-4dfa-89fa-216fbcb715c2",
       "firstName": "string",
       "lastName": "string",
-      "email": "aca-assinee1@aca.gov.uk",
+      "email": "master.solicitor.1@gmail.com",
       "roles": [
         "caseworker",
         "caseworker-BEFTA_MASTER",
@@ -60,5 +60,5 @@
       "idamMessage": "11 OK"
     }
   ],
-  "organisationIdentifier": "cdsc"
+  "organisationIdentifier": "aca-2"
 }

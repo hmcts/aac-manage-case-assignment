@@ -1,12 +1,14 @@
 {
   "users": [
     {
-      "userIdentifier": "5d1fe0fc-d950-46dc-9b4e-ed86172ad8b9",
+      "userIdentifier": "025aa1c2-0ff2-411f-8342-4f2560858ff2",
       "firstName": "string",
       "lastName": "string",
-      "email": "pum_demo_pui-caa-internal@mailinator.com",
+      "email": "aca-assinee1@aca.gov.uk",
       "roles": [
-        "pui-caa"
+        "caseworker",
+        "caseworker-BEFTA_MASTER",
+        "caseworker-BEFTA_MASTER-solicitor"
       ],
       "idamStatus": "ACTIVE",
       "idamStatusCode": "200",
@@ -58,5 +60,5 @@
       "idamMessage": "11 OK"
     }
   ],
-  "organisationIdentifier": "259facf"
+  "organisationIdentifier": "cdsc"
 }

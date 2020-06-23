@@ -1,0 +1,7 @@
+[
+  {"email": "master.caseworker@gmail.com", "roles": "caseworker,caseworker-befta_master,caseworker-caa", "lastName": "(local-authority)"},
+  {"email": "master.solicitor.1@gmail.com", "roles": "caseworker,caseworker-BEFTA_MASTER, caseworker-BEFTA_MASTER-solicitor", "lastName": "(local-authority)"},
+  {"email": "aca-invoker@aca.gov.uk", "roles": "caseworker,caseworker-AUTOTEST1,caseworker-AUTOTEST1-solicitor", "lastName": "(local-authority)"},
+  {"email": "aca-assinee1@aca.gov.uk", "roles": "caseworker,caseworker-AUTOTEST1,caseworker-AUTOTEST1-solicitor", "lastName": "(local-authority)"},
+  {"email": "aca-assinee2@aca.gov.uk", "roles": "caseworker,caseworker-AUTOTEST1", "lastName": "(local-authority)"}
+]

@@ -21,7 +21,6 @@
 			"user_id": "${[scenarioContext][parentContext][testData][users][S1][id]}",
 			"case_roles": [
 				"[ClaimantSolicitor]",
-				"[DefendantSolicitor]",
 				"[CREATOR]"
 			]
 		}

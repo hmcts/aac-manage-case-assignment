@@ -42,8 +42,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<Object> handleFeignStatusException(FeignException ex) {
-        log.error(ex.getMessage(), ex);
-        ex.responseBody().ifPresent(response -> log.error(new String(response.array())));
+        log.error("Downstream service errors: {}", ex.getMessage(), ex);
         return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
     }
 

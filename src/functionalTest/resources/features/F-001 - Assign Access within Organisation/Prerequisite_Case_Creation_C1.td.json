@@ -5,12 +5,12 @@
 	"method": "POST",
 	"uri": "{{DATA_STORE_HOST}}/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
 	"specs": [
-		"C1, which has just been"
+		"C1, which S1 has just"
 	],
 	"users": {
 		"invokingUser": {
-			"username": "master.caseworker@gmail.com",
-			"password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+			"username": "befta.caseworker.2.solicitor.1@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
 		}
 	},
 	"request": {

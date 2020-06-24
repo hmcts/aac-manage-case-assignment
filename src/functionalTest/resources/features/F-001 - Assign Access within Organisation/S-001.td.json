@@ -6,9 +6,8 @@
 	"operationName": "Assign Access within Organisation",
 
 	"specs": [
-		"S1 - with a solicitor role under an organisation to receive initial access on a case from a case worker",
-		"S2 - with a solicitor role within the same organisation, with whome S1 will share a case with an assignment within organisation",
-		"CW1 - to create a case and initially grant access for S1 on it",
+		"S1 - a solicitor, to create a case under their organisation and share it with a fellow-solicitor in the same organisation",
+		"S2 - another solicitor in the same organisation, with whom S1 will share a case with an assignment within organisation",
 		"is to be invoked by S1 to assign access over C1 for S2 within the same organisation"
 	],
 

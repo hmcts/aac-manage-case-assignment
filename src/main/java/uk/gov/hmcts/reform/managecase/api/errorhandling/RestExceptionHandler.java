@@ -25,7 +25,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String[] errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(e -> e.getDefaultMessage())
                 .toArray(String[]::new);
-        return toResponseEntity(status, ex.getLocalizedMessage(), errors);
+        log.debug("MethodArgumentNotValidException:{}", ex.getLocalizedMessage());
+        return toResponseEntity(status, null, errors);
     }
 
     @ExceptionHandler(AccessDeniedException.class)

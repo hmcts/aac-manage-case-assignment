@@ -10,7 +10,7 @@ def component = "manage-case-assignment"
 GradleBuilder builder = new GradleBuilder(this, product)
 
 def secrets = [
-  'ccd-${env}': [ // NB: load CCD secrets used by BEFTA framework direct from equivilant CCD vault
+  'ccd-${env}': [
     secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
     secret('ccd-caseworker-autotest-password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
     secret('ccd-importer-autotest-email', 'CCD_IMPORT_AUTOTEST_EMAIL'),

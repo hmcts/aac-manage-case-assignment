@@ -8,9 +8,10 @@
 
 - [Docker](https://www.docker.com)
 - Install and run CCD stack as advised [here](https://github.com/hmcts/ccd-docker).
-  You would need to register aca service under `service-auth-provider` docker config in the ccd.
+  You would need to register aca and xuiwebapp services under `service-auth-provider` docker config in the ccd.
   ```
-  MICROSERVICEKEYS_AAC_MANAGE_CASE_ASSIGNMENT: "${S2S_KEY_MANAGE_CASE_ASSIGNMENT}"  
+  MICROSERVICEKEYS_AAC_MANAGE_CASE_ASSIGNMENT: "${S2S_KEY_MANAGE_CASE_ASSIGNMENT}"
+  MICROSERVICEKEYS_XUI_WEBAPP: "${S2S_KEY_XUI_WEBAPP}"
   ```
   Please enable and start elasticsearch along with other ccd components.
   ```
@@ -18,7 +19,13 @@
   ```
 *Memory and CPU allocations may need to be increased for successful execution of ccd applications altogether*
 
-## ACA Scripts
+## ACA
+
+Please run aca docker as follows. 
+```
+> cd aca_docker
+> docker-compose -f aca.yaml up -d
+```
 
 Scripts to create ACA test roles, services and users are located in the bin directory.
 

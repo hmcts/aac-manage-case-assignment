@@ -1,0 +1,64 @@
+{
+  "users": [
+    {
+      "userIdentifier": "9192e9c1-859d-4dfa-89fa-216fbcb715c2",
+      "firstName": "string",
+      "lastName": "string",
+      "email": "master.solicitor.1@gmail.com",
+      "roles": [
+        "caseworker",
+        "caseworker-BEFTA_MASTER",
+        "caseworker-BEFTA_MASTER-solicitor"
+      ],
+      "idamStatus": "ACTIVE",
+      "idamStatusCode": "200",
+      "idamMessage": "11 OK"
+    },
+    {
+      "userIdentifier": "bd827c2e-275c-4698-9a01-9b11137bc5f3",
+      "firstName": "string",
+      "lastName": "string",
+      "email": "pum_demo_internal@mailinator.com",
+      "roles": [
+        "pui-finance-manager",
+        "pui-user-manager",
+        "pui-case-manager",
+        "caseworker-caa",
+        "pui-caa",
+        "pui-organisation-manager"
+      ],
+      "idamStatus": "ACTIVE",
+      "idamStatusCode": "200",
+      "idamMessage": "11 OK"
+    },
+    {
+      "userIdentifier": "ea92e5c2-21f5-4bd6-bbb0-640d6d87fb77",
+      "firstName": "string",
+      "lastName": "string",
+      "email": "superuser_demo_internal@mailinator.com",
+      "roles": [
+        "pui-finance-manager",
+        "pui-user-manager",
+        "caseworker-publiclaw",
+        "caseworker-divorce",
+        "caseworker-divorce-solicitor",
+        "pui-caa",
+        "pui-organisation-manager",
+        "caseworker-probate",
+        "caseworker-probate-solicitor",
+        "caseworker-ia",
+        "caseworker-publiclaw-solicitor",
+        "pui-case-manager",
+        "caseworker-divorce-financialremedy",
+        "caseworker-caa",
+        "caseworker-ia-legalrep-solicitor",
+        "caseworker-divorce-financialremedy-solicitor",
+        "caseworker"
+      ],
+      "idamStatus": "ACTIVE",
+      "idamStatusCode": "200",
+      "idamMessage": "11 OK"
+    }
+  ],
+  "organisationIdentifier": "aca-2"
+}

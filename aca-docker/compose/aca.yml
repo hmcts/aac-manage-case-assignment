@@ -1,0 +1,35 @@
+---
+version: '2.4'
+
+services:
+  manage-case-assignment:
+    image: "hmctspublic.azurecr.io/aac/manage-case-assignment:pr-23-c476dc55"
+    container_name: manage-case-assignment
+    environment:
+      SERVER_PORT: 4454
+      IDAM_URL: http://idam-api:5000
+      S2S_URL: http://service-auth-provider-api:8080
+      MANAGE_CASE_S2S_KEY: "AAAAAAAAAAAAAAAA"
+      MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp
+      CCD_DATA_STORE_HOST: http://ccd-data-store-api:4452
+      PRD_HOST: http://aca-wiremock:8080
+    ports:
+      - 4454:4454
+    depends_on:
+      - aca-wiremock
+    networks:
+      - ccd-network
+
+  aca-wiremock:
+    container_name: aca-wiremock
+    image: rodolpheche/wiremock
+    volumes:
+      - ./../mocks/wiremock:/home/wiremock:rw
+    ports:
+      - 8765:8080
+    networks:
+      - ccd-network
+
+networks:
+  ccd-network:
+    external: true

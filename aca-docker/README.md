@@ -24,7 +24,7 @@
 Please run aca docker as follows. 
 ```
 > cd aca_docker
-> docker-compose -f aca.yaml up -d
+> docker-compose -f compose/aca.yml up -d
 ```
 
 Scripts to create ACA test roles, services and users are located in the bin directory.
@@ -34,7 +34,7 @@ Export following variables.
 export IDAM_ADMIN_USER=<enter email>
 export IDAM_ADMIN_PASSWORD=<enter password>
 ```
-`IDAM_ADMIN_USER` and `IDAM_ADMIN_PASSWORD` details can be found on confluence.
+`IDAM_ADMIN_USER` and `IDAM_ADMIN_PASSWORD` details can be found on [confluence](https://tools.hmcts.net/confluence/x/eQP3P)
 
 To add idam client services (eg: xui-web) :
 

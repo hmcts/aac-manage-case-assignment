@@ -9,8 +9,12 @@ import io.cucumber.junit.CucumberOptions;
 import uk.gov.hmcts.befta.BeftaMain;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(plugin = "json:target/cucumber.json", glue = "uk.gov.hmcts.befta.player", features = {
-        "classpath:features" }, tags = { "not @Ignore" })
+@CucumberOptions(
+    plugin = "json:target/cucumber.json",
+    glue = { "uk.gov.hmcts.befta.player", "uk.gov.hmcts.reform.managecase.befta" },
+    features = { "classpath:features" },
+    tags = { "not @Ignore" }
+)
 public final class ManageCaseAssignmentsBeftaRunner {
 
     private ManageCaseAssignmentsBeftaRunner() {

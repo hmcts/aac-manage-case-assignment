@@ -15,6 +15,20 @@
       "idamMessage": "11 OK"
     },
     {
+      "userIdentifier": "bd7065ed-d4f0-4cfa-aee4-fcd0996b510a",
+      "firstName": "string",
+      "lastName": "string",
+      "email": "master.solicitor.2@gmail.com",
+      "roles": [
+        "caseworker",
+        "caseworker-BEFTA_MASTER",
+        "caseworker-BEFTA_MASTER-solicitor"
+      ],
+      "idamStatus": "ACTIVE",
+      "idamStatusCode": "200",
+      "idamMessage": "11 OK"
+    },
+    {
       "userIdentifier": "bd827c2e-275c-4698-9a01-9b11137bc5f3",
       "firstName": "string",
       "lastName": "string",

@@ -41,7 +41,7 @@ sourceSets {
 }
 
 tasks.withType(JavaCompile) {
-  options.compilerArgs << "-Xlint:unchecked" << "-Werror"
+  options.compilerArgs << "-Xlint:unchecked"
 }
 
 tasks.withType(Test) {
@@ -70,7 +70,7 @@ task functional(type: Test) {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = ['--plugin', "json:$project.buildDir/reports/tests/befta/cucumber.json", '--tags', 'not @Ignore', '--glue',
-              'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features']
+              'uk.gov.hmcts.reform.managecase.befta', '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features']
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
     }
@@ -259,7 +259,7 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  functionalTestImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '3.0.4'
+  functionalTestImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '3.1.1-RDM-8667.3'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath

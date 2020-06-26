@@ -43,25 +43,25 @@ Feature: F-001: Assign Access within Organisation
     And   the response has all the details as expected,
     And   a call [by S2 to access C1] will get the expected response as in [S2 fails to access C1].
 
-  @S-004 @Ignore
+  @S-004
   Scenario: must return an error response for a malformed Case ID
     Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
     And   a user [S2 - with a solicitor role within the same organisation],
     When  a request is prepared with appropriate values,
     And   the request [intends to assign access within the same organisation for S2 by S1],
     And   the request [contains a malformed Case ID],
-    And   it is submitted to call the [Assign Access within Organisation] operation of [Case Assignment Microservice],
+    And   it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
     Then  a negative response is received,
     And   the response has all the details as expected.
 
-  @S-005 @Ignore
+  @S-005
   Scenario: must return an error response for a missing Case ID
     Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
     And   a user [S2 - with a solicitor role within the same organisation],
     When  a request is prepared with appropriate values,
     And   the request [intends to assign access within the same organisation for S2 by S1],
     And   the request [does not contain a Case ID],
-    And   it is submitted to call the [Assign Access within Organisation] operation of [Case Assignment Microservice],
+    And   it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
     Then  a negative response is received,
     And   the response has all the details as expected.
 

@@ -29,6 +29,19 @@
       "idamMessage": "11 OK"
     },
     {
+      "userIdentifier": "6f52b926-bc1c-4209-9d12-a92aa96e16b1",
+      "firstName": "string",
+      "lastName": "string",
+      "email": "master.caseworker@gmail.com",
+      "roles": [
+        "caseworker",
+        "caseworker-BEFTA_MASTER"
+      ],
+      "idamStatus": "ACTIVE",
+      "idamStatusCode": "200",
+      "idamMessage": "11 OK"
+    },
+    {
       "userIdentifier": "bd827c2e-275c-4698-9a01-9b11137bc5f3",
       "firstName": "string",
       "lastName": "string",

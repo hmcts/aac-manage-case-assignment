@@ -1,15 +1,15 @@
 {
-  "_guid_": "Prerequisite_Case_Creation_C1",
+  "_guid_": "Prerequisite_Case_Creation_C2",
   "productName": "CCD Data Store",
-  "operationName": "Submit case creation as Solicitor",
+  "operationName": "Submit case creation as Caseworker CAA",
   "method": "POST",
   "uri": "{{DATA_STORE_HOST}}/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
   "specs": [
-    "C1, which S1 has just"
+    "C2, which CW1 has just"
   ],
   "user": {
-    "username": "master.solicitor.1@gmail.com",
-    "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
+    "username": "master.caseworker@gmail.com",
+    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
   },
   "request": {
     "_extends_": "Common_Request",
@@ -19,7 +19,7 @@
       "ctid": "FT_MasterCaseType"
     },
     "body": {
-      "event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1_Token_Creation][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C2_Token_Creation][testData][actualResponse][body][token]}",
       "data": {
         "TextField": "Case Created for FTA",
         "TextAreaField": "multi line\ninput \nfor test",

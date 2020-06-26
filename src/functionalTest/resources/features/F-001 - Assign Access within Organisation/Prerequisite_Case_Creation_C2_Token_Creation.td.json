@@ -1,15 +1,15 @@
 {
-  "_guid_": "Prerequisite_Case_Creation_C1_Token_Creation",
+  "_guid_": "Prerequisite_Case_Creation_C2_Token_Creation",
   "productName": "CCD Data Store",
-  "operationName": "Start event creation as Solicitor",
+  "operationName": "Start event creation as Caseworker CAA",
   "method": "GET",
   "uri": "{{DATA_STORE_HOST}}/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
   "specs": [
     "to create a token for case creation"
   ],
   "user": {
-    "username": "master.solicitor.1@gmail.com",
-    "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
+    "username": "master.caseworker@gmail.com",
+    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
   },
   "request": {
     "_extends_": "Common_Request",

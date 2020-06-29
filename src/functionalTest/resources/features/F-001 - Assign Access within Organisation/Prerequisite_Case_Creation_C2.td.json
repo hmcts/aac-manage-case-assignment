@@ -1,58 +1,22 @@
 {
   "_guid_": "Prerequisite_Case_Creation_C2",
-  "productName": "CCD Data Store",
-  "operationName": "Submit case creation as Caseworker CAA",
-  "method": "POST",
-  "uri": "{{DATA_STORE_HOST}}/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+  "_extends_": "Case_Creation",
   "specs": [
-    "C2, which CW1 has just"
+    "C2, which CW1 has just",
+    "C2, which U1 has just"
   ],
   "user": {
     "username": "master.caseworker@gmail.com",
     "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
   },
   "request": {
-    "_extends_": "Common_Request",
     "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType"
     },
     "body": {
       "event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C2_Token_Creation][testData][actualResponse][body][token]}",
       "data": {
-        "TextField": "Case Created for FTA",
-        "TextAreaField": "multi line\ninput \nfor test",
-        "DateField": "1977-01-01",
-        "PhoneField": "+447541710866",
-        "NumberField": "234",
-        "YesNoField": "No",
-        "CollectionField": [
-          {
-            "id": null,
-            "value": "value in collection element - 1"
-          },
-          {
-            "id": null,
-            "value": "value in collection element - 2"
-          }
-        ],
-        "AddressUKField": {
-          "AddressLine1": null,
-          "AddressLine2": null,
-          "AddressLine3": null,
-          "PostTown": null,
-          "County": null,
-          "PostCode": null,
-          "Country": null
-        },
-        "MarritalStatus": "MARRIAGE",
-        "MoneyField": "20000",
-        "EmailField": "info@ccd.hmcts.net",
-        "MultiSelectField": [
-          "OXFORD",
-          "CARDIFF"
-        ],
         "OrganisationPolicyField1": {
           "OrgPolicyCaseAssignedRole": "[Claimant]",
           "OrgPolicyReference": "ClaimantPolicy",
@@ -68,77 +32,21 @@
             "OrganisationID": "aca-2",
             "OrganisationName": "ACA-2 Organisation"
           }
-        },
-        "DynamicList": null,
-        "AddressField": {
-          "AddressLine1": "ABC Street",
-          "AddressLine2": "DEF Avenue",
-          "AddressLine3": null,
-          "Country": "UK"
-        },
-        "DocumentField": {
-          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4",
-          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4/binary",
-          "document_filename": "Sample.pdf"
         }
       },
       "event": {
         "id": "createCase",
         "summary": "",
         "description": ""
-      },
-      "ignore_warning": false,
-      "draft_id": null
+      }
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_201_Response",
-    "headers": {
-      "Strict-Transport-Security": "[[ANY_NULLABLE]]",
-      "Content-Encoding": "gzip",
-      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]",
-      "Vary": "accept-encoding"
-    },
     "body": {
-      "id": "[[ANY_NUMBER_NOT_NULLABLE]]",
       "jurisdiction": "BEFTA_MASTER",
       "case_type_id": "FT_MasterCaseType",
       "state": "CaseCreated",
-      "version": 0,
-      "created_date": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "last_modified": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "last_state_modified_date": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "security_classification": "PUBLIC",
-      "after_submit_callback_response": null,
-      "callback_response_status_code": null,
-      "callback_response_status": null,
-      "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null,
       "case_data": {
-        "AddressField": {
-          "AddressLine1": "ABC Street",
-          "AddressLine2": "DEF Avenue",
-          "AddressLine3": null,
-          "Country": "UK"
-        },
-        "AddressUKField": {
-          "AddressLine1": null,
-          "AddressLine2": null,
-          "AddressLine3": null,
-          "PostTown": null,
-          "County": null,
-          "PostCode": null,
-          "Country": null
-        },
-        "DocumentField": {
-          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4",
-          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4/binary",
-          "document_filename": "Sample.pdf"
-        },
-        "MoneyField": "20000",
-        "DynamicList": null,
-        "MarritalStatus": "MARRIAGE",
-        "NumberField": "234",
         "OrganisationPolicyField1": {
           "OrgPolicyCaseAssignedRole": "[Claimant]",
           "OrgPolicyReference": "ClaimantPolicy",
@@ -154,178 +62,6 @@
             "OrganisationID": "aca-2",
             "OrganisationName": "ACA-2 Organisation"
           }
-        },
-        "MultiSelectField": [
-          "OXFORD",
-          "CARDIFF"
-        ],
-        "YesNoField": "No",
-        "EmailField": "info@ccd.hmcts.net",
-        "TextField": "Case Created for FTA",
-        "PhoneField": "+447541710866",
-        "DateField": "1977-01-01",
-        "TextAreaField": "multi line\ninput \nfor test",
-        "CollectionField": [
-          {
-            "value": "value in collection element - 1",
-            "id": "[[ANY_STRING_NOT_NULLABLE]]"
-          },
-          {
-            "value": "value in collection element - 2",
-            "id": "[[ANY_STRING_NOT_NULLABLE]]"
-          }
-        ]
-      },
-      "security_classifications": {
-        "AddressField": {
-          "classification": "PUBLIC",
-          "value": {
-            "AddressLine1": "PUBLIC",
-            "AddressLine2": "PUBLIC",
-            "AddressLine3": "PUBLIC",
-            "Country": "PUBLIC"
-          }
-        },
-        "AddressUKField": {
-          "classification": "PUBLIC",
-          "value": {
-            "AddressLine1": "PUBLIC",
-            "AddressLine2": "PUBLIC",
-            "AddressLine3": "PUBLIC",
-            "PostTown": "PUBLIC",
-            "County": "PUBLIC",
-            "PostCode": "PUBLIC",
-            "Country": "PUBLIC"
-          }
-        },
-        "DocumentField": "PUBLIC",
-        "MoneyField": "PUBLIC",
-        "DynamicList": "PUBLIC",
-        "MarritalStatus": "PUBLIC",
-        "NumberField": "PUBLIC",
-        "MultiSelectField": "PUBLIC",
-        "YesNoField": "PUBLIC",
-        "EmailField": "PUBLIC",
-        "TextField": "PUBLIC",
-        "PhoneField": "PUBLIC",
-        "DateField": "PUBLIC",
-        "OrganisationPolicyField2": {
-          "classification": "PUBLIC",
-          "value": {
-            "OrgPolicyCaseAssignedRole": "PUBLIC",
-            "OrgPolicyReference": "PUBLIC",
-            "Organisation": {
-              "classification": "PUBLIC",
-              "value": {
-                "OrganisationID": "PUBLIC",
-                "OrganisationName": "PUBLIC"
-              }
-            }
-          }
-        },
-        "TextAreaField": "PUBLIC",
-        "OrganisationPolicyField1": {
-          "classification": "PUBLIC",
-          "value": {
-            "OrgPolicyCaseAssignedRole": "PUBLIC",
-            "OrgPolicyReference": "PUBLIC",
-            "Organisation": {
-              "classification": "PUBLIC",
-              "value": {
-                "OrganisationID": "PUBLIC",
-                "OrganisationName": "PUBLIC"
-              }
-            }
-          }
-        },
-        "CollectionField": {
-          "classification": "PUBLIC",
-          "value": [
-            {
-              "id": "[[ANY_STRING_NOT_NULLABLE]]",
-              "classification": "PUBLIC"
-            },
-            {
-              "id": "[[ANY_STRING_NOT_NULLABLE]]",
-              "classification": "PUBLIC"
-            }
-          ]
-        }
-      },
-      "data_classification": {
-        "AddressField": {
-          "classification": "PUBLIC",
-          "value": {
-            "AddressLine1": "PUBLIC",
-            "AddressLine2": "PUBLIC",
-            "AddressLine3": "PUBLIC",
-            "Country": "PUBLIC"
-          }
-        },
-        "AddressUKField": {
-          "classification": "PUBLIC",
-          "value": {
-            "AddressLine1": "PUBLIC",
-            "AddressLine2": "PUBLIC",
-            "AddressLine3": "PUBLIC",
-            "PostTown": "PUBLIC",
-            "County": "PUBLIC",
-            "PostCode": "PUBLIC",
-            "Country": "PUBLIC"
-          }
-        },
-        "DocumentField": "PUBLIC",
-        "MoneyField": "PUBLIC",
-        "DynamicList": "PUBLIC",
-        "MarritalStatus": "PUBLIC",
-        "NumberField": "PUBLIC",
-        "MultiSelectField": "PUBLIC",
-        "YesNoField": "PUBLIC",
-        "EmailField": "PUBLIC",
-        "TextField": "PUBLIC",
-        "PhoneField": "PUBLIC",
-        "DateField": "PUBLIC",
-        "OrganisationPolicyField2": {
-          "classification": "PUBLIC",
-          "value": {
-            "OrgPolicyCaseAssignedRole": "PUBLIC",
-            "OrgPolicyReference": "PUBLIC",
-            "Organisation": {
-              "classification": "PUBLIC",
-              "value": {
-                "OrganisationID": "PUBLIC",
-                "OrganisationName": "PUBLIC"
-              }
-            }
-          }
-        },
-        "TextAreaField": "PUBLIC",
-        "OrganisationPolicyField1": {
-          "classification": "PUBLIC",
-          "value": {
-            "OrgPolicyCaseAssignedRole": "PUBLIC",
-            "OrgPolicyReference": "PUBLIC",
-            "Organisation": {
-              "classification": "PUBLIC",
-              "value": {
-                "OrganisationID": "PUBLIC",
-                "OrganisationName": "PUBLIC"
-              }
-            }
-          }
-        },
-        "CollectionField": {
-          "classification": "PUBLIC",
-          "value": [
-            {
-              "id": "[[ANY_STRING_NOT_NULLABLE]]",
-              "classification": "PUBLIC"
-            },
-            {
-              "id": "[[ANY_STRING_NOT_NULLABLE]]",
-              "classification": "PUBLIC"
-            }
-          ]
         }
       }
     }

@@ -1,6 +1,6 @@
 {
-  "_guid_": "S2_Querying_Their_Access_Over_C1",
-  "title": "S2 Querying Their Access Over C1",
+  "_guid_": "S2_Querying_No_Access_Over_C1",
+  "title": "S2 Querying No Access Over C1",
   "_extends_": "Case_Assigned_Users_Roles",
   "specs": [
     "by S2 to query his/her case roles granted over C1"
@@ -16,13 +16,7 @@
   },
   "expectedResponse": {
     "body": {
-      "case_users": [
-        {
-          "case_id": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
-          "user_id": "${[scenarioContext][testData][users][invokingUser][id]}",
-          "case_role": "[Defendant]"
-        }
-      ]
+      "case_users": []
     }
   }
 }

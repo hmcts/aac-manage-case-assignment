@@ -49,7 +49,7 @@ sourceSets {
 }
 
 tasks.withType(JavaCompile) {
-  options.compilerArgs << "-Xlint:unchecked" << "-Werror"
+  options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }
 
 tasks.withType(Test) {
@@ -175,7 +175,7 @@ repositories {
     url 'https://dl.bintray.com/hmcts/hmcts-maven'
   }
   maven {
-    url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/'
+    url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/'
   }
 }
 

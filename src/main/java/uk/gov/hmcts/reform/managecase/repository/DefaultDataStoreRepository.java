@@ -34,13 +34,13 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public Optional<CaseDetails> findCaseBy(String caseTypeId, String caseId) {
+    public Optional<CaseDetails> findCaseBy(String caseTypeId, Long caseId) {
         CaseSearchResponse searchResponse = dataStoreApi.searchCases(caseTypeId, String.format(ES_QUERY, caseId));
         return searchResponse.getCases().stream().findFirst();
     }
 
     @Override
-    public void assignCase(String caseId, String caseRole, String userId) {
+    public void assignCase(Long caseId, String caseRole, String userId) {
         CaseUserRole caseUserRole = CaseUserRole.builder()
             .caseRole(caseRole)
             .caseId(caseId)

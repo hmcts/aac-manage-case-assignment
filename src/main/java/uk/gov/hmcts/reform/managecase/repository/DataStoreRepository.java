@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface DataStoreRepository {
 
-    Optional<CaseDetails> findCaseBy(String caseTypeId, String caseId);
+    Optional<CaseDetails> findCaseBy(String caseTypeId, Long caseId);
 
-    void assignCase(String caseId, String caseRole, String userId);
+    void assignCase(Long caseId, String caseRole, String userId);
 }

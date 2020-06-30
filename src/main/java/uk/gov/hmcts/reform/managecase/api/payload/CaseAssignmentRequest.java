@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @AllArgsConstructor
@@ -19,9 +20,9 @@ public class CaseAssignmentRequest {
     private String caseTypeId;
 
     @JsonProperty("case_id")
-    @NotEmpty(message = "Case ID can not be empty")
+    @NotNull(message = "Case ID can not be empty")
     @ApiModelProperty(value = "Case ID to Assign Access To", required = true, example = "1583841721773828")
-    private String caseId;
+    private Long caseId;
 
     @JsonProperty("assignee_id")
     @NotEmpty(message = "IDAM Assignee ID can not be empty")

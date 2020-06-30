@@ -31,7 +31,7 @@ class DataStoreRepositoryTest {
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
     private static final String ASSIGNEE_ID = "0a5874a4-3f38-4bbd-ba4c";
     private static final String ROLE = "caseworker-probate";
-    private static final String CASE_ID = "12345678";
+    private static final Long CASE_ID = 12345678L;
 
     @Mock
     private DataStoreApiClient dataStoreApi;

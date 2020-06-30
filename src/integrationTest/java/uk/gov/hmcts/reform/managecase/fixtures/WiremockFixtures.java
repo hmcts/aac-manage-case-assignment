@@ -38,15 +38,15 @@ public final class WiremockFixtures {
                 .willReturn(okForJson(response)));
     }
 
-    public static void stubSearchCase(String caseTypeId, Long caseId, CaseDetails caseDetails) {
+    public static void stubSearchCase(String caseTypeId, String caseId, CaseDetails caseDetails) {
         stubFor(WireMock.post(urlEqualTo("/searchCases?ctid=" + caseTypeId)).willReturn(
             aResponse().withStatus(HTTP_OK).withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
                 .withHeader("Content-Type", "application/json")));
     }
 
-    public static void stubAssignCase(Long caseId, String userId, String caseRole) {
+    public static void stubAssignCase(String caseId, String userId, String caseRole) {
         stubFor(WireMock.post(urlEqualTo("/case-users"))
-                .withRequestBody(matchingJsonPath("$.case_users[0].case_id", equalTo(String.valueOf(caseId))))
+                .withRequestBody(matchingJsonPath("$.case_users[0].case_id", equalTo(caseId)))
                 .withRequestBody(matchingJsonPath("$.case_users[0].case_role", equalTo(caseRole)))
                 .withRequestBody(matchingJsonPath("$.case_users[0].user_id", equalTo(userId)))
                 .willReturn(aResponse().withStatus(HTTP_OK)));

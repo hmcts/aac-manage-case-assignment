@@ -47,7 +47,7 @@ public class CaseAssignmentControllerTest {
 
     private static final String ASSIGNEE_ID = "0a5874a4-3f38-4bbd-ba4c";
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
-    private static final Long CASE_ID = 12345678L;
+    private static final String CASE_ID = "12345678";
     public static final String CASE_ASSIGNMENTS = "/case-assignments";
 
     @Autowired

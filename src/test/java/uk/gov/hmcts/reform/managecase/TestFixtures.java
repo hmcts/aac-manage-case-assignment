@@ -16,7 +16,7 @@ import java.util.List;
 public class TestFixtures {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
-    private static final Long CASE_ID = 12345678L;
+    private static final String CASE_ID = "12345678";
     private static final String JURISDICTION = "AUTOTEST1";
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
     private static final String ORGANIZATION_ID = "TEST_ORG";

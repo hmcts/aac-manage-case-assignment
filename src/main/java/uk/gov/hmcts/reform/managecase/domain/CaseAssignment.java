@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class CaseAssignment {
 
     private String caseTypeId;
-    private Long caseId;
+    private String caseId;
     private String assigneeId;
 }

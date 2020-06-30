@@ -11,7 +11,7 @@ import lombok.Getter;
 public class CaseUserRole {
 
     @JsonProperty("case_id")
-    private Long caseId;
+    private String caseId;
 
     @JsonProperty("user_id")
     private String userId;

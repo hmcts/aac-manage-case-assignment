@@ -19,7 +19,7 @@ public class CaseDetails {
 
     public static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
 
-    private Long reference;
+    private String reference;
     private String jurisdiction;
     private String state;
     @JsonProperty("case_type_id")

@@ -29,7 +29,33 @@
       "idamMessage": "11 OK"
     },
     {
-      "userIdentifier": "6f52b926-bc1c-4209-9d12-a92aa96e16b1",
+      "userIdentifier": "b07bd4bd-078f-4df0-b249-c4a19e9aeed6",
+      "firstName": "string",
+      "lastName": "string",
+      "email": "befta_master.solicitor.becky@gmail.com",
+      "roles": [
+        "caseworker",
+        "caseworker-BEFTA_MASTER-solicitor"
+      ],
+      "idamStatus": "ACTIVE",
+      "idamStatusCode": "200",
+      "idamMessage": "11 OK"
+    },
+    {
+      "userIdentifier": "fb406834-bdf4-483e-a230-f09a02824ab7",
+      "firstName": "string",
+      "lastName": "string",
+      "email": "befta_master.solicitor.benjamin@gmail.com",
+      "roles": [
+        "caseworker",
+        "caseworker-BEFTA_MASTER-solicitor"
+      ],
+      "idamStatus": "ACTIVE",
+      "idamStatusCode": "200",
+      "idamMessage": "11 OK"
+    },
+    {
+      "userIdentifier": "802e4422-28b9-4a38-b6e6-e0d76897d9f2",
       "firstName": "string",
       "lastName": "string",
       "email": "master.caseworker@gmail.com",

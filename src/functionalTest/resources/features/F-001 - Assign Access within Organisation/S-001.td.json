@@ -14,11 +14,11 @@
   "oauth2ClientId": "xuiwebapp",
   "users": {
     "S1": {
-      "username": "master.solicitor.1@gmail.com",
+      "username": "befta_master.solicitor.becky@gmail.com",
       "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
     },
     "S2": {
-      "username": "master.solicitor.2@gmail.com",
+      "username": "befta_master.solicitor.benjamin@gmail.com",
       "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_2_PWD]]"
     }
   },

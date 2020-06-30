@@ -4,7 +4,6 @@
 *.class
 
 # BEFTA temp locations
-bin/
 definition_files/
 
 ### STS ###

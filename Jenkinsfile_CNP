@@ -10,7 +10,7 @@ def component = "manage-case-assignment"
 GradleBuilder builder = new GradleBuilder(this, product)
 
 def secrets = [
-  'ccd-${env}': [ // NB: load CCD secrets used by BEFTA framework direct from equivilant CCD vault
+  'ccd-${env}': [
     secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
     secret('ccd-caseworker-autotest-password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
     secret('ccd-importer-autotest-email', 'CCD_IMPORT_AUTOTEST_EMAIL'),
@@ -38,7 +38,7 @@ def vaultOverrides = [
 // vars needed for functional tests
 env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
 env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
+env.BEFTA_S2S_CLIENT_ID = "xui_webapp"
 env.OAUTH2_CLIENT_ID = "ccd_gateway"
 env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"

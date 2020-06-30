@@ -1,4 +1,4 @@
-version: '2.1'
+version: '2.4'
 
 services:
   manage-case-assignment:
@@ -8,11 +8,14 @@ services:
         - http_proxy
         - https_proxy
         - no_proxy
-    image: hmctspublic.azurecr.io/aac/manage-case-assignment
+    image: hmctspublic.azurecr.io/aac/manage-case-assignment:latest
     environment:
-      # these environment variables are used by java-logging library
-      - REFORM_SERVICE_NAME=manage-case-assignment
-      - REFORM_TEAM=cdm
-      - REFORM_ENVIRONMENT=local
+      IDAM_URL: https://idam-web-public.aat.platform.hmcts.net
+      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      MANAGE_CASE_S2S_KEY: "AAAAAAAAAAAAAAAA" # use aat key from vault
+      MANAGE_CASE_S2S_AUTHORISED_SERVICES: ccd_gw,xui_webapp
+      CCD_DATA_STORE_HOST: http://ccd-data-store-api-aat.service.core-compute-aat.internal
+      PRD_HOST: http://rd-professional-api-aat.service.core-compute-aat.internal
+      # for debug JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     ports:
       - $SERVER_PORT:$SERVER_PORT

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.managecase.security;
+package uk.gov.hmcts.reform.managecase.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,7 +17,7 @@ public class IdamRepository {
     }
 
     @Cacheable("userInfoCache")
-    public UserInfo getUserInfo(String jwtToken) {
-        return idamClient.getUserInfo("Bearer " + jwtToken);
+    public UserInfo getUserInfo(String bearerToken) {
+        return idamClient.getUserInfo(bearerToken);
     }
 }

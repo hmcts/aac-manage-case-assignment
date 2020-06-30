@@ -36,7 +36,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final ServiceAuthFilter serviceAuthFilter;
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
-    private static final String[] AUTH_WHITELIST = {
+    private static final String[] AUTH_ALLOWED_LIST = {
         "/swagger-ui.html",
         "/webjars/springfox-swagger-ui/**",
         "/swagger-resources/**",
@@ -60,7 +60,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers(AUTH_WHITELIST);
+        web.ignoring().antMatchers(AUTH_ALLOWED_LIST);
     }
 
     @Override

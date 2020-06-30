@@ -57,7 +57,7 @@ These are the tests run against an environment. For example if you would like to
 export TEST_URL=http://localhost:4454
 export S2S_URL=http://localhost:4502
 export IDAM_URL=http://localhost:5000
-export BEFTA_S2S_CLIENT_ID=ccd_gw
+export BEFTA_S2S_CLIENT_ID=xui_webapp
 export BEFTA_S2S_CLIENT_SECRET=AAAAAAAAAAAAAAAC
 export CCD_CASEWORKER_AUTOTEST_EMAIL=someemail@blob.com
 export CCD_CASEWORKER_AUTOTEST_PASSWORD=XYZT
@@ -80,6 +80,23 @@ To run all checks execute the following command:
 ```bash
 ./gradlew clean checkstyleMain checkstyleTest checkstyleIntegrationTest pmdMain pmdTest pmdIntegrationTest
 ```
+### Docker
+Create docker image:
+
+```bash
+  docker-compose build
+```
+
+Run the distribution by executing the following command:
+
+```bash
+  docker-compose up
+```
+This will start the API container exposing the application's port 4454. 
+
+By default, docker-compose.yml is pointing to AAT urls of all downstream dependencies. So, you need to enable hmcts proxy.  
+
+You can spin-up full aca docker stack locally. Instructions are available under `aca-docker/README.md`.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.

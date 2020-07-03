@@ -74,7 +74,7 @@ public class CaseAssignmentControllerTest {
         this.mockMvc.perform(post(CASE_ASSIGNMENTS)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(content().contentType(APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.status_message", is(String.format(MESSAGE, "Assigned-Role"))));
     }
@@ -85,7 +85,7 @@ public class CaseAssignmentControllerTest {
         this.mockMvc.perform(post(CASE_ASSIGNMENTS)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk());
+            .andExpect(status().isCreated());
 
         ArgumentCaptor<CaseAssignment> captor = ArgumentCaptor.forClass(CaseAssignment.class);
         verify(service).assignCaseAccess(captor.capture());

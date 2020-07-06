@@ -53,7 +53,7 @@ public class CaseAssignmentService {
     }
 
     @SuppressWarnings("PMD")
-    public String assignCaseAccess(CaseAssignment assignment) {
+    public List<String> assignCaseAccess(CaseAssignment assignment) {
         CaseDetails caseDetails = getCase(assignment);
         String solicitorRole = String.format(SOLICITOR_ROLE, caseDetails.getJurisdiction());
 
@@ -69,11 +69,12 @@ public class CaseAssignmentService {
             throw new ValidationException(ASSIGNEE_ROLE_ERROR);
         }
 
-        OrganisationPolicy invokerPolicy = findInvokerOrgPolicy(caseDetails, usersByOrg.getOrganisationIdentifier());
-        dataStoreRepository.assignCase(
-            assignment.getCaseId(), invokerPolicy.getOrgPolicyCaseAssignedRole(), assignment.getAssigneeId()
-        );
-        return invokerPolicy.getOrgPolicyCaseAssignedRole();
+        List<String> policyRoles = findInvokerOrgPolicyRoles(caseDetails, usersByOrg.getOrganisationIdentifier());
+        if (policyRoles.isEmpty()) {
+            throw new ValidationException(ORGA_POLICY_ERROR);
+        }
+        dataStoreRepository.assignCase(policyRoles, assignment.getCaseId(), assignment.getAssigneeId());
+        return policyRoles;
     }
 
     private CaseDetails getCase(CaseAssignment input) {
@@ -81,12 +82,12 @@ public class CaseAssignmentService {
         return caseOptional.orElseThrow(() -> new ValidationException(CASE_NOT_FOUND));
     }
 
-    private OrganisationPolicy findInvokerOrgPolicy(CaseDetails caseDetails, String organisation) {
+    private List<String> findInvokerOrgPolicyRoles(CaseDetails caseDetails, String organisation) {
         List<OrganisationPolicy> policies = findPolicies(caseDetails);
         return policies.stream()
             .filter(policy -> organisation.equalsIgnoreCase(policy.getOrganisation().getOrganisationID()))
-            .findFirst()
-            .orElseThrow(() -> new ValidationException(ORGA_POLICY_ERROR));
+            .map(policy -> policy.getOrgPolicyCaseAssignedRole())
+            .collect(Collectors.toList());
     }
 
     private List<OrganisationPolicy> findPolicies(CaseDetails caseDetails) {

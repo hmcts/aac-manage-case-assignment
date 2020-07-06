@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
+import java.util.List;
 import java.util.Optional;
 
 import static java.util.List.of;
@@ -35,7 +36,7 @@ import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.ASSIG
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.INVOKER_ROLE_ERROR;
 
-@SuppressWarnings({"PMD.MethodNamingConventions"})
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.JUnitAssertionsShouldIncludeMessage"})
 class CaseAssignmentServiceTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
@@ -43,6 +44,7 @@ class CaseAssignmentServiceTest {
     private static final String CASE_ID = "12345678";
     private static final String ANOTHER_USER = "vcd345cvs-816a-4eea-b714-6654d022fcef";
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
+    private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";
     private static final String ORGANIZATION_ID = "TEST_ORG";
 
     @InjectMocks
@@ -77,14 +79,18 @@ class CaseAssignmentServiceTest {
     @DisplayName("should assign case in the organisation")
     void shouldAssignCaseAccess() {
 
+        given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, CASE_ID))
+                .willReturn(Optional.of(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2)));
+
         given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
-                .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE));
+                .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE))
+                .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE2));
 
-        String role = service.assignCaseAccess(caseAssignment);
+        List<String> roles = service.assignCaseAccess(caseAssignment);
 
-        assertThat(role).isEqualTo(ORG_POLICY_ROLE);
+        assertThat(roles).containsExactly(ORG_POLICY_ROLE, ORG_POLICY_ROLE2);
 
-        verify(dataStoreRepository).assignCase(CASE_ID, ORG_POLICY_ROLE, ASSIGNEE_ID);
+        verify(dataStoreRepository).assignCase(of(ORG_POLICY_ROLE, ORG_POLICY_ROLE2), CASE_ID, ASSIGNEE_ID);
     }
 
     @Test

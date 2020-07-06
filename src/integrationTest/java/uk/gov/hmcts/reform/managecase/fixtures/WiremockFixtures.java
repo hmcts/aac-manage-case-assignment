@@ -44,10 +44,10 @@ public final class WiremockFixtures {
                 .withHeader("Content-Type", "application/json")));
     }
 
-    public static void stubAssignCase(String caseId, String userId, String caseRole) {
+    public static void stubAssignCase(String caseId, String userId, String... caseRoles) {
         stubFor(WireMock.post(urlEqualTo("/case-users"))
                 .withRequestBody(matchingJsonPath("$.case_users[0].case_id", equalTo(caseId)))
-                .withRequestBody(matchingJsonPath("$.case_users[0].case_role", equalTo(caseRole)))
+                .withRequestBody(matchingJsonPath("$.case_users[0].case_role", equalTo(caseRoles[0])))
                 .withRequestBody(matchingJsonPath("$.case_users[0].user_id", equalTo(userId)))
                 .willReturn(aResponse().withStatus(HTTP_OK)));
     }

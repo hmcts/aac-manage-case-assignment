@@ -21,6 +21,9 @@ import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 
+import java.util.List;
+
+import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -34,7 +37,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.MESSAGE;
 
 @WebMvcTest(controllers = CaseAssignmentController.class,
     includeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes = MapperConfig.class),
@@ -42,13 +44,13 @@ import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentContro
         { SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class }))
 @AutoConfigureMockMvc(addFilters = false)
 @ImportAutoConfiguration(TestIdamConfiguration.class)
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert"})
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
 public class CaseAssignmentControllerTest {
 
     private static final String ASSIGNEE_ID = "0a5874a4-3f38-4bbd-ba4c";
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
     private static final String CASE_ID = "12345678";
-    public static final String CASE_ASSIGNMENTS = "/case-assignments";
+    private static final String CASE_ASSIGNMENTS = "/case-assignments";
 
     @Autowired
     private MockMvc mockMvc;
@@ -69,14 +71,16 @@ public class CaseAssignmentControllerTest {
     @DisplayName("should assign case successfully for a valid request")
     @Test
     void shouldAssignCaseAccess() throws Exception {
-        given(service.assignCaseAccess(any(CaseAssignment.class))).willReturn("Assigned-Role");
+        List<String> roles = of("Role1", "Role2");
+        given(service.assignCaseAccess(any(CaseAssignment.class))).willReturn(roles);
 
         this.mockMvc.perform(put(CASE_ASSIGNMENTS)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
             .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.status_message", is(String.format(MESSAGE, "Assigned-Role"))));
+            .andExpect(jsonPath("$.status_message", is(
+                    "Roles Role1,Role2 from the organisation policies successfully assigned to the assignee.")));
     }
 
     @DisplayName("should delegate to service domain for a valid request")

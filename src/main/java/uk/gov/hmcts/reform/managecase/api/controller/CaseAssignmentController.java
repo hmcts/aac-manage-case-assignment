@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
+import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -17,13 +18,16 @@ import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 
 import javax.validation.Valid;
 
+import java.util.List;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @Validated
 public class CaseAssignmentController {
 
-    public static final String MESSAGE = "Role %s from the organisation policy successfully assigned to the assignee.";
+    public static final String MESSAGE =
+            "Roles %s from the organisation policies successfully assigned to the assignee.";
 
     private final CaseAssignmentService caseAssignmentService;
     private final ModelMapper mapper;
@@ -71,7 +75,7 @@ public class CaseAssignmentController {
     public CaseAssignmentResponse assignAccessWithinOrganisation(
             @Valid @RequestBody CaseAssignmentRequest requestPayload) {
         CaseAssignment caseAssignment = mapper.map(requestPayload, CaseAssignment.class);
-        String role = caseAssignmentService.assignCaseAccess(caseAssignment);
-        return new CaseAssignmentResponse(String.format(MESSAGE, role));
+        List<String> roles = caseAssignmentService.assignCaseAccess(caseAssignment);
+        return new CaseAssignmentResponse(String.format(MESSAGE, StringUtils.join(roles, ',')));
     }
 }

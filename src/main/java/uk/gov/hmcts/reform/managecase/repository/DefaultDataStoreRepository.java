@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class DefaultDataStoreRepository implements DataStoreRepository {
@@ -40,12 +41,10 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public void assignCase(String caseId, String caseRole, String userId) {
-        CaseUserRole caseUserRole = CaseUserRole.builder()
-            .caseRole(caseRole)
-            .caseId(caseId)
-            .userId(userId)
-            .build();
-        dataStoreApi.assignCase(new CaseUserRolesRequest(List.of(caseUserRole)));
+    public void assignCase(List<String> caseRoles, String caseId, String userId) {
+        List<CaseUserRole> caseUserRoles = caseRoles.stream()
+                .map(role -> CaseUserRole.builder().caseRole(role).caseId(caseId).userId(userId).build())
+                .collect(Collectors.toList());
+        dataStoreApi.assignCase(new CaseUserRolesRequest(caseUserRoles));
     }
 }

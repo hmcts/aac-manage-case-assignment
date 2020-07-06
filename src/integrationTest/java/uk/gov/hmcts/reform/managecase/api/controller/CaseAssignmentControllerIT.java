@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.BaseTest;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
+
+import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
@@ -36,6 +39,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
     private static final String ANOTHER_USER = "vcd345cvs-816a-4eea-b714-6654d022fcef";
     private static final String CASE_ID = "12345678";
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
+    private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";
     private static final String ORGANIZATION_ID = "TEST_ORG";
 
     public static final String PATH = "/case-assignments";
@@ -69,6 +73,24 @@ public class CaseAssignmentControllerIT extends BaseTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.status_message", is(String.format(MESSAGE, ORG_POLICY_ROLE))));
+
+        verify(postRequestedFor(urlEqualTo("/case-users")));
+    }
+
+    @DisplayName("Successfully sharing case access with multiple org roles")
+    @Test
+    void shouldAssignCaseAccess_withMultipleOrganisationRoles() throws Exception {
+
+        stubSearchCase(CASE_TYPE_ID, CASE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
+        stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2);
+
+        this.mockMvc.perform(put(PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status_message", is(String.format(MESSAGE,
+                        StringUtils.join(List.of(ORG_POLICY_ROLE, ORG_POLICY_ROLE2), ',')))));
 
         verify(postRequestedFor(urlEqualTo("/case-users")));
     }

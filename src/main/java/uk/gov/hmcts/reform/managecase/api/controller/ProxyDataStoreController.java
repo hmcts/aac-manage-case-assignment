@@ -103,6 +103,8 @@ public class ProxyDataStoreController {
     }
 
     private URI prepareUri(HttpServletRequest request) throws URISyntaxException {
-        return new URI(applicationParams.getDateStoreHost() + request.getRequestURI().substring("/ccd".length()));
+        return new URI(applicationParams.getDateStoreHost()
+                           + request.getRequestURI().substring("/ccd".length())
+                           + (request.getQueryString() != null ? "?" + request.getQueryString() : ""));
     }
 }

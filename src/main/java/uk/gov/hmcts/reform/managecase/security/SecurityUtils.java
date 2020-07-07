@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.managecase.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -9,7 +8,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 
 import javax.inject.Named;
-import java.util.Collection;
 
 @Named
 public class SecurityUtils {

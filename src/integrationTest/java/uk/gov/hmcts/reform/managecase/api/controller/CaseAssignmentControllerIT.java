@@ -70,7 +70,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
         this.mockMvc.perform(post(PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(jsonPath("$.status_message", is(String.format(MESSAGE, ORG_POLICY_ROLE))));
 
         verify(postRequestedFor(urlEqualTo("/case-users")));
@@ -85,7 +85,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
         this.mockMvc.perform(post(PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(content().contentType(APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.status_message", is(String.format(MESSAGE, ORG_POLICY_ROLE))));
 

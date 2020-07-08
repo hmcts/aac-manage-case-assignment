@@ -13,13 +13,22 @@ import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse
 import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.okForJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.assertj.core.util.Lists.list;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 public final class WiremockFixtures {
+
+    private static final String ES_QUERY = "{\"query\":{\"bool\":{\"filter\":{\"term\":{\"reference\":%s}}}}}";
+
+    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    public static final String SYS_USER_TOKEN = "Bearer eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9aa";
+    public static final String S2S_TOKEN = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9"
+            + ".WWRzROlKxLQCJw5h0h0dHb9hHfbBhF2Idwv1z4L4FnqSw3VZ38ZRLuDmwr3tj-8oOv6EfLAxV0dJAPtUT203Iw";
 
     private static final ObjectMapper OBJECT_MAPPER = new Jackson2ObjectMapperBuilder()
         .modules(new Jdk8Module())
@@ -39,13 +48,19 @@ public final class WiremockFixtures {
     }
 
     public static void stubSearchCase(String caseTypeId, String caseId, CaseDetails caseDetails) {
-        stubFor(WireMock.post(urlEqualTo("/searchCases?ctid=" + caseTypeId)).willReturn(
-            aResponse().withStatus(HTTP_OK).withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
-                .withHeader("Content-Type", "application/json")));
+        stubFor(WireMock.post(urlEqualTo("/searchCases?ctid=" + caseTypeId))
+                .withRequestBody(equalToJson(String.format(ES_QUERY, caseId)))
+                .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                .willReturn(aResponse()
+                    .withStatus(HTTP_OK).withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
+                    .withHeader("Content-Type", "application/json")));
     }
 
     public static void stubAssignCase(String caseId, String userId, String caseRole) {
         stubFor(WireMock.post(urlEqualTo("/case-users"))
+                .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                 .withRequestBody(matchingJsonPath("$.case_users[0].case_id", equalTo(caseId)))
                 .withRequestBody(matchingJsonPath("$.case_users[0].case_role", equalTo(caseRole)))
                 .withRequestBody(matchingJsonPath("$.case_users[0].user_id", equalTo(userId)))

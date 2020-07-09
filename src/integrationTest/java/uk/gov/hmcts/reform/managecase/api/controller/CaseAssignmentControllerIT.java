@@ -57,7 +57,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
         stubInvokerWithRoles(CASEWORKER_CAA);
         stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor"),
                 user(ANOTHER_USER)));
-        stubSearchCase(CASE_TYPE_ID, CASE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
+        stubSearchCase(CASE_TYPE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
         stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE);
     }
 
@@ -142,7 +142,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
     @Test
     void shouldReturn400_whenInvokersOrgIsNotPresentInCaseData() throws Exception {
 
-        stubSearchCase(CASE_TYPE_ID, CASE_ID, caseDetails("ANOTHER_ORGANIZATION_ID", ORG_POLICY_ROLE));
+        stubSearchCase(CASE_TYPE_ID, caseDetails("ANOTHER_ORGANIZATION_ID", ORG_POLICY_ROLE));
 
         this.mockMvc.perform(put(PATH)
                                  .contentType(MediaType.APPLICATION_JSON)

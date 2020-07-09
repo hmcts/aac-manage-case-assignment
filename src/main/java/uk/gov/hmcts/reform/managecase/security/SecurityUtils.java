@@ -27,6 +27,10 @@ public class SecurityUtils {
         return authTokenGenerator.generate();
     }
 
+    public String getSystemUserToken() {
+        return idamRepository.getSystemUserAccessToken();
+    }
+
     public String getUserToken() {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return BEARER + jwt.getTokenValue();

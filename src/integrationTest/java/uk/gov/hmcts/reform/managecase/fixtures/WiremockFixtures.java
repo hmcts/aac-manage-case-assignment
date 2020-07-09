@@ -38,7 +38,7 @@ public final class WiremockFixtures {
                 .willReturn(okForJson(response)));
     }
 
-    public static void stubSearchCase(String caseTypeId, String caseId, CaseDetails caseDetails) {
+    public static void stubSearchCase(String caseTypeId, CaseDetails caseDetails) {
         stubFor(WireMock.post(urlEqualTo("/searchCases?ctid=" + caseTypeId)).willReturn(
             aResponse().withStatus(HTTP_OK).withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
                 .withHeader("Content-Type", "application/json")));

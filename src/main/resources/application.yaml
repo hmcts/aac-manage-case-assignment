@@ -21,7 +21,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   cache:
-    cache-names: userInfoCache,usersByOrganisation
+    cache-names: userInfoCache,usersByOrganisation,systemUserAccessTokenCache
     caffeine:
       spec: expireAfterAccess=1800s
   security:
@@ -37,6 +37,13 @@ spring:
 idam:
   api:
     url: ${IDAM_URL:http://localhost:5000}
+  client:
+    id: aac_manage_case_assignment
+    secret: ${IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
+    redirect_uri: http://localhost/receiver
+  system-user:
+    username: ${IDAM_SYSTEM_USER_USERNAME:master.solicitor.1@gmail.com}
+    password: ${IDAM_SYSTEM_USER_PASSWORD:Pa55word11}
   s2s-auth:
     microservice: aac_manage_case_assignment
     totp_secret: ${MANAGE_CASE_S2S_KEY:AAAAAAAAAAAAAAAA}
@@ -49,5 +56,12 @@ oidc:
 ccd:
   data-store:
     host: ${CCD_DATA_STORE_HOST:http://localhost:4452}
+zuul:
+  routes:
+    users:
+      path: /ccd/**
+      sensitiveHeaders:
+      url: ${CCD_DATA_STORE_HOST:http://localhost:4452}
+
 prd:
   host: ${PRD_HOST:http://localhost:4455}

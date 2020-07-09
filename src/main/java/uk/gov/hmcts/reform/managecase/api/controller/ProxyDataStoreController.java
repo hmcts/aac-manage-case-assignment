@@ -33,6 +33,7 @@ import static org.springframework.http.ResponseEntity.status;
 @Slf4j
 @RestController
 @RequestMapping("/ccd")
+@SuppressWarnings("PMD")
 public class ProxyDataStoreController {
 
     // TODO: use and move it to application config

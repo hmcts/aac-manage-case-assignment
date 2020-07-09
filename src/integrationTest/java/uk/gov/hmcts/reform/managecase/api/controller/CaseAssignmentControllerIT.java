@@ -25,7 +25,6 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixtur
 import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.MESSAGE;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubAssignCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisation;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubInvokerWithRoles;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
@@ -54,33 +53,15 @@ public class CaseAssignmentControllerIT extends BaseTest {
     void setUp() {
         request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, ASSIGNEE_ID);
         // Positive stub mappings - individual tests override again for a specific scenario.
-        stubInvokerWithRoles(CASEWORKER_CAA);
         stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor"),
                 user(ANOTHER_USER)));
         stubSearchCase(CASE_TYPE_ID, CASE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
         stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE);
     }
 
-    @DisplayName("CAA successfully sharing case access with another solicitor in their org")
+    @DisplayName("Invoker successfully sharing case access with another solicitor in their org")
     @Test
-    void shouldAssignCaseAccess_whenCAASuccessfullyShareACase() throws Exception {
-
-        stubInvokerWithRoles(CASEWORKER_CAA);
-
-        this.mockMvc.perform(put(PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status_message", is(String.format(MESSAGE, ORG_POLICY_ROLE))));
-
-        verify(postRequestedFor(urlEqualTo("/case-users")));
-    }
-
-    @DisplayName("Solicitor successfully sharing case access with another solicitor in their org")
-    @Test
-    void shouldAssignCaseAccess_whenSolicitorSuccessfullyShareACase() throws Exception {
-
-        stubInvokerWithRoles("caseworker-AUTOTEST1-solicitor");
+    void shouldAssignCaseAccess_whenInvokerSuccessfullyShareACase() throws Exception {
 
         this.mockMvc.perform(put(PATH)
             .contentType(MediaType.APPLICATION_JSON)
@@ -119,22 +100,6 @@ public class CaseAssignmentControllerIT extends BaseTest {
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message",
                    is("Intended assignee has to be a solicitor enabled in the jurisdiction of the case.")));
-    }
-
-    @DisplayName("Must return 403 bad request response if the invoker doesn't have a solicitor role"
-        + " for the jurisdiction of the case or a caseworker-caa role")
-    @Test
-    void shouldReturn403_whenInvokerDoesNotHaveRequiredRoles() throws Exception {
-
-        stubInvokerWithRoles("caseworker-JUD2-solicitor");
-
-        this.mockMvc.perform(put(PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.message",
-                is("The user is neither a case access administrator nor a solicitor with access to"
-                       + " the jurisdiction of the case.")));
     }
 
     @DisplayName("Must return 400 bad request response if invoker's organisation is not present"

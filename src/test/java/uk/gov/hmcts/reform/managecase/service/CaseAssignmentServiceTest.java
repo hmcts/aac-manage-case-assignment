@@ -6,19 +6,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.security.access.AccessDeniedException;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
-import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
 import java.util.Optional;
 
-import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,7 +29,6 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixtur
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.ASSIGNEE_ORGA_ERROR;
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.ASSIGNEE_ROLE_ERROR;
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_NOT_FOUND;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.INVOKER_ROLE_ERROR;
 
 @SuppressWarnings({"PMD.MethodNamingConventions"})
 class CaseAssignmentServiceTest {
@@ -53,8 +48,6 @@ class CaseAssignmentServiceTest {
     @Mock
     private PrdRepository prdRepository;
     @Mock
-    private SecurityUtils securityUtils;
-    @Mock
     private JacksonUtils jacksonUtils;
 
     private CaseAssignment caseAssignment;
@@ -67,8 +60,6 @@ class CaseAssignmentServiceTest {
 
         given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, CASE_ID))
                 .willReturn(Optional.of(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE)));
-        given(securityUtils.getUserInfo())
-                .willReturn(UserInfo.builder().roles(of("caseworker-AUTOTEST1-solicitor")).build());
         given(prdRepository.findUsersByOrganisation())
                 .willReturn(usersByOrganisation(user(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor")));
     }
@@ -100,19 +91,7 @@ class CaseAssignmentServiceTest {
     }
 
     @Test
-    @DisplayName("should throw AccessDenied error when invoker is not found")
-    void shouldThrowAccessDeniedException_whenInvokerRolesNotMatching() {
-
-        given(securityUtils.getUserInfo()).willReturn(UserInfo.builder()
-                .roles(of("caseworker-solicitor")).build());
-
-        assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
-                .isInstanceOf(AccessDeniedException.class)
-                .hasMessageContaining(INVOKER_ROLE_ERROR);
-    }
-
-    @Test
-    @DisplayName("should throw validation error when assignee is not found")
+    @DisplayName("should throw validation error when assignee is not found in the organisation")
     void shouldThrowValidationException_whenAssigneeNotExists() {
 
         given(prdRepository.findUsersByOrganisation())
@@ -124,7 +103,7 @@ class CaseAssignmentServiceTest {
     }
 
     @Test
-    @DisplayName("should throw validation error when assignee is not found")
+    @DisplayName("should throw validation error when assignee doesn't have jurisdiction solicitor role")
     void shouldThrowValidationException_whenAssigneeRolesNotMatching() {
 
         given(prdRepository.findUsersByOrganisation())
@@ -134,5 +113,4 @@ class CaseAssignmentServiceTest {
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining(ASSIGNEE_ROLE_ERROR);
     }
-
 }

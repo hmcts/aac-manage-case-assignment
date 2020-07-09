@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static uk.gov.hmcts.reform.managecase.client.AuthHeadersInterceptor.SERVICE_AUTHORIZATION;
+import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 class SystemUserAuthHeadersInterceptorTest {
 

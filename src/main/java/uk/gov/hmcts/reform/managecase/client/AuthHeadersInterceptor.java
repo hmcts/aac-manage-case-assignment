@@ -5,10 +5,9 @@ import feign.RequestTemplate;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 public class AuthHeadersInterceptor implements RequestInterceptor {
-
-    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
     private final SecurityUtils securityUtils;
 

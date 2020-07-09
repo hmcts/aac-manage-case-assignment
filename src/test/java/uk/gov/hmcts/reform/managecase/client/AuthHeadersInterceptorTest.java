@@ -14,7 +14,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static uk.gov.hmcts.reform.managecase.client.AuthHeadersInterceptor.SERVICE_AUTHORIZATION;
+import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 class AuthHeadersInterceptorTest {
 

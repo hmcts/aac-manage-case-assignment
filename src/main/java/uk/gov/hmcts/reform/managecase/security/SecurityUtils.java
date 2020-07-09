@@ -13,6 +13,7 @@ import javax.inject.Named;
 public class SecurityUtils {
 
     public static final String BEARER = "Bearer ";
+    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamRepository idamRepository;

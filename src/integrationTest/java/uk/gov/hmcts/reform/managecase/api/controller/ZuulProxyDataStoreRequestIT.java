@@ -18,12 +18,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCaseWithPrefix;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions"})
 public class ZuulProxyDataStoreRequestIT extends BaseTest {
     private static final String CASE_TYPE_ID = "CT_MasterCase";
     private static final String PATH = "/ccd/searchCases?ctid=CT_MasterCase";
     private static final String INVALID_PATH = "/ccd/invalid?ctid=CT_MasterCase";
+    private static final String VALID_NOT_WHITELISTED_PATH = "/ccd/notwhitelisted/searchCases?ctid=CT_MasterCase";
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
     private static final String ORGANIZATION_ID = "TEST_ORG";
 
@@ -48,9 +50,9 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
     }
 
     @DisplayName("Zuul forwards /ccd/searchCases to the data store using a system user token"
-        + "and aac_manage_case_assignment client id")
+        + " and aac_manage_case_assignment client id")
     @Test
-    void shouldReturn200_withASystemUserToken_whenTheRequestHasCcdPrefixAndAnotherUserToken() throws Exception {
+    void shouldReturn200_withASystemUserTokenWhenTheRequestHasCcdPrefixAndAnotherUserToken() throws Exception {
 
         this.mockMvc.perform(post(PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
@@ -73,8 +75,20 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
 
         this.mockMvc.perform(post(INVALID_PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
+                                 .content("{}"))
             .andExpect(status().isNotFound());
+    }
+
+    @DisplayName("Zuul fails with 400 on a valid not whitelisted request url")
+    @Test
+    void shouldReturn404_whenValidNotWhitelistedRequestUrl() throws Exception {
+
+        stubSearchCaseWithPrefix(CASE_TYPE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE), "/notwhitelisted");
+
+        this.mockMvc.perform(post(VALID_NOT_WHITELISTED_PATH)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .content("{}"))
+            .andExpect(status().isBadRequest());
     }
 }
 

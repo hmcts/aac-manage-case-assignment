@@ -38,10 +38,14 @@ public final class WiremockFixtures {
                 .willReturn(okForJson(response)));
     }
 
-    public static void stubSearchCase(String caseTypeId, CaseDetails caseDetails) {
-        stubFor(WireMock.post(urlEqualTo("/searchCases?ctid=" + caseTypeId)).willReturn(
+    public static void stubSearchCaseWithPrefix(String caseTypeId, CaseDetails caseDetails, String prefix) {
+        stubFor(WireMock.post(urlEqualTo(prefix + "/searchCases?ctid=" + caseTypeId)).willReturn(
             aResponse().withStatus(HTTP_OK).withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
                 .withHeader("Content-Type", "application/json")));
+    }
+
+    public static void stubSearchCase(String caseTypeId, CaseDetails caseDetails) {
+        stubSearchCaseWithPrefix(caseTypeId, caseDetails, "");
     }
 
     public static void stubAssignCase(String caseId, String userId, String caseRole) {

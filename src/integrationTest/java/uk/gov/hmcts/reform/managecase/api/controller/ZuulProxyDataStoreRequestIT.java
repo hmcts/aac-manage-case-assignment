@@ -69,9 +69,9 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
             .andExpect(status().isNotFound());
     }
 
-    @DisplayName("Zuul fails with 400 on a valid not whitelisted request url")
+    @DisplayName("Zuul fails with 403 on a valid not whitelisted request url")
     @Test
-    void shouldReturn404_whenValidNotWhitelistedRequestUrl() throws Exception {
+    void shouldReturn403_whenValidNotWhitelistedRequestUrl() throws Exception {
 
         stubSearchCaseWithPrefix(CASE_TYPE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE), "/notwhitelisted");
 

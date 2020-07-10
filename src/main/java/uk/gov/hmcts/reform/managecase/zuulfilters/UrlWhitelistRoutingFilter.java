@@ -13,6 +13,10 @@ import java.util.List;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SIMPLE_HOST_ROUTING_FILTER_ORDER;
 
+/**
+ * Filters requests based on the uri. Checks if it matches against one of the regex list elements defined in
+ * ccd.data-store.whitelisted-urls property.
+ */
 @Component
 public class UrlWhitelistRoutingFilter extends ZuulFilter {
 
@@ -51,7 +55,7 @@ public class UrlWhitelistRoutingFilter extends ZuulFilter {
             + (context.getRequest().getQueryString() == null ? "" : "?" + context.getRequest().getQueryString());
 
         if (ccdDataStoreWhitelistedUrls.stream().noneMatch(uri::matches)) {
-            ZuulException zuulException = new ZuulException("Url not whitelisted: " + uri, 403, "Url not whitelisted");
+            ZuulException zuulException = new ZuulException("Uri not whitelisted: " + uri, 403, "Uri not whitelisted");
             throw new ZuulRuntimeException(zuulException);
         }
     }

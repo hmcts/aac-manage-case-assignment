@@ -56,10 +56,10 @@ oidc:
 ccd:
   data-store:
     host: ${CCD_DATA_STORE_HOST:http://localhost:4452}
-    whitelisted-urls: /ccd/searcCases\?ctid.*
+    whitelisted-urls: ${MANAGE_CASE_DS_PROXY_URLS_WHITELIST:/ccd/searchCases.*,/ccd/internal/searchCases.*}
 zuul:
   routes:
-    search-cases:
+    data-store:
       path: /ccd/**
       sensitiveHeaders: Cookie,Set-Cookie
       url: ${CCD_DATA_STORE_HOST:http://localhost:4452}

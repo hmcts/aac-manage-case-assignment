@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearc
 public class ZuulProxyDataStoreRequestIT extends BaseTest {
     private static final String CASE_TYPE_ID = "CT_MasterCase";
     private static final String PATH = "/ccd/searchCases?ctid=CT_MasterCase";
+    private static final String PATH_INTERNAL = "/ccd/internal/searchCases?ctid=CT_MasterCase";
     private static final String INVALID_PATH = "/ccd/invalid?ctid=CT_MasterCase";
     private static final String VALID_NOT_WHITELISTED_PATH = "/ccd/notwhitelisted/searchCases?ctid=CT_MasterCase";
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
@@ -40,7 +41,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
     @DisplayName("Zuul successfully forwards /ccd/searchCases request to the data store with a system user token"
         + " and aac_manage_case_assignment client id")
     @Test
-    void shouldReturn200_whenTheRequestHasCcdPrefix() throws Exception {
+    void shouldReturn200_whenTheSearchCasesRequestHasCcdPrefix() throws Exception {
 
         this.mockMvc.perform(post(PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
@@ -54,6 +55,30 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
         verify(postRequestedFor(urlEqualTo("/s2s/lease"))
                    .withRequestBody(containing("aac_manage_case_assignment")));
         verify(postRequestedFor(urlEqualTo("/searchCases?ctid=CT_MasterCase"))
+                   .withHeader("Authorization",
+                               containing("Bearer eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9aa")
+                   ));
+    }
+
+    @DisplayName("Zuul successfully forwards /ccd/internal/searchCases request to the data store with"
+        + " a system user token and aac_manage_case_assignment client id")
+    @Test
+    void shouldReturn200_whenTheInternalSearchCasesRequestHasCcdPrefix() throws Exception {
+
+        stubSearchCaseWithPrefix(CASE_TYPE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE), "/internal");
+
+        this.mockMvc.perform(post(PATH_INTERNAL)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.cases.length()", is(1)))
+            .andExpect(jsonPath("$.cases[0].reference", is("12345678")));
+
+        verify(postRequestedFor(urlEqualTo("/o/token"))
+                   .withRequestBody(containing("username=master.solicitor.1%40gmail.com")));
+        verify(postRequestedFor(urlEqualTo("/s2s/lease"))
+                   .withRequestBody(containing("aac_manage_case_assignment")));
+        verify(postRequestedFor(urlEqualTo("/internal/searchCases?ctid=CT_MasterCase"))
                    .withHeader("Authorization",
                                containing("Bearer eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9aa")
                    ));

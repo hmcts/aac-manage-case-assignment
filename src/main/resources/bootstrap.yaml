@@ -5,6 +5,7 @@ spring:
       paths: /mnt/secrets/aac
       aliases:
         aac-manage-case-s2s-secret: MANAGE_CASE_S2S_KEY
+        aac-manage-case-datastore-proxy-url-whitelist: MANAGE_CASE_DS_PROXY_URLS_WHITELIST
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
         idam-mca-client-secret: IDAM_CLIENT_SECRET
         idam-mca-system-user-username: IDAM_SYSTEM_USER_USERNAME

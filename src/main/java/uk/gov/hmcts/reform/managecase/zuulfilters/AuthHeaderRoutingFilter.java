@@ -10,6 +10,10 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SIMPLE_HOST_ROUTING_FILTER_ORDER;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+/**
+ * Adds system user Authorization header with the access token.
+ * Adds ServiceAuthorization header with the s2s access token.
+ */
 @Component
 public class AuthHeaderRoutingFilter extends ZuulFilter {
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";

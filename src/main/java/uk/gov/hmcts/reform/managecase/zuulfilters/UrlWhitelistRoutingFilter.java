@@ -51,7 +51,7 @@ public class UrlWhitelistRoutingFilter extends ZuulFilter {
             + (context.getRequest().getQueryString() == null ? "" : "?" + context.getRequest().getQueryString());
 
         if (ccdDataStoreWhitelistedUrls.stream().noneMatch(uri::matches)) {
-            ZuulException zuulException = new ZuulException("Url not whitelisted: " + uri, 400, "Uri not whitelisted");
+            ZuulException zuulException = new ZuulException("Url not whitelisted: " + uri, 403, "Url not whitelisted");
             throw new ZuulRuntimeException(zuulException);
         }
     }

@@ -37,7 +37,8 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
         stubSearchCase(CASE_TYPE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
     }
 
-    @DisplayName("Zuul successfully forwards /ccd/searchCases request to the data store")
+    @DisplayName("Zuul successfully forwards /ccd/searchCases request to the data store with a system user token"
+        + " and aac_manage_case_assignment client id")
     @Test
     void shouldReturn200_whenTheRequestHasCcdPrefix() throws Exception {
 
@@ -47,17 +48,6 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))
             .andExpect(jsonPath("$.cases[0].reference", is("12345678")));
-    }
-
-    @DisplayName("Zuul forwards /ccd/searchCases to the data store using a system user token"
-        + " and aac_manage_case_assignment client id")
-    @Test
-    void shouldReturn200_withASystemUserTokenWhenTheRequestHasCcdPrefixAndAnotherUserToken() throws Exception {
-
-        this.mockMvc.perform(post(PATH)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
-            .andExpect(status().isOk());
 
         verify(postRequestedFor(urlEqualTo("/o/token"))
                    .withRequestBody(containing("username=master.solicitor.1%40gmail.com")));
@@ -88,7 +78,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
         this.mockMvc.perform(post(VALID_NOT_WHITELISTED_PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
                                  .content("{}"))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isForbidden());
     }
 }
 

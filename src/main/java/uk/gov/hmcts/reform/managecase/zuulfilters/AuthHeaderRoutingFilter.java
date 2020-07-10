@@ -8,10 +8,10 @@ import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.ROUTE_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SIMPLE_HOST_ROUTING_FILTER_ORDER;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Component
 public class AuthHeaderRoutingFilter extends ZuulFilter {
-    public static final String AUTHORIZATION = "Authorization";
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
     @Autowired
@@ -29,8 +29,7 @@ public class AuthHeaderRoutingFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        return RequestContext.getCurrentContext().getRouteHost() != null
-            && RequestContext.getCurrentContext().sendZuulResponse();
+        return true;
     }
 
     @Override

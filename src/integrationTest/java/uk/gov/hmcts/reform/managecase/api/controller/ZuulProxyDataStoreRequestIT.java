@@ -26,7 +26,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
     private static final String PATH = "/ccd/searchCases?ctid=CT_MasterCase";
     private static final String PATH_INTERNAL = "/ccd/internal/searchCases?ctid=CT_MasterCase";
     private static final String INVALID_PATH = "/ccd/invalid?ctid=CT_MasterCase";
-    private static final String VALID_NOT_WHITELISTED_PATH = "/ccd/notwhitelisted/searchCases?ctid=CT_MasterCase";
+    private static final String VALID_NOT_ALLOWED_PATH = "/ccd/notallowed/searchCases?ctid=CT_MasterCase";
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
     private static final String ORGANIZATION_ID = "TEST_ORG";
 
@@ -94,13 +94,13 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
             .andExpect(status().isNotFound());
     }
 
-    @DisplayName("Zuul fails with 403 on a valid not whitelisted request url")
+    @DisplayName("Zuul fails with 403 on a valid not allowed request url")
     @Test
-    void shouldReturn403_whenValidNotWhitelistedRequestUrl() throws Exception {
+    void shouldReturn403_whenValidNotAllowedRequestUrl() throws Exception {
 
-        stubSearchCaseWithPrefix(CASE_TYPE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE), "/notwhitelisted");
+        stubSearchCaseWithPrefix(CASE_TYPE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE), "/notallowed");
 
-        this.mockMvc.perform(post(VALID_NOT_WHITELISTED_PATH)
+        this.mockMvc.perform(post(VALID_NOT_ALLOWED_PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
                                  .content("{}"))
             .andExpect(status().isForbidden());

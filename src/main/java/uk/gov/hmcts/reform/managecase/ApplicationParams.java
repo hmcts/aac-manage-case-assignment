@@ -14,8 +14,8 @@ public class ApplicationParams {
     private String idamSystemUserId;
     @Value("${idam.system-user.password}")
     private String idamSystemUserPassword;
-    @Value("${ccd.data-store.whitelisted-urls}")
-    private List<String> ccdDataStoreWhitelistedUrls;
+    @Value("${ccd.data-store.allowed-urls}")
+    private List<String> ccdDataStoreAllowedUrls;
 
     public String getIdamSystemUserId() {
         return idamSystemUserId;
@@ -25,8 +25,8 @@ public class ApplicationParams {
         return idamSystemUserPassword;
     }
 
-    public List<String> getCcdDataStoreWhitelistedUrls() {
-        return ccdDataStoreWhitelistedUrls;
+    public List<String> getCcdDataStoreAllowedUrls() {
+        return ccdDataStoreAllowedUrls;
     }
 }
 

@@ -15,10 +15,10 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 
 /**
  * Filters requests based on the uri. Checks if it matches against one of the regex list elements defined in
- * ccd.data-store.whitelisted-urls property.
+ * ccd.data-store.allowed-urls property.
  */
 @Component
-public class UrlWhitelistRoutingFilter extends ZuulFilter {
+public class AllowedUrlRoutingFilter extends ZuulFilter {
 
     @Autowired
     private ApplicationParams applicationParams;
@@ -42,20 +42,20 @@ public class UrlWhitelistRoutingFilter extends ZuulFilter {
     public Object run() {
         RequestContext context = RequestContext.getCurrentContext();
 
-        validateWhitelistedUrls(context);
+        validateAllowedUrls(context);
 
         return null;
     }
 
-    private void validateWhitelistedUrls(RequestContext context) {
+    private void validateAllowedUrls(RequestContext context) {
 
-        List<String> ccdDataStoreWhitelistedUrls = applicationParams.getCcdDataStoreWhitelistedUrls();
+        List<String> ccdDataStoreAllowedUrls = applicationParams.getCcdDataStoreAllowedUrls();
 
         String uri = context.getRequest().getRequestURI()
             + (context.getRequest().getQueryString() == null ? "" : "?" + context.getRequest().getQueryString());
 
-        if (ccdDataStoreWhitelistedUrls.stream().noneMatch(uri::matches)) {
-            ZuulException zuulException = new ZuulException("Uri not whitelisted: " + uri, 403, "Uri not whitelisted");
+        if (ccdDataStoreAllowedUrls.stream().noneMatch(uri::matches)) {
+            ZuulException zuulException = new ZuulException("Uri not allowed: " + uri, 403, "Uri not allowed");
             throw new ZuulRuntimeException(zuulException);
         }
     }

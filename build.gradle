@@ -41,7 +41,7 @@ sourceSets {
 }
 
 tasks.withType(JavaCompile) {
-  options.compilerArgs << "-Xlint:unchecked"
+  options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }
 
 tasks.withType(Test) {
@@ -182,7 +182,7 @@ repositories {
     url 'https://dl.bintray.com/hmcts/hmcts-maven'
   }
   maven {
-    url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/'
+    url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/'
   }
 }
 
@@ -191,7 +191,7 @@ def versions = [
   junitPlatform   : '1.6.2',
   reformLogging   : '5.1.1',
   springBoot      : springBoot.class.package.implementationVersion,
-  springfoxSwagger: '3.0.0-SNAPSHOT',
+  springfoxSwagger: '2.10.5',
   restAssured    : '4.2.0',
   lombok  : '1.18.8'
 ]

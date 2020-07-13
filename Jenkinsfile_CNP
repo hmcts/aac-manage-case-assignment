@@ -45,6 +45,7 @@ def vaultOverrides = [
 // vars needed for functional tests
 env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+env.BEFTA_S2S_CLIENT_ID = "xui_webapp"
 env.OAUTH2_CLIENT_ID = "ccd_gateway"
 env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"

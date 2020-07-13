@@ -48,6 +48,6 @@ oidc:
 
 ccd:
   data-store:
-    host: ${CCD_DATA_STORE_HOST:http://localhost:4452}
+    host: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
 prd:
   host: ${PRD_HOST:http://localhost:4455}

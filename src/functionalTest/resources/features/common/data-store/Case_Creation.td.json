@@ -3,7 +3,7 @@
   "productName": "CCD Data Store",
   "operationName": "Submit case creation",
   "method": "POST",
-  "uri": "{{DATA_STORE_HOST}}/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {

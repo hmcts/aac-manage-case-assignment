@@ -3,7 +3,7 @@
   "productName": "CCD Data Store",
   "operationName": "Grant access to case",
   "method": "PUT",
-  "uri": "{{DATA_STORE_HOST}}/cases/{caseReference}/users/{userId}",
+  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/cases/{caseReference}/users/{userId}",
   "specs": [
     "to grant access to C1 for S1"
   ],

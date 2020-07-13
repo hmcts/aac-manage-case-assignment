@@ -21,6 +21,7 @@ def secrets = [
     secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
     secret('ccd-befta-caseworker-2-solicitor-1-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD'),
     secret('ccd-befta-caseworker-2-solicitor-2-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD'),
+    secret('ccd-befta-master-solicitor1-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_1_PWD'),
     secret('ccd-befta-master-caseworker-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_PWD')
   ],
   's2s-${env}': [

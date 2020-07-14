@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUs
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubInvokerWithRoles;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
 
+// testing
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals"})
 public class CaseAssignmentControllerIT extends BaseTest {

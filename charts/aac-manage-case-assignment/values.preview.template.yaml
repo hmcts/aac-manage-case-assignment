@@ -6,7 +6,6 @@ java:
     aac:
       secrets:
         - aac-manage-case-s2s-secret
-        - aac-manage-case-datastore-proxy-url-allowed-list
         - idam-mca-client-secret
         - idam-mca-system-user-username
         - idam-mca-system-user-password

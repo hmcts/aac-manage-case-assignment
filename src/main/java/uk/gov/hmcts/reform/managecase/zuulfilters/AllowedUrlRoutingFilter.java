@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SIMPLE_HOST_ROUTING_FILTER_ORDER;
@@ -49,7 +50,10 @@ public class AllowedUrlRoutingFilter extends ZuulFilter {
 
     private void validateAllowedUrls(RequestContext context) {
 
-        List<String> ccdDataStoreAllowedUrls = applicationParams.getCcdDataStoreAllowedUrls();
+        List<String> ccdDataStoreAllowedUrls = applicationParams.getCcdDataStoreAllowedUrls()
+            .stream()
+            .map("/ccd"::concat)
+            .collect(Collectors.toList());
 
         String uri = context.getRequest().getRequestURI()
             + (context.getRequest().getQueryString() == null ? "" : "?" + context.getRequest().getQueryString());

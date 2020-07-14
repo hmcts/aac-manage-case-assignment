@@ -14,6 +14,7 @@ import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.o
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -31,6 +32,10 @@ public final class WiremockFixtures {
     public static void stubInvokerWithRoles(String... roles) {
         UserInfo userInfo = UserInfo.builder().roles(list(roles)).build();
         stubFor(WireMock.get(urlEqualTo("/o/userinfo")).willReturn(okForJson(userInfo)));
+    }
+
+    public static void stubS2SDetails(String serviceName) {
+        stubFor(WireMock.get(urlEqualTo("/s2s/details")).willReturn(okJson(serviceName)));
     }
 
     public static void stubGetUsersByOrganisation(FindUsersByOrganisationResponse response) {

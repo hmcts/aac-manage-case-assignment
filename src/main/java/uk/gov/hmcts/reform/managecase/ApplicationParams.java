@@ -16,6 +16,8 @@ public class ApplicationParams {
     private String idamSystemUserPassword;
     @Value("${ccd.data-store.allowed-urls}")
     private List<String> ccdDataStoreAllowedUrls;
+    @Value("${ccd.data-store.allowed-service}")
+    private String ccdDataStoreAllowedService;
 
     public String getIdamSystemUserId() {
         return idamSystemUserId;
@@ -27,6 +29,10 @@ public class ApplicationParams {
 
     public List<String> getCcdDataStoreAllowedUrls() {
         return ccdDataStoreAllowedUrls;
+    }
+
+    public String getCcdDataStoreAllowedService() {
+        return ccdDataStoreAllowedService;
     }
 }
 

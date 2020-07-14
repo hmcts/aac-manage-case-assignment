@@ -17,8 +17,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubS2SDetails;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCaseWithPrefix;
+import static uk.gov.hmcts.reform.managecase.zuulfilters.AuthHeaderRoutingFilter.SERVICE_AUTHORIZATION;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions"})
 public class ZuulProxyDataStoreRequestIT extends BaseTest {
@@ -29,6 +31,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
     private static final String VALID_NOT_ALLOWED_PATH = "/ccd/notallowed/searchCases?ctid=CT_MasterCase";
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
     private static final String ORGANIZATION_ID = "TEST_ORG";
+    private static final String SOME_SERVICE_TOKEN = "someServiceToken";
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,6 +48,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
 
         this.mockMvc.perform(post(PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
+                                 .header(SERVICE_AUTHORIZATION, SOME_SERVICE_TOKEN)
                                  .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))
@@ -69,6 +73,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
 
         this.mockMvc.perform(post(PATH_INTERNAL)
                                  .contentType(MediaType.APPLICATION_JSON)
+                                 .header(SERVICE_AUTHORIZATION, SOME_SERVICE_TOKEN)
                                  .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))
@@ -90,7 +95,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
 
         this.mockMvc.perform(post(INVALID_PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .content("{}"))
+                                 .header(SERVICE_AUTHORIZATION, SOME_SERVICE_TOKEN))
             .andExpect(status().isNotFound());
     }
 
@@ -102,7 +107,21 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
 
         this.mockMvc.perform(post(VALID_NOT_ALLOWED_PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
+                                 .header(SERVICE_AUTHORIZATION, SOME_SERVICE_TOKEN)
                                  .content("{}"))
+            .andExpect(status().isForbidden());
+    }
+
+    @DisplayName("Zuul fails with 403 on invalid service name")
+    @Test
+    void shouldReturn403_whenInvalidServiceName() throws Exception {
+
+        stubS2SDetails("invalidServiceName");
+
+        this.mockMvc.perform(post(PATH)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .header(SERVICE_AUTHORIZATION, SOME_SERVICE_TOKEN)
+                                 .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
             .andExpect(status().isForbidden());
     }
 }

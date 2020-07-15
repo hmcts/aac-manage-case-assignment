@@ -11,7 +11,7 @@
   "method": "PUT",
   "uri": "/case-assignments",
   "s2sClientId": "xui_webapp",
-  "oauth2ClientId": "xuiwebapp",
+  "userTokenClientId": "xuiwebapp",
   "users": {
     "S1": {
       "username": "befta_master.solicitor.becky@gmail.com",

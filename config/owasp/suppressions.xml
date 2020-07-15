@@ -20,6 +20,7 @@
 	<!-- Temporary suppression -->
 	<suppress>
 		<cve>CVE-2020-11996</cve>
+		<cve>CVE-2020-8022</cve>
 	</suppress>
 
 </suppressions>

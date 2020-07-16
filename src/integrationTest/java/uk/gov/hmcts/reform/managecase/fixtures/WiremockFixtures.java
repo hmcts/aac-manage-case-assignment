@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -31,22 +32,24 @@ public final class WiremockFixtures {
 
     public static void stubInvokerWithRoles(String... roles) {
         UserInfo userInfo = UserInfo.builder().roles(list(roles)).build();
-        stubFor(WireMock.get(urlEqualTo("/o/userinfo")).willReturn(okForJson(userInfo)));
+        stubFor(WireMock.get(urlEqualTo("/o/userinfo")).willReturn(okForJson(userInfo).withHeader(HttpHeaders.CONNECTION, "close")));
     }
 
     public static void stubS2SDetails(String serviceName) {
-        stubFor(WireMock.get(urlEqualTo("/s2s/details")).willReturn(okJson(serviceName)));
+        stubFor(WireMock.get(urlEqualTo("/s2s/details")).willReturn(okJson(serviceName).withHeader(HttpHeaders.CONNECTION, "close")));
     }
 
     public static void stubGetUsersByOrganisation(FindUsersByOrganisationResponse response) {
         stubFor(WireMock.get(urlEqualTo("/refdata/external/v1/organisations/users?status=Active"))
-                .willReturn(okForJson(response)));
+                .willReturn(okForJson(response)
+                        .withHeader(HttpHeaders.CONNECTION, "close")));
     }
 
     public static void stubSearchCaseWithPrefix(String caseTypeId, CaseDetails caseDetails, String prefix) {
         stubFor(WireMock.post(urlEqualTo(prefix + "/searchCases?ctid=" + caseTypeId)).willReturn(
             aResponse().withStatus(HTTP_OK).withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
-                .withHeader("Content-Type", "application/json")));
+                .withHeader("Content-Type", "application/json")
+                    .withHeader(HttpHeaders.CONNECTION, "close")));
     }
 
     public static void stubSearchCase(String caseTypeId, CaseDetails caseDetails) {
@@ -58,7 +61,8 @@ public final class WiremockFixtures {
                 .withRequestBody(matchingJsonPath("$.case_users[0].case_id", equalTo(caseId)))
                 .withRequestBody(matchingJsonPath("$.case_users[0].case_role", equalTo(caseRole)))
                 .withRequestBody(matchingJsonPath("$.case_users[0].user_id", equalTo(userId)))
-                .willReturn(aResponse().withStatus(HTTP_OK)));
+                .willReturn(aResponse().withStatus(HTTP_OK)
+                        .withHeader(HttpHeaders.CONNECTION, "close")));
     }
 
     @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")

@@ -138,7 +138,6 @@ public class CaseAssignmentControllerIT extends BaseTest {
                        + " the jurisdiction of the case.")));
     }
 
-    @Disabled
     @DisplayName("Must return 400 bad request response if invoker's organisation is not present"
         + " in the case data organisation policies")
     @Test

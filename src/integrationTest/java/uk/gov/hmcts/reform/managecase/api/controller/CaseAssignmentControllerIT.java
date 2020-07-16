@@ -143,7 +143,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
     @Test
     void shouldReturn400_whenInvokersOrgIsNotPresentInCaseData() throws Exception {
 
-        stubSearchCaseWithId(CASE_TYPE_ID, CASE_ID, caseDetails("ANOTHER_ORGANIZATION_ID", ORG_POLICY_ROLE));
+        stubSearchCaseWithId(CASE_TYPE_ID, CASE_ID, caseDetails("ANOTHER_ORGANIZATION_ID", null));
 
         this.mockMvc.perform(post(PATH)
                                  .contentType(MediaType.APPLICATION_JSON)

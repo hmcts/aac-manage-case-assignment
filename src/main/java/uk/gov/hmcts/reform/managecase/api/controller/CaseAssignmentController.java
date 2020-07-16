@@ -6,9 +6,11 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentResponse;
@@ -33,11 +35,12 @@ public class CaseAssignmentController {
         this.mapper = mapper;
     }
 
-    @PutMapping(path = "/case-assignments", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/case-assignments", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Assign Access within Organisation", notes = "Assign Access within Organisation")
+    @ResponseStatus(HttpStatus.CREATED)
     @ApiResponses({
         @ApiResponse(
-            code = 200,
+            code = 201,
             message = "Role from the organisation policy successfully assigned to the assignee."
         ),
         @ApiResponse(

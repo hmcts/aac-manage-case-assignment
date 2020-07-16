@@ -92,7 +92,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
     @DisplayName("Zuul fails with 404 on invalid /ccd/invalid request url")
     @Test
     void shouldReturn404_whenInvalidRequestUrlHasCcdPrefix() throws Exception {
-
+        stubS2SDetails("xui_webapp");
         this.mockMvc.perform(post(INVALID_PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
                                  .header(SERVICE_AUTHORIZATION, SOME_SERVICE_TOKEN))

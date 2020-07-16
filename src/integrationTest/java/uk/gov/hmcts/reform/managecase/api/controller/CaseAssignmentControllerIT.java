@@ -42,8 +42,10 @@ public class CaseAssignmentControllerIT extends BaseTest {
     private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";
     private static final String ORGANIZATION_ID = "TEST_ORG";
 
+    private static final String RAW_QUERY = "{\"query\":{\"bool\":{\"filter\":{\"term\":{\"reference\":%s}}}}}";
+    private static final String ES_QUERY = String.format(RAW_QUERY, CASE_ID);
+
     public static final String PATH = "/case-assignments";
-    public static final String CASEWORKER_CAA = "caseworker-caa";
 
     @Autowired
     private MockMvc mockMvc;
@@ -59,7 +61,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
         // Positive stub mappings - individual tests override again for a specific scenario.
         stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor"),
                 user(ANOTHER_USER)));
-        stubSearchCase(CASE_TYPE_ID, CASE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
+        stubSearchCase(CASE_TYPE_ID, ES_QUERY, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
         stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE);
     }
 
@@ -81,7 +83,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
     @Test
     void shouldAssignCaseAccess_withMultipleOrganisationRoles() throws Exception {
 
-        stubSearchCase(CASE_TYPE_ID, CASE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
+        stubSearchCase(CASE_TYPE_ID, ES_QUERY, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
         stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2);
 
         this.mockMvc.perform(post(PATH)
@@ -129,7 +131,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
     @Test
     void shouldReturn400_whenInvokersOrgIsNotPresentInCaseData() throws Exception {
 
-        stubSearchCase(CASE_TYPE_ID, CASE_ID, caseDetails("ANOTHER_ORGANIZATION_ID", ORG_POLICY_ROLE));
+        stubSearchCase(CASE_TYPE_ID, ES_QUERY, caseDetails("ANOTHER_ORGANIZATION_ID", ORG_POLICY_ROLE));
 
         this.mockMvc.perform(post(PATH)
                                  .contentType(MediaType.APPLICATION_JSON)

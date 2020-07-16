@@ -81,7 +81,7 @@ class CaseAssignmentServiceTest {
 
         assertThat(roles).containsExactly(ORG_POLICY_ROLE, ORG_POLICY_ROLE2);
 
-        verify(dataStoreRepository).assignCase(of(ORG_POLICY_ROLE, ORG_POLICY_ROLE2), CASE_ID, ASSIGNEE_ID);
+        verify(dataStoreRepository).assignCase(List.of(ORG_POLICY_ROLE, ORG_POLICY_ROLE2), CASE_ID, ASSIGNEE_ID);
     }
 
     @Test

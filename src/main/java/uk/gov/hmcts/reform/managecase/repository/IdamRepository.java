@@ -29,3 +29,4 @@ public class IdamRepository {
         return idamClient.getAccessToken(appParams.getIdamSystemUserId(), appParams.getIdamSystemUserPassword());
     }
 }
+

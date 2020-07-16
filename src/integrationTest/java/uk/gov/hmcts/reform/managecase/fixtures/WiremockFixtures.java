@@ -49,12 +49,6 @@ public final class WiremockFixtures {
                 .withHeader("Content-Type", "application/json")));
     }
 
-    public static void stubSearchCaseWithId(String caseTypeId, String caseId, CaseDetails caseDetails) {
-        stubFor(WireMock.post(urlEqualTo("/searchCases?ctid=" + caseTypeId)).willReturn(
-                aResponse().withStatus(HTTP_OK).withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
-                        .withHeader("Content-Type", "application/json")));
-    }
-
     public static void stubSearchCase(String caseTypeId, CaseDetails caseDetails) {
         stubSearchCaseWithPrefix(caseTypeId, caseDetails, "");
     }

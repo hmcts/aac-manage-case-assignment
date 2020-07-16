@@ -27,7 +27,6 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubAssig
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisation;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubInvokerWithRoles;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCaseWithId;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals"})
@@ -143,7 +142,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
     @Test
     void shouldReturn400_whenInvokersOrgIsNotPresentInCaseData() throws Exception {
 
-        stubSearchCaseWithId(CASE_TYPE_ID, CASE_ID, caseDetails("ANOTHER_ORGANIZATION_ID", null));
+        stubSearchCase(CASE_TYPE_ID, caseDetails("ANOTHER_ORGANIZATION_ID", null));
 
         this.mockMvc.perform(post(PATH)
                                  .contentType(MediaType.APPLICATION_JSON)

@@ -27,23 +27,25 @@ public final class WiremockFixtures {
         .modules(new Jdk8Module())
         .build();
 
+    private static String CLOSE = "close";
+
     private WiremockFixtures() {
     }
 
     public static void stubInvokerWithRoles(String... roles) {
         UserInfo userInfo = UserInfo.builder().roles(list(roles)).build();
         stubFor(WireMock.get(urlEqualTo("/o/userinfo")).willReturn(okForJson(userInfo)
-                .withHeader(HttpHeaders.CONNECTION, "close")));
+                .withHeader(HttpHeaders.CONNECTION, CLOSE)));
     }
 
     public static void stubS2SDetails(String serviceName) {
         stubFor(WireMock.get(urlEqualTo("/s2s/details")).willReturn(okJson(serviceName)
-                .withHeader(HttpHeaders.CONNECTION, "close")));
+                .withHeader(HttpHeaders.CONNECTION, CLOSE)));
     }
 
     public static void stubGetUsersByOrganisation(FindUsersByOrganisationResponse response) {
         stubFor(WireMock.get(urlEqualTo("/refdata/external/v1/organisations/users?status=Active"))
-                .willReturn(okForJson(response).withHeader(HttpHeaders.CONNECTION, "close")));
+                .willReturn(okForJson(response).withHeader(HttpHeaders.CONNECTION, CLOSE)));
     }
 
     public static void stubSearchCaseWithPrefix(String caseTypeId, CaseDetails caseDetails, String prefix) {
@@ -51,7 +53,7 @@ public final class WiremockFixtures {
                     .withStatus(HTTP_OK)
                     .withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
                     .withHeader("Content-Type", "application/json")
-                    .withHeader(HttpHeaders.CONNECTION, "close")));
+                    .withHeader(HttpHeaders.CONNECTION, CLOSE)));
     }
 
     public static void stubSearchCase(String caseTypeId, CaseDetails caseDetails) {
@@ -64,7 +66,7 @@ public final class WiremockFixtures {
                 .withRequestBody(matchingJsonPath("$.case_users[0].case_role", equalTo(caseRole)))
                 .withRequestBody(matchingJsonPath("$.case_users[0].user_id", equalTo(userId)))
                 .willReturn(aResponse().withStatus(HTTP_OK)
-                        .withHeader(HttpHeaders.CONNECTION, "close")));
+                        .withHeader(HttpHeaders.CONNECTION, CLOSE)));
     }
 
     @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")

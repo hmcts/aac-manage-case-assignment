@@ -32,23 +32,25 @@ public final class WiremockFixtures {
 
     public static void stubInvokerWithRoles(String... roles) {
         UserInfo userInfo = UserInfo.builder().roles(list(roles)).build();
-        stubFor(WireMock.get(urlEqualTo("/o/userinfo")).willReturn(okForJson(userInfo).withHeader(HttpHeaders.CONNECTION, "close")));
+        stubFor(WireMock.get(urlEqualTo("/o/userinfo")).willReturn(okForJson(userInfo)
+                .withHeader(HttpHeaders.CONNECTION, "close")));
     }
 
     public static void stubS2SDetails(String serviceName) {
-        stubFor(WireMock.get(urlEqualTo("/s2s/details")).willReturn(okJson(serviceName).withHeader(HttpHeaders.CONNECTION, "close")));
+        stubFor(WireMock.get(urlEqualTo("/s2s/details")).willReturn(okJson(serviceName)
+                .withHeader(HttpHeaders.CONNECTION, "close")));
     }
 
     public static void stubGetUsersByOrganisation(FindUsersByOrganisationResponse response) {
         stubFor(WireMock.get(urlEqualTo("/refdata/external/v1/organisations/users?status=Active"))
-                .willReturn(okForJson(response)
-                        .withHeader(HttpHeaders.CONNECTION, "close")));
+                .willReturn(okForJson(response).withHeader(HttpHeaders.CONNECTION, "close")));
     }
 
     public static void stubSearchCaseWithPrefix(String caseTypeId, CaseDetails caseDetails, String prefix) {
-        stubFor(WireMock.post(urlEqualTo(prefix + "/searchCases?ctid=" + caseTypeId)).willReturn(
-            aResponse().withStatus(HTTP_OK).withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
-                .withHeader("Content-Type", "application/json")
+        stubFor(WireMock.post(urlEqualTo(prefix + "/searchCases?ctid=" + caseTypeId)).willReturn(aResponse()
+                    .withStatus(HTTP_OK)
+                    .withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
+                    .withHeader("Content-Type", "application/json")
                     .withHeader(HttpHeaders.CONNECTION, "close")));
     }
 

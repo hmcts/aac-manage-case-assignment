@@ -4,8 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.junit.ClassRule;
+import com.github.tomakehurst.wiremock.http.ResponseDefinition;
+import com.github.tomakehurst.wiremock.common.FileSource;
+import com.github.tomakehurst.wiremock.extension.Parameters;
+import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer;
+import com.github.tomakehurst.wiremock.http.Request;
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -29,12 +33,24 @@ public final class WiremockFixtures {
         .modules(new Jdk8Module())
         .build();
 
-    private static String close = "close";
-
-    @ClassRule
-    public static WireMockRule wireMockRule = new WireMockRule(8089);
 
     private WiremockFixtures() {
+    }
+
+    public static class connectionClosedTransformer extends ResponseDefinitionTransformer {
+
+        @Override
+        public String getName() {
+            return "keep-alive-disabler";
+        }
+
+        @Override
+        public ResponseDefinition transform(Request request, ResponseDefinition responseDefinition,
+                                            FileSource files, Parameters parameters) {
+            return ResponseDefinitionBuilder.like(responseDefinition)
+                    .withHeader(HttpHeaders.CONNECTION, "close")
+                    .build();
+        }
     }
 
     public static void stubInvokerWithRoles(String... roles) {

@@ -50,7 +50,7 @@ public class BaseTest {
     static class WireMockTestConfiguration {
         @Bean
         public WireMockConfigurationCustomizer wireMockConfigurationCustomizer() {
-            return config -> config.extensions(new WiremockFixtures.connectionClosedTransformer());
+            return config -> config.extensions(new WiremockFixtures.ConnectionClosedTransformer());
         }
     }
 

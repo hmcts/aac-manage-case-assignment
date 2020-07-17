@@ -37,7 +37,7 @@ public final class WiremockFixtures {
     private WiremockFixtures() {
     }
 
-    public static class connectionClosedTransformer extends ResponseDefinitionTransformer {
+    public static class ConnectionClosedTransformer extends ResponseDefinitionTransformer {
 
         @Override
         public String getName() {

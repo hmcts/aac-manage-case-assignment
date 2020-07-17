@@ -141,8 +141,6 @@ public class CaseAssignmentControllerIT extends BaseTest {
         + " in the case data organisation policies")
     @Test
     void shouldReturn400_whenInvokersOrgIsNotPresentInCaseData() throws Exception {
-        Thread.sleep(5000);
-
         stubSearchCase(CASE_TYPE_ID, caseDetails("ANOTHER_ORGANIZATION_ID", ORG_POLICY_ROLE));
 
         this.mockMvc.perform(post(PATH)

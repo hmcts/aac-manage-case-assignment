@@ -18,7 +18,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -71,10 +71,10 @@ public class CaseAssignmentControllerIT extends BaseTest {
 
         stubInvokerWithRoles(CASEWORKER_CAA);
 
-        this.mockMvc.perform(put(PATH)
+        this.mockMvc.perform(post(PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(jsonPath("$.status_message", is(String.format(MESSAGE, ORG_POLICY_ROLE))));
 
         verify(postRequestedFor(urlEqualTo("/case-users")));
@@ -86,10 +86,10 @@ public class CaseAssignmentControllerIT extends BaseTest {
 
         stubInvokerWithRoles("caseworker-AUTOTEST1-solicitor");
 
-        this.mockMvc.perform(put(PATH)
+        this.mockMvc.perform(post(PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(content().contentType(APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.status_message", is(String.format(MESSAGE, ORG_POLICY_ROLE))));
 
@@ -120,7 +120,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
 
         stubGetUsersByOrganisation(usersByOrganisation(user(ANOTHER_USER)));
 
-        this.mockMvc.perform(put(PATH)
+        this.mockMvc.perform(post(PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
@@ -135,7 +135,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
 
         stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID, "caseworker-JUD2-solicitor")));
 
-        this.mockMvc.perform(put(PATH)
+        this.mockMvc.perform(post(PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
@@ -150,7 +150,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
 
         stubInvokerWithRoles("caseworker-JUD2-solicitor");
 
-        this.mockMvc.perform(put(PATH)
+        this.mockMvc.perform(post(PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isForbidden())
@@ -166,7 +166,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
 
         stubSearchCase(CASE_TYPE_ID, CASE_ID, caseDetails("ANOTHER_ORGANIZATION_ID", ORG_POLICY_ROLE));
 
-        this.mockMvc.perform(put(PATH)
+        this.mockMvc.perform(post(PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
                                  .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())

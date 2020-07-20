@@ -33,7 +33,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -74,10 +74,10 @@ public class CaseAssignmentControllerTest {
         List<String> roles = of("Role1", "Role2");
         given(service.assignCaseAccess(any(CaseAssignment.class))).willReturn(roles);
 
-        this.mockMvc.perform(put(CASE_ASSIGNMENTS)
+        this.mockMvc.perform(post(CASE_ASSIGNMENTS)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(content().contentType(APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.status_message", is(
                     "Roles Role1,Role2 from the organisation policies successfully assigned to the assignee.")));
@@ -86,10 +86,10 @@ public class CaseAssignmentControllerTest {
     @DisplayName("should delegate to service domain for a valid request")
     @Test
     void shouldDelegateToServiceDomain() throws Exception {
-        this.mockMvc.perform(put(CASE_ASSIGNMENTS)
+        this.mockMvc.perform(post(CASE_ASSIGNMENTS)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk());
+            .andExpect(status().isCreated());
 
         ArgumentCaptor<CaseAssignment> captor = ArgumentCaptor.forClass(CaseAssignment.class);
         verify(service).assignCaseAccess(captor.capture());
@@ -102,7 +102,7 @@ public class CaseAssignmentControllerTest {
     void shouldFailWithBadRequestWhenCaseTypeIdIsNull() throws Exception {
         request = new CaseAssignmentRequest(null,CASE_ID, ASSIGNEE_ID);
 
-        this.mockMvc.perform(put(CASE_ASSIGNMENTS)
+        this.mockMvc.perform(post(CASE_ASSIGNMENTS)
                                  .contentType(MediaType.APPLICATION_JSON)
                                  .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
@@ -115,7 +115,7 @@ public class CaseAssignmentControllerTest {
     void shouldFailWithBadRequestWhenCaseIdIsNull() throws Exception {
         request = new CaseAssignmentRequest(CASE_TYPE_ID,null, ASSIGNEE_ID);
 
-        this.mockMvc.perform(put(CASE_ASSIGNMENTS)
+        this.mockMvc.perform(post(CASE_ASSIGNMENTS)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
@@ -128,7 +128,7 @@ public class CaseAssignmentControllerTest {
     void shouldFailWithBadRequestWhenAssigneeIdIsNull() throws Exception {
         request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, "");
 
-        this.mockMvc.perform(put(CASE_ASSIGNMENTS)
+        this.mockMvc.perform(post(CASE_ASSIGNMENTS)
              .contentType(MediaType.APPLICATION_JSON)
              .content(objectMapper.writeValueAsString(request)))
              .andExpect(status().isBadRequest())

@@ -24,7 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @Validated
-@ConditionalOnProperty(value = "api.case-assignments.enabled", havingValue = "true")
+@ConditionalOnProperty(value = "mca.conditional-apis.case-assignments.enabled", havingValue = "true")
 public class CaseAssignmentController {
 
     public static final String MESSAGE = "Role %s from the organisation policy successfully assigned to the assignee.";

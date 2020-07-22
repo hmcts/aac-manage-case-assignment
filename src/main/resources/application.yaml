@@ -51,6 +51,7 @@ ccd:
     host: ${CCD_DATA_STORE_HOST:http://localhost:4452}
 prd:
   host: ${PRD_HOST:http://localhost:4455}
-api:
-  case-assignments:
-    enabled: ${API_CASE_ASSIGNMENTS_ENABLED:true}
+mca:
+  conditional-apis:
+    case-assignments:
+      enabled: ${MCA_CONDITIONAL_APIS_CASE_ASSIGNMENTS_ENABLED:true}

@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.TextCodec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.BaseTest;
+
+import java.util.Date;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
@@ -17,7 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubS2SDetails;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCaseWithPrefix;
 import static uk.gov.hmcts.reform.managecase.zuulfilters.AuthHeaderRoutingFilter.SERVICE_AUTHORIZATION;
@@ -31,7 +35,8 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
     private static final String VALID_NOT_ALLOWED_PATH = "/ccd/notallowed/searchCases?ctid=CT_MasterCase";
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
     private static final String ORGANIZATION_ID = "TEST_ORG";
-    private static final String SOME_SERVICE_TOKEN = "someServiceToken";
+    private static final String SERVICE_NAME = "xui_webapp";
+    private static final String BEARER = "Bearer ";
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,10 +50,10 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
         + " and aac_manage_case_assignment client id")
     @Test
     void shouldReturn200_whenTheSearchCasesRequestHasCcdPrefix() throws Exception {
-
+        String s2SToken = generateDummyS2SToken(SERVICE_NAME);
         this.mockMvc.perform(post(PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .header(SERVICE_AUTHORIZATION, SOME_SERVICE_TOKEN)
+                                 .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
                                  .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))
@@ -68,12 +73,12 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
         + " a system user token and aac_manage_case_assignment client id")
     @Test
     void shouldReturn200_whenTheInternalSearchCasesRequestHasCcdPrefix() throws Exception {
-
+        String s2SToken = generateDummyS2SToken(SERVICE_NAME);
         stubSearchCaseWithPrefix(CASE_TYPE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE), "/internal");
 
         this.mockMvc.perform(post(PATH_INTERNAL)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .header(SERVICE_AUTHORIZATION, SOME_SERVICE_TOKEN)
+                                 .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
                                  .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))
@@ -92,22 +97,22 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
     @DisplayName("Zuul fails with 404 on invalid /ccd/invalid request url")
     @Test
     void shouldReturn404_whenInvalidRequestUrlHasCcdPrefix() throws Exception {
-        stubS2SDetails("xui_webapp");
+        String s2SToken = generateDummyS2SToken(SERVICE_NAME);
         this.mockMvc.perform(post(INVALID_PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .header(SERVICE_AUTHORIZATION, SOME_SERVICE_TOKEN))
+                                 .header(SERVICE_AUTHORIZATION, BEARER + s2SToken))
             .andExpect(status().isNotFound());
     }
 
     @DisplayName("Zuul fails with 403 on a valid not allowed request url")
     @Test
     void shouldReturn403_whenValidNotAllowedRequestUrl() throws Exception {
-
+        String s2SToken = generateDummyS2SToken(SERVICE_NAME);
         stubSearchCaseWithPrefix(CASE_TYPE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE), "/notallowed");
 
         this.mockMvc.perform(post(VALID_NOT_ALLOWED_PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .header(SERVICE_AUTHORIZATION, SOME_SERVICE_TOKEN)
+                                 .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
                                  .content("{}"))
             .andExpect(status().isForbidden());
     }
@@ -115,14 +120,21 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
     @DisplayName("Zuul fails with 403 on invalid service name")
     @Test
     void shouldReturn403_whenInvalidServiceName() throws Exception {
-
-        stubS2SDetails("invalidServiceName");
+        String s2SToken = generateDummyS2SToken("invalidService");
 
         this.mockMvc.perform(post(PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .header(SERVICE_AUTHORIZATION, SOME_SERVICE_TOKEN)
+                                 .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
                                  .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
             .andExpect(status().isForbidden());
+    }
+
+    public static String generateDummyS2SToken(String serviceName) {
+        return Jwts.builder()
+                .setSubject(serviceName)
+                .setIssuedAt(new Date())
+                .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+                .compact();
     }
 }
 

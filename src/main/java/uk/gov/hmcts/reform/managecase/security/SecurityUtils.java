@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.managecase.security;
 
+import com.auth0.jwt.JWT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -38,6 +39,20 @@ public class SecurityUtils {
 
     public UserInfo getUserInfo() {
         return idamRepository.getUserInfo(getUserToken());
+    }
+
+    public String getServiceNameFromS2SToken(String serviceAuthenticationToken) {
+        // NB: this grabs the service name straight from the token under the assumption
+        // that the S2S token has already been verified elsewhere
+        return JWT.decode(removeBearerFromToken(serviceAuthenticationToken)).getSubject();
+    }
+
+    private String removeBearerFromToken(String token) {
+        if (token.startsWith(BEARER)) {
+            return token.substring(BEARER.length());
+        } else {
+            return token;
+        }
     }
 
 }

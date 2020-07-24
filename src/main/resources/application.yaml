@@ -40,7 +40,8 @@ idam:
   client:
     id: aac_manage_case_assignment
     secret: ${IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
-    redirect_uri: ${OAUTH2_REDIRECT_URI:http://localhost:3451/oauth2redirect}
+    # same for all environments - not used in mca but configured as idam mandates for token generation
+    redirect_uri: https://manage-case-assignment/oauth2redirect
   system-user:
     username: ${IDAM_SYSTEM_USER_USERNAME:master.solicitor.1@gmail.com}
     password: ${IDAM_SYSTEM_USER_PASSWORD:Pa55word11}

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.managecase.api.controller;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,30 +25,28 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearc
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCaseWithPrefix;
 import static uk.gov.hmcts.reform.managecase.zuulfilters.AuthHeaderRoutingFilter.SERVICE_AUTHORIZATION;
 
-@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions"})
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions", "PMD.AvoidDuplicateLiterals"})
 public class ZuulProxyDataStoreRequestIT extends BaseTest {
+
     private static final String CASE_TYPE_ID = "CT_MasterCase";
     private static final String PATH = "/ccd/searchCases?ctid=CT_MasterCase";
     private static final String PATH_INTERNAL = "/ccd/internal/searchCases?ctid=CT_MasterCase";
     private static final String INVALID_PATH = "/ccd/invalid?ctid=CT_MasterCase";
     private static final String VALID_NOT_ALLOWED_PATH = "/ccd/notallowed/searchCases?ctid=CT_MasterCase";
-    private static final String ORG_POLICY_ROLE = "caseworker-probate";
-    private static final String ORGANIZATION_ID = "TEST_ORG";
+    private static final String ES_QUERY = "{\"query\": {\"match_all\": {}},\"size\": 50}";
     private static final String SERVICE_NAME = "xui_webapp";
     private static final String BEARER = "Bearer ";
 
     @Autowired
     private MockMvc mockMvc;
 
-    @BeforeEach
-    void setUp() {
-        stubSearchCase(CASE_TYPE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
-    }
-
     @DisplayName("Zuul successfully forwards /ccd/searchCases request to the data store with a system user token"
         + " and aac_manage_case_assignment client id")
     @Test
     void shouldReturn200_whenTheSearchCasesRequestHasCcdPrefix() throws Exception {
+
+        stubSearchCase(CASE_TYPE_ID, ES_QUERY, caseDetails());
+
         String s2SToken = generateDummyS2SToken(SERVICE_NAME);
         this.mockMvc.perform(post(PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
@@ -73,8 +70,9 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
         + " a system user token and aac_manage_case_assignment client id")
     @Test
     void shouldReturn200_whenTheInternalSearchCasesRequestHasCcdPrefix() throws Exception {
+
         String s2SToken = generateDummyS2SToken(SERVICE_NAME);
-        stubSearchCaseWithPrefix(CASE_TYPE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE), "/internal");
+        stubSearchCaseWithPrefix(CASE_TYPE_ID, ES_QUERY, caseDetails(), "/internal");
 
         this.mockMvc.perform(post(PATH_INTERNAL)
                                  .contentType(MediaType.APPLICATION_JSON)
@@ -108,7 +106,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
     @Test
     void shouldReturn403_whenValidNotAllowedRequestUrl() throws Exception {
         String s2SToken = generateDummyS2SToken(SERVICE_NAME);
-        stubSearchCaseWithPrefix(CASE_TYPE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE), "/notallowed");
+        stubSearchCaseWithPrefix(CASE_TYPE_ID, ES_QUERY, caseDetails(), "/notallowed");
 
         this.mockMvc.perform(post(VALID_NOT_ALLOWED_PATH)
                                  .contentType(MediaType.APPLICATION_JSON)

@@ -14,6 +14,7 @@ import javax.inject.Named;
 public class SecurityUtils {
 
     public static final String BEARER = "Bearer ";
+    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamRepository idamRepository;
@@ -48,11 +49,7 @@ public class SecurityUtils {
     }
 
     private String removeBearerFromToken(String token) {
-        if (token.startsWith(BEARER)) {
-            return token.substring(BEARER.length());
-        } else {
-            return token;
-        }
+        return token.startsWith(BEARER) ? token.substring(BEARER.length()) : token;
     }
 
 }

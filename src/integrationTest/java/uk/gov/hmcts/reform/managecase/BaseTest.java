@@ -68,5 +68,4 @@ public class BaseTest {
             .collect(Collectors.toCollection(ArrayList::new));
         when(authentication.getAuthorities()).thenAnswer(invocationOnMock -> authorityCollection);
     }
-
 }

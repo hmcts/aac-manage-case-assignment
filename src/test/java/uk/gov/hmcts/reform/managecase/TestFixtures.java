@@ -11,7 +11,11 @@ import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TestFixtures {
 
@@ -33,10 +37,11 @@ public class TestFixtures {
         private CaseDetailsFixture() {
         }
 
-        public static CaseDetails caseDetails(String organizationId, String orgPolicyRole) {
-            return defaultCaseDetails()
-                    .data(Maps.newHashMap("OrganisationPolicy1", jsonNode(organizationId, orgPolicyRole)))
-                    .build();
+        public static CaseDetails caseDetails(String organizationId, String... orgPolicyRoles) {
+            Map<String, JsonNode> jsonNodeMap = Stream.of(orgPolicyRoles)
+                    .collect(Collectors.toMap(role -> "Field_" + role, role -> jsonNode(organizationId, role),
+                        (v1, v2) -> v1, LinkedHashMap::new));
+            return defaultCaseDetails().data(jsonNodeMap).build();
         }
 
         public static CaseDetails caseDetails() {

@@ -96,7 +96,7 @@ public class CaseAssignmentService {
                                                   Map<String, ProfessionalUser> prdUsersMap) {
         return CaseAssignedUsers.builder()
                 .caseId(caseId)
-                .caseTitle(caseId + "-" + DUMMY_TITLE)
+                .caseTitle(caseId + "-" + DUMMY_TITLE) // TODO : Design is still pending so hardcoded for now
                 .users(userRolesMap.entrySet().stream()
                         .map(entry -> toUserDetails(prdUsersMap.get(entry.getKey()), entry.getValue()))
                         .collect(toList()))

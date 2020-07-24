@@ -180,4 +180,6 @@ public class CaseAssignmentControllerIT extends BaseTest {
                 .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles[0]", is(TestFixtures.CASE_ROLE)));
     }
 
+    // TODO : need to add negative scenario (400 BadRequest) tests for Get Case Assignments
+
 }

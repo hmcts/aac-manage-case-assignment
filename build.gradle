@@ -106,6 +106,7 @@ task smoke(type: Test) {
 
 pmd {
   toolVersion = "6.24.0"
+  maxFailures = 1
   sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest, sourceSets.smokeTest]
   reportsDir = file("$project.buildDir/reports/pmd")
   // https://github.com/pmd/pmd/issues/876
@@ -170,6 +171,10 @@ dependencyManagement {
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
     }
+    // multiple CVEs
+    dependencySet(group: 'com.netflix.servo', version: '0.12.4') {
+      entry 'servo-core'
+    }
   }
 }
 
@@ -227,6 +232,7 @@ dependencies {
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.5.3'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.3.RELEASE'
 
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.security:spring-security-config"

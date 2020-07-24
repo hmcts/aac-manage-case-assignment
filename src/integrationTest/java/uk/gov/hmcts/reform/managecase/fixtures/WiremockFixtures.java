@@ -4,6 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.http.ResponseDefinition;
+import com.github.tomakehurst.wiremock.common.FileSource;
+import com.github.tomakehurst.wiremock.extension.Parameters;
+import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer;
+import com.github.tomakehurst.wiremock.http.Request;
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -14,6 +21,7 @@ import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.o
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -25,7 +33,24 @@ public final class WiremockFixtures {
         .modules(new Jdk8Module())
         .build();
 
+
     private WiremockFixtures() {
+    }
+
+    public static class ConnectionClosedTransformer extends ResponseDefinitionTransformer {
+
+        @Override
+        public String getName() {
+            return "keep-alive-disabler";
+        }
+
+        @Override
+        public ResponseDefinition transform(Request request, ResponseDefinition responseDefinition,
+                                            FileSource files, Parameters parameters) {
+            return ResponseDefinitionBuilder.like(responseDefinition)
+                    .withHeader(HttpHeaders.CONNECTION, "close")
+                    .build();
+        }
     }
 
     public static void stubInvokerWithRoles(String... roles) {
@@ -33,15 +58,24 @@ public final class WiremockFixtures {
         stubFor(WireMock.get(urlEqualTo("/o/userinfo")).willReturn(okForJson(userInfo)));
     }
 
+    public static void stubS2SDetails(String serviceName) {
+        stubFor(WireMock.get(urlEqualTo("/s2s/details")).willReturn(okJson(serviceName)));
+    }
+
     public static void stubGetUsersByOrganisation(FindUsersByOrganisationResponse response) {
         stubFor(WireMock.get(urlEqualTo("/refdata/external/v1/organisations/users?status=Active"))
                 .willReturn(okForJson(response)));
     }
 
-    public static void stubSearchCase(String caseTypeId, String caseId, CaseDetails caseDetails) {
-        stubFor(WireMock.post(urlEqualTo("/searchCases?ctid=" + caseTypeId)).willReturn(
-            aResponse().withStatus(HTTP_OK).withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
-                .withHeader("Content-Type", "application/json")));
+    public static void stubSearchCaseWithPrefix(String caseTypeId, CaseDetails caseDetails, String prefix) {
+        stubFor(WireMock.post(urlEqualTo(prefix + "/searchCases?ctid=" + caseTypeId)).willReturn(aResponse()
+                    .withStatus(HTTP_OK)
+                    .withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
+                    .withHeader("Content-Type", "application/json")));
+    }
+
+    public static void stubSearchCase(String caseTypeId, CaseDetails caseDetails) {
+        stubSearchCaseWithPrefix(caseTypeId, caseDetails, "");
     }
 
     public static void stubAssignCase(String caseId, String userId, String caseRole) {

@@ -57,6 +57,9 @@
             "exists": true
           }
         },
+        "hystrix" : {
+          "status" : "UP"
+        },
         "livenessState": {
           "status": "UP"
         },

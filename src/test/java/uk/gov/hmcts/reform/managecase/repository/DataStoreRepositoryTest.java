@@ -77,7 +77,7 @@ class DataStoreRepositoryTest {
     void assignCase() {
         doNothing().when(dataStoreApi).assignCase(any(CaseUserRolesRequest.class));
 
-        repository.assignCase(CASE_ID, ROLE, ASSIGNEE_ID);
+        repository.assignCase(List.of(ROLE), CASE_ID, ASSIGNEE_ID);
 
         ArgumentCaptor<CaseUserRolesRequest> captor = ArgumentCaptor.forClass(CaseUserRolesRequest.class);
         verify(dataStoreApi).assignCase(captor.capture());

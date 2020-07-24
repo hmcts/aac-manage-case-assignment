@@ -9,7 +9,7 @@
     "intends to assign access within the same organisation for S2 by S1",
     "contains a malformed Case ID"
   ],
-  "method": "PUT",
+  "method": "POST",
   "uri": "/case-assignments",
   "s2sClientId": "xui_webapp",
   "userTokenClientId": "xuiwebapp",

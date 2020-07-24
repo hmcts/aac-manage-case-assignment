@@ -8,7 +8,7 @@
     "U2 - who does not have a solicitor role for the jurisdiction of C1 but works within the same organisation as S1",
     "intends to assign access within the same organisation for U2 by S1"
   ],
-  "method": "PUT",
+  "method": "POST",
   "uri": "/case-assignments",
   "s2sClientId": "xui_webapp",
   "userTokenClientId": "xuiwebapp",

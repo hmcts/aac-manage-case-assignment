@@ -8,7 +8,7 @@
     "S2 - a solicitor in the same organisation, with whom CW1 will share a care with an assignment within their organisation",
     "is to be invoked by CW1 to assign access over C2 for S2 within the same organisation"
   ],
-  "method": "PUT",
+  "method": "POST",
   "uri": "/case-assignments",
   "s2sClientId": "xui_webapp",
   "userTokenClientId": "xuiwebapp",

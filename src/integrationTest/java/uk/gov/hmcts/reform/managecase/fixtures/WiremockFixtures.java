@@ -42,6 +42,23 @@ public final class WiremockFixtures {
     private WiremockFixtures() {
     }
 
+    // Same issue as here https://github.com/tomakehurst/wiremock/issues/97
+    public static class ConnectionClosedTransformer extends ResponseDefinitionTransformer {
+
+        @Override
+        public String getName() {
+            return "keep-alive-disabler";
+        }
+
+        @Override
+        public ResponseDefinition transform(Request request, ResponseDefinition responseDefinition,
+                                            FileSource files, Parameters parameters) {
+            return ResponseDefinitionBuilder.like(responseDefinition)
+                    .withHeader(HttpHeaders.CONNECTION, "close")
+                    .build();
+        }
+    }
+
     public static void stubS2SDetails(String serviceName) {
         stubFor(WireMock.get(urlEqualTo("/s2s/details")).willReturn(okJson(serviceName)));
     }
@@ -84,23 +101,6 @@ public final class WiremockFixtures {
             return OBJECT_MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    // Same issue as here https://github.com/tomakehurst/wiremock/issues/97
-    public static class NoKeepAliveTransformer extends ResponseDefinitionTransformer {
-
-        @Override
-        public String getName() {
-            return "keep-alive-disabler";
-        }
-
-        @Override
-        public ResponseDefinition transform(Request request, ResponseDefinition responseDefinition,
-                                            FileSource files, Parameters parameters) {
-            return ResponseDefinitionBuilder.like(responseDefinition)
-                    .withHeader(HttpHeaders.CONNECTION, "close")
-                    .build();
         }
     }
 }

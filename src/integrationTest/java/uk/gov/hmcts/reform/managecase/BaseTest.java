@@ -49,6 +49,14 @@ public class BaseTest {
         SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
     }
 
+    @Configuration
+    static class WireMockTestConfiguration {
+        @Bean
+        public WireMockConfigurationCustomizer wireMockConfigurationCustomizer() {
+            return config -> config.extensions(new WiremockFixtures.ConnectionClosedTransformer());
+        }
+    }
+
     private Jwt dummyJwt() {
         return Jwt.withTokenValue("a dummy jwt token")
                 .claim("aClaim", "aClaim")
@@ -68,7 +76,7 @@ public class BaseTest {
     static class TestConfiguration {
         @Bean
         public WireMockConfigurationCustomizer wireMockConfigurationCustomizer() {
-            return config -> config.extensions(new WiremockFixtures.NoKeepAliveTransformer());
+            return config -> config.extensions(new WiremockFixtures.ConnectionClosedTransformer());
         }
     }
 

@@ -7,16 +7,9 @@ import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
-import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
-import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
-import uk.gov.hmcts.reform.authorisation.validators.ServiceAuthTokenValidator;
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
-
-import javax.servlet.http.HttpServletRequest;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.ROUTE_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SIMPLE_HOST_ROUTING_FILTER_ORDER;
@@ -28,14 +21,12 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
  * Adds ServiceAuthorization header with the s2s MCA access token.
  */
 @Component
-@EnableFeignClients(basePackageClasses = ServiceAuthorisationApi.class)
 public class AuthHeaderRoutingFilter extends ZuulFilter {
     private static final Logger LOG = LoggerFactory.getLogger(AuthHeaderRoutingFilter.class);
 
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
     private final SecurityUtils securityUtils;
-    private final ServiceAuthorisationApi authorisationApi;
     private final ApplicationParams applicationParams;
 
     @Override
@@ -53,12 +44,10 @@ public class AuthHeaderRoutingFilter extends ZuulFilter {
         return true;
     }
 
-    public AuthHeaderRoutingFilter(ServiceAuthorisationApi authorisationApi,
-                                   SecurityUtils securityUtils,
+    public AuthHeaderRoutingFilter(SecurityUtils securityUtils,
                                    ApplicationParams applicationParams) {
         super();
         this.securityUtils = securityUtils;
-        this.authorisationApi = authorisationApi;
         this.applicationParams = applicationParams;
     }
 
@@ -74,9 +63,8 @@ public class AuthHeaderRoutingFilter extends ZuulFilter {
     }
 
     private void validateClientId(RequestContext context) {
-        AuthTokenValidator authTokenValidator = new ServiceAuthTokenValidator(authorisationApi);
-        String bearerToken = extractBearerToken(context.getRequest());
-        String serviceName = authTokenValidator.getServiceName(bearerToken);
+        String serviceName = securityUtils
+                .getServiceNameFromS2SToken(context.getRequest().getHeader(SERVICE_AUTHORIZATION));
 
         if (!applicationParams.getCcdDataStoreAllowedService().equals(serviceName)) {
             String errorMessage = String.format("forbidden client id %s for the /ccd endpoint", serviceName);
@@ -90,13 +78,5 @@ public class AuthHeaderRoutingFilter extends ZuulFilter {
     private void addSystemUserHeaders(RequestContext context) {
         context.addZuulRequestHeader(AUTHORIZATION, securityUtils.getSystemUserToken());
         context.addZuulRequestHeader(SERVICE_AUTHORIZATION, securityUtils.getS2SToken());
-    }
-
-    private String extractBearerToken(HttpServletRequest request) {
-        String token = request.getHeader(SERVICE_AUTHORIZATION);
-        if (token == null) {
-            throw new InvalidTokenException("ServiceAuthorization Token is missing");
-        }
-        return token.startsWith("Bearer ") ? token : "Bearer " + token;
     }
 }

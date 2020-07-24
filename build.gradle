@@ -106,6 +106,7 @@ task smoke(type: Test) {
 
 pmd {
   toolVersion = "6.24.0"
+  maxFailures = 1
   sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest, sourceSets.smokeTest]
   reportsDir = file("$project.buildDir/reports/pmd")
   // https://github.com/pmd/pmd/issues/876
@@ -164,8 +165,8 @@ dependencyManagement {
     dependencySet(group: 'org.apache.logging.log4j', version: '2.13.2') {
       entry 'log4j-api'
     }
-    // CVE-2020-11996
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.36') {
+    // CVE-2020-11996, CVE-2020-13934
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.37') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'

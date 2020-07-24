@@ -8,8 +8,10 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
+import uk.gov.hmcts.reform.managecase.domain.CaseAssignedUsers;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
+import uk.gov.hmcts.reform.managecase.domain.UserDetails;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,11 +21,17 @@ import java.util.stream.Stream;
 
 public class TestFixtures {
 
-    private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
-    private static final String CASE_ID = "12345678";
-    private static final String JURISDICTION = "AUTOTEST1";
-    private static final String ORG_POLICY_ROLE = "caseworker-probate";
-    private static final String ORGANIZATION_ID = "TEST_ORG";
+    public static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
+    public static final String CASE_ID = "1588234985453946";
+    public static final String JURISDICTION = "AUTOTEST1";
+    public static final String CASE_ROLE = "[Collaborator]";
+    public static final String CASE_ROLE2 = "[Creator]";
+    public static final String ORGANIZATION_ID = "TEST_ORG";
+
+    public static final String CASE_TITLE = "Test case title";
+    public static final String FIRST_NAME = "Bill";
+    public static final String LAST_NAME = "Roberts";
+    public static final String EMAIL = "bill.roberts@greatbrsolicitors.co.uk";
 
     private static final ObjectMapper OBJECT_MAPPER = new Jackson2ObjectMapperBuilder()
             .modules(new Jdk8Module())
@@ -53,7 +61,7 @@ public class TestFixtures {
                     .caseTypeId(CASE_TYPE_ID)
                     .reference(CASE_ID)
                     .jurisdiction(JURISDICTION)
-                    .data(Maps.newHashMap("OrganisationPolicy1", jsonNode(ORGANIZATION_ID, ORG_POLICY_ROLE)));
+                    .data(Maps.newHashMap("OrganisationPolicy1", jsonNode(ORGANIZATION_ID, CASE_ROLE)));
         }
 
         public static OrganisationPolicy organisationPolicy(String organizationId, String orgPolicyRole) {
@@ -80,10 +88,37 @@ public class TestFixtures {
         public static ProfessionalUser user(String userIdentifier, String... roles) {
             return ProfessionalUser.builder()
                     .userIdentifier(userIdentifier)
+                    .firstName(FIRST_NAME)
+                    .lastName(LAST_NAME)
+                    .email(EMAIL)
                     .roles(List.of(roles))
                     .build();
         }
 
+    }
+
+    public static class CaseAssignedUsersFixture {
+
+        private CaseAssignedUsersFixture() {
+        }
+
+        public static CaseAssignedUsers caseAssignedUsers() {
+            return CaseAssignedUsers.builder()
+                    .caseId(CASE_ID)
+                    .caseTitle(CASE_TITLE)
+                    .users(List.of(defaultUser()))
+                    .build();
+        }
+
+        public static UserDetails defaultUser() {
+            return UserDetails.builder()
+                    .idamId("221a2877-e1ab-4dc4-a9ff-f9424ad58738")
+                    .firstName(FIRST_NAME)
+                    .lastName(LAST_NAME)
+                    .email(EMAIL)
+                    .caseRoles(List.of(CASE_ROLE, CASE_ROLE2))
+                    .build();
+        }
     }
 
 }

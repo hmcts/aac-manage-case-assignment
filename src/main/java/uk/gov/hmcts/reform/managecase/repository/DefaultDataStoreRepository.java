@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.managecase.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 
 import java.util.List;
@@ -45,6 +45,12 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         List<CaseUserRole> caseUserRoles = caseRoles.stream()
                 .map(role -> CaseUserRole.builder().caseRole(role).caseId(caseId).userId(userId).build())
                 .collect(Collectors.toList());
-        dataStoreApi.assignCase(new CaseUserRolesRequest(caseUserRoles));
+        dataStoreApi.assignCase(new CaseUserRoleResource(caseUserRoles));
+    }
+
+    @Override
+    public List<CaseUserRole> getCaseAssignments(List<String> caseIds, List<String> userIds) {
+        CaseUserRoleResource response = dataStoreApi.getCaseAssignments(caseIds, userIds);
+        return response.getCaseUsers();
     }
 }

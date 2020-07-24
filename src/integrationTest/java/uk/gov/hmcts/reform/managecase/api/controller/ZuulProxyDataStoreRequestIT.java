@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.BaseTest;
+import uk.gov.hmcts.reform.managecase.TestFixtures;
 
 import java.util.Date;
 
@@ -54,7 +55,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
                                  .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))
-            .andExpect(jsonPath("$.cases[0].reference", is("12345678")));
+            .andExpect(jsonPath("$.cases[0].reference", is(TestFixtures.CASE_ID)));
 
         verify(postRequestedFor(urlEqualTo("/o/token"))
                    .withRequestBody(containing("username=master.solicitor.1%40gmail.com")));
@@ -80,7 +81,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
                                  .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))
-            .andExpect(jsonPath("$.cases[0].reference", is("12345678")));
+            .andExpect(jsonPath("$.cases[0].reference", is(TestFixtures.CASE_ID)));
 
         verify(postRequestedFor(urlEqualTo("/o/token"))
                    .withRequestBody(containing("username=master.solicitor.1%40gmail.com")));

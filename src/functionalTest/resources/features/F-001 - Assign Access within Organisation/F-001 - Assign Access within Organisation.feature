@@ -82,7 +82,7 @@ Feature: F-001: Assign Access within Organisation
   Scenario: Must return a negative response when the case doesn't contain an assignment for the invoker's organisation
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],
     And   a user [S2 - another solicitor in the same organisation, with whom S1 will share a case with an assignment within organisation],
-    And   a case [C1, which S1 has just] created as in [Prerequisite_Case_Creation_C2_Without_Org_Policies],
+    And   a case [C1, which S1 has just] created as in [Prerequisite_Case_Creation_C0_Without_Org_Policies],
     And   a wait time of [5] seconds [to allow for the case just created to appear in search results],
     When  a request is prepared with appropriate values,
     And   the request [is to be invoked by S1 to assign access over C1 for S2 within the same organisation],

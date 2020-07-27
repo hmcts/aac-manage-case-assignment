@@ -31,9 +31,9 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_200_Response",
+    "_extends_": "Common_201_Response",
     "body": {
-      "status_message": "Role [Defendant] from the organisation policy successfully assigned to the assignee."
+      "status_message": "Roles [Defendant],[Claimant] from the organisation policies successfully assigned to the assignee."
     }
   }
 }

@@ -4,9 +4,9 @@
   "productName": "Manage Case Assignment Microservice",
   "operationName": "Assign Access within Organisation",
   "specs": [
-    "S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation",
+    "S1 - a solicitor, to create a case under their organisation",
     "CAA - a PUI case access admin, to share it with a solicitor in the same organisation",
-    "S2 - a solicitor in the same organisation, with whom CW1 will share a care with an assignment within their organisation",
+    "S2 - another solicitor in the same organisation, with whom CAA will share a case with an assignment within organisation",
     "is to be invoked by CAA to assign access over C1 for S2 within the same organisation"
   ],
   "method": "POST",

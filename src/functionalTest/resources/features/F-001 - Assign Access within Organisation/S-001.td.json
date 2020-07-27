@@ -5,7 +5,7 @@
   "operationName": "Assign Access within Organisation",
   "specs": [
     "S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation",
-    "S2 - another solicitor in the same organisation, with whom S1 will share a case with an assignment within their organisation",
+    "S2 - another solicitor in the same organisation, with whom S1 will share a case with an assignment within organisation",
     "is to be invoked by S1 to assign access over C1 for S2 within the same organisation"
   ],
   "method": "POST",

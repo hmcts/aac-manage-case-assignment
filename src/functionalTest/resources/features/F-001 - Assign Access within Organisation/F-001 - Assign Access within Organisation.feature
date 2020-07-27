@@ -77,20 +77,6 @@ Feature: F-001: Assign Access within Organisation
     And   it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
     Then  a negative response is received,
     And   the response has all the details as expected,
-    And   a call [by U2 to query his/her case roles granted over C1] will get the expected response as in [U2_Querying_No_Access_Over_C1].
-
-  @S-007 @Ignore
-  Scenario: Must return an error response if the invoker doesn't have a solicitor role for the jurisdiction of the case or a caseworker-caa role
-    And   a user [U1 - who does not have a solicitor role for the jurisdiction of C2 but works within the same organisation as S2],
-    And   a user [S2 - with a solicitor role within the same organisation],
-    And   a case [C2, which U1 has just] created as in [Prerequisite_Case_Creation_C2],
-    And   a wait time of [5] seconds [to allow for the case just created to appear in search results],
-    When  a request is prepared with appropriate values,
-    And   the request [intends to assign access within the same organisation for S2 by U1],
-    And   it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
-    Then  a negative response is received,
-    And   the response has all the details as expected,
-    And   a call [by S2 to query his/her case roles granted over C1] will get the expected response as in [S2_Querying_No_Access_Over_C1].
 
   @S-008 @Ignore
   Scenario: Must return a negative response when the case doesn't contain an assignment for the invoker's organisation

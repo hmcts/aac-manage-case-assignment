@@ -270,7 +270,7 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  functionalTestImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '4.2.0-aca-11.5'
+  functionalTestImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '4.2.0-aca-11.7'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath

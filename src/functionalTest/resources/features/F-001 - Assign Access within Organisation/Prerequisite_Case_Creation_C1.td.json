@@ -20,7 +20,7 @@
           "OrgPolicyCaseAssignedRole": "[Claimant]",
           "OrgPolicyReference": "ClaimantPolicy",
           "Organisation": {
-            "OrganisationID": "aca-2",
+            "OrganisationID": "QUK822N",
             "OrganisationName": "ACA-2 Organisation"
           }
         },
@@ -28,7 +28,7 @@
           "OrgPolicyCaseAssignedRole": "[Defendant]",
           "OrgPolicyReference": "DefendantPolicy",
           "Organisation": {
-            "OrganisationID": "aca-2",
+            "OrganisationID": "QUK822N",
             "OrganisationName": "ACA-2 Organisation"
           }
         }
@@ -50,7 +50,7 @@
           "OrgPolicyCaseAssignedRole": "[Claimant]",
           "OrgPolicyReference": "ClaimantPolicy",
           "Organisation": {
-            "OrganisationID": "aca-2",
+            "OrganisationID": "QUK822N",
             "OrganisationName": "ACA-2 Organisation"
           }
         },
@@ -58,7 +58,7 @@
           "OrgPolicyCaseAssignedRole": "[Defendant]",
           "OrgPolicyReference": "DefendantPolicy",
           "Organisation": {
-            "OrganisationID": "aca-2",
+            "OrganisationID": "QUK822N",
             "OrganisationName": "ACA-2 Organisation"
           }
         }

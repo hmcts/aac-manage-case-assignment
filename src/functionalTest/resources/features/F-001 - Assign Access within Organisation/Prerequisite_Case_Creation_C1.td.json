@@ -24,6 +24,7 @@
   },
   "expectedResponse": {
     "body": {
+      "event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1_Token_Creation][testData][actualResponse][body][token]}",
       "case_data": {
         "OrganisationPolicyField1": {
           "OrgPolicyReference": "ClaimantPolicy",

@@ -14,7 +14,7 @@
       "ctid": "FT_MasterCaseType"
     },
     "body": {
-      "event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1_Token_Creation][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C0_Without_Org_Policies_Token_Creation][testData][actualResponse][body][token]}",
       "data": {
         "OrganisationPolicyField1": {
           "OrgPolicyCaseAssignedRole": "[Claimant]"

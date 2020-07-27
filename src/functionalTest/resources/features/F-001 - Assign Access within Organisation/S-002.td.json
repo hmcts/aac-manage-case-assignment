@@ -10,10 +10,12 @@
 		"is to be invoked by CAA to assign access over C1 for S2 within the same organisation"
 	],
 
-	"invokingUser": {
-		"username": "befta.pui.caa.1@gmail.com",
-		"password": "[[$CCD_BEFTA_PUI_CAA_1_PWD]]"
-    },
+	"users": {
+		"invokingUser": {
+			"username": "befta.pui.caa.1@gmail.com",
+			"password": "[[$CCD_BEFTA_PUI_CAA_1_PWD]]"
+    	} 
+	},
 
 	"expectedResponse": {
 		"_extends_": "Common_201_Response",

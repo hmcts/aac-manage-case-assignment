@@ -4,7 +4,7 @@
 
 	"request": {
 		"body": {
-		    "event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1_Token_Creation][testData][actualResponse][body][token]}",
+			"event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1_Token_Creation][testData][actualResponse][body][token]}",
 			"data": {
 				"OrganisationPolicyField1": {
 					"OrgPolicyReference": "ClaimantPolicy",
@@ -39,6 +39,58 @@
 					"Organisation": {
 						"OrganisationID": "QUK822N",
 						"OrganisationName": "ACA-2 Organisation"
+					}
+				}
+			},
+			"security_classifications": {
+				"OrganisationPolicyField2": {
+					"value": {
+						"OrgPolicyReference": "PUBLIC",
+						"Organisation": {
+							"classification": "PUBLIC",
+							"value": {
+								"OrganisationID": "PUBLIC",
+								"OrganisationName": "PUBLIC"
+							}
+						}
+					}
+				},
+				"OrganisationPolicyField1": {
+					"value": {
+						"OrgPolicyReference": "PUBLIC",
+						"Organisation": {
+							"classification": "PUBLIC",
+							"value": {
+								"OrganisationID": "PUBLIC",
+								"OrganisationName": "PUBLIC"
+							}
+						}
+					}
+				}
+			},
+			"data_classification": {
+				"OrganisationPolicyField2": {
+					"value": {
+						"OrgPolicyReference": "PUBLIC",
+						"Organisation": {
+							"classification": "PUBLIC",
+							"value": {
+								"OrganisationID": "PUBLIC",
+								"OrganisationName": "PUBLIC"
+							}
+						}
+					}
+				},
+				"OrganisationPolicyField1": {
+					"value": {
+						"OrgPolicyReference": "PUBLIC",
+						"Organisation": {
+							"classification": "PUBLIC",
+							"value": {
+								"OrganisationID": "PUBLIC",
+								"OrganisationName": "PUBLIC"
+							}
+						}
 					}
 				}
 			}

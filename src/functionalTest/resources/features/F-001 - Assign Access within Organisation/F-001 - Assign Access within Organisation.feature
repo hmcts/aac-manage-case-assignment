@@ -76,7 +76,7 @@ Feature: F-001: Assign Access within Organisation
     And   the request [intends to assign access within the same organisation for S2 by S1],
     And   it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
     Then  a negative response is received,
-    And   the response has all the details as expected,
+    And   the response has all the details as expected.
 
   @S-008 @Ignore
   Scenario: Must return a negative response when the case doesn't contain an assignment for the invoker's organisation
@@ -88,5 +88,4 @@ Feature: F-001: Assign Access within Organisation
     And   the request [intends to assign access within the same organisation for U2 by U1],
     And   it is submitted to call the [Assign Access within Organisation] operation of [Case Assignment Microservice],
     Then  a negative response is received,
-    And   the response has all the details as expected,
-    And   a call [by U2 to query his/her case roles granted over C1] will get the expected response as in [U2_Querying_No_Access_Over_C1].
+    And   the response has all the details as expected.

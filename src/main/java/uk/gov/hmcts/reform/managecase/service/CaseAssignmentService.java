@@ -74,6 +74,7 @@ public class CaseAssignmentService {
         return policyRoles;
     }
 
+    @SuppressWarnings("PMD")
     public List<CaseAssignedUsers> getCaseAssignments(List<String> caseIds) {
 
         List<ProfessionalUser> professionalUsers = prdRepository.findUsersByOrganisation().getUsers();
@@ -87,16 +88,19 @@ public class CaseAssignmentService {
                         Collectors.groupingBy(CaseUserRole::getUserId,
                                 Collectors.mapping(item -> item.getCaseRole(), toList()))));
 
+        Map<String, String> caseTitles = dataStoreRepository.getCaseTitles(caseIds);
+
         return rolesByUserIdAndByCaseId.entrySet().stream()
-                .map(entry -> toCaseAssignedUsers(entry.getKey(), entry.getValue(), prdUsersMap))
+                .map(entry -> toCaseAssignedUsers(entry.getKey(), entry.getValue(), prdUsersMap, caseTitles))
                 .collect(toList());
     }
 
     private CaseAssignedUsers toCaseAssignedUsers(String caseId, Map<String, List<String>> userRolesMap,
-                                                  Map<String, ProfessionalUser> prdUsersMap) {
+                                                  Map<String, ProfessionalUser> prdUsersMap,
+                                                  Map<String, String> caseTitles) {
         return CaseAssignedUsers.builder()
                 .caseId(caseId)
-                .caseTitle(caseId + "-" + DUMMY_TITLE) // TODO : Design is still pending so hardcoded for now
+                .caseTitle(caseTitles.get(caseId))
                 .users(userRolesMap.entrySet().stream()
                         .map(entry -> toUserDetails(prdUsersMap.get(entry.getKey()), entry.getValue()))
                         .collect(toList()))

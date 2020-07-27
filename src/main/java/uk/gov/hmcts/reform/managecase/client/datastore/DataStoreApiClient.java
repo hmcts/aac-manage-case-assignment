@@ -24,7 +24,7 @@ public interface DataStoreApiClient {
     @PostMapping(value = "/case-users", consumes = APPLICATION_JSON_VALUE)
     void assignCase(@RequestBody CaseUserRoleResource userRolesRequest);
 
-    @GetMapping(value = "/case-users")
+    @GetMapping("/case-users")
     CaseUserRoleResource getCaseAssignments(@RequestParam("case_ids") List<String> caseIds,
                                             @RequestParam("user_ids") List<String> userIds);
 }

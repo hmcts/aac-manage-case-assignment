@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 
 import java.util.List;
 
@@ -139,7 +140,8 @@ public class CaseAssignmentController {
                     message = "UnAuthorised S2S service.\n"
             )
     })
-    public GetCaseAssignmentsResponse getCaseAssignments(@RequestParam("case_ids") List<String> caseIds) {
+    public GetCaseAssignmentsResponse getCaseAssignments(@RequestParam("case_ids")
+            @Valid @NotEmpty(message = "case_ids must be a non-empty list of proper case ids.") List<String> caseIds) {
         List<CaseAssignedUsers> caseAssignedUsers = caseAssignmentService.getCaseAssignments(caseIds);
         return new GetCaseAssignmentsResponse(GET_ASSIGNMENTS_MESSAGE, caseAssignedUsers);
     }

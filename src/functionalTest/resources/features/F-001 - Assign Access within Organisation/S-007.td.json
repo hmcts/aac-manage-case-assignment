@@ -1,40 +1,40 @@
 {
-  "_guid_": "S-007",
-  "title": "Must return an error response if the invoker doesn't have a solicitor role for the jurisdiction of the case or a caseworker-caa role",
-  "productName": "Manage Case Assignment Microservice",
-  "operationName": "Assign Access within Organisation",
-  "specs": [
-    "U1 - who does not have a solicitor role for the jurisdiction of C2 but works within the same organisation as S2",
-    "S2 - with a solicitor role within the same organisation",
-    "intends to assign access within the same organisation for S2 by U1"
-  ],
-  "method": "POST",
-  "uri": "/case-assignments",
-  "s2sClientId": "xui_webapp",
-  "userTokenClientId": "xuiwebapp",
-  "users": {
-    "U1": {
-      "username": "master.caseworker@gmail.com",
-      "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
-    },
-    "S2": {
-      "username": "master.solicitor.1@gmail.com",
-      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
-    }
-  },
-  "request": {
-    "_extends_": "Common_Request",
-    "body": {
-      "case_type_id": "FT_MasterCaseType",
-      "case_id": "${[scenarioContext][childContexts][Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
-      "assignee_id": "${[scenarioContext][testData][users][S2][id]}"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "ACA_400_Response",
-    "body": {
-      "message": "The user is neither a case access administrator nor a solicitor with access to the jurisdiction of the case.",
-      "errors": []
-    }
-  }
+	"_guid_": "S-007",
+	"title": "Must return an error response if the invoker doesn't have a solicitor role for the jurisdiction of the case or a caseworker-caa role",
+	"productName": "Manage Case Assignment Microservice",
+	"operationName": "Assign Access within Organisation",
+	"specs": [
+		"U1 - who does not have a solicitor role for the jurisdiction of C2 but works within the same organisation as S2",
+		"S2 - with a solicitor role within the same organisation",
+		"intends to assign access within the same organisation for S2 by U1"
+	],
+	"method": "POST",
+	"uri": "/case-assignments",
+	"s2sClientId": "xui_webapp",
+	"userTokenClientId": "xuiwebapp",
+	"users": {
+		"U1": {
+			"username": "master.caseworker@gmail.com",
+			"password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+		},
+		"S2": {
+			"username": "master.solicitor.1@gmail.com",
+			"password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
+		}
+	},
+	"request": {
+		"_extends_": "Common_Request",
+		"body": {
+			"case_type_id": "FT_MasterCaseType",
+			"case_id": "${[scenarioContext][childContexts][Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
+			"assignee_id": "${[scenarioContext][testData][users][S2][id]}"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "ACA_400_Response",
+		"body": {
+			"message": "The user is neither a case access administrator nor a solicitor with access to the jurisdiction of the case.",
+			"errors": []
+		}
+	}
 }

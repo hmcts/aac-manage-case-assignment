@@ -9,6 +9,14 @@
 		"is to be invoked by S1 to assign access over C1 for S2 within the same organisation"
 	],
 
+	"request": {
+		"_extends_": "Common_Request",
+		"body": {
+			"case_type_id": "${[scenarioContext][childContexts][Prerequisite_Case_Creation_C0_Without_Org_Policies][testData][actualResponse][body][case_type_id]}",
+			"case_id": "${[scenarioContext][childContexts][Prerequisite_Case_Creation_C0_Without_Org_Policies][testData][actualResponse][body][id]}"
+		}
+	},
+
 	"expectedResponse": {
 		"_extends_": "ACA_400_Response",
 		"body": {

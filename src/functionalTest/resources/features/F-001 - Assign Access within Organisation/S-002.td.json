@@ -18,7 +18,7 @@
       "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
     },
     "S2": {
-      "username": "befta_master.solicitor.benjamin@gmail.com",
+      "username": "befta.master.solicitor.benjamin@gmail.com",
       "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_2_PWD]]"
     }
   },

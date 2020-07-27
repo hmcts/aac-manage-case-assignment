@@ -46,6 +46,34 @@
 				"OrganisationPolicyField2": {
 					"OrgPolicyCaseAssignedRole": "[Defendant]"
 				}
+			},
+			"security_classifications": {
+				"OrganisationPolicyField2": {
+					"classification": "PUBLIC",
+					"value": {
+						"OrgPolicyCaseAssignedRole": "PUBLIC"
+					}
+				},
+				"OrganisationPolicyField1": {
+					"classification": "PUBLIC",
+					"value": {
+						"OrgPolicyCaseAssignedRole": "PUBLIC"
+					}
+				}
+			},
+			"data_classification": {
+				"OrganisationPolicyField2": {
+					"classification": "PUBLIC",
+					"value": {
+						"OrgPolicyCaseAssignedRole": "PUBLIC"
+					}
+				},
+				"OrganisationPolicyField1": {
+					"classification": "PUBLIC",
+					"value": {
+						"OrgPolicyCaseAssignedRole": "PUBLIC"
+					}
+				}
 			}
 		}
 	}

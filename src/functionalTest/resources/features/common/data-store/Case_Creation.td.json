@@ -162,19 +162,7 @@
 				"TextField": "PUBLIC",
 				"PhoneField": "PUBLIC",
 				"DateField": "PUBLIC",
-				"OrganisationPolicyField2": {
-					"classification": "PUBLIC",
-					"value": {
-						"OrgPolicyCaseAssignedRole": "PUBLIC"
-					}
-				},
 				"TextAreaField": "PUBLIC",
-				"OrganisationPolicyField1": {
-					"classification": "PUBLIC",
-					"value": {
-						"OrgPolicyCaseAssignedRole": "PUBLIC"
-					}
-				},
 				"CollectionField": {
 					"classification": "PUBLIC",
 					"value": [
@@ -222,19 +210,7 @@
 				"TextField": "PUBLIC",
 				"PhoneField": "PUBLIC",
 				"DateField": "PUBLIC",
-				"OrganisationPolicyField2": {
-					"classification": "PUBLIC",
-					"value": {
-						"OrgPolicyCaseAssignedRole": "PUBLIC"
-					}
-				},
 				"TextAreaField": "PUBLIC",
-				"OrganisationPolicyField1": {
-					"classification": "PUBLIC",
-					"value": {
-						"OrgPolicyCaseAssignedRole": "PUBLIC"
-					}
-				},
 				"CollectionField": {
 					"classification": "PUBLIC",
 					"value": [

@@ -18,8 +18,8 @@
       "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
     },
     "U2": {
-      "username": "master.caseworker@gmail.com",
-      "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+      "username": "befta.solicitor.3@gmail.com",
+      "password": "[[$CCD_BEFTA_SOLICITOR_3_PWD]]"
     }
   },
   "request": {

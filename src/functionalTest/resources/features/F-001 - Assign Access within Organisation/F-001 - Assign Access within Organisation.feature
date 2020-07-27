@@ -78,7 +78,7 @@ Feature: F-001: Assign Access within Organisation
     Then  a negative response is received,
     And   the response has all the details as expected.
 
-  @S-008 @Ignore
+  @S-007
   Scenario: Must return a negative response when the case doesn't contain an assignment for the invoker's organisation
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],
     And   a user [S2 - another solicitor in the same organisation, with whom S1 will share a case with an assignment within organisation],

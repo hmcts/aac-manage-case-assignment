@@ -21,7 +21,7 @@ Feature: F-001: Assign Access within Organisation
   Scenario: PUI CAA successfully sharing case access with another solicitor in their org (happy path)
     Given a user [S1 - a solicitor, to create a case under their organisation],
     And   a user [CAA - a PUI case access admin, to share it with a solicitor in the same organisation],
-    And   a user [S2 - another solicitor in the same organisation, with whom CAA will share a case with an assignment within organisation],
+    And   a user [S2 - another solicitor in the same organisation, with whom a CAA will share a case with an assignment within organisation],
     And   a case [C1, which S1 has just] created as in [Prerequisite_Case_Creation_C1],
     And   a wait time of [5] seconds [to allow for the case just created to appear in search results],
     When  a request is prepared with appropriate values,

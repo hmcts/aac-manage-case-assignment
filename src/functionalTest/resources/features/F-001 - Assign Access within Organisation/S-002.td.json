@@ -5,8 +5,8 @@
 
 	"specs": [
 		"S1 - a solicitor, to create a case under their organisation",
-		"CAA - a PUI case access admin, to share it with a solicitor in the same organisation",
-		"S2 - another solicitor in the same organisation, with whom CAA will share a case with an assignment within organisation",
+		"S2 - another solicitor in the same organisation, with whom a CAA will share a case with an assignment within organisation",
+		"CAA - a PUI case access admin, to share a case with a solicitor in the same organisation",
 		"is to be invoked by CAA to assign access over C1 for S2 within the same organisation"
 	],
 

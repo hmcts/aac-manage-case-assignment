@@ -1,9 +1,8 @@
 {
-  "_guid_": "Prerequisite_Case_Creation_C2_Without_Org_Policies",
+  "_guid_": "Prerequisite_Case_Creation_C0_Without_Org_Policies",
   "_extends_": "Case_Creation",
   "specs": [
-    "C2, which CW1 has just",
-    "C2, which U1 has just"
+    "C1, which S1 has just"
   ],
   "user": {
     "username": "befta.master.solicitor.becky@gmail.com",
@@ -15,15 +14,13 @@
       "ctid": "FT_MasterCaseType"
     },
     "body": {
-      "event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C2_Without_Org_Policies_Token_Creation][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1_Token_Creation][testData][actualResponse][body][token]}",
       "data": {
         "OrganisationPolicyField1": {
-          "OrgPolicyCaseAssignedRole": "[Claimant]",
-          "OrgPolicyReference": "ClaimantPolicy"
+          "OrgPolicyCaseAssignedRole": "[Claimant]"
         },
         "OrganisationPolicyField2": {
-          "OrgPolicyCaseAssignedRole": "[Defendant]",
-          "OrgPolicyReference": "DefendantPolicy"
+          "OrgPolicyCaseAssignedRole": "[Defendant]"
         }
       },
       "event": {
@@ -40,12 +37,10 @@
       "state": "CaseCreated",
       "case_data": {
         "OrganisationPolicyField1": {
-          "OrgPolicyCaseAssignedRole": "[Claimant]",
-          "OrgPolicyReference": "ClaimantPolicy"
+          "OrgPolicyCaseAssignedRole": "[Claimant]"
         },
         "OrganisationPolicyField2": {
-          "OrgPolicyCaseAssignedRole": "[Defendant]",
-          "OrgPolicyReference": "DefendantPolicy"
+          "OrgPolicyCaseAssignedRole": "[Defendant]"
         }
       }
     }

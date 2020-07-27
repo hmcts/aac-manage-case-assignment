@@ -1,46 +1,47 @@
 {
-  "_guid_": "Prerequisite_Case_Creation_C1",
-  "_extends_": "Prerequisite_Case_Creation_C0_Without_Org_Policies",
+	"_guid_": "Prerequisite_Case_Creation_C1",
+	"_extends_": "Prerequisite_Case_Creation_C0_Without_Org_Policies",
 
-  "request": {
-    "body": {
-      "data": {
-        "OrganisationPolicyField1": {
-          "OrgPolicyReference": "ClaimantPolicy",
-          "Organisation": {
-            "OrganisationID": "QUK822N",
-            "OrganisationName": "ACA-2 Organisation"
-          }
-        },
-        "OrganisationPolicyField2": {
-          "OrgPolicyReference": "DefendantPolicy",
-          "Organisation": {
-            "OrganisationID": "QUK822N",
-            "OrganisationName": "ACA-2 Organisation"
-          }
-        }
-      }
-    }
-  },
-  "expectedResponse": {
-    "body": {
-      "event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1_Token_Creation][testData][actualResponse][body][token]}",
-      "case_data": {
-        "OrganisationPolicyField1": {
-          "OrgPolicyReference": "ClaimantPolicy",
-          "Organisation": {
-            "OrganisationID": "QUK822N",
-            "OrganisationName": "ACA-2 Organisation"
-          }
-        },
-        "OrganisationPolicyField2": {
-          "OrgPolicyReference": "DefendantPolicy",
-          "Organisation": {
-            "OrganisationID": "QUK822N",
-            "OrganisationName": "ACA-2 Organisation"
-          }
-        }
-      }
-    }
-  }
+	"request": {
+		"body": {
+			"data": {
+				"OrganisationPolicyField1": {
+					"OrgPolicyReference": "ClaimantPolicy",
+					"Organisation": {
+						"OrganisationID": "QUK822N",
+						"OrganisationName": "ACA-2 Organisation"
+					}
+				},
+				"OrganisationPolicyField2": {
+					"OrgPolicyReference": "DefendantPolicy",
+					"Organisation": {
+						"OrganisationID": "QUK822N",
+						"OrganisationName": "ACA-2 Organisation"
+					}
+				}
+			}
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1_Token_Creation][testData][actualResponse][body][token]}",
+			"case_data": {
+				"OrganisationPolicyField1": {
+					"OrgPolicyReference": "ClaimantPolicy",
+					"Organisation": {
+						"OrganisationID": "QUK822N",
+						"OrganisationName": "ACA-2 Organisation"
+					}
+				},
+				"OrganisationPolicyField2": {
+					"OrgPolicyReference": "DefendantPolicy",
+					"Organisation": {
+						"OrganisationID": "QUK822N",
+						"OrganisationName": "ACA-2 Organisation"
+					}
+				}
+			}
+		}
+	}
 }

@@ -17,7 +17,7 @@ Feature: F-001: Assign Access within Organisation
     And   the response has all other details as expected,
     And   a call [by S2 to query his/her case roles granted over C1] will get the expected response as in [S2_Querying_Their_Access_Over_C1].
 
-  @S-001
+  @S-002
   Scenario: PUI CAA successfully sharing case access with another solicitor in their org (happy path)
     Given a user [S1 - a solicitor, to create a case under their organisation],
     Given a user [CAA - a PUI case access admin, to share it with a solicitor in the same organisation],

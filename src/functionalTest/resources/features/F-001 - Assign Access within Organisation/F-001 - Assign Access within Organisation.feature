@@ -69,11 +69,11 @@ Feature: F-001: Assign Access within Organisation
   @S-006
   Scenario: must return an error response for an assignee user who doesn't have a solicitor role for the jurisdiction of the case
     And   a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
-    And   a user [U2 - who does not have a solicitor role for the jurisdiction of C1 but works within the same organisation as S1],
+    And   a user [S2 - who does not have a solicitor role for the jurisdiction of C1 but works within the same organisation as S1],
     And   a case [C1, which S1 has just] created as in [Prerequisite_Case_Creation_C1],
     And   a wait time of [5] seconds [to allow for the case just created to appear in search results],
     When  a request is prepared with appropriate values,
-    And   the request [intends to assign access within the same organisation for U2 by S1],
+    And   the request [intends to assign access within the same organisation for S2 by S1],
     And   it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
     Then  a negative response is received,
     And   the response has all the details as expected,

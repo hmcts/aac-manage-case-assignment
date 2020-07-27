@@ -12,7 +12,7 @@
 	"expectedResponse": {
 		"_extends_": "ACA_400_Response",
 		"body": {
-			"message": "The user is neither a case access administrator nor a solicitor with access to the jurisdiction of the case.",
+			"message": "Case ID has to be one for which a case role is represented by the invoker's organisation.",
 			"errors": []
 		}
 	}

@@ -1,8 +1,20 @@
 package uk.gov.hmcts.reform.managecase.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import static java.util.stream.Collectors.toList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+import javax.validation.ValidationException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
@@ -14,15 +26,6 @@ import uk.gov.hmcts.reform.managecase.domain.UserDetails;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
-
-import javax.validation.ValidationException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class CaseAssignmentService {
@@ -125,7 +128,9 @@ public class CaseAssignmentService {
     private List<String> findInvokerOrgPolicyRoles(CaseDetails caseDetails, String organisation) {
         List<OrganisationPolicy> policies = findPolicies(caseDetails);
         return policies.stream()
-                .filter(policy -> organisation.equalsIgnoreCase(policy.getOrganisation().getOrganisationID()))
+                .filter(policy -> policy.getOrganisation() != null && organisation.equalsIgnoreCase(policy
+                        .getOrganisation()
+                        .getOrganisationID()))
                 .map(policy -> policy.getOrgPolicyCaseAssignedRole())
                 .collect(toList());
     }

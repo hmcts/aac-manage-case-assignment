@@ -100,24 +100,28 @@ public class CaseAssignmentController {
                     response = GetCaseAssignmentsResponse.class,
                     examples = @Example({
                             @ExampleProperty(
-                                    value = "[\n"
-                                            + "  {\n"
-                                            + "    \"case_id\": \"1588234985453946\",\n"
-                                            + "    \"case_title\": \"Paul Saddlebrook\",\n"
-                                            + "    \"shared_with\": [\n"
-                                            + "      {\n"
-                                            + "        \"idam_id\": \"221a2877-e1ab-4dc4-a9ff-f9424ad58738\",\n"
-                                            + "        \"first_name\": \"Bill\",\n"
-                                            + "        \"last_name\": \"Roberts\",\n"
-                                            + "        \"email\": \"bill.roberts@greatbrsolicitors.co.uk\",\n"
-                                            + "        \"case_roles\": [\n"
-                                            + "          \"[Collaborator]\",\n"
-                                            + "          \"[Creator]\"\n"
-                                            + "        ]\n"
-                                            + "      }\n"
-                                            + "    ]\n"
-                                            + "  }\n"
-                                            + "]",
+                                    value = "{\n"
+                                            + "  \"status_message\": \"Case-User-Role assignments returned "
+                                            + "successfully\",\n"
+                                            + "  \"case_assignments\": [\n"
+                                            + "    {\n"
+                                            + "      \"case_id\": \"1588234985453946\",\n"
+                                            + "      \"case_title\": \"Paul Saddlebrook\",\n"
+                                            + "      \"shared_with\": [\n"
+                                            + "        {\n"
+                                            + "          \"idam_id\": \"221a2877-e1ab-4dc4-a9ff-f9424ad58738\",\n"
+                                            + "          \"first_name\": \"Bill\",\n"
+                                            + "          \"last_name\": \"Roberts\",\n"
+                                            + "          \"email\": \"bill.roberts@greatbrsolicitors.co.uk\",\n"
+                                            + "          \"case_roles\": [\n"
+                                            + "            \"[Claimant]\",\n"
+                                            + "            \"[Defendant]\"\n"
+                                            + "          ]\n"
+                                            + "        }\n"
+                                            + "      ]\n"
+                                            + "    }    \n"
+                                            + "  ]\n"
+                                            + "}",
                                     mediaType = APPLICATION_JSON_VALUE)
                     })
             ),

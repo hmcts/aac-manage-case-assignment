@@ -43,7 +43,7 @@ idam:
     # same for all environments - not used in mca but configured as idam mandates for token generation
     redirect_uri: https://manage-case-assignment/oauth2redirect
   system-user:
-    username: ${IDAM_SYSTEM_USER_USERNAME:master.solicitor.1@gmail.com}
+    username: ${IDAM_SYSTEM_USER_USERNAME:master.caa@gmail.com}
     password: ${IDAM_SYSTEM_USER_PASSWORD:Pa55word11}
   s2s-auth:
     microservice: aac_manage_case_assignment

@@ -58,7 +58,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
             .andExpect(jsonPath("$.cases[0].reference", is(TestFixtures.CASE_ID)));
 
         verify(postRequestedFor(urlEqualTo("/o/token"))
-                   .withRequestBody(containing("username=master.solicitor.1%40gmail.com")));
+                   .withRequestBody(containing("username=master.caa%40gmail.com")));
         verify(postRequestedFor(urlEqualTo("/s2s/lease"))
                    .withRequestBody(containing("aac_manage_case_assignment")));
         verify(postRequestedFor(urlEqualTo("/searchCases?ctid=CT_MasterCase"))
@@ -84,7 +84,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
             .andExpect(jsonPath("$.cases[0].reference", is(TestFixtures.CASE_ID)));
 
         verify(postRequestedFor(urlEqualTo("/o/token"))
-                   .withRequestBody(containing("username=master.solicitor.1%40gmail.com")));
+                   .withRequestBody(containing("username=master.caa%40gmail.com")));
         verify(postRequestedFor(urlEqualTo("/s2s/lease"))
                    .withRequestBody(containing("aac_manage_case_assignment")));
         verify(postRequestedFor(urlEqualTo("/internal/searchCases?ctid=CT_MasterCase"))

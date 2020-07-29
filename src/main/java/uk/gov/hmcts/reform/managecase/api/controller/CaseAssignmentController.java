@@ -1,11 +1,7 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -16,19 +12,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
-import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentResponse;
-import uk.gov.hmcts.reform.managecase.api.payload.GetCaseAssignmentsResponse;
-import uk.gov.hmcts.reform.managecase.domain.CaseAssignedUsers;
-import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
-import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
+
+import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
 import java.util.List;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
+import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.GetCaseAssignmentsResponse;
+import uk.gov.hmcts.reform.managecase.domain.CaseAssignedUsers;
+import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
+import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 
 @RestController
 @Validated
@@ -100,28 +102,7 @@ public class CaseAssignmentController {
                     response = GetCaseAssignmentsResponse.class,
                     examples = @Example({
                             @ExampleProperty(
-                                    value = "{\n"
-                                            + "  \"status_message\": \"Case-User-Role assignments returned "
-                                            + "successfully\",\n"
-                                            + "  \"case_assignments\": [\n"
-                                            + "    {\n"
-                                            + "      \"case_id\": \"1588234985453946\",\n"
-                                            + "      \"case_title\": \"Paul Saddlebrook\",\n"
-                                            + "      \"shared_with\": [\n"
-                                            + "        {\n"
-                                            + "          \"idam_id\": \"221a2877-e1ab-4dc4-a9ff-f9424ad58738\",\n"
-                                            + "          \"first_name\": \"Bill\",\n"
-                                            + "          \"last_name\": \"Roberts\",\n"
-                                            + "          \"email\": \"bill.roberts@greatbrsolicitors.co.uk\",\n"
-                                            + "          \"case_roles\": [\n"
-                                            + "            \"[Claimant]\",\n"
-                                            + "            \"[Defendant]\"\n"
-                                            + "          ]\n"
-                                            + "        }\n"
-                                            + "      ]\n"
-                                            + "    }    \n"
-                                            + "  ]\n"
-                                            + "}",
+                                    value = ExampleModelObjects.EXAMPLE,
                                     mediaType = APPLICATION_JSON_VALUE)
                     })
             ),

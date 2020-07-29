@@ -62,8 +62,8 @@ env.BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP = "profile openid roles manage-use
 // temporary workaround for platform changes: turn BEFTA header checks to warning mode
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 
-env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-675.service.core-compute-preview.internal"
-env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-pr-1027.service.core-compute-preview.internal"
+env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-680.service.core-compute-preview.internal"
+env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-pr-1033.service.core-compute-preview.internal"
 
 withPipeline("java", product, component) {
   after('test') {

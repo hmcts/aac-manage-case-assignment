@@ -156,7 +156,6 @@ public class CaseAssignmentControllerTest {
                 .andExpect(jsonPath("$.status_message", is(GET_ASSIGNMENTS_MESSAGE)))
                 .andExpect(jsonPath("$.case_assignments", hasSize(1)))
                 .andExpect(jsonPath("$.case_assignments[0].case_id", is(TestFixtures.CASE_ID)))
-                .andExpect(jsonPath("$.case_assignments[0].case_title", is(TestFixtures.CASE_TITLE)))
                 .andExpect(jsonPath("$.case_assignments[0].shared_with", hasSize(1)))
                 .andExpect(jsonPath("$.case_assignments[0].shared_with[0].first_name", is(TestFixtures.FIRST_NAME)))
                 .andExpect(jsonPath("$.case_assignments[0].shared_with[0].last_name", is(TestFixtures.LAST_NAME)))

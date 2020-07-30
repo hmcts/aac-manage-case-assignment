@@ -35,7 +35,6 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubAssig
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseAssignments;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisation;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.DUMMY_TITLE;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals"})
@@ -171,7 +170,6 @@ public class CaseAssignmentControllerIT extends BaseTest {
 
                 .andExpect(jsonPath("$.case_assignments", hasSize(1)))
                 .andExpect(jsonPath("$.case_assignments[0].case_id", is(CASE_ID)))
-                .andExpect(jsonPath("$.case_assignments[0].case_title", is(CASE_ID + "-" + DUMMY_TITLE)))
                 .andExpect(jsonPath("$.case_assignments[0].shared_with", hasSize(1)))
                 .andExpect(jsonPath("$.case_assignments[0].shared_with[0].first_name", is(TestFixtures.FIRST_NAME)))
                 .andExpect(jsonPath("$.case_assignments[0].shared_with[0].last_name", is(TestFixtures.LAST_NAME)))

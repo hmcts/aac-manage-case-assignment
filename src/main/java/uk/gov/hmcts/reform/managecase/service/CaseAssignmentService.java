@@ -91,19 +91,15 @@ public class CaseAssignmentService {
                         Collectors.groupingBy(CaseUserRole::getUserId,
                                 Collectors.mapping(item -> item.getCaseRole(), toList()))));
 
-        Map<String, String> caseTitles = dataStoreRepository.getCaseTitles(caseIds);
-
         return rolesByUserIdAndByCaseId.entrySet().stream()
-                .map(entry -> toCaseAssignedUsers(entry.getKey(), entry.getValue(), prdUsersMap, caseTitles))
+                .map(entry -> toCaseAssignedUsers(entry.getKey(), entry.getValue(), prdUsersMap))
                 .collect(toList());
     }
 
     private CaseAssignedUsers toCaseAssignedUsers(String caseId, Map<String, List<String>> userRolesMap,
-                                                  Map<String, ProfessionalUser> prdUsersMap,
-                                                  Map<String, String> caseTitles) {
+                                                  Map<String, ProfessionalUser> prdUsersMap) {
         return CaseAssignedUsers.builder()
                 .caseId(caseId)
-                .caseTitle(caseTitles.get(caseId))
                 .users(userRolesMap.entrySet().stream()
                         .map(entry -> toUserDetails(prdUsersMap.get(entry.getKey()), entry.getValue()))
                         .collect(toList()))

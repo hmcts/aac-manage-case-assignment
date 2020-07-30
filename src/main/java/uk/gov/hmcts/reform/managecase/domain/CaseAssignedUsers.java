@@ -15,9 +15,6 @@ public class CaseAssignedUsers {
     @JsonProperty("case_id")
     private String caseId;
 
-    @JsonProperty("case_title")
-    private String caseTitle;
-
     @JsonProperty("shared_with")
     private List<UserDetails> users;
 

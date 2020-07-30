@@ -2,16 +2,14 @@ package uk.gov.hmcts.reform.managecase.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
@@ -58,10 +56,4 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         return response.getCaseUsers();
     }
 
-    @Override
-    public Map<String, String> getCaseTitles(List<String> caseIds) {
-        // TODO : Design is still pending so hardcoded for now
-        return caseIds.stream()
-                .collect(Collectors.toMap(Function.identity(), caseId -> caseId + "-" + DUMMY_TITLE));
-    }
 }

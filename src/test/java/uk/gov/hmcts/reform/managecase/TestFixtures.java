@@ -28,7 +28,6 @@ public class TestFixtures {
     public static final String CASE_ROLE2 = "[Creator]";
     public static final String ORGANIZATION_ID = "TEST_ORG";
 
-    public static final String CASE_TITLE = "Test case title";
     public static final String FIRST_NAME = "Bill";
     public static final String LAST_NAME = "Roberts";
     public static final String EMAIL = "bill.roberts@greatbrsolicitors.co.uk";
@@ -105,7 +104,6 @@ public class TestFixtures {
         public static CaseAssignedUsers caseAssignedUsers() {
             return CaseAssignedUsers.builder()
                     .caseId(CASE_ID)
-                    .caseTitle(CASE_TITLE)
                     .users(List.of(defaultUser()))
                     .build();
         }

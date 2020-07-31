@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.UserDetails;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
+import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
@@ -40,32 +41,36 @@ public class CaseAssignmentService {
     public static final String ORGA_POLICY_ERROR = "Case ID has to be one for which a case role is "
             + "represented by the invoker's organisation.";
 
-    public static final String DUMMY_TITLE = "Dummy Title";
+    public static final String IDAM_ES_QUERY = "id:\"%s\"";
 
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
+    private final IdamRepository idamRepository;
     private final JacksonUtils jacksonUtils;
 
     @Autowired
     public CaseAssignmentService(PrdRepository prdRepository,
                                  DataStoreRepository dataStoreRepository,
-                                 JacksonUtils jacksonUtils) {
+                                 IdamRepository idamRepository, JacksonUtils jacksonUtils) {
         this.dataStoreRepository = dataStoreRepository;
         this.prdRepository = prdRepository;
+        this.idamRepository = idamRepository;
         this.jacksonUtils = jacksonUtils;
     }
 
     @SuppressWarnings("PMD")
     public List<String> assignCaseAccess(CaseAssignment assignment) {
+
         CaseDetails caseDetails = getCase(assignment);
         String solicitorRole = String.format(SOLICITOR_ROLE, caseDetails.getJurisdiction());
 
         FindUsersByOrganisationResponse usersByOrg = prdRepository.findUsersByOrganisation();
+        if (!isAssigneePresent(usersByOrg.getUsers(), assignment.getAssigneeId())) {
+            throw new ValidationException(ASSIGNEE_ORGA_ERROR);
+        }
 
-        Optional<ProfessionalUser> userOptional = findUserBy(usersByOrg.getUsers(), assignment.getAssigneeId());
-        ProfessionalUser assignee = userOptional.orElseThrow(() -> new ValidationException(ASSIGNEE_ORGA_ERROR));
-
-        if (!containsIgnoreCase(assignee.getRoles(), solicitorRole)) {
+        List<String> assigneeRoles = getAssigneeRoles(assignment.getAssigneeId());
+        if (!containsIgnoreCase(assigneeRoles, solicitorRole)) {
             throw new ValidationException(ASSIGNEE_ROLE_ERROR);
         }
 
@@ -73,6 +78,7 @@ public class CaseAssignmentService {
         if (policyRoles.isEmpty()) {
             throw new ValidationException(ORGA_POLICY_ERROR);
         }
+
         dataStoreRepository.assignCase(policyRoles, assignment.getCaseId(), assignment.getAssigneeId());
         return policyRoles;
     }
@@ -138,13 +144,21 @@ public class CaseAssignmentService {
             .collect(toList());
     }
 
-    private Optional<ProfessionalUser> findUserBy(List<ProfessionalUser> users, String assigneeId) {
-        return users.stream()
-                .filter(user -> assigneeId.equalsIgnoreCase(user.getUserIdentifier()))
-                .findFirst();
+    private boolean isAssigneePresent(List<ProfessionalUser> users, String assigneeId) {
+        return users.stream().anyMatch(user -> assigneeId.equalsIgnoreCase(user.getUserIdentifier()));
     }
 
     private boolean containsIgnoreCase(List<String> list, String value) {
         return list.stream().anyMatch(value::equalsIgnoreCase);
+    }
+
+    private List<String> getAssigneeRoles(String assigneeId) {
+        String systemUserToken = idamRepository.getSystemUserAccessToken();
+        List<uk.gov.hmcts.reform.idam.client.models.UserDetails> users =
+                idamRepository.searchUsers(systemUserToken, String.format(IDAM_ES_QUERY, assigneeId));
+        if (users.size() == 1 && assigneeId.equalsIgnoreCase(users.get(0).getId())) {
+            return users.get(0).getRoles();
+        }
+        throw new RuntimeException("Can't find assignee in IDAM with id:" + assigneeId);
     }
 }

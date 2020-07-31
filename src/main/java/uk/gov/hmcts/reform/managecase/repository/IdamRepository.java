@@ -4,8 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
+
+import java.util.List;
 
 @Component
 public class IdamRepository {
@@ -28,5 +31,10 @@ public class IdamRepository {
     public String getSystemUserAccessToken() {
         return idamClient.getAccessToken(appParams.getIdamSystemUserId(), appParams.getIdamSystemUserPassword());
     }
+
+    public List<UserDetails> searchUsers(String bearerToken, String query) {
+        return idamClient.searchUsers(bearerToken, query);
+    }
+
 }
 

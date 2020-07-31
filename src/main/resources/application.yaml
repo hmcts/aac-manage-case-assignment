@@ -40,6 +40,7 @@ idam:
   client:
     id: aac_manage_case_assignment
     secret: ${IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
+    scope: openid roles profile search-user
     # same for all environments - not used in mca but configured as idam mandates for token generation
     redirect_uri: https://manage-case-assignment/oauth2redirect
   system-user:

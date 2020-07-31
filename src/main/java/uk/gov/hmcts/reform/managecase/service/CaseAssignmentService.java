@@ -156,9 +156,13 @@ public class CaseAssignmentService {
         String systemUserToken = idamRepository.getSystemUserAccessToken();
         List<uk.gov.hmcts.reform.idam.client.models.UserDetails> users =
                 idamRepository.searchUsers(systemUserToken, String.format(IDAM_ES_QUERY, assigneeId));
-        if (users.size() == 1 && assigneeId.equalsIgnoreCase(users.get(0).getId())) {
-            return users.get(0).getRoles();
-        }
-        throw new RuntimeException("Can't find assignee in IDAM with id:" + assigneeId);
+
+        return users.stream()
+                .filter(user -> assigneeId.equalsIgnoreCase(user.getId()))
+                .reduce((a, b) -> {
+                    throw new IllegalStateException("Multiple users with same IDAM with id:: " + assigneeId);
+                })
+                .get()
+                .getRoles();
     }
 }

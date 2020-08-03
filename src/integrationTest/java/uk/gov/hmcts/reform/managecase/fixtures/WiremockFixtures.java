@@ -11,10 +11,15 @@ import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
+
+import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.okForJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -24,6 +29,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.assertj.core.util.Lists.list;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -91,6 +97,18 @@ public final class WiremockFixtures {
                 .withRequestBody(matchingJsonPath("$.case_users[0].case_role", equalTo(caseRoles[0])))
                 .withRequestBody(matchingJsonPath("$.case_users[0].user_id", equalTo(userId)))
                 .willReturn(aResponse().withStatus(HTTP_OK)));
+    }
+
+    public static void stubGetCaseAssignments(List<String> caseIds, List<String> userIds,
+                                              List<CaseUserRole> caseUserRoles) {
+        stubFor(WireMock.get(urlPathEqualTo("/case-users"))
+                .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                .withQueryParam("case_ids", equalTo(caseIds.get(0)))
+                .withQueryParam("user_ids", equalTo(userIds.get(0)))
+                .willReturn(aResponse()
+                        .withStatus(HTTP_OK).withBody(getJsonString(new CaseUserRoleResource(caseUserRoles)))
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")

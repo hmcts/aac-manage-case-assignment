@@ -1,13 +1,14 @@
 package uk.gov.hmcts.reform.managecase.api.payload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
 
 @Getter
 @AllArgsConstructor

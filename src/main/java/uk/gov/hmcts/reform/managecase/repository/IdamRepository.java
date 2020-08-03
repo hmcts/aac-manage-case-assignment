@@ -3,12 +3,13 @@ package uk.gov.hmcts.reform.managecase.repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
-
-import java.util.List;
 
 @Component
 public class IdamRepository {
@@ -39,9 +40,10 @@ public class IdamRepository {
         return users.stream()
                 .filter(user -> userId.equalsIgnoreCase(user.getId()))
                 .reduce((a, b) -> {
-                    throw new IllegalStateException("Multiple users with same IDAM id:: " + userId);
+                    throw new IllegalStateException("Multiple users with same IDAM id: " + userId);
                 })
-                .orElseThrow(() -> new RuntimeException("Can t find user in IDAM with id:" + userId));
+                .orElseThrow(
+                    () -> new IllegalStateException("User unexpectedly unavailable in IDAM with id: " + userId));
     }
 
 }

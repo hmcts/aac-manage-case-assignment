@@ -32,7 +32,6 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixtur
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.ASSIGNEE_ORGA_ERROR;
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.ASSIGNEE_ROLE_ERROR;
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_NOT_FOUND;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.IDAM_ES_QUERY;
 
 @SuppressWarnings({"PMD.MethodNamingConventions", "PMD.JUnitAssertionsShouldIncludeMessage"})
 class CaseAssignmentServiceTest {
@@ -75,8 +74,7 @@ class CaseAssignmentServiceTest {
         UserDetails userDetails = UserDetails.builder()
                 .id(ASSIGNEE_ID).roles(List.of("caseworker-AUTOTEST1-solicitor")).build();
         given(idamRepository.getSystemUserAccessToken()).willReturn(BEAR_TOKEN);
-        given(idamRepository.searchUsers(BEAR_TOKEN, String.format(IDAM_ES_QUERY, ASSIGNEE_ID)))
-                .willReturn(List.of(userDetails));
+        given(idamRepository.searchUserById(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
     }
 
     @Test
@@ -128,8 +126,7 @@ class CaseAssignmentServiceTest {
         UserDetails userDetails = UserDetails.builder()
                 .id(ASSIGNEE_ID).roles(List.of("caseworker-AUTOTEST2-solicitor")).build();
 
-        given(idamRepository.searchUsers(BEAR_TOKEN, String.format(IDAM_ES_QUERY, ASSIGNEE_ID)))
-                .willReturn(List.of(userDetails));
+        given(idamRepository.searchUserById(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
 
         assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
                 .isInstanceOf(ValidationException.class)

@@ -41,8 +41,6 @@ public class CaseAssignmentService {
     public static final String ORGA_POLICY_ERROR = "Case ID has to be one for which a case role is "
             + "represented by the invoker's organisation.";
 
-    public static final String IDAM_ES_QUERY = "id:\"%s\"";
-
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
     private final IdamRepository idamRepository;
@@ -154,15 +152,6 @@ public class CaseAssignmentService {
 
     private List<String> getAssigneeRoles(String assigneeId) {
         String systemUserToken = idamRepository.getSystemUserAccessToken();
-        List<uk.gov.hmcts.reform.idam.client.models.UserDetails> users =
-                idamRepository.searchUsers(systemUserToken, String.format(IDAM_ES_QUERY, assigneeId));
-
-        return users.stream()
-                .filter(user -> assigneeId.equalsIgnoreCase(user.getId()))
-                .reduce((a, b) -> {
-                    throw new IllegalStateException("Multiple users with same IDAM with id:: " + assigneeId);
-                })
-                .get()
-                .getRoles();
+        return idamRepository.searchUserById(assigneeId, systemUserToken).getRoles();
     }
 }

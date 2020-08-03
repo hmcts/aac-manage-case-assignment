@@ -13,6 +13,8 @@ import java.util.List;
 @Component
 public class IdamRepository {
 
+    public static final String IDAM_ES_QUERY = "id:\"%s\"";
+
     private final IdamClient idamClient;
     private final ApplicationParams appParams;
 
@@ -32,8 +34,14 @@ public class IdamRepository {
         return idamClient.getAccessToken(appParams.getIdamSystemUserId(), appParams.getIdamSystemUserPassword());
     }
 
-    public List<UserDetails> searchUsers(String bearerToken, String query) {
-        return idamClient.searchUsers(bearerToken, query);
+    public UserDetails searchUserById(String userId, String bearerToken) {
+        List<UserDetails> users = idamClient.searchUsers(bearerToken, String.format(IDAM_ES_QUERY, userId));
+        return users.stream()
+                .filter(user -> userId.equalsIgnoreCase(user.getId()))
+                .reduce((a, b) -> {
+                    throw new IllegalStateException("Multiple users with same IDAM id:: " + userId);
+                })
+                .get();
     }
 
 }

@@ -41,7 +41,7 @@ public class IdamRepository {
                 .reduce((a, b) -> {
                     throw new IllegalStateException("Multiple users with same IDAM id:: " + userId);
                 })
-                .get();
+                .orElseThrow(() -> new RuntimeException("Can t find user in IDAM with id:" + userId));
     }
 
 }

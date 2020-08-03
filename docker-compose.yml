@@ -14,7 +14,7 @@ services:
       S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       MANAGE_CASE_S2S_KEY: "AAAAAAAAAAAAAAAA" # use aat key from vault
       MANAGE_CASE_S2S_AUTHORISED_SERVICES: ccd_gw,xui_webapp
-      CCD_DATA_STORE_HOST: http://ccd-data-store-api-aat.service.core-compute-aat.internal
+      CCD_DATA_STORE_API_BASE_URL: http://ccd-data-store-api-aat.service.core-compute-aat.internal
       PRD_HOST: http://rd-professional-api-aat.service.core-compute-aat.internal
       # for debug JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     ports:

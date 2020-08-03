@@ -25,7 +25,15 @@
     "_extends_" : "Common_200_Response",
     "headers": {
       "Content-Type": "application/vnd.spring-boot.actuator.v3+json",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Cache-Control": "[[ANY_NULLABLE]]",
+      "Expires": "[[ANY_NULLABLE]]",
+      "Pragma": "[[ANY_NULLABLE]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]",
+      "VaRy": "[[ANY_NULLABLE]]",
+      "X-Content-Type-Options": "[[ANY_NULLABLE]]",
+      "X-Frame-Options": "[[ANY_NULLABLE]]",
+      "X-XSS-Protection": "[[ANY_NULLABLE]]"
     },
     "body": {
       "status": "UP",

@@ -1,0 +1,28 @@
+{
+	"_guid_": "Prerequisite_Case_Creation_C0_Without_Org_Policies_Token_Creation",
+	"_extends_": "Case_Creation_Token_Creation",
+
+	"user": {
+		"username": "befta.master.solicitor.becky@gmail.com",
+		"password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
+	},
+
+	"request": {
+		"pathVariables": {
+			"jid": "BEFTA_MASTER",
+			"ctid": "FT_MasterCaseType",
+			"etid": "createCase"
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"token": "[[ANY_STRING_NOT_NULLABLE]]",
+			"case_details": {
+				"jurisdiction": "BEFTA_MASTER",
+				"case_type_id": "FT_MasterCaseType"
+			},
+			"event_id": "createCase"
+		}
+	}
+}

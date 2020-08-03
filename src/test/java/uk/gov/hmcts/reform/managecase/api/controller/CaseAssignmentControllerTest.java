@@ -13,10 +13,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.reform.managecase.TestFixtures;
+import uk.gov.hmcts.reform.managecase.TestFixtures.CaseAssignedUsersFixture;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.config.SecurityConfiguration;
+import uk.gov.hmcts.reform.managecase.domain.CaseAssignedUsers;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
@@ -33,10 +36,12 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.GET_ASSIGNMENTS_MESSAGE;
 
 @WebMvcTest(controllers = CaseAssignmentController.class,
     includeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes = MapperConfig.class),
@@ -49,7 +54,7 @@ public class CaseAssignmentControllerTest {
 
     private static final String ASSIGNEE_ID = "0a5874a4-3f38-4bbd-ba4c";
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
-    private static final String CASE_ID = "12345678";
+    private static final String CASE_ID = "1588234985453946";
     private static final String CASE_ASSIGNMENTS = "/case-assignments";
 
     @Autowired
@@ -134,5 +139,37 @@ public class CaseAssignmentControllerTest {
              .andExpect(status().isBadRequest())
              .andExpect(jsonPath("$.errors", hasSize(1)))
              .andExpect(jsonPath("$.errors", hasItem("IDAM Assignee ID can not be empty")));
+    }
+
+    @DisplayName("should successfully get case assignments")
+    @Test
+    void shouldGetCaseAssignmentsForAValidRequest() throws Exception {
+        String caseIds = "1588234985453946,1588234985453948";
+        List<CaseAssignedUsers> caseAssignedUsers = of(CaseAssignedUsersFixture.caseAssignedUsers());
+
+        given(service.getCaseAssignments(of(caseIds.split(",")))).willReturn(caseAssignedUsers);
+
+        this.mockMvc.perform(get(CASE_ASSIGNMENTS)
+                .queryParam("case_ids", caseIds))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status_message", is(GET_ASSIGNMENTS_MESSAGE)))
+                .andExpect(jsonPath("$.case_assignments", hasSize(1)))
+                .andExpect(jsonPath("$.case_assignments[0].case_id", is(TestFixtures.CASE_ID)))
+                .andExpect(jsonPath("$.case_assignments[0].shared_with", hasSize(1)))
+                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].first_name", is(TestFixtures.FIRST_NAME)))
+                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].last_name", is(TestFixtures.LAST_NAME)))
+                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].email", is(TestFixtures.EMAIL)))
+                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles", hasSize(2)))
+                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles[0]", is(TestFixtures.CASE_ROLE)))
+                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles[1]", is(TestFixtures.CASE_ROLE2)));
+    }
+
+    @DisplayName("should fail with 400 bad request when caseIds query param is not passed")
+    @Test
+    void shouldFailWithBadRequestWhenCaseIdsInGetAssignmentsIsNull() throws Exception {
+
+        this.mockMvc.perform(get(CASE_ASSIGNMENTS))
+                .andExpect(status().isBadRequest());
     }
 }

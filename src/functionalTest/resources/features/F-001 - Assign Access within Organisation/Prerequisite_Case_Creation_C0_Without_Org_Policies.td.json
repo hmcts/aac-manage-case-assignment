@@ -1,0 +1,80 @@
+{
+	"_guid_": "Prerequisite_Case_Creation_C0_Without_Org_Policies",
+	"_extends_": "Case_Creation",
+
+	"specs": [
+		"C1, which S1 has just"
+	],
+
+	"user": {
+		"username": "befta.master.solicitor.becky@gmail.com",
+		"password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
+	},
+
+	"request": {
+		"pathVariables": {
+			"jid": "BEFTA_MASTER",
+			"ctid": "FT_MasterCaseType"
+		},
+		"body": {
+			"event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C0_Without_Org_Policies_Token_Creation][testData][actualResponse][body][token]}",
+			"data": {
+				"OrganisationPolicyField1": {
+					"OrgPolicyCaseAssignedRole": "[Claimant]"
+				},
+				"OrganisationPolicyField2": {
+					"OrgPolicyCaseAssignedRole": "[Defendant]"
+				}
+			},
+			"event": {
+				"id": "createCase",
+				"summary": "",
+				"description": ""
+			}
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"jurisdiction": "BEFTA_MASTER",
+			"case_type_id": "FT_MasterCaseType",
+			"state": "CaseCreated",
+			"case_data": {
+				"OrganisationPolicyField1": {
+					"OrgPolicyCaseAssignedRole": "[Claimant]"
+				},
+				"OrganisationPolicyField2": {
+					"OrgPolicyCaseAssignedRole": "[Defendant]"
+				}
+			},
+			"security_classifications": {
+				"OrganisationPolicyField2": {
+					"classification": "PUBLIC",
+					"value": {
+						"OrgPolicyCaseAssignedRole": "PUBLIC"
+					}
+				},
+				"OrganisationPolicyField1": {
+					"classification": "PUBLIC",
+					"value": {
+						"OrgPolicyCaseAssignedRole": "PUBLIC"
+					}
+				}
+			},
+			"data_classification": {
+				"OrganisationPolicyField2": {
+					"classification": "PUBLIC",
+					"value": {
+						"OrgPolicyCaseAssignedRole": "PUBLIC"
+					}
+				},
+				"OrganisationPolicyField1": {
+					"classification": "PUBLIC",
+					"value": {
+						"OrgPolicyCaseAssignedRole": "PUBLIC"
+					}
+				}
+			}
+		}
+	}
+}

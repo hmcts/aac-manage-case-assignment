@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.BaseTest;
+import uk.gov.hmcts.reform.managecase.TestFixtures;
 
 import java.util.Date;
 
@@ -54,10 +55,10 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
                                  .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))
-            .andExpect(jsonPath("$.cases[0].reference", is("12345678")));
+            .andExpect(jsonPath("$.cases[0].reference", is(TestFixtures.CASE_ID)));
 
         verify(postRequestedFor(urlEqualTo("/o/token"))
-                   .withRequestBody(containing("username=master.solicitor.1%40gmail.com")));
+                   .withRequestBody(containing("username=master.caa%40gmail.com")));
         verify(postRequestedFor(urlEqualTo("/s2s/lease"))
                    .withRequestBody(containing("aac_manage_case_assignment")));
         verify(postRequestedFor(urlEqualTo("/searchCases?ctid=CT_MasterCase"))
@@ -80,10 +81,10 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
                                  .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))
-            .andExpect(jsonPath("$.cases[0].reference", is("12345678")));
+            .andExpect(jsonPath("$.cases[0].reference", is(TestFixtures.CASE_ID)));
 
         verify(postRequestedFor(urlEqualTo("/o/token"))
-                   .withRequestBody(containing("username=master.solicitor.1%40gmail.com")));
+                   .withRequestBody(containing("username=master.caa%40gmail.com")));
         verify(postRequestedFor(urlEqualTo("/s2s/lease"))
                    .withRequestBody(containing("aac_manage_case_assignment")));
         verify(postRequestedFor(urlEqualTo("/internal/searchCases?ctid=CT_MasterCase"))

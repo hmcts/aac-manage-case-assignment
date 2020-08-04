@@ -7,15 +7,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
+@SuppressWarnings("PMD.MethodNamingConventions")
 class IdamRepositoryTest {
 
     private static final String TEST_BEAR_TOKEN = "TestBearToken";
+    private static final String USER_ID = "232-SFWE-4543-CVDSF";
 
     @Mock
     private IdamClient idamClient;
@@ -51,6 +57,31 @@ class IdamRepositoryTest {
         String token = idamRepository.getSystemUserAccessToken();
 
         assertThat(token).isEqualTo(TEST_BEAR_TOKEN);
+    }
+
+    @Test
+    @DisplayName("Search users")
+    void shouldSearchUsers() {
+        UserDetails userDetails = UserDetails.builder().id(USER_ID).build();
+        List<UserDetails> userList = List.of(userDetails);
+        given(idamClient.searchUsers(TEST_BEAR_TOKEN, String.format(IdamRepository.IDAM_ES_QUERY, USER_ID)))
+                .willReturn(userList);
+        UserDetails result = idamRepository.searchUserById(USER_ID, TEST_BEAR_TOKEN);
+        assertThat(result).isSameAs(userDetails);
+    }
+
+    @Test
+    @DisplayName("Search users with duplicate users in the results")
+    void shouldThrowIllegalStateException_whenDuplicateUsersReturnForSearch() {
+        UserDetails userDetails = UserDetails.builder().id(USER_ID).build();
+        List<UserDetails> userList = List.of(userDetails, userDetails);
+        given(idamClient.searchUsers(TEST_BEAR_TOKEN, String.format(IdamRepository.IDAM_ES_QUERY, USER_ID)))
+                .willReturn(userList);
+
+        assertThatThrownBy(() -> idamRepository.searchUserById(USER_ID, TEST_BEAR_TOKEN))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Multiple users with same IDAM id");
+
     }
 }
 

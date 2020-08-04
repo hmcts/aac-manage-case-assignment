@@ -13,6 +13,7 @@ import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
@@ -26,7 +27,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
-import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
@@ -65,12 +65,8 @@ public final class WiremockFixtures {
         }
     }
 
-    public static void stubS2SDetails(String serviceName) {
-        stubFor(WireMock.get(urlEqualTo("/s2s/details")).willReturn(okJson(serviceName)));
-    }
-
     public static void stubGetUsersByOrganisation(FindUsersByOrganisationResponse response) {
-        stubFor(WireMock.get(urlEqualTo("/refdata/external/v1/organisations/users?status=Active"))
+        stubFor(WireMock.get(urlEqualTo("/refdata/external/v1/organisations/users?status=Active&returnRoles=false"))
                 .willReturn(okForJson(response)));
     }
 
@@ -108,6 +104,15 @@ public final class WiremockFixtures {
                 .withQueryParam("user_ids", equalTo(userIds.get(0)))
                 .willReturn(aResponse()
                         .withStatus(HTTP_OK).withBody(getJsonString(new CaseUserRoleResource(caseUserRoles)))
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubIdamSearch(String userId, UserDetails user) {
+        stubFor(WireMock.get(urlPathEqualTo("/api/v1/users"))
+                .withQueryParam("query", equalTo("id:\"" + userId + "\""))
+                .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                .willReturn(aResponse()
+                        .withStatus(HTTP_OK).withBody(getJsonString(List.of(user)))
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 

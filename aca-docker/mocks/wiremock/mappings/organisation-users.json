@@ -5,6 +5,9 @@
     "queryParameters": {
       "status": {
         "equalTo": "Active"
+      },
+      "returnRoles": {
+        "equalTo": "false"
       }
     }
   },

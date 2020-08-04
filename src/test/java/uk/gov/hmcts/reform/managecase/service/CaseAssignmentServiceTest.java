@@ -6,9 +6,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
+import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
@@ -42,6 +44,8 @@ class CaseAssignmentServiceTest {
     private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";
     private static final String ORGANIZATION_ID = "TEST_ORG";
 
+    private static final String BEAR_TOKEN = "TestBearToken";
+
     @InjectMocks
     private CaseAssignmentService service;
 
@@ -49,6 +53,8 @@ class CaseAssignmentServiceTest {
     private DataStoreRepository dataStoreRepository;
     @Mock
     private PrdRepository prdRepository;
+    @Mock
+    private IdamRepository idamRepository;
     @Mock
     private JacksonUtils jacksonUtils;
 
@@ -63,7 +69,12 @@ class CaseAssignmentServiceTest {
         given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, CASE_ID))
                 .willReturn(Optional.of(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE)));
         given(prdRepository.findUsersByOrganisation())
-                .willReturn(usersByOrganisation(user(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor")));
+                .willReturn(usersByOrganisation(user(ASSIGNEE_ID)));
+
+        UserDetails userDetails = UserDetails.builder()
+                .id(ASSIGNEE_ID).roles(List.of("caseworker-AUTOTEST1-solicitor")).build();
+        given(idamRepository.getSystemUserAccessToken()).willReturn(BEAR_TOKEN);
+        given(idamRepository.searchUserById(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
     }
 
     @Test
@@ -112,8 +123,10 @@ class CaseAssignmentServiceTest {
     @DisplayName("should throw validation error when assignee doesn't have jurisdiction solicitor role")
     void shouldThrowValidationException_whenAssigneeRolesNotMatching() {
 
-        given(prdRepository.findUsersByOrganisation())
-                .willReturn(usersByOrganisation(user(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicitor")));
+        UserDetails userDetails = UserDetails.builder()
+                .id(ASSIGNEE_ID).roles(List.of("caseworker-AUTOTEST2-solicitor")).build();
+
+        given(idamRepository.searchUserById(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
 
         assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
                 .isInstanceOf(ValidationException.class)

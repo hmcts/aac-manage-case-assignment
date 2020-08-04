@@ -9,8 +9,6 @@ import uk.gov.hmcts.reform.managecase.client.prd.PrdApiClient;
 @Repository
 public class DefaultPrdRepository implements PrdRepository {
 
-    public static final String ACTIVE = "Active";
-
     private final PrdApiClient prdApi;
 
     @Autowired
@@ -21,6 +19,6 @@ public class DefaultPrdRepository implements PrdRepository {
     @Override
     @Cacheable(value = "usersByOrganisation", key = "@securityUtils.userToken")
     public FindUsersByOrganisationResponse findUsersByOrganisation() {
-        return prdApi.findUsersByOrganisation(ACTIVE);
+        return prdApi.findActiveUsersByOrganisation();
     }
 }

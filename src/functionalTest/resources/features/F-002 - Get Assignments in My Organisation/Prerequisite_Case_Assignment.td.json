@@ -1,0 +1,21 @@
+{
+  "_guid_": "Prerequisite_Case_Assignment",
+  "title": "Solicitor successfully sharing case access with another solicitor in their org",
+
+  "productName": "Manage Case Assignment Microservice",
+  "operationName": "Assign Access within Organisation",
+
+  "method": "POST",
+  "uri": "/case-assignments",
+
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
+
+  "users": {
+    "_extends_": "F-002_Users"
+  },
+
+  "request": {
+    "_extends_": "Common_Request"
+  }
+}

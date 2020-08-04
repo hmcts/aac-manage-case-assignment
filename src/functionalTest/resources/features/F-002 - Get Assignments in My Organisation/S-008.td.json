@@ -1,0 +1,49 @@
+{
+  "_guid_": "S-008",
+
+  "title": "Must return case assignments in my organisation for the provided Case IDs",
+
+  "specs": [
+    "Richard – a solicitor with the required permissions to create a case",
+    "Dil – another solicitor within the same organisation as Richard",
+    "Jamal – another solicitor within the same organisation as Richard",
+    "is made by Richard",
+    "contains a correctly-formed comma separated list of the valid case ID’s of C1 and C2"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.1@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
+    }
+  },
+
+  "request": {
+    "body": {
+      "case_ids": [
+        "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+        "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}"
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "status_message": "Case-User-Role assignments returned successfully",
+    "case_assignments": [
+      {
+        "case_id": "1588234985453946",
+        "shared_with": [
+          {
+            "idam_id": "221a2877-e1ab-4dc4-a9ff-f9424ad58738",
+            "first_name": "Bill",
+            "last_name": "Roberts",
+            "email": "bill.roberts@greatbrsolicitors.co.uk",
+            "case_roles": [
+              "[Claimant]",
+              "[Defendant]"
+            ]
+          }
+        ]
+      }]
+  }
+}

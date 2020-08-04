@@ -1,0 +1,17 @@
+{
+  "_guid_": "Prerequisite_Case_Assignment_C2_Jamal",
+  "_extends_": "Prerequisite_Case_Assignment",
+
+  "specs": [
+    "to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Jamal access to C2"
+  ],
+
+  "request": {
+    "body": {
+      "case_type_id": "${[scenarioContext][siblingContexts][F-002_Prerequisite_Case_Creation_C2][testData][actualResponse][body][case_type_id]}",
+      "case_id": "${[scenarioContext][siblingContexts][F-002_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
+      "assignee_id": "${[scenarioContext][testData][users][userJamal][id]}"
+    }
+  }
+
+}

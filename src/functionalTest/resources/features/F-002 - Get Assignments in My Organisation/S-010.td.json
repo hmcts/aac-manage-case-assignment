@@ -19,13 +19,9 @@
   "userTokenClientId": "xuiwebapp",
 
   "users": {
-    "S1": {
+    "invokingUser": {
       "username": "befta.master.solicitor.becky@gmail.com",
       "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
-    },
-    "S2": {
-      "username": "befta.master.solicitor.benjamin@gmail.com",
-      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_2_PWD]]"
     }
   },
 

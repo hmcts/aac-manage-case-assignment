@@ -11,14 +11,24 @@
     "contains a correctly-formed comma separated list of the valid case ID’s of C1 and C2"
   ],
 
+  "productName": "Manage Case Assignment Microservice",
+  "operationName": "Get Assignments in My Organisation",
+
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
+
+  "method": "GET",
+  "uri": "/case-assignments",
+
   "users": {
     "invokingUser": {
-      "username": "befta.caseworker.2.solicitor.1@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
+      "username": "befta.master.solicitor.becky@gmail.com",
+      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
     }
   },
 
   "request": {
+    "_extends_": "Common_Request",
     "body": {
       "case_ids": [
         "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",

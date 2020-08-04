@@ -13,5 +13,4 @@
       "assignee_id": "${[scenarioContext][testData][users][userJamal][id]}"
     }
   }
-
 }

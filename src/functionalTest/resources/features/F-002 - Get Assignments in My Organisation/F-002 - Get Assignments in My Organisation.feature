@@ -40,7 +40,7 @@ Feature: F-002: Get Assignments in My Organisation
     And the response has all the details as expected.
 
   # ACA-48 / AC-3
-#  @S-010
+  @S-010
   Scenario: Must return an error response for a missing case ID
     Given a user [Richard – with a solicitor role with access to invoke the ‘Get Assignments in My Organisation’ operation of Case Assignment Microservice],
     When a request is prepared with appropriate values,

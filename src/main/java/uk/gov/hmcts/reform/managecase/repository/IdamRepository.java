@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
@@ -13,7 +12,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
 
 @Component
-@Slf4j
 public class IdamRepository {
 
     public static final String IDAM_ES_QUERY = "id:\"%s\"";
@@ -38,9 +36,6 @@ public class IdamRepository {
     }
 
     public UserDetails searchUserById(String userId, String bearerToken) {
-
-        log.info("logging system bearer token:{}",  bearerToken);
-
         List<UserDetails> users = idamClient.searchUsers(bearerToken, String.format(IDAM_ES_QUERY, userId));
         return users.stream()
                 .filter(user -> userId.equalsIgnoreCase(user.getId()))

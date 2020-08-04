@@ -7,8 +7,7 @@ Feature: F-002: Get Assignments in My Organisation
   # ACA-48 / AC-1
   @S-008
   Scenario: Must return case assignments in my organisation for the provided Case IDs
-    Given an appropriate test context as detailed in the test data source,
-    And a user [Richard – a solicitor with the required permissions to create a case],
+    Given a user [Richard – a solicitor with the required permissions to create a case],
     And a successful call [by Richard to create a case - C1] as in [F-002_Prerequisite_Case_Creation_C1],
     And a successful call [by Richard to create another case – C2] as in [F-002_Prerequisite_Case_Creation_C2],
     And a user [Dil – another solicitor within the same organisation as Richard],

@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.managecase.client.prd.PrdApiClient;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static uk.gov.hmcts.reform.managecase.repository.DefaultPrdRepository.ACTIVE;
 
 class PrdRepositoryTest {
 
@@ -32,7 +31,7 @@ class PrdRepositoryTest {
 
         FindUsersByOrganisationResponse response = new FindUsersByOrganisationResponse(null, null);
 
-        given(apiClient.findUsersByOrganisation(ACTIVE)).willReturn(response);
+        given(apiClient.findActiveUsersByOrganisation()).willReturn(response);
 
         FindUsersByOrganisationResponse result = repository.findUsersByOrganisation();
 

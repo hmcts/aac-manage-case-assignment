@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.IdamFixture.userDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.usersByOrganisation;
 import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.ASSIGN_ACCESS_MESSAGE;
@@ -34,10 +35,11 @@ import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentContro
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubAssignCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseAssignments;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisation;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubIdamSearch;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
-    "PMD.AvoidDuplicateLiterals"})
+    "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports"})
 public class CaseAssignmentControllerIT extends BaseTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
@@ -65,8 +67,8 @@ public class CaseAssignmentControllerIT extends BaseTest {
     void setUp() {
         request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, ASSIGNEE_ID);
         // Positive stub mappings - individual tests override again for a specific scenario.
-        stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor"),
-                user(ANOTHER_USER)));
+        stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID), user(ANOTHER_USER)));
+        stubIdamSearch(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor"));
         stubSearchCase(CASE_TYPE_ID, ES_QUERY, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
         stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE);
     }
@@ -122,7 +124,9 @@ public class CaseAssignmentControllerIT extends BaseTest {
     @Test
     void shouldReturn400_whenAssigneeNotHaveCorrectJurisdictionRole() throws Exception {
 
-        stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID, "caseworker-JUD2-solicitor")));
+        stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID)));
+
+        stubIdamSearch(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicitor"));
 
         this.mockMvc.perform(post(PATH)
             .contentType(MediaType.APPLICATION_JSON)

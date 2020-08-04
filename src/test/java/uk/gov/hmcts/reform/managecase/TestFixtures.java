@@ -35,8 +35,24 @@ public class TestFixtures {
     private static final ObjectMapper OBJECT_MAPPER = new Jackson2ObjectMapperBuilder()
             .modules(new Jdk8Module())
             .build();
+    public static final String IDAM_ID = "221a2877-e1ab-4dc4-a9ff-f9424ad58738";
 
     private TestFixtures() {
+    }
+
+    public static class IdamFixture {
+
+        private IdamFixture() {
+        }
+
+        public static uk.gov.hmcts.reform.idam.client.models.UserDetails userDetails(String id, String... roles) {
+            return uk.gov.hmcts.reform.idam.client.models.UserDetails.builder()
+                    .id(id)
+                    .forename(FIRST_NAME)
+                    .surname(LAST_NAME)
+                    .roles(List.of(roles))
+                    .build();
+        }
     }
 
     public static class CaseDetailsFixture {
@@ -84,13 +100,12 @@ public class TestFixtures {
             return new FindUsersByOrganisationResponse(List.of(users), ORGANIZATION_ID);
         }
 
-        public static ProfessionalUser user(String userIdentifier, String... roles) {
+        public static ProfessionalUser user(String userIdentifier) {
             return ProfessionalUser.builder()
                     .userIdentifier(userIdentifier)
                     .firstName(FIRST_NAME)
                     .lastName(LAST_NAME)
                     .email(EMAIL)
-                    .roles(List.of(roles))
                     .build();
         }
 
@@ -110,7 +125,7 @@ public class TestFixtures {
 
         public static UserDetails defaultUser() {
             return UserDetails.builder()
-                    .idamId("221a2877-e1ab-4dc4-a9ff-f9424ad58738")
+                    .idamId(IDAM_ID)
                     .firstName(FIRST_NAME)
                     .lastName(LAST_NAME)
                     .email(EMAIL)

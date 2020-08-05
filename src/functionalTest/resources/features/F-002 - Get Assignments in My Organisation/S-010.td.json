@@ -27,17 +27,13 @@
 
   "request": {
     "_extends_": "Common_Request",
-    "body": {
-      "case_id": []
+    "queryParams": {
+      "case_ids": ["123"]
     }
   },
 
   "expectedResponse": {
     "_extends_": "ACA_400_Response",
-    "body": {
-      "errors": [
-        "Case ID can not be empty"
-      ]
-    }
+    "body": {}
   }
 }

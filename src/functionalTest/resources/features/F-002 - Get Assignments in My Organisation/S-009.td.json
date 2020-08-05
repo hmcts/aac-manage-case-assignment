@@ -17,6 +17,9 @@
   "method": "GET",
   "uri": "/case-assignments",
 
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
+
   "users": {
     "invokingUser": {
       "username": "befta.master.solicitor.becky@gmail.com",

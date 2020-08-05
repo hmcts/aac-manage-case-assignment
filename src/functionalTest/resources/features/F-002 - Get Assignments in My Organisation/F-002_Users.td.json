@@ -10,11 +10,11 @@
     "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_2_PWD]]"
   },
   "userJamal": {
-    "username": "befta.caseworker.2.solicitor.1@gmail.com",
-    "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
-  },
-  "userMutlu": {
     "username": "befta.pui.caa.1@gmail.com",
     "password": "[[$CCD_BEFTA_PUI_CAA_1_PWD]]"
+  },
+  "userMutlu": {
+    "username": "befta.caseworker.2.solicitor.1@gmail.com",
+    "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
   }
 }

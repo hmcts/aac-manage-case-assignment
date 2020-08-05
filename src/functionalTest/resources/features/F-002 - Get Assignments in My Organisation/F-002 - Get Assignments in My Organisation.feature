@@ -8,8 +8,8 @@ Feature: F-002: Get Assignments in My Organisation
   @S-008
   Scenario: Must return case assignments in my organisation for the provided Case IDs
     Given a user [Richard – a solicitor with the required permissions to create a case],
-    And a successful call [by Richard to create a case - C1] as in [F-002_Prerequisite_Case_Creation_C1],
-    And a successful call [by Richard to create another case – C2] as in [F-002_Prerequisite_Case_Creation_C2],
+    And a case [by Richard to create a case - C1] created as in [F-002_Prerequisite_Case_Creation_C1],
+    And a case [by Richard to create another case – C2] created as in [F-002_Prerequisite_Case_Creation_C2],
     And a user [Dil – another solicitor within the same organisation as Richard],
     And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Dil access to C1] as in [Prerequisite_Case_Assignment_C1_Dil],
     And a user [Jamal – another solicitor within the same organisation as Richard],
@@ -51,21 +51,21 @@ Feature: F-002: Get Assignments in My Organisation
     And the response has all the details as expected.
 
   # ACA-48 / AC-4
-#  @S-011
-#  Scenario: Must return an error response for a malformed Case ID List
-#    Given a user [Richard – a solicitor with the required permissions to create a case],
-#    And a successful call [by Richard to create a case - C1] as in [F-002_Prerequisite_Case_Creation_C1],
-#    And a successful call [by Richard to create another case – C2] as in [F-002_Prerequisite_Case_Creation_C2],
-#    And a successful call [by Richard to create another case – C3] as in [F-002_Prerequisite_Case_Creation_C3],
-#    And a user [Dil – another solicitor within the same organisation as Richard],
-#    And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Dil access to C1] as in [Prerequisite_Case_Assignment_C1_Dil],
-#    And a user [Jamal – another solicitor within the same organisation as Richard],
-#    And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Jamal access to C2] as in [Prerequisite_Case_Assignment_C2_Jamal],
-#    And a user [Mutlu – another solicitor within the same organisation as Richard],
-#    And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Mutlu access to C3] as in [Prerequisite_Case_Assignment_C3_Mutlu],
-#    When a request is prepared with appropriate values,
-#    And the request [is made by Richard],
-#    And the request [contains the IDs of C1, C2 & C3 along with an empty element in the comma-separated list of case ID's],
-#    And it is submitted to call the [Get Assignments in My Organisation] operation of [Manage Case Assignment Microservice],
-#    Then a negative response is received,
-#    And the response has all the details as expected.
+  @S-011
+  Scenario: Must return an error response for a malformed Case ID List
+    Given a user [Richard – a solicitor with the required permissions to create a case],
+    And a successful call [by Richard to create a case - C1] as in [F-002_Prerequisite_Case_Creation_C1],
+    And a successful call [by Richard to create another case – C2] as in [F-002_Prerequisite_Case_Creation_C2],
+    And a successful call [by Richard to create another case – C3] as in [F-002_Prerequisite_Case_Creation_C3],
+    And a user [Dil – another solicitor within the same organisation as Richard],
+    And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Dil access to C1] as in [Prerequisite_Case_Assignment_C1_Dil],
+    And a user [Jamal – another solicitor within the same organisation as Richard],
+    And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Jamal access to C2] as in [Prerequisite_Case_Assignment_C2_Jamal],
+    And a user [Mutlu – another solicitor within the same organisation as Richard],
+    And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Mutlu access to C3] as in [Prerequisite_Case_Assignment_C3_Mutlu],
+    When a request is prepared with appropriate values,
+    And the request [is made by Richard],
+    And the request [contains the IDs of C1, C2 & C3 along with an empty element in the comma-separated list of case ID's],
+    And it is submitted to call the [Get Assignments in My Organisation] operation of [Manage Case Assignment Microservice],
+    Then a negative response is received,
+    And the response has all the details as expected.

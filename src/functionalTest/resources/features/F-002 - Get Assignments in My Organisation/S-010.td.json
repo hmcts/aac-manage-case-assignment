@@ -26,14 +26,11 @@
   },
 
   "request": {
-    "_extends_": "Common_Request",
-    "queryParams": {
-      "case_ids": []
-    }
+    "_extends_": "Common_Request"
   },
 
   "expectedResponse": {
     "_extends_": "ACA_400_Response",
-    "body": {}
+    "body": null
   }
 }

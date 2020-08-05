@@ -26,8 +26,8 @@ Feature: F-002: Get Assignments in My Organisation
   @S-009
   Scenario: Must return an error response when a malformed case ID is provided
     Given a user [Richard – a solicitor with the required permissions to create a case],
-    And a successful call [by Richard to create a case - C1] as in [F-002_Prerequisite_Case_Creation_C1],
-    And a successful call [by Richard to create another case – C2] as in [F-002_Prerequisite_Case_Creation_C2],
+    And a case [by Richard to create a case - C1] created as in [F-002_Prerequisite_Case_Creation_C1],
+    And a case [by Richard to create another case – C2] created as in [F-002_Prerequisite_Case_Creation_C2],
     And a user [Dil – another solicitor within the same organisation as Richard],
     And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Dil access to C1] as in [Prerequisite_Case_Assignment_C1_Dil],
     And a user [Jamal – another solicitor within the same organisation as Richard],
@@ -54,9 +54,9 @@ Feature: F-002: Get Assignments in My Organisation
   @S-011
   Scenario: Must return an error response for a malformed Case ID List
     Given a user [Richard – a solicitor with the required permissions to create a case],
-    And a successful call [by Richard to create a case - C1] as in [F-002_Prerequisite_Case_Creation_C1],
-    And a successful call [by Richard to create another case – C2] as in [F-002_Prerequisite_Case_Creation_C2],
-    And a successful call [by Richard to create another case – C3] as in [F-002_Prerequisite_Case_Creation_C3],
+    And a case [by Richard to create a case - C1] created as in [F-002_Prerequisite_Case_Creation_C1],
+    And a case [by Richard to create another case – C2] created as in [F-002_Prerequisite_Case_Creation_C2],
+    And a case [by Richard to create another case – C3] created as in [F-002_Prerequisite_Case_Creation_C3],
     And a user [Dil – another solicitor within the same organisation as Richard],
     And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Dil access to C1] as in [Prerequisite_Case_Assignment_C1_Dil],
     And a user [Jamal – another solicitor within the same organisation as Richard],

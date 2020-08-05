@@ -11,10 +11,6 @@
   "s2sClientId": "xui_webapp",
   "userTokenClientId": "xuiwebapp",
 
-  "users": {
-    "_extends_": "F-002_Users"
-  },
-
   "request": {
     "_extends_": "Common_Request"
   }

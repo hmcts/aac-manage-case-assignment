@@ -28,7 +28,7 @@
   "request": {
     "_extends_": "Common_Request",
     "queryParams": {
-      "case_ids": ["123"]
+      "case_ids": []
     }
   },
 

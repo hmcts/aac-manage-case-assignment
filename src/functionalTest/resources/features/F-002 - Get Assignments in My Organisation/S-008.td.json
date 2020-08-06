@@ -37,22 +37,22 @@
 
   "expectedResponse": {
     "_extends_" : "Common_200_Response",
-    "status_message": "Case-User-Role assignments returned successfully",
-    "case_assignments": [
-      {
-        "case_id": "1588234985453946",
-        "shared_with": [
-          {
-            "idam_id": "221a2877-e1ab-4dc4-a9ff-f9424ad58738",
-            "first_name": "Bill",
-            "last_name": "Roberts",
-            "email": "bill.roberts@greatbrsolicitors.co.uk",
-            "case_roles": [
-              "[Claimant]",
-              "[Defendant]"
-            ]
-          }
-        ]
+    "status_message" : "Case-User-Role assignments returned successfully",
+    "case_assignments" : [{
+      "case_id" : "1596718867147931",
+      "shared_with" : [ {
+        "idam_id" : "251059c7-2d0d-442e-b1f0-6b5982757b9a",
+        "first_name" : "Benjamin",
+        "last_name" : "Solicington",
+        "email" : "befta.master.solicitor.benjamin@gmail.com",
+        "case_roles" : ["[Claimant]", "[Defendant]"]
+      }, {
+        "idam_id" : "7044dc22-2357-4b85-9fd5-6945f9b43ba2",
+        "first_name" : "Becky",
+        "last_name" : "Solicington",
+        "email" : "befta.master.solicitor.becky@gmail.com",
+        "case_roles" : [ "[CREATOR]" ]
       }]
+    }]
   }
 }

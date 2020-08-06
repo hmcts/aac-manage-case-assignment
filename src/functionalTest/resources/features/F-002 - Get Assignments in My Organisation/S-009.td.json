@@ -38,6 +38,11 @@
   },
 
   "expectedResponse": {
-    "_extends_": "ACA_400_Response"
+    "_extends_": "ACA_400_Response",
+    "body" : {
+      "status" : "BAD_REQUEST",
+      "message" : "Case ID should contain digits only",
+      "errors" : []
+    }
   }
 }

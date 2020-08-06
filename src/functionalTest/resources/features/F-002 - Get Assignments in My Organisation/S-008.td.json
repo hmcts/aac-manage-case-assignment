@@ -36,6 +36,7 @@
   },
 
   "expectedResponse": {
+    "_extends_" : "Common_200_Response",
     "status_message": "Case-User-Role assignments returned successfully",
     "case_assignments": [
       {

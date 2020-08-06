@@ -29,7 +29,8 @@
   },
 
   "request": {
-    "body": {
+    "_extends_": "Common_Request",
+    "queryParams": {
       "case_ids": [
         "MALFORMED",
         "MALFORMED",
@@ -38,6 +39,7 @@
     }
   },
 
-
-  "expectedResponse": {}
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response"
+  }
 }

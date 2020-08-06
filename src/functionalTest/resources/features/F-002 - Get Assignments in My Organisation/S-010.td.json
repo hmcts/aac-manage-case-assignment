@@ -26,7 +26,10 @@
   },
 
   "request": {
-    "_extends_": "Common_Request"
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "case_ids": []
+    }
   },
 
   "expectedResponse": {

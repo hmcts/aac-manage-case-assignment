@@ -28,7 +28,8 @@
   },
 
   "request": {
-    "body": {
+    "_extends_": "Common_Request",
+    "queryParams": {
       "case_ids": [
         "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
         "MALFORMED"
@@ -36,5 +37,7 @@
     }
   },
 
-  "expectedResponse": {}
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response"
+  }
 }

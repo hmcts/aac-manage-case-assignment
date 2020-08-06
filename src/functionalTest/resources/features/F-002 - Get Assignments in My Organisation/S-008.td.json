@@ -29,10 +29,8 @@
 
   "request": {
     "_extends_": "Common_Request",
-    "body": {
-      "case_ids": [
-        "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
-      ]
+    "queryParams": {
+      "case_ids": "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
     }
   },
 

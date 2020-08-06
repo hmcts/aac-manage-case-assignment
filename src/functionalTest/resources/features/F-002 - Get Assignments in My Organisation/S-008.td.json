@@ -8,7 +8,8 @@
     "Dil – another solicitor within the same organisation as Richard",
     "Jamal – another solicitor within the same organisation as Richard",
     "is made by Richard",
-    "contains a correctly-formed comma separated list of the valid case ID’s of C1 and C2"
+    "contains a correctly-formed comma separated list of the valid case ID’s of C1 and C2",
+    "includes the respective case assignments of user ID's of both Dil and Jamal and cases C1 and C2"
   ],
 
   "productName": "Manage Case Assignment Microservice",

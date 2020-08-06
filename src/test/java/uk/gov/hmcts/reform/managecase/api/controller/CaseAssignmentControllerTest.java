@@ -172,4 +172,14 @@ public class CaseAssignmentControllerTest {
         this.mockMvc.perform(get(CASE_ASSIGNMENTS))
                 .andExpect(status().isBadRequest());
     }
+
+    @DisplayName("should fail with 400 bad request when caseIds is malformed or invalid")
+    @Test
+    void shouldFailWithBadRequestWhenCaseIdsInGetAssignmentsIsMalformed() throws Exception {
+
+        this.mockMvc.perform(get(CASE_ASSIGNMENTS)
+                .queryParam("case_ids", "121324,%12345"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is("Case ID should contain digits only")));
+    }
 }

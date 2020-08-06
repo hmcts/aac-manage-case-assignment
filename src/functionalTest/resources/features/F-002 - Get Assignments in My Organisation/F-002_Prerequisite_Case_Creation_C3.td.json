@@ -8,7 +8,7 @@
 
   "request": {
     "body": {
-      "event_token": "${[scenarioContext][siblingContexts][F-002_Prerequisite_Case_Creation_C3_Token_Creation][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][siblingContexts][F-002_Prerequisite_Case_Creation_C3_Token_Creation][testData][actualResponse][body][token]}"
     }
   }
 }

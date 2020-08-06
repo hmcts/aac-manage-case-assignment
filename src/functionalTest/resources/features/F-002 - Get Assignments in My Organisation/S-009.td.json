@@ -32,6 +32,7 @@
     "queryParams": {
       "case_ids": [
         "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+        "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
         "MALFORMED"
       ]
     }

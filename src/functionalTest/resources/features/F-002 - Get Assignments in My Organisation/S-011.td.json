@@ -32,9 +32,10 @@
     "_extends_": "Common_Request",
     "queryParams": {
       "case_ids": [
-        "MALFORMED",
-        "MALFORMED",
-        "MALFORMED"
+        "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+        "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
+        "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}",
+        " "
       ]
     }
   },

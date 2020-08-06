@@ -1,6 +1,6 @@
 {
   "_guid_": "F-002_Prerequisite_Case_Creation_C3",
-  "_extends_": "F-002_Prerequisite_Case_Creation",
+  "_extends_": "Prerequisite_Case_Creation_C0_Without_Org_Policies",
 
   "specs": [
     "by Richard to create another case – C3"
@@ -8,7 +8,23 @@
 
   "request": {
     "body": {
-      "event_token": "${[scenarioContext][siblingContexts][F-002_Prerequisite_Case_Creation_C3_Token_Creation][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][siblingContexts][F-002_Prerequisite_Case_Creation_C3_Token_Creation][testData][actualResponse][body][token]}",
+      "data": {
+        "OrganisationPolicyField1": {
+          "OrgPolicyReference": "ClaimantPolicy",
+          "Organisation": {
+            "OrganisationID": "QUK822N",
+            "OrganisationName": "ACA-2 Organisation"
+          }
+        },
+        "OrganisationPolicyField2": {
+          "OrgPolicyReference": "DefendantPolicy",
+          "Organisation": {
+            "OrganisationID": "QUK822N",
+            "OrganisationName": "ACA-2 Organisation"
+          }
+        }
+      }
     }
   },
 

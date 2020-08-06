@@ -41,7 +41,7 @@
       "status_message": "Case-User-Role assignments returned successfully",
       "case_assignments": [
         {
-          "case_id": "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+          "case_id": "${}${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
           "shared_with": [
             {
               "idam_id": "[[ANYTHING_PRESENT]]",

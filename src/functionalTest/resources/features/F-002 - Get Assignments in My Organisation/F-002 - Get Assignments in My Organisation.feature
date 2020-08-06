@@ -62,7 +62,7 @@ Feature: F-002: Get Assignments in My Organisation
     And a user [Jamal – another solicitor within the same organisation as Richard],
 #    And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Jamal access to C2] as in [Prerequisite_Case_Assignment_C2_Jamal],
     And a user [Mutlu – another solicitor within the same organisation as Richard],
-    And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Mutlu access to C3] as in [Prerequisite_Case_Assignment_C3_Mutlu],
+#    And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Mutlu access to C3] as in [Prerequisite_Case_Assignment_C3_Mutlu],
     When a request is prepared with appropriate values,
     And the request [is made by Richard],
     And the request [contains the IDs of C1, C2 & C3 along with an empty element in the comma-separated list of case ID's],

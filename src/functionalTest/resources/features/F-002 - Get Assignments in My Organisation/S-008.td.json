@@ -41,10 +41,10 @@
       "status_message": "Case-User-Role assignments returned successfully",
       "case_assignments": [
         {
-          "case_id": "{[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+          "case_id": "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
           "shared_with": [
             {
-              "idam_id": "${[scenarioContext][testData][users][userDil][id]}",
+              "idam_id": "[[ANYTHING_PRESENT]]",
               "first_name": "Benjamin",
               "last_name": "Solicington",
               "email": "befta.master.solicitor.benjamin@gmail.com",
@@ -54,7 +54,7 @@
               ]
             },
             {
-              "idam_id": "${[scenarioContext][testData][users][userRichard][id]}",
+              "idam_id": "[[ANYTHING_PRESENT]]",
               "first_name": "Becky",
               "last_name": "Solicington",
               "email": "befta.master.solicitor.becky@gmail.com",

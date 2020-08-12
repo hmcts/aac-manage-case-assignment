@@ -28,9 +28,8 @@ public class NotifyService {
         this.appParams = appParams;
     }
 
-    @Retryable(value = {ConnectException.class}, backoff = @Backoff(delay = 1000, multiplier = 3))
     public List<SendEmailResponse> senEmail(final List<String> caseIds,
-                                            final List<String> emailAddresses) throws NotificationClientException {
+                                            final List<String> emailAddresses) throws NotificationClientException  {
         if (caseIds == null || caseIds.size() == 0) {
             throw new ValidationException("At least one case id is required to send notification");
         }
@@ -42,16 +41,21 @@ public class NotifyService {
         List<SendEmailResponse> emailNotificationResponses = Lists.newArrayList();
         for (String caseId : caseIds) {
             for (String emailAddress : emailAddresses) {
-                emailNotificationResponses.add(this.notificationClient.sendEmail(
-                    this.appParams.getEmailTemplateId(),
-                    emailAddress,
-                    personalisationParams(caseId),
-                    createReference(),
-                    this.appParams.getReplyToEmailId()
-                ));
+                emailNotificationResponses.add(sendNotification(caseId, emailAddress));
             }
         }
         return emailNotificationResponses;
+    }
+
+    @Retryable(value = {ConnectException.class}, backoff = @Backoff(delay = 1000, multiplier = 3))
+    private SendEmailResponse sendNotification(String caseId, String emailAddress) throws NotificationClientException {
+        return this.notificationClient.sendEmail(
+            this.appParams.getEmailTemplateId(),
+            emailAddress,
+            personalisationParams(caseId),
+            createReference(),
+            this.appParams.getReplyToEmailId()
+        );
     }
 
     private Map<String, ?> personalisationParams(final String caseId) {

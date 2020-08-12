@@ -18,10 +18,13 @@ public class ApplicationParams {
     private List<String> ccdDataStoreAllowedUrls;
     @Value("${ccd.data-store.allowed-service}")
     private String ccdDataStoreAllowedService;
+
     @Value("${notify.email-template-id}")
     private String emailTemplateId;
+
     @Value("${notify.reply-to-email-id}")
     private String replyToEmailId;
+
     @Value("${notify.api-key}")
     private String notifyApiKey;
 

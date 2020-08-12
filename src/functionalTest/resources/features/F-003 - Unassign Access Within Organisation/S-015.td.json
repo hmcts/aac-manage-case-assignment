@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-015",
+
+  "title": "Pui-caa successfully removing access to multiple cases for multiple solicitors in their org (happy path)",
+
+  "specs": [
+    "U1 - with a solicitor role in a particular jurisdiction within an organisation, to create a case",
+    "U2 - with a pui-caa role within the same organisation to assign and unassign access to a case for a solicitor in their organisation",
+    "U3 - with a solicitor role for the same jurisdiction within the same organisation, to get assigned and unassigned access to a case",
+    "is made by U2 and intends to unassign access to C1, C2 and C3 for U1 & U3"
+  ],
+
+  "productName": "Manage Case Assignment Microservice",
+  "operationName": "Unassign Access within Organisation",
+
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
+
+  "method": "DELETE",
+  "uri": "/case-assignments",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {},
+    "body" : {}
+  },
+
+  "expectedResponse": {
+    "_extends_" : "",
+    "body" : {}
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-017",
+
+  "title": "Must return an error response for a malformed Case ID",
+
+  "specs": [
+    "U1 - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation",
+    "U2 - with a solicitor role for the same jurisdiction within the same organisation as U1",
+    "is made by U1 and intends to unassign access for U2 to some cases",
+    "contains the Case ID of C1 plus an additional malformed caseID"
+  ],
+
+  "productName": "Manage Case Assignment Microservice",
+  "operationName": "Unassign Access within Organisation",
+
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
+
+  "method": "DELETE",
+  "uri": "/case-assignments",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {},
+    "body" : {}
+  },
+
+  "expectedResponse": {
+    "_extends_" : "",
+    "body" : {}
+  }
+}

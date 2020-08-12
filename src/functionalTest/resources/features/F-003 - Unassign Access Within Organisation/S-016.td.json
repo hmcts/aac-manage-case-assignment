@@ -1,0 +1,33 @@
+{
+  "_guid_": "S-016",
+
+  "title": "Must return an error response if intended unassignee doesn't exist in invoker's organisation",
+
+  "specs": [
+    "U1 - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation - O1",
+    "U2 - with a solicitor role for the same jurisdiction within organisation - O1",
+    "U3 - with a solicitor role for the same jurisdiction within a different organisation from U1 - O2",
+    "U4 - with a Pui-CAA role for the same jurisdiction and in organisation - O2",
+    "is made by U1 and intends to unassign access to C1 for U2 and U3"
+  ],
+
+  "productName": "Manage Case Assignment Microservice",
+  "operationName": "Unassign Access within Organisation",
+
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
+
+  "method": "DELETE",
+  "uri": "/case-assignments",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {},
+    "body" : {}
+  },
+
+  "expectedResponse": {
+    "_extends_" : "",
+    "body" : {}
+  }
+}

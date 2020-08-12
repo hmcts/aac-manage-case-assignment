@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-014",
+
+  "title": "Solicitor successfully removing access to multiple cases for multiple solicitors in their org (happy path)",
+
+  "specs": [
+    "U1 - with a Solicitor role in a jurisdiction under an organisation to assign and Unassign a case role to a solicitor within the same organisation",
+    "U2 - with a Solicitor role in the same jurisdiction under the same organisation as U1 to be assigned and unassigned to some cases",
+    "U3 - with a Solicitor role in the same jurisdiction under the same organisation as U1 to be assigned and unassigned to some cases",
+    "is made by U1 and intends to unassign access to C1, C2 and C3 for U2 & U3"
+  ],
+
+  "productName": "Manage Case Assignment Microservice",
+  "operationName": "Unassign Access within Organisation",
+
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
+
+  "method": "DELETE",
+  "uri": "/case-assignments",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {},
+    "body" : {}
+  },
+
+  "expectedResponse": {
+    "_extends_" : "",
+    "body" : {}
+  }
+}

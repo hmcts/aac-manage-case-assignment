@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.CaseUnassignmentRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.CaseUnassignmentResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.GetCaseAssignmentsResponse;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignedUsers;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
@@ -37,6 +40,7 @@ public class CaseAssignmentController {
 
     public static final String ASSIGN_ACCESS_MESSAGE =
             "Roles %s from the organisation policies successfully assigned to the assignee.";
+    public static final String UNASSIGN_ACCESS_MESSAGE = "Unassignment(s) performed successfully.";
     public static final String GET_ASSIGNMENTS_MESSAGE = "Case-User-Role assignments returned successfully";
 
     private final CaseAssignmentService caseAssignmentService;
@@ -147,5 +151,43 @@ public class CaseAssignmentController {
             @Valid @NotEmpty(message = "case_ids must be a non-empty list of proper case ids.") List<String> caseIds) {
         List<CaseAssignedUsers> caseAssignedUsers = caseAssignmentService.getCaseAssignments(caseIds);
         return new GetCaseAssignmentsResponse(GET_ASSIGNMENTS_MESSAGE, caseAssignedUsers);
+    }
+
+    @DeleteMapping(path = "/case-assignments", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Unassign Access within Organisation", notes = "Unassign Access within Organisation")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiResponses({
+        @ApiResponse(
+            code = 201,
+            message = UNASSIGN_ACCESS_MESSAGE
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One of the following reasons.\n"
+                + "1. Unassign list can not be empty. \n"
+                + "2. Case ID can not be empty. \n"
+                + "3. Assignee IDAM ID can not be empty. \n"
+                + "4. Intended user to be unassigned has to be in the same organisation as that of the invoker.",
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\"message\": \"Intended user to be unassigned has to be in the same organisation as that of the invoker\","
+                        + " \"status\": \"BAD_REQUEST\" }",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = "Authentication failure due to invalid / expired tokens (IDAM / S2S)."
+        ),
+        @ApiResponse(
+            code = 403,
+            message = "One of the following reasons.\n"
+                + "1) UnAuthorised S2S service \n"
+                + "2) The user is neither a case access administrator nor a solicitor with access to the jurisdiction"
+        )
+    })
+    public CaseUnassignmentResponse unassignAccessWithinOrganisation(
+        @Valid @RequestBody CaseUnassignmentRequest requestPayload) {
+        return new CaseUnassignmentResponse(UNASSIGN_ACCESS_MESSAGE);
     }
 }

@@ -1,5 +1,6 @@
 {
   "_guid_": "S-011",
+  "_extends_": "F-002-Base",
 
   "title": "Must return an error response for a malformed Case ID List",
 
@@ -12,24 +13,7 @@
     "contains the IDs of C1, C2 & C3 along with an empty element in the comma-separated list of case ID's"
   ],
 
-  "productName": "Manage Case Assignment Microservice",
-  "operationName": "Get Assignments in My Organisation",
-
-  "method": "GET",
-  "uri": "/case-assignments",
-
-  "s2sClientId": "xui_webapp",
-  "userTokenClientId": "xuiwebapp",
-
-  "users": {
-    "invokingUser": {
-      "username": "befta.master.solicitor.becky@gmail.com",
-      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
-    }
-  },
-
   "request": {
-    "_extends_": "Common_Request",
     "queryParams": {
       "case_ids": [
         "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",

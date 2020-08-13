@@ -14,14 +14,14 @@
           "OrgPolicyReference": "ClaimantPolicy",
           "Organisation": {
             "OrganisationID": "QUK822N",
-            "OrganisationName": "ACA-2 Organisation"
+            "OrganisationName": "CCD Solicitors Limited"
           }
         },
         "OrganisationPolicyField2": {
           "OrgPolicyReference": "DefendantPolicy",
           "Organisation": {
             "OrganisationID": "QUK822N",
-            "OrganisationName": "ACA-2 Organisation"
+            "OrganisationName": "CCD Solicitors Limited"
           }
         }
       }

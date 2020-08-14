@@ -1,16 +1,16 @@
-####################################################
+#=================================================
 @F-002
 Feature: F-002: Get Assignments in My Organisation
-####################################################
+#=================================================
 
 Background:
     Given an appropriate test context as detailed in the test data source
 
-#=======================================================================================================================================================================================================
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-1
 @S-008
 Scenario: Must return case assignments in my organisation for the provided Case IDs
-#----------------------------------------------------------------------------------
+
     Given a user [Becky – a solicitor with the required permissions to create a case],
       And a user [Benjamin – another solicitor within the same organisation as Becky],
       And a user [Bill – another solicitor within the same organisation as Becky],
@@ -29,11 +29,11 @@ Scenario: Must return case assignments in my organisation for the provided Case 
       And the response [includes the respective case assignments of user ID's of both Benjamin and Bill and cases C1 and C2],
       And the response has all the details as expected.
 
-#=======================================================================================================================================================================================================
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-2
 @S-009
 Scenario: Must return an error response when a malformed case ID is provided
-#---------------------------------------------------------------------------
+
     Given a user [Becky – a solicitor with the required permissions to create a case],
       And a user [Benjamin – another solicitor within the same organisation as Becky],
       And a user [Bill – another solicitor within the same organisation as Becky],
@@ -51,11 +51,11 @@ Scenario: Must return an error response when a malformed case ID is provided
      Then a negative response is received,
       And the response has all the details as expected.
 
-#=======================================================================================================================================================================================================
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-3
 @S-010
 Scenario: Must return an error response for a missing case ID
-#------------------------------------------------------------
+
     Given a user [Becky – with a solicitor role with access to invoke the ‘Get Assignments in My Organisation’ operation of Case Assignment Microservice],
 
      When a request is prepared with appropriate values,
@@ -66,11 +66,11 @@ Scenario: Must return an error response for a missing case ID
      Then a negative response is received,
       And the response has all the details as expected.
 
-#=======================================================================================================================================================================================================
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-4
 @S-011
 Scenario: Must return an error response for a malformed Case ID List
-#-------------------------------------------------------------------
+
     Given a user [Becky – a solicitor with the required permissions to create a case],
       And a user [Benjamin – another solicitor within the same organisation as Becky],
       And a user [Bill – another solicitor within the same organisation as Becky],
@@ -90,4 +90,4 @@ Scenario: Must return an error response for a malformed Case ID List
 
      Then a negative response is received,
       And the response has all the details as expected.
-#=======================================================================================================================================================================================================
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

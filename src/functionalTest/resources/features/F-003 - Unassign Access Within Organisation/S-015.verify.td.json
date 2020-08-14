@@ -1,0 +1,8 @@
+{
+  "_guid_": "S-015_Get_Assignments_In_Org",
+  "_extends_": "F-003_Verify_Assignments_In_Org_My_Org_Base",
+
+  "specs": [
+    "to Get Assignments In My Organisation by CAA to verify unassignment of Becky and Bill from C1, C2 and C3"
+  ]
+}

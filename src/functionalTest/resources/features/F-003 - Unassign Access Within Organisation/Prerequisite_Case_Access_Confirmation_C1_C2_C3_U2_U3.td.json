@@ -2,7 +2,7 @@
   "_guid_": "Prerequisite_Case_Access_Confirmation_C1_C2_C3_U2_U3",
 
   "specs": [
-    "by U1 to confirm the access to C1 for U2 & U3"
+    "by Becky to confirm the access to C1 for Benjamin & Bill"
   ],
 
   "users": {
@@ -15,11 +15,7 @@
   "request": {
     "_extends_": "Common_Request",
     "queryParams": {
-      "case_ids": [
-        "${[scenarioContext][childContexts][F-003_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
-        "${[scenarioContext][childContexts][F-003_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
-        "${[scenarioContext][childContexts][F-003_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}"
-      ]
+      "case_ids": "${[scenarioContext][childContexts][F-003_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F-003_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F-003_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}"
     }
   },
 

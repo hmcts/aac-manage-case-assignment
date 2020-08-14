@@ -1,19 +1,12 @@
 {
-  "_guid_": "Prerequisite_Case_Access_Confirmation_C1_U1",
+  "_guid_": "S-020_Get_Assignments_In_Org",
+  "_extends_": "F-003_Verify_Assignments_In_Org_My_Org_Base",
 
   "specs": [
-    "by Becky to confirm the access to C1 for Benjamin & Bill"
+    "to Get Assignments In My Organisation by Becky to verify the continued assignment of Becky for C1"
   ],
 
-  "users": {
-    "invokingUser": {
-      "username": "befta.master.solicitor.becky@gmail.com",
-      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
-    }
-  },
-
   "request": {
-    "_extends_": "Common_Request",
     "queryParams": {
       "case_ids": "${[scenarioContext][childContexts][F-003_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
     }

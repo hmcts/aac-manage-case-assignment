@@ -1,22 +1,17 @@
 {
   "_guid_": "S-018",
   "_extends_": "F-003-Base",
-
   "title": "Must return an error response for a missing Case ID",
 
   "specs": [
-    "U1 - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation",
-    "U2 - with a solicitor role for the same jurisdiction within the same organisation as U1",
-    "is made by U1 and intends to unassign access for U2 to some cases",
+    "Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation",
+    "Benjamin - with a solicitor role for the same jurisdiction within the same organisation as Becky",
+    "is made by Becky and intends to unassign access for Benjamin to some cases",
     "contains the Case ID of C1 and a missing case ID"
   ],
 
   "users": {
-    "_extends_": "F-003_Users",
-    "invokingUser": {
-      "username": "befta.master.solicitor.becky@gmail.com",
-      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
-    }
+    "_extends_": "F-003_Users"
   },
 
   "request": {
@@ -24,14 +19,14 @@
       "unassignments": [
         {
           "case_id": "${[scenarioContext][childContexts][F-003_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
-          "assignee_id": "${[scenarioContext][testData][users][U2][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}",
           "case_roles": [
             "[Claimant]",
             "[Defendant]"
           ]
         }, {
           "case_id": " ",
-          "assignee_id": "${[scenarioContext][testData][users][U2][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}",
           "case_roles": [
             "[Claimant]",
             "[Defendant]"

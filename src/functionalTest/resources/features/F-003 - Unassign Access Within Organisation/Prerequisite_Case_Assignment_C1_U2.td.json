@@ -3,25 +3,18 @@
   "_extends_": "Prerequisite_Case_Assignment",
 
   "specs": [
-    "by U1 to grant access to C1 for U2"
+    "by Becky to grant access to C1 for Benjamin"
   ],
 
   "users": {
-    "U1": {
-      "username": "befta.master.solicitor.becky@gmail.com",
-      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
-    },
-    "U2": {
-      "username": "befta.master.solicitor.benjamin@gmail.com",
-      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_2_PWD]]"
-    }
+    "_extends_": "F-003_Users"
   },
 
   "request": {
     "body": {
-      "case_type_id": "${[scenarioContext][siblingContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][case_type_id]}",
-      "case_id": "${[scenarioContext][siblingContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
-      "assignee_id": "${[scenarioContext][testData][users][U2][id]}"
+      "case_type_id": "${[scenarioContext][siblingContexts][F-003_Prerequisite_Case_Creation_C1][testData][actualResponse][body][case_type_id]}",
+      "case_id": "${[scenarioContext][siblingContexts][F-003_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+      "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}"
     }
   }
 }

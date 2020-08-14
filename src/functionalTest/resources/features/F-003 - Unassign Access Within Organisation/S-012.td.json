@@ -1,14 +1,13 @@
 {
   "_guid_": "S-012",
   "_extends_": "F-003-Base",
-
   "title": "Solicitor successfully removing case access for another solicitor in their org (happy path)",
 
   "specs": [
-    "U1 - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation",
-    "U2 - with a solicitor role for the same jurisdiction within the same organisation as U1",
-    "U3 - with a solicitor role for the same jurisdiction within the same organisation as U1",
-    "is made by U2 and intends to unassign access to C1 for U1 and U3"
+    "Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation",
+    "Benjamin - with a solicitor role for the same jurisdiction within the same organisation as Becky",
+    "Bill - with a solicitor role for the same jurisdiction within the same organisation as Becky",
+    "is made by Benjamin and intends to unassign access to C1 for Becky and Bill"
   ],
 
   "users": {
@@ -24,13 +23,13 @@
       "unassignments": [
         {
           "case_id": "${[scenarioContext][childContexts][F-003_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
-          "assignee_id": "${[scenarioContext][testData][users][U1][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Becky][id]}",
           "case_roles": [
             "[CREATOR]"
           ]
         }, {
           "case_id": "${[scenarioContext][childContexts][F-003_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
-          "assignee_id": "${[scenarioContext][testData][users][U3][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Bill][id]}",
           "case_roles": [
             "[Claimant]",
             "[Defendant]"

@@ -1,5 +1,6 @@
 {
   "_guid_": "S-019",
+  "_extends_": "F-003-Base",
 
   "title": "Must return an error response if the invoker is a solicitor in a different jurisdiction from that of the case",
 
@@ -9,6 +10,22 @@
     "is made by U2 and intends to unassign access to C1 for U1"
   ],
 
-  "productName": "Manage Case Assignment Microservice",
-  "operationName": "Unassign Access within Organisation"
+  "request": {
+    "body": {
+      "unassignments": [
+        {
+          "case_id": "C1",
+          "assignee_id": "U1",
+          "case_roles": []
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "message" : "The user is neither a case access administrator nor a solicitor with access to the jurisdiction"
+    }
+  }
 }

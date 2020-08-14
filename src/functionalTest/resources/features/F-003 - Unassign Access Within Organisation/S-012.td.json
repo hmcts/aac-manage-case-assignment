@@ -1,5 +1,6 @@
 {
   "_guid_": "S-012",
+  "_extends_": "F-003-Base",
 
   "title": "Solicitor successfully removing case access for another solicitor in their org (happy path)",
 
@@ -10,23 +11,39 @@
     "is made by U2 and intends to unassign access to C1 for U1 and U3"
   ],
 
-  "productName": "Manage Case Assignment Microservice",
-  "operationName": "Unassign Access within Organisation",
-
-  "s2sClientId": "xui_webapp",
-  "userTokenClientId": "xuiwebapp",
-
-  "method": "DELETE",
-  "uri": "/case-assignments",
+  "users": {
+    "_extends_": "F-003_Users",
+    "invokingUser": {
+      "username": "befta.master.solicitor.benjamin@gmail.com",
+      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
+    }
+  },
 
   "request": {
-    "_extends_": "Common_Request",
-    "queryParams": {},
-    "body" : {}
+    "body": {
+      "unassignments": [
+        {
+          "case_id": "${[scenarioContext][childContexts][F-003_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][U1][id]}",
+          "case_roles": [
+            "[CREATOR]"
+          ]
+        }, {
+          "case_id": "${[scenarioContext][childContexts][F-003_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][U3][id]}",
+          "case_roles": [
+            "[Claimant]",
+            "[Defendant]"
+          ]
+        }
+      ]
+    }
   },
 
   "expectedResponse": {
-    "_extends_" : "",
-    "body" : {}
+    "_extends_": "Common_201_Response",
+    "body": {
+      "status_message": "Unassignment(s) performed successfully."
+    }
   }
 }

@@ -1,5 +1,6 @@
 {
   "_guid_": "S-016",
+  "_extends_": "F-003-Base",
 
   "title": "Must return an error response if intended unassignee doesn't exist in invoker's organisation",
 
@@ -11,23 +12,28 @@
     "is made by U1 and intends to unassign access to C1 for U2 and U3"
   ],
 
-  "productName": "Manage Case Assignment Microservice",
-  "operationName": "Unassign Access within Organisation",
-
-  "s2sClientId": "xui_webapp",
-  "userTokenClientId": "xuiwebapp",
-
-  "method": "DELETE",
-  "uri": "/case-assignments",
-
   "request": {
-    "_extends_": "Common_Request",
-    "queryParams": {},
-    "body" : {}
+    "body": {
+      "unassignments": [
+        {
+          "case_id": "C1",
+          "assignee_id": "U2",
+          "case_roles": []
+        }, {
+          "case_id": "C1",
+          "assignee_id": "U3",
+          "case_roles": []
+        }
+      ]
+    }
   },
 
   "expectedResponse": {
-    "_extends_" : "",
-    "body" : {}
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "status" : "BAD_REQUEST",
+      "message" : "Intended user to be unassigned has to be in the same organisation as that of the invoker.",
+      "errors": []
+    }
   }
 }

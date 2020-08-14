@@ -1,0 +1,27 @@
+{
+  "_guid_": "Prerequisite_Case_Assignment_C2_U3",
+  "_extends_": "Prerequisite_Case_Assignment",
+
+  "specs": [
+    "by U1 to grant access to C2 for U3"
+  ],
+
+  "users": {
+    "U1": {
+      "username": "befta.master.solicitor.becky@gmail.com",
+      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
+    },
+    "U3": {
+      "username": "befta.master.solicitor.bill@gmail.com",
+      "password": "[[CCD_BEFTA_CASEWORKER_2_SOLICITOR_3_PWD]]"
+    }
+  },
+
+  "request": {
+    "body": {
+      "case_type_id": "${[scenarioContext][siblingContexts][F-002_Prerequisite_Case_Creation_C2][testData][actualResponse][body][case_type_id]}",
+      "case_id": "${[scenarioContext][siblingContexts][F-002_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
+      "assignee_id": "${[scenarioContext][testData][users][U3][id]}"
+    }
+  }
+}

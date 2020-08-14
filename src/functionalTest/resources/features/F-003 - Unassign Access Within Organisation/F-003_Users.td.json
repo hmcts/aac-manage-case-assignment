@@ -1,0 +1,16 @@
+{
+  "_guid_": "F-003_Users",
+
+  "U1": {
+    "username": "befta.master.solicitor.becky@gmail.com",
+    "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
+  },
+  "U2": {
+    "username": "befta.master.solicitor.benjamin@gmail.com",
+    "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_2_PWD]]"
+  },
+  "U3": {
+    "username": "befta.master.solicitor.bill@gmail.com",
+    "password": "[[CCD_BEFTA_CASEWORKER_2_SOLICITOR_3_PWD]]"
+  }
+}

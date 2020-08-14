@@ -1,23 +1,23 @@
 {
-  "_guid_": "F-002-Base",
+	"_guid_": "F-002-Base",
 
-  "productName": "Manage Case Assignment Microservice",
-  "operationName": "Get Assignments in My Organisation",
+	"productName": "Manage Case Assignment Microservice",
+	"operationName": "Get Assignments in My Organisation",
 
-  "method": "GET",
-  "uri": "/case-assignments",
+	"method": "GET",
+	"uri": "/case-assignments",
 
-  "s2sClientId": "xui_webapp",
-  "userTokenClientId": "xuiwebapp",
+	"s2sClientId": "xui_webapp",
+	"userTokenClientId": "xuiwebapp",
 
-  "users": {
-    "invokingUser": {
-      "username": "befta.master.solicitor.becky@gmail.com",
-      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
-    }
-  },
+	"users": {
+		"Becky": {
+			"username": "befta.master.solicitor.becky@gmail.com",
+			"password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
+		}
+	},
 
-  "request": {
-    "_extends_": "Common_Request"
-  }
+	"request": {
+		"_extends_": "Common_Request"
+	}
 }

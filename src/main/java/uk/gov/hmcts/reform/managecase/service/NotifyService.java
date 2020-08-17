@@ -30,11 +30,11 @@ public class NotifyService {
 
     public List<SendEmailResponse> senEmail(final List<String> caseIds,
                                             final List<String> emailAddresses) throws NotificationClientException  {
-        if (caseIds == null || caseIds.size() == 0) {
+        if (caseIds == null || caseIds.isEmpty()) {
             throw new ValidationException("At least one case id is required to send notification");
         }
 
-        if (emailAddresses == null || emailAddresses.size() == 0) {
+        if (emailAddresses == null || emailAddresses.isEmpty()) {
             throw new ValidationException("At least one email address is required to send notification");
         }
 

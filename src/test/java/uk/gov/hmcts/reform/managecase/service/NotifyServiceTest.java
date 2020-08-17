@@ -95,14 +95,14 @@ class NotifyServiceTest {
         given(appParams.getReplyToEmailId()).willReturn(replyToEmailId);
         given(appParams.getEmailTemplateId()).willReturn(emailTemplateId);
         SendEmailResponse sendEmailResponse = mock(SendEmailResponse.class);
-        given(this.notificationClient.
-            sendEmail(
-                anyString(),
-                anyString(),
-                anyMap(),
-                anyString(),
-                anyString()
-            ))
+        given(this.notificationClient
+                  .sendEmail(
+                      anyString(),
+                      anyString(),
+                      anyMap(),
+                      anyString(),
+                      anyString()
+                  ))
             .willReturn(sendEmailResponse);
 
         List<SendEmailResponse> responses = this.notifyService.senEmail(Lists.newArrayList("12345678"),
@@ -126,14 +126,14 @@ class NotifyServiceTest {
         given(appParams.getReplyToEmailId()).willReturn(replyToEmailId);
         given(appParams.getEmailTemplateId()).willReturn(emailTemplateId);
         SendEmailResponse sendEmailResponse = mock(SendEmailResponse.class);
-        given(this.notificationClient.
-            sendEmail(
-                anyString(),
-                anyString(),
-                anyMap(),
-                anyString(),
-                anyString()
-            ))
+        given(this.notificationClient
+                  .sendEmail(
+                      anyString(),
+                      anyString(),
+                      anyMap(),
+                      anyString(),
+                      anyString()
+                  ))
             .willReturn(sendEmailResponse);
 
         List<SendEmailResponse> responses = this.notifyService.senEmail(Lists.newArrayList("12345678", "12345679"),
@@ -150,25 +150,28 @@ class NotifyServiceTest {
     }
 
     @Test
-    @DisplayName("should invoke notification client sendEmail for more than one case id and more then one email addresses")
-    void shouldInvokeNotificationClientSendNotificationForMoreThanOneCaseIdAndMoreThanOneEmailAddress() throws NotificationClientException {
+    @DisplayName("should invoke notification client sendEmail for multiple case id and email addresses")
+    void shouldInvokeNotificationClientSendNotificationForMoreThanOneCaseIdAndMoreThanOneEmailAddress()
+        throws NotificationClientException {
         String emailTemplateId = "TestEmailTemplateId";
         String replyToEmailId = "noreply@hmcts.net";
         given(appParams.getReplyToEmailId()).willReturn(replyToEmailId);
         given(appParams.getEmailTemplateId()).willReturn(emailTemplateId);
         SendEmailResponse sendEmailResponse = mock(SendEmailResponse.class);
-        given(this.notificationClient.
-            sendEmail(
-                anyString(),
-                anyString(),
-                anyMap(),
-                anyString(),
-                anyString()
-            ))
+        given(this.notificationClient
+                  .sendEmail(
+                      anyString(),
+                      anyString(),
+                      anyMap(),
+                      anyString(),
+                      anyString()
+                  ))
             .willReturn(sendEmailResponse);
 
-        List<SendEmailResponse> responses = this.notifyService.senEmail(Lists.newArrayList("12345678", "12345679"),
-                                                                        Lists.newArrayList("test@hmcts.net", "test2@hmcts.net"));
+        List<SendEmailResponse> responses = this.notifyService.senEmail(
+            Lists.newArrayList("12345678", "12345679"),
+            Lists.newArrayList("test@hmcts.net", "test2@hmcts.net")
+        );
         assertNotNull(responses);
         assertEquals(4, responses.size());
         verify(this.notificationClient, times(4)).sendEmail(

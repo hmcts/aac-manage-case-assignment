@@ -1,6 +1,6 @@
 {
-  "_guid_": "Prerequisite_Case_Assignment_C2_U3_By_CAA",
-  "_extends_": "Prerequisite_Case_Assignment_C2_U3",
+  "_guid_": "Prerequisite_Case_Assignment_C2_Bill_By_CAA",
+  "_extends_": "Prerequisite_Case_Assignment_C2_Bill",
 
   "specs": [
     "by CAA to grant access to C2 for Bill"

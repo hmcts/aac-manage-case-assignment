@@ -1,9 +1,9 @@
 {
-  "_guid_": "Prerequisite_Case_Assignment_C3_U3",
+  "_guid_": "Prerequisite_Case_Assignment_C3_Benjamin",
   "_extends_": "Prerequisite_Case_Assignment",
 
   "specs": [
-    "by Becky to grant access to C3 for Bill"
+    "by Becky to grant access to C3 for Benjamin"
   ],
 
   "users": {
@@ -14,7 +14,7 @@
     "body": {
       "case_type_id": "${[scenarioContext][siblingContexts][F-003_Prerequisite_Case_Creation_C3][testData][actualResponse][body][case_type_id]}",
       "case_id": "${[scenarioContext][siblingContexts][F-003_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}",
-      "assignee_id": "${[scenarioContext][testData][users][Bill][id]}"
+      "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}"
     }
   }
 }

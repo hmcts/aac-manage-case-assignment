@@ -25,8 +25,8 @@
 	"request": {
 		"_extends_": "Common_Request",
 		"body": {
-			"case_type_id": "${[scenarioContext][childContexts][Prerequisite_Case_Creation_C1][testData][actualResponse][body][case_type_id]}",
-			"case_id": "${[scenarioContext][childContexts][Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+			"case_type_id": "${[scenarioContext][childContexts][F-201_Prerequisite_Case_Creation_C1][testData][actualResponse][body][case_type_id]}",
+			"case_id": "${[scenarioContext][childContexts][F-201_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
 			"assignee_id": "${[scenarioContext][testData][users][S2][id]}"
 		}
 	}

@@ -1,6 +1,6 @@
 {
-	"_guid_": "Prerequisite_Case_Assignment_C1_Benjamin",
-	"_extends_": "Prerequisite_Case_Assignment",
+	"_guid_": "F-202_Prerequisite_Case_Assignment_C1_Benjamin",
+	"_extends_": "F-202_Prerequisite_Case_Assignment",
 
 	"specs": [
 		"to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Benjamin access to C1"

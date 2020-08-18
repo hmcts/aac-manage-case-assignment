@@ -1,10 +1,10 @@
 {
-	"_guid_": "Prerequisite_Case_Creation_C1",
+	"_guid_": "F-201_Prerequisite_Case_Creation_C1",
 	"_extends_": "Prerequisite_Case_Creation_C0_Without_Org_Policies",
 
 	"request": {
 		"body": {
-			"event_token": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_C1_Token_Creation][testData][actualResponse][body][token]}",
+			"event_token": "${[scenarioContext][siblingContexts][F-201_Prerequisite_Case_Creation_C1_Token_Creation][testData][actualResponse][body][token]}",
 			"data": {
 				"OrganisationPolicyField1": {
 					"OrgPolicyReference": "ClaimantPolicy",

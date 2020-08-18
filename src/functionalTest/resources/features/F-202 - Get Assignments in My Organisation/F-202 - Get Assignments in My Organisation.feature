@@ -8,7 +8,7 @@ Background:
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-1
-@S-002.1
+@S-202.1
 Scenario: Must return case assignments in my organisation for the provided Case IDs
 
     Given a user [Becky – a solicitor with the required permissions to create a case],
@@ -17,8 +17,8 @@ Scenario: Must return case assignments in my organisation for the provided Case 
       And a case [C1, Becky has just] created as in [F-202_Prerequisite_Case_Creation_C1],
       And a case [C2, Becky has just] created as in [F-202_Prerequisite_Case_Creation_C2],
       And a wait time of [5] seconds [to allow for the cases just created to appear in search results],
-      And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Benjamin access to C1] as in [Prerequisite_Case_Assignment_C1_Benjamin],
-      And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Bill access to C2] as in [Prerequisite_Case_Assignment_C2_Bill],
+      And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Benjamin access to C1] as in [F-202_Prerequisite_Case_Assignment_C1_Benjamin],
+      And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Bill access to C2] as in [F-202_Prerequisite_Case_Assignment_C2_Bill],
 
      When a request is prepared with appropriate values,
       And the request [is made by Becky],
@@ -31,7 +31,7 @@ Scenario: Must return case assignments in my organisation for the provided Case 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-2
-@S-002.2
+@S-202.2
 Scenario: Must return an error response when a malformed case ID is provided
 
     Given a user [Becky – a solicitor with the required permissions to create a case],
@@ -40,8 +40,8 @@ Scenario: Must return an error response when a malformed case ID is provided
       And a case [C1, Becky has just] created as in [F-202_Prerequisite_Case_Creation_C1],
       And a case [C2, Becky has just] created as in [F-202_Prerequisite_Case_Creation_C2],
       And a wait time of [5] seconds [to allow for the case just created to appear in search results],
-      And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Benjamin access to C1] as in [Prerequisite_Case_Assignment_C1_Benjamin],
-      And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Bill access to C2] as in [Prerequisite_Case_Assignment_C2_Bill],
+      And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Benjamin access to C1] as in [F-202_Prerequisite_Case_Assignment_C1_Benjamin],
+      And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Bill access to C2] as in [F-202_Prerequisite_Case_Assignment_C2_Bill],
 
      When a request is prepared with appropriate values,
       And the request [is made by Becky],
@@ -53,7 +53,7 @@ Scenario: Must return an error response when a malformed case ID is provided
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-3
-@S-002.3
+@S-202.3
 Scenario: Must return an error response for a missing case ID
 
     Given a user [Becky – with a solicitor role with access to invoke the ‘Get Assignments in My Organisation’ operation of Case Assignment Microservice],
@@ -68,7 +68,7 @@ Scenario: Must return an error response for a missing case ID
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-4
-@S-002.4
+@S-202.4
 Scenario: Must return an error response for a malformed Case ID List
 
     Given a user [Becky – a solicitor with the required permissions to create a case],
@@ -79,9 +79,9 @@ Scenario: Must return an error response for a malformed Case ID List
       And a case [C2, Becky has just] created as in [F-202_Prerequisite_Case_Creation_C2],
       And a case [C3, Becky has just] created as in [F-202_Prerequisite_Case_Creation_C3],
       And a wait time of [5] seconds [to allow for the case just created to appear in search results],
-      And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Benjamin access to C1] as in [Prerequisite_Case_Assignment_C1_Benjamin],
-      And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Bill access to C2] as in [Prerequisite_Case_Assignment_C2_Bill],
-      And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Emma access to C3] as in [Prerequisite_Case_Assignment_C3_Emma],
+      And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Benjamin access to C1] as in [F-202_Prerequisite_Case_Assignment_C1_Benjamin],
+      And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Bill access to C2] as in [F-202_Prerequisite_Case_Assignment_C2_Bill],
+      And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Emma access to C3] as in [F-202_Prerequisite_Case_Assignment_C3_Emma],
 
      When a request is prepared with appropriate values,
       And the request [is made by Becky],

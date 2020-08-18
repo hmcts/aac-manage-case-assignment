@@ -14,8 +14,10 @@
 		},
 		"Emma": {
 			"username": "befta.master.solicitor.emma@gmail.com",
-			"password": "[[$CCD_BEFTA_MASTER_SOLICITOR_4_PWD]]"
-		}
+			"password": "[[$CCD_BEFTA_MASTER_SOLICITOR_4_PWD]]",
+      "id": "${[scenarioContext][parentContext][testData][users][Emma][id]}"
+
+    }
 	},
 
 	"request": {

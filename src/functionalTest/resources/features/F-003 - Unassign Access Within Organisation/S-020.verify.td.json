@@ -1,0 +1,37 @@
+{
+  "_guid_": "S-020_Get_Assignments_In_Org",
+  "_extends_": "F-003_Verify_Assignments_In_Org_My_Org_Base",
+
+  "specs": [
+    "to Get Assignments In My Organisation by Becky to verify the continued assignment of Becky for C1"
+  ],
+
+  "request": {
+    "queryParams": {
+      "case_ids": "${[scenarioContext][childContexts][F-003_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_" : "Common_200_Response",
+    "body" : {
+      "status_message": "Case-User-Role assignments returned successfully",
+      "case_assignments": [
+        {
+          "case_id": "${}${[scenarioContext][childContexts][F-003_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+          "shared_with": [
+            {
+              "idam_id": "[[ANYTHING_PRESENT]]",
+              "first_name": "Becky",
+              "last_name": "Solicington",
+              "email": "befta.master.solicitor.becky@gmail.com",
+              "case_roles": [
+                "[CREATOR]"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

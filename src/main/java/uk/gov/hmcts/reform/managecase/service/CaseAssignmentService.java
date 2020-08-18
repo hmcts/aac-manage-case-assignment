@@ -122,7 +122,7 @@ public class CaseAssignmentService {
 
     private CaseDetails getCase(CaseAssignment input) {
         Optional<CaseDetails> caseOptional = dataStoreRepository.findCaseBy(input.getCaseTypeId(), input.getCaseId());
-        return caseOptional.orElseThrow(() -> new ValidationException(CASE_NOT_FOUND));
+        return caseOptional.orElseThrow(() -> new IllegalArgumentException(CASE_NOT_FOUND));
     }
 
     private List<String> findInvokerOrgPolicyRoles(CaseDetails caseDetails, String organisation) {

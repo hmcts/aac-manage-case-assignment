@@ -103,7 +103,7 @@ class CaseAssignmentServiceTest {
                 .willReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
-                .isInstanceOf(ValidationException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(CASE_NOT_FOUND);
     }
 

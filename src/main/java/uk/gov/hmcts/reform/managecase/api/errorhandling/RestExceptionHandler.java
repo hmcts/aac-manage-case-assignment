@@ -41,6 +41,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.error("Case Id errors: {}", ex.getMessage(), ex);
+        return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
+    }
+
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<Object> handleFeignStatusException(FeignException ex) {
         log.error("Downstream service errors: {}", ex.getMessage(), ex);

@@ -1,5 +1,5 @@
 {
-	"_guid_": "S-010",
+	"_guid_": "S-002.3",
 	"_extends_": "F-202-Base",
 	"title": "Must return an error response for a missing case ID",
 

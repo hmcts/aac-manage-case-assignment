@@ -1,5 +1,5 @@
 {
-	"_guid_": "S-006",
+	"_guid_": "S-001.6",
 	"_extends_": "F-201-Base",
 	"title": "Must return an error response for an assignee user who doesn't have a solicitor role for the jurisdiction of the case",
 

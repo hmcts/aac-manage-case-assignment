@@ -8,7 +8,7 @@ Background:
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-1
-@S-008
+@S-002.1
 Scenario: Must return case assignments in my organisation for the provided Case IDs
 
     Given a user [Becky – a solicitor with the required permissions to create a case],
@@ -31,7 +31,7 @@ Scenario: Must return case assignments in my organisation for the provided Case 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-2
-@S-009
+@S-002.2
 Scenario: Must return an error response when a malformed case ID is provided
 
     Given a user [Becky – a solicitor with the required permissions to create a case],
@@ -53,7 +53,7 @@ Scenario: Must return an error response when a malformed case ID is provided
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-3
-@S-010
+@S-002.3
 Scenario: Must return an error response for a missing case ID
 
     Given a user [Becky – with a solicitor role with access to invoke the ‘Get Assignments in My Organisation’ operation of Case Assignment Microservice],
@@ -68,7 +68,7 @@ Scenario: Must return an error response for a missing case ID
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-4
-@S-011
+@S-002.4
 Scenario: Must return an error response for a malformed Case ID List
 
     Given a user [Becky – a solicitor with the required permissions to create a case],

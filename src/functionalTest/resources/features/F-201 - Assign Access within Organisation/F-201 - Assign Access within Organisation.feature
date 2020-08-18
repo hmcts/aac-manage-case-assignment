@@ -7,7 +7,7 @@ Background:
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-001
+@S-001.1
 Scenario: Solicitor successfully sharing case access with another solicitor in their org (happy path)
 
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],
@@ -24,7 +24,7 @@ Scenario: Solicitor successfully sharing case access with another solicitor in t
       And a call [by S2 to query his/her case roles granted over C1] will get the expected response as in [S2_Querying_Their_Access_Over_C1].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-002
+@S-001.2
 Scenario: PUI CAA successfully sharing case access with another solicitor in their org (happy path)
 
     Given a user [S1 - a solicitor, to create a case under their organisation],
@@ -42,7 +42,7 @@ Scenario: PUI CAA successfully sharing case access with another solicitor in the
       And a call [by S2 to query his/her case roles granted over C1] will get the expected response as in [S2_Querying_Their_Access_Over_C1].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-003
+@S-001.3
 Scenario: must return an error response if assignee doesn't exist in invoker's organisation
 
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],
@@ -59,7 +59,7 @@ Scenario: must return an error response if assignee doesn't exist in invoker's o
       And a call [by S2 to query his/her case roles granted over C1] will get the expected response as in [S2_Querying_No_Access_Over_C1].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-004
+@S-001.4
 Scenario: must return an error response for a malformed Case ID
 
     Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
@@ -74,7 +74,7 @@ Scenario: must return an error response for a malformed Case ID
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-005
+@S-001.5
 Scenario: must return an error response for a missing Case ID
 
     Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
@@ -89,7 +89,7 @@ Scenario: must return an error response for a missing Case ID
       And the response has all the details as expected,
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-006
+@S-001.6
 Scenario: must return an error response for an assignee user who doesn't have a solicitor role for the jurisdiction of the case
 
     Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
@@ -105,7 +105,7 @@ Scenario: must return an error response for an assignee user who doesn't have a 
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-007
+@S-001.7
 Scenario: Must return a negative response when the case doesn't contain an assignment for the invoker's organisation
 
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],
@@ -119,3 +119,4 @@ Scenario: Must return a negative response when the case doesn't contain an assig
 
     Then a negative response is received,
       And the response has all other details as expected.
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

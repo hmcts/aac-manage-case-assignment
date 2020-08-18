@@ -7,7 +7,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import uk.gov.hmcts.reform.managecase.client.datastore.*;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
+
 
 import java.util.List;
 import java.util.Optional;

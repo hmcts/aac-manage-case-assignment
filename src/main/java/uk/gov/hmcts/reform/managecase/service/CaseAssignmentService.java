@@ -77,7 +77,8 @@ public class CaseAssignmentService {
             throw new ValidationException(ORGA_POLICY_ERROR);
         }
 
-        dataStoreRepository.assignCase(policyRoles, assignment.getCaseId(), assignment.getAssigneeId(), usersByOrg.getOrganisationIdentifier());
+        dataStoreRepository.assignCase(policyRoles, assignment.getCaseId(),
+                                       assignment.getAssigneeId(), usersByOrg.getOrganisationIdentifier());
         return policyRoles;
     }
 

@@ -20,7 +20,6 @@
 	"expectedResponse": {
 		"_extends_": "ACA_500_Response",
 		"body": {
-      "status": "INTERNAL_SERVER_ERROR",
 			"message": "Case ID has to be for an existing case accessible by the invoker.",
 			"errors": []
 		}

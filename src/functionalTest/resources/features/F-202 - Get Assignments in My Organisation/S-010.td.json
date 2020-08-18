@@ -1,6 +1,6 @@
 {
 	"_guid_": "S-010",
-	"_extends_": "F-002-Base",
+	"_extends_": "F-202-Base",
 	"title": "Must return an error response for a missing case ID",
 
 	"specs": [

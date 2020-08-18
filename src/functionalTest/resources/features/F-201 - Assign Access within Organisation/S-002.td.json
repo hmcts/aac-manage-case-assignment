@@ -1,6 +1,6 @@
 {
 	"_guid_": "S-002",
-	"_extends_": "F-001-Base",
+	"_extends_": "F-201-Base",
 	"title": "CAA successfully sharing case access with another solicitor in their org",
 
 	"specs": [
@@ -14,7 +14,7 @@
 		"invokingUser": {
 			"username": "befta.pui.caa.1@gmail.com",
 			"password": "[[$CCD_BEFTA_PUI_CAA_1_PWD]]"
-    	} 
+    	}
 	},
 
 	"expectedResponse": {

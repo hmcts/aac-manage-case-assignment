@@ -1,6 +1,6 @@
 {
 	"_guid_": "S-008",
-	"_extends_": "F-002-Base",
+	"_extends_": "F-202-Base",
 	"title": "Must return case assignments in my organisation for the provided Case IDs",
 
 	"specs": [
@@ -25,7 +25,7 @@
 
 	"request": {
 		"queryParams": {
-			"case_ids": "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}"
+			"case_ids": "${[scenarioContext][childContexts][F-202_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F-202_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}"
 		}
 	},
 
@@ -39,7 +39,7 @@
 					"__elementId__": "case_id"
 				},
 				{
-					"case_id": "${}${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+					"case_id": "${}${[scenarioContext][childContexts][F-202_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
 					"shared_with": [
 						{
 							"__ordering__": "unordered",
@@ -67,7 +67,7 @@
 					]
 				},
 				{
-					"case_id": "${}${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
+					"case_id": "${}${[scenarioContext][childContexts][F-202_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
 					"shared_with": [
 						{
 							"__ordering__": "unordered",

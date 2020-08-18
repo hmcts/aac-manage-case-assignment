@@ -1,27 +1,28 @@
 {
-	"_guid_": "S-004",
-	"_extends_": "F-001-Base",
-	"title": "Must return an error response for a malformed Case ID",
+	"_guid_": "S-005",
+	"_extends_": "F-201-Base",
+	"title": "Must return an error response for a missing Case ID",
 
 	"specs": [
 		"S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation",
 		"S2 - with a solicitor role within the same organisation",
 		"intends to assign access within the same organisation for S2 by S1",
-		"contains a malformed Case ID"
+		"does not contain a Case ID"
 	],
 
 	"request": {
 		"body": {
-			"case_type_id": "FT_MasterCaseType",
-			"case_id": "123"
+      "case_type_id" : "FT_MasterCaseType",
+			"case_id": null
 		}
 	},
 
 	"expectedResponse": {
 		"_extends_": "ACA_400_Response",
 		"body": {
-			"message": "Case ID has to be for an existing case accessible by the invoker.",
-			"errors": []
+			"errors": [
+				"Case ID can not be empty"
+			]
 		}
 	}
 }

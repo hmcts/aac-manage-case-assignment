@@ -1,6 +1,6 @@
 {
 	"_guid_": "S-001",
-	"_extends_": "F-001-Base",
+	"_extends_": "F-201-Base",
 	"title": "Solicitor successfully sharing case access with another solicitor in their org (happy path)",
 
 	"specs": [

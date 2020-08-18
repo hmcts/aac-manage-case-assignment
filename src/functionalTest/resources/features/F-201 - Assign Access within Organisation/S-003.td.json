@@ -1,6 +1,6 @@
 {
 	"_guid_": "S-003",
-	"_extends_": "F-001-Base",
+	"_extends_": "F-201-Base",
 	"title": "Must return an error response if assignee doesn't exist in invoker's organisation",
 
 	"specs": [

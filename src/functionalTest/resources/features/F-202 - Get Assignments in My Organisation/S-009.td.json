@@ -1,6 +1,6 @@
 {
 	"_guid_": "S-009",
-	"_extends_": "F-002-Base",
+	"_extends_": "F-202-Base",
 	"title": "Must return an error response when a malformed case ID is provided",
 
 	"specs": [
@@ -24,7 +24,7 @@
 
 	"request": {
 		"queryParams": {
-			"case_ids": "${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F-002_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]},MALFORMED"
+			"case_ids": "${[scenarioContext][childContexts][F-202_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F-202_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]},MALFORMED"
 		}
 	},
 

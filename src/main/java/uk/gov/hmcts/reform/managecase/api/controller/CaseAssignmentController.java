@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 
 import javax.validation.Valid;
+import javax.validation.ValidationException;
 import javax.validation.constraints.NotEmpty;
 
 import java.util.List;
@@ -151,6 +152,7 @@ public class CaseAssignmentController {
     })
     public GetCaseAssignmentsResponse getCaseAssignments(@RequestParam("case_ids")
             @Valid @NotEmpty(message = "case_ids must be a non-empty list of proper case ids.") List<String> caseIds) {
+        validateCaseIds(caseIds);
         List<CaseAssignedUsers> caseAssignedUsers = caseAssignmentService.getCaseAssignments(caseIds);
         return new GetCaseAssignmentsResponse(GET_ASSIGNMENTS_MESSAGE, caseAssignedUsers);
     }
@@ -203,4 +205,13 @@ public class CaseAssignmentController {
         return new CaseUnassignmentResponse(UNASSIGN_ACCESS_MESSAGE);
     }
 
+    private void validateCaseIds(List<String> caseIds) {
+        caseIds.stream()
+                .filter(caseId -> !StringUtils.isNumeric(caseId))
+                .findAny()
+                .ifPresent(caseId -> {
+                    throw new ValidationException("Case ID should contain digits only");
+                });
+
+    }
 }

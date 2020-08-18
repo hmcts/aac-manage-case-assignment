@@ -30,6 +30,7 @@ import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -171,5 +172,26 @@ public class CaseAssignmentControllerTest {
 
         this.mockMvc.perform(get(CASE_ASSIGNMENTS))
                 .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("should fail with 400 bad request when caseIds is empty")
+    @Test
+    void shouldFailWithBadRequestWhenCaseIdsInGetAssignmentsIsEmpty() throws Exception {
+
+        this.mockMvc.perform(get(CASE_ASSIGNMENTS)
+                .queryParam("case_ids", ""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message",
+                        containsString("case_ids must be a non-empty list of proper case ids.")));
+    }
+
+    @DisplayName("should fail with 400 bad request when caseIds is malformed or invalid")
+    @Test
+    void shouldFailWithBadRequestWhenCaseIdsInGetAssignmentsIsMalformed() throws Exception {
+
+        this.mockMvc.perform(get(CASE_ASSIGNMENTS)
+                .queryParam("case_ids", "121324,%12345"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is("Case ID should contain digits only")));
     }
 }

@@ -21,7 +21,7 @@ public class CaseAssignmentRequest {
     private String caseTypeId;
 
     @JsonProperty("case_id")
-    @NotEmpty(message = "Case ID can not be empty")
+    @NotEmpty(message = "Case ID has to be a valid 16-digit Luhn number")
     @Pattern(regexp = "\\d+", message = "Case ID should contain digits only")
     @ApiModelProperty(value = "Case ID to Assign Access To", required = true, example = "1583841721773828")
     private String caseId;

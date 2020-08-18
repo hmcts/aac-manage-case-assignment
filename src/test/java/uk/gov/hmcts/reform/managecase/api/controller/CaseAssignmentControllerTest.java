@@ -126,7 +126,7 @@ public class CaseAssignmentControllerTest {
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errors", hasSize(1)))
-            .andExpect(jsonPath("$.errors", hasItem("Case ID can not be empty")));
+            .andExpect(jsonPath("$.errors", hasItem("Case ID has to be a valid 16-digit Luhn number")));
     }
 
     @DisplayName("should fail with 400 bad request when assignee id is empty")

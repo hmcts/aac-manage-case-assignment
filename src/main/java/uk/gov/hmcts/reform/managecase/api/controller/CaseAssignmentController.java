@@ -59,7 +59,7 @@ public class CaseAssignmentController {
         @ApiResponse(
             code = 400,
             message = "One of the following reasons.\n"
-                + "1. Case ID can not be empty \n"
+                + "1. Case ID has to be a valid 16-digit Luhn number \n"
                 + "2. Case type ID can not be empty \n"
                 + "3. Assignee IDAM ID can not be empty \n"
                 + "4. Intended assignee has to be in the same organisation as that of the invoker. \n"

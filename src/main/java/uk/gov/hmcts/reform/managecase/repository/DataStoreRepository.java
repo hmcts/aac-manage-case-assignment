@@ -14,4 +14,6 @@ public interface DataStoreRepository {
 
     List<CaseUserRole> getCaseAssignments(List<String> caseIds, List<String> userIds);
 
+    void removeCaseUserRoles(List<CaseUserRole> caseUserRoles, String organisationId);
+
 }

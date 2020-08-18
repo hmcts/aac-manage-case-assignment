@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseUnassignmentRequest;
@@ -163,16 +165,25 @@ public class CaseAssignmentController {
         ),
         @ApiResponse(
             code = 400,
-            message = "One of the following reasons.\n"
-                + "1. Unassign list can not be empty. \n"
-                + "2. Case ID can not be empty. \n"
-                + "3. Assignee IDAM ID can not be empty. \n"
-                + "4. Intended user to be unassigned has to be in the same organisation as that of the invoker.",
-            examples = @Example({
+            message = "One or more of the following reasons"
+                + ": \n1. " + ValidationError.EMPTY_REQUESTED_UNASSIGNMENTS_LIST
+                + ", \n2. " + ValidationError.CASE_ID_EMPTY
+                + ", \n3. " + ValidationError.CASE_ID_INVALID
+                + ", \n4. " + ValidationError.ASSIGNEE_ID_EMPTY
+                + ", \n5. " + ValidationError.CASE_ROLE_FORMAT_INVALID
+                + ", \n6. " + ValidationError.INVOKER_NOT_IN_SAME_ORGANISATION_AS_UNASSIGNED_USER + ".",
+            response = ApiError.class,
+            examples = @Example(value = {
                 @ExampleProperty(
-                    value = "{\"message\": \"Intended user to be unassigned has to be in the same organisation as that of the invoker\","
-                        + " \"status\": \"BAD_REQUEST\" }",
-                    mediaType = APPLICATION_JSON_VALUE)
+                    value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"errors\": [\n"
+                        + "      \"" + ValidationError.CASE_ID_INVALID + "\", \n"
+                        + "      \"" + ValidationError.CASE_ROLE_FORMAT_INVALID + "\"\n"
+                        + "   ]\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE
+                )
             })
         ),
         @ApiResponse(
@@ -188,6 +199,8 @@ public class CaseAssignmentController {
     })
     public CaseUnassignmentResponse unassignAccessWithinOrganisation(
         @Valid @RequestBody CaseUnassignmentRequest requestPayload) {
+        caseAssignmentService.unassignCaseAccess(requestPayload.getUnassignments());
         return new CaseUnassignmentResponse(UNASSIGN_ACCESS_MESSAGE);
     }
+
 }

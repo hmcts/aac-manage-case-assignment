@@ -1,0 +1,73 @@
+{
+  "_guid_": "S-203.3",
+  "_extends_": "F-203_Base",
+  "title": "Solicitor successfully removing access to multiple cases for multiple solicitors in their org (happy path)",
+
+  "specs": [
+    "Becky - with a Solicitor role in a jurisdiction under an organisation to assign and Unassign a case role to a solicitor within the same organisation",
+    "Benjamin - with a Solicitor role in the same jurisdiction under the same organisation as Becky to be assigned and unassigned to some cases",
+    "Bill - with a Solicitor role in the same jurisdiction under the same organisation as Becky to be assigned and unassigned to some cases",
+    "is made by Becky and intends to unassign access to C1, C2 and C3 for Benjamin & Bill"
+  ],
+
+  "users": {
+    "_extends_": "F-203_Users"
+  },
+
+  "request": {
+    "body": {
+      "unassignments": [
+        {
+          "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}",
+          "case_roles": [
+            "[Claimant]",
+            "[Defendant]"
+          ]
+        }, {
+          "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Bill][id]}",
+          "case_roles": [
+            "[Claimant]",
+            "[Defendant]"
+          ]
+        }, {
+          "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}",
+          "case_roles": [
+            "[Claimant]",
+            "[Defendant]"
+          ]
+        }, {
+          "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Bill][id]}",
+          "case_roles": [
+            "[Claimant]",
+            "[Defendant]"
+          ]
+        }, {
+          "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}",
+          "case_roles": [
+            "[Claimant]",
+            "[Defendant]"
+          ]
+        }, {
+          "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Bill][id]}",
+          "case_roles": [
+            "[Claimant]",
+            "[Defendant]"
+          ]
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "status_message": "Unassignment(s) performed successfully."
+    }
+  }
+}

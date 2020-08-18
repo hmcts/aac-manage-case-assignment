@@ -1,0 +1,20 @@
+{
+  "_guid_": "F-203_Prerequisite_Case_Assignment_C3_Benjamin",
+  "_extends_": "Prerequisite_Case_Assignment",
+
+  "specs": [
+    "by Becky to grant access to C3 for Benjamin"
+  ],
+
+  "users": {
+    "_extends_": "F-203_Users"
+  },
+
+  "request": {
+    "body": {
+      "case_type_id": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][case_type_id]}",
+      "case_id": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}",
+      "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}"
+    }
+  }
+}

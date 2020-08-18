@@ -1,0 +1,11 @@
+{
+  "_guid_": "F-203_Verify_Assignments_In_My_Org_Base",
+
+  "users": {
+    "_extends_": "F-203_Users"
+  },
+
+  "request": {
+    "_extends_": "Common_Request"
+  }
+}

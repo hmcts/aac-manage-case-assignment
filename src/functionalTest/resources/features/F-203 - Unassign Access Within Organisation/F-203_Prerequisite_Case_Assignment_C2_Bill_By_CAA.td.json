@@ -1,0 +1,15 @@
+{
+  "_guid_": "F-203_Prerequisite_Case_Assignment_C2_Bill_By_CAA",
+  "_extends_": "F-203_Prerequisite_Case_Assignment_C2_Bill",
+
+  "specs": [
+    "by CAA to grant access to C2 for Bill"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.pui.caa.1@gmail.com",
+      "password": "[[$CCD_BEFTA_PUI_CAA_1_PWD]]"
+    }
+  }
+}

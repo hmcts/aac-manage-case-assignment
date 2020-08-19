@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.GetCaseAssignmentsResponse;
@@ -60,11 +61,13 @@ public class CaseAssignmentController {
             code = 400,
             message = "One of the following reasons.\n"
                 + "1) Case ID has to be a valid 16-digit Luhn number \n"
-                + "2) Case type ID can not be empty \n"
-                + "3) Assignee IDAM ID can not be empty \n"
-                + "4) Intended assignee has to be in the same organisation as that of the invoker. \n"
-                + "5) Case ID has to be one for which a case role is represented by the invoker's organisation. \n"
-                + "6) Intended assignee has to be a solicitor enabled in the jurisdiction of the case. \n",
+                + "2) Case ID can not be empty \n"
+                + "3) Case type ID can not be empty \n"
+                + "4) Assignee IDAM ID can not be empty \n"
+                + "5) Intended assignee has to be in the same organisation as that of the invoker. \n"
+                + "6) Case ID has to be one for which a case role is represented by the invoker's organisation. \n"
+                + "7) Intended assignee has to be a solicitor enabled in the jurisdiction of the case. \n",
+            response = ApiError.class,
             examples = @Example({
                     @ExampleProperty(
                             value = "{\"message\": \"Intended assignee has to be in the same organisation of invoker\","
@@ -85,7 +88,7 @@ public class CaseAssignmentController {
         @ApiResponse(
             code = 500,
             message = "One of the following reasons.\n"
-                + "1) Case ID has to be for an existing case accessible by the invoker"
+                + "1) Case could not be fetched"
         )
     })
     public CaseAssignmentResponse assignAccessWithinOrganisation(

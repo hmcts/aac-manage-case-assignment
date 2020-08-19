@@ -119,4 +119,34 @@ Scenario: Must return a negative response when the case doesn't contain an assig
 
     Then a negative response is received,
       And the response has all other details as expected.
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@S-201.8
+Scenario: Must return an error response for an invalid Luhn number used as Case ID
+
+  Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
+  And a user [S2 - with a solicitor role within the same organisation],
+
+  When a request is prepared with appropriate values,
+  And the request [intends to assign access within the same organisation for S2 by S1],
+  And the request [contains an invalid Luhn number as Case ID],
+  And it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
+
+  Then a negative response is received,
+  And the response has all the details as expected.
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@S-201.9
+Scenario: Must return an error response for a valid Luhn number used as Case ID but no cases found
+
+    Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
+    And a user [S2 - with a solicitor role within the same organisation],
+
+    When a request is prepared with appropriate values,
+    And the request [intends to assign access within the same organisation for S2 by S1],
+    And the request [contains a valid Luhn number as Case ID],
+    And it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
+
+    Then a negative response is received,
+    And the response has all the details as expected.
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

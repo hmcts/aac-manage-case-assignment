@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
@@ -29,9 +30,7 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.cas
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.usersByOrganisation;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.ASSIGNEE_ORGA_ERROR;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.ASSIGNEE_ROLE_ERROR;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_NOT_FOUND;
+import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.*;
 
 @SuppressWarnings({"PMD.MethodNamingConventions", "PMD.JUnitAssertionsShouldIncludeMessage"})
 class CaseAssignmentServiceTest {
@@ -97,15 +96,15 @@ class CaseAssignmentServiceTest {
     }
 
     @Test
-    @DisplayName("should throw validation error when case is not found")
+    @DisplayName("should throw case could not be fetched error error when case is not found")
     void shouldThrowValidationException_whenCaseNotFound() {
 
         given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, CASE_ID))
                 .willReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining(CASE_NOT_FOUND);
+                .isInstanceOf(CaseCouldNotBeFetchedException.class)
+                .hasMessageContaining(CASE_COULD_NOT_BE_FETCHED);
     }
 
     @Test

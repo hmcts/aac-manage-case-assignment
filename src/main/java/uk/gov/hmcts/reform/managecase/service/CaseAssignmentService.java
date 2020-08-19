@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
@@ -33,7 +34,7 @@ public class CaseAssignmentService {
 
     public static final String SOLICITOR_ROLE = "caseworker-%s-solicitor";
 
-    public static final String CASE_NOT_FOUND = "Case ID has to be for an existing case accessible by the invoker.";
+    public static final String CASE_COULD_NOT_BE_FETCHED = "Case could not be fetched";
     public static final String ASSIGNEE_ROLE_ERROR = "Intended assignee has to be a solicitor "
             + "enabled in the jurisdiction of the case.";
     public static final String ASSIGNEE_ORGA_ERROR = "Intended assignee has to be in the same organisation"
@@ -123,7 +124,7 @@ public class CaseAssignmentService {
 
     private CaseDetails getCase(CaseAssignment input) {
         Optional<CaseDetails> caseOptional = dataStoreRepository.findCaseBy(input.getCaseTypeId(), input.getCaseId());
-        return caseOptional.orElseThrow(() -> new IllegalArgumentException(CASE_NOT_FOUND));
+        return caseOptional.orElseThrow(() -> new CaseCouldNotBeFetchedException(CASE_COULD_NOT_BE_FETCHED));
     }
 
     private List<String> findInvokerOrgPolicyRoles(CaseDetails caseDetails, String organisation) {

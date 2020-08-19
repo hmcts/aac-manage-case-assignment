@@ -21,7 +21,7 @@
 		"_extends_": "ACA_400_Response",
 		"body": {
 			"errors": [
-				"Case ID has to be a valid 16-digit Luhn number"
+				"Case ID can not be empty"
 			]
 		}
 	}

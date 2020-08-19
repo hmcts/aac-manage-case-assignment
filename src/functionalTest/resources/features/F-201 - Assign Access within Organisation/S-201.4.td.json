@@ -18,9 +18,9 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "ACA_500_Response",
+		"_extends_": "ACA_400_Response",
 		"body": {
-			"message": "Case ID has to be for an existing case accessible by the invoker.",
+			"message": "Case ID has to be a valid 16-digit Luhn number.",
 			"errors": []
 		}
 	}

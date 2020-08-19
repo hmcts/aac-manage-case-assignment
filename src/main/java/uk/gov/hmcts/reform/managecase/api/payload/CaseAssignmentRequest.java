@@ -4,11 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.hibernate.validator.constraints.LuhnCheck;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 
 @Getter
 @AllArgsConstructor
@@ -21,7 +24,9 @@ public class CaseAssignmentRequest {
     private String caseTypeId;
 
     @JsonProperty("case_id")
-    @NotEmpty(message = "Case ID has to be a valid 16-digit Luhn number")
+    @NotEmpty(message = ValidationError.CASE_ID_EMPTY)
+    @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID)
+    @LuhnCheck(message = ValidationError.CASE_ID_INVALID)
     @Pattern(regexp = "\\d+", message = "Case ID should contain digits only")
     @ApiModelProperty(value = "Case ID to Assign Access To", required = true, example = "1583841721773828")
     private String caseId;

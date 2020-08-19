@@ -20,7 +20,7 @@
   "expectedResponse": {
     "_extends_": "ACA_500_Response",
     "body": {
-      "message": "Case could not be fetched.",
+      "message": "Case could not be fetched",
       "errors": []
     }
   }

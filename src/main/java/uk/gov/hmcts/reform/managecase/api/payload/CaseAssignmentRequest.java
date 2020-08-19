@@ -25,7 +25,7 @@ public class CaseAssignmentRequest {
 
     @JsonProperty("case_id")
     @NotEmpty(message = ValidationError.CASE_ID_EMPTY)
-    @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID)
+    @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID_LENGTH)
     @LuhnCheck(message = ValidationError.CASE_ID_INVALID)
     @Pattern(regexp = "\\d+", message = "Case ID should contain digits only")
     @ApiModelProperty(value = "Case ID to Assign Access To", required = true, example = "1583841721773828")

@@ -61,12 +61,13 @@ public class CaseAssignmentController {
             code = 400,
             message = "One of the following reasons.\n"
                 + "1) Case ID has to be a valid 16-digit Luhn number \n"
-                + "2) Case ID can not be empty \n"
-                + "3) Case type ID can not be empty \n"
-                + "4) Assignee IDAM ID can not be empty \n"
-                + "5) Intended assignee has to be in the same organisation as that of the invoker. \n"
-                + "6) Case ID has to be one for which a case role is represented by the invoker's organisation. \n"
-                + "7) Intended assignee has to be a solicitor enabled in the jurisdiction of the case. \n",
+                + "2) Case ID has to be 16-digits long \n"
+                + "3) Case ID can not be empty \n"
+                + "4) Case type ID can not be empty \n"
+                + "5) Assignee IDAM ID can not be empty \n"
+                + "6) Intended assignee has to be in the same organisation as that of the invoker. \n"
+                + "7) Case ID has to be one for which a case role is represented by the invoker's organisation. \n"
+                + "8) Intended assignee has to be a solicitor enabled in the jurisdiction of the case. \n",
             response = ApiError.class,
             examples = @Example({
                     @ExampleProperty(

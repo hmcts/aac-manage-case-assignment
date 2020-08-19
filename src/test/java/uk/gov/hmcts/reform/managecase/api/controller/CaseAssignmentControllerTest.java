@@ -132,13 +132,14 @@ public class CaseAssignmentControllerTest {
     @DisplayName("should fail with 400 bad request when case id is an invalid Luhn number")
     @Test
     void shouldFailWithBadRequestWhenCaseIdIsInvalidLuhnNumber() throws Exception {
-        request = new CaseAssignmentRequest(CASE_TYPE_ID,"12341234123412341234", ASSIGNEE_ID);
+        request = new CaseAssignmentRequest(CASE_TYPE_ID,"123", ASSIGNEE_ID);
 
         this.mockMvc.perform(post(CASE_ASSIGNMENTS)
                                  .contentType(MediaType.APPLICATION_JSON)
                                  .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.errors", hasSize(1)))
+            .andExpect(jsonPath("$.errors", hasSize(2)))
+            .andExpect(jsonPath("$.errors", hasItem("Case ID has to be 16-digits long")))
             .andExpect(jsonPath("$.errors", hasItem("Case ID has to be a valid 16-digit Luhn number")));
     }
 

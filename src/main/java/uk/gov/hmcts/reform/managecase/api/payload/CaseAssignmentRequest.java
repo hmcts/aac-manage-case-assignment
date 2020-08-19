@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.managecase.api.payload;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import io.swagger.annotations.ApiModel;
@@ -26,8 +25,7 @@ public class CaseAssignmentRequest {
     @JsonProperty("case_id")
     @NotEmpty(message = ValidationError.CASE_ID_EMPTY)
     @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID_LENGTH)
-    @LuhnCheck(message = ValidationError.CASE_ID_INVALID)
-    @Pattern(regexp = "\\d+", message = "Case ID should contain digits only")
+    @LuhnCheck(message = ValidationError.CASE_ID_INVALID, ignoreNonDigitCharacters = false)
     @ApiModelProperty(value = "Case ID to Assign Access To", required = true, example = "1583841721773828")
     private String caseId;
 

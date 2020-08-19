@@ -43,7 +43,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CaseCouldNotBeFetchedException.class)
     public ResponseEntity<Object> handleCaseCouldNotBeFetchedException(CaseCouldNotBeFetchedException ex) {
-        log.error("Case Id errors: {}", ex.getMessage(), ex);
+        log.error("Data Store errors: {}", ex.getMessage(), ex);
         return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
     }
 

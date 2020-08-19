@@ -43,6 +43,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.GET_ASSIGNMENTS_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
 
 @WebMvcTest(controllers = CaseAssignmentController.class,
     includeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes = MapperConfig.class),
@@ -126,7 +129,7 @@ public class CaseAssignmentControllerTest {
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errors", hasSize(1)))
-            .andExpect(jsonPath("$.errors", hasItem("Case ID can not be empty")));
+            .andExpect(jsonPath("$.errors", hasItem(CASE_ID_EMPTY)));
     }
 
     @DisplayName("should fail with 400 bad request when case id is an invalid Luhn number")
@@ -139,8 +142,8 @@ public class CaseAssignmentControllerTest {
                                  .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errors", hasSize(2)))
-            .andExpect(jsonPath("$.errors", hasItem("Case ID has to be 16-digits long")))
-            .andExpect(jsonPath("$.errors", hasItem("Case ID has to be a valid 16-digit Luhn number")));
+            .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID_LENGTH)))
+            .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID)));
     }
 
     @DisplayName("should fail with 400 bad request when assignee id is empty")

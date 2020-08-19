@@ -30,7 +30,9 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.cas
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.usersByOrganisation;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.*;
+import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.ASSIGNEE_ORGA_ERROR;
+import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.ASSIGNEE_ROLE_ERROR;
+import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
 
 @SuppressWarnings({"PMD.MethodNamingConventions", "PMD.JUnitAssertionsShouldIncludeMessage"})
 class CaseAssignmentServiceTest {

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.managecase.service;
 
 import com.google.common.collect.Lists;
-import java.util.List;
 import javax.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
+import uk.gov.hmcts.reform.managecase.domain.EmailNotificationResponse;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
@@ -31,8 +31,6 @@ class NotifyServiceTest {
     private static final String TEST_EMAIL = "test@hmcts.net";
 
     private static final String EMAIL_TEMPLATE_ID = "TestEmailTemplateId";
-
-    private static final String REPLY_TO_EMAIL = "noreply@hmcts.net";
 
     @Mock
     private ApplicationParams appParams;
@@ -72,12 +70,10 @@ class NotifyServiceTest {
     @Test
     @DisplayName("should fail when email addresses list is null")
     void shouldThrowValidationExceptionWhenEmailAddressesIsNull() {
-        given(appParams.getReplyToEmailId()).willReturn(REPLY_TO_EMAIL);
         given(appParams.getEmailTemplateId()).willReturn(EMAIL_TEMPLATE_ID);
 
         ValidationException exception = assertThrows(ValidationException.class, () ->
-            this.notifyService.senEmail(Lists.newArrayList(CASE_ID),
-                                        null));
+            this.notifyService.senEmail(Lists.newArrayList(CASE_ID), null));
 
         assertThat(exception.getMessage()).isEqualTo("At least one email address is required to send notification");
     }
@@ -95,7 +91,6 @@ class NotifyServiceTest {
     @Test
     @DisplayName("should invoke notification client sendEmail")
     void shouldInvokeNotificationClientSendNotification() throws NotificationClientException {
-        given(appParams.getReplyToEmailId()).willReturn(REPLY_TO_EMAIL);
         given(appParams.getEmailTemplateId()).willReturn(EMAIL_TEMPLATE_ID);
         SendEmailResponse sendEmailResponse = mock(SendEmailResponse.class);
         given(this.notificationClient
@@ -108,10 +103,10 @@ class NotifyServiceTest {
                   ))
             .willReturn(sendEmailResponse);
 
-        List<SendEmailResponse> responses = this.notifyService.senEmail(Lists.newArrayList(CASE_ID),
-                                                                        Lists.newArrayList(TEST_EMAIL));
+        EmailNotificationResponse responses = this.notifyService.senEmail(Lists.newArrayList(CASE_ID),
+                                                                          Lists.newArrayList(TEST_EMAIL));
         assertNotNull(responses, "response object should not be null");
-        assertEquals(1, responses.size(), "response size is not equal");
+        assertEquals(1, responses.getSuccessResponses().size(), "response size is not equal");
         verify(this.notificationClient).sendEmail(
             anyString(),
             anyString(),
@@ -124,7 +119,6 @@ class NotifyServiceTest {
     @Test
     @DisplayName("should invoke notification client sendEmail for more than one case id")
     void shouldInvokeNotificationClientSendNotificationForMoreThanOneCaseId() throws NotificationClientException {
-        given(appParams.getReplyToEmailId()).willReturn(REPLY_TO_EMAIL);
         given(appParams.getEmailTemplateId()).willReturn(EMAIL_TEMPLATE_ID);
         SendEmailResponse sendEmailResponse = mock(SendEmailResponse.class);
         given(this.notificationClient
@@ -137,10 +131,10 @@ class NotifyServiceTest {
                   ))
             .willReturn(sendEmailResponse);
 
-        List<SendEmailResponse> responses = this.notifyService.senEmail(Lists.newArrayList(CASE_ID, "12345679"),
+        EmailNotificationResponse responses = this.notifyService.senEmail(Lists.newArrayList(CASE_ID, "12345679"),
                                                                         Lists.newArrayList(TEST_EMAIL));
         assertNotNull(responses, "response object should not be null");
-        assertEquals(2, responses.size(), "response size is not equal");
+        assertEquals(2, responses.getSuccessResponses().size(), "response size is not equal");
         verify(this.notificationClient, times(2)).sendEmail(
             anyString(),
             anyString(),
@@ -154,7 +148,6 @@ class NotifyServiceTest {
     @DisplayName("should invoke notification client sendEmail for multiple case id and email addresses")
     void shouldInvokeNotificationClientSendNotificationForMoreThanOneCaseIdAndMoreThanOneEmailAddress()
         throws NotificationClientException {
-        given(appParams.getReplyToEmailId()).willReturn(REPLY_TO_EMAIL);
         given(appParams.getEmailTemplateId()).willReturn(EMAIL_TEMPLATE_ID);
         SendEmailResponse sendEmailResponse = mock(SendEmailResponse.class);
         given(this.notificationClient
@@ -167,12 +160,12 @@ class NotifyServiceTest {
                   ))
             .willReturn(sendEmailResponse);
 
-        List<SendEmailResponse> responses = this.notifyService.senEmail(
+        EmailNotificationResponse responses = this.notifyService.senEmail(
             Lists.newArrayList(CASE_ID, "12345679"),
             Lists.newArrayList(TEST_EMAIL, "test2@hmcts.net")
         );
         assertNotNull(responses, "response object should not be null");
-        assertEquals(4, responses.size(), "response size is not equal");
+        assertEquals(4, responses.getSuccessResponses().size(), "response size is not equal");
         verify(this.notificationClient, times(4)).sendEmail(
             anyString(),
             anyString(),

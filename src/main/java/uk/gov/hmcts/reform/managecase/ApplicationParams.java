@@ -22,9 +22,6 @@ public class ApplicationParams {
     @Value("${notify.email-template-id}")
     private String emailTemplateId;
 
-    @Value("${notify.reply-to-email-id}")
-    private String replyToEmailId;
-
     @Value("${notify.api-key}")
     private String notifyApiKey;
 
@@ -46,10 +43,6 @@ public class ApplicationParams {
 
     public String getEmailTemplateId() {
         return emailTemplateId;
-    }
-
-    public String getReplyToEmailId() {
-        return replyToEmailId;
     }
 
     public String getNotifyApiKey() {

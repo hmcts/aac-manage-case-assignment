@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.managecase.service;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.net.ConnectException;
 import java.util.List;
@@ -11,6 +10,8 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
+import uk.gov.hmcts.reform.managecase.domain.EmailNotificationFailure;
+import uk.gov.hmcts.reform.managecase.domain.EmailNotificationResponse;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
@@ -28,8 +29,8 @@ public class NotifyService {
         this.appParams = appParams;
     }
 
-    public List<SendEmailResponse> senEmail(final List<String> caseIds,
-                                            final List<String> emailAddresses) throws NotificationClientException  {
+    public EmailNotificationResponse senEmail(final List<String> caseIds,
+                                              final List<String> emailAddresses)  {
         if (caseIds == null || caseIds.isEmpty()) {
             throw new ValidationException("At least one case id is required to send notification");
         }
@@ -38,13 +39,21 @@ public class NotifyService {
             throw new ValidationException("At least one email address is required to send notification");
         }
 
-        List<SendEmailResponse> emailNotificationResponses = Lists.newArrayList();
+        EmailNotificationResponse emailNotificationResponse = new EmailNotificationResponse();
         for (String caseId : caseIds) {
             for (String emailAddress : emailAddresses) {
-                emailNotificationResponses.add(sendNotification(caseId, emailAddress));
+                try {
+                    emailNotificationResponse.addSuccessResponse(sendNotification(caseId, emailAddress));
+                } catch (NotificationClientException e) {
+                    EmailNotificationFailure notificationFailure = new EmailNotificationFailure();
+                    notificationFailure.setCaseId(caseId);
+                    notificationFailure.setEmailAddress(emailAddress);
+                    notificationFailure.setErrorMessage(e.getMessage());
+                    emailNotificationResponse.addFailureResponse(notificationFailure);
+                }
             }
         }
-        return emailNotificationResponses;
+        return emailNotificationResponse;
     }
 
     @Retryable(value = {ConnectException.class}, backoff = @Backoff(delay = 1000, multiplier = 3))
@@ -53,8 +62,7 @@ public class NotifyService {
             this.appParams.getEmailTemplateId(),
             emailAddress,
             personalisationParams(caseId),
-            createReference(),
-            this.appParams.getReplyToEmailId()
+            createReference()
         );
     }
 

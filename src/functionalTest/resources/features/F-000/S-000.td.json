@@ -1,8 +1,10 @@
 {
   "_guid_": "S-000",
   "title": "must return a successful response when hitting Manage Case Assignment health endpoint",
+
   "productName": "Manage Case Assignment API",
-  "operationName": "Health Endpoint",
+  "operationName": "Healthcheck Operation",
+
   "method": "GET",
   "uri": "/health",
 
@@ -12,7 +14,7 @@
   ],
 
   "users": {
-		"invokingUser": {
+    "invokingUser": {
       "_extends_": "Common_User_For_Request"
     }
   },
@@ -22,7 +24,7 @@
   },
 
   "expectedResponse": {
-    "_extends_" : "Common_200_Response",
+    "_extends_": "Common_200_Response",
     "headers": {
       "Content-Type": "application/vnd.spring-boot.actuator.v3+json",
       "Content-Length": "[[ANYTHING_PRESENT]]",
@@ -57,8 +59,8 @@
             "exists": true
           }
         },
-        "hystrix" : {
-          "status" : "UP"
+        "hystrix": {
+          "status": "UP"
         },
         "livenessState": {
           "status": "UP"
@@ -77,8 +79,8 @@
         }
       },
       "groups": [
-         "liveness",
-         "readiness"
+        "liveness",
+        "readiness"
       ]
     }
   }

@@ -1,18 +1,23 @@
 {
   "_guid_": "Case_Creation_Token_Creation",
+
   "productName": "CCD Data Store",
   "operationName": "Start event creation",
+
   "method": "GET",
   "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+
   "specs": [
     "to create a token for case creation"
   ],
+
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
       "uid": "[[DEFAULT_AUTO_VALUE]]"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {

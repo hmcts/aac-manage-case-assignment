@@ -6,6 +6,12 @@
     "by Becky to create a case - C1"
   ],
 
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Becky"
+    }
+  },
+
   "request": {
     "body": {
       "event_token": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C1_Token_Creation][testData][actualResponse][body][token]}",

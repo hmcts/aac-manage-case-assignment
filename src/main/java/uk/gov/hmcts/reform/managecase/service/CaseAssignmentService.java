@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestedCaseUnassignment;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
@@ -111,7 +112,7 @@ public class CaseAssignmentService {
             .distinct()
             .forEach(assignee -> {
                 if (!isAssigneePresent(usersByOrg.getUsers(), assignee)) {
-                    throw new ValidationException(ASSIGNEE_ORGA_ERROR);
+                    throw new ValidationException(ValidationError.INVOKER_NOT_IN_SAME_ORGANISATION_AS_UNASSIGNED_USER);
                 }
             });
 

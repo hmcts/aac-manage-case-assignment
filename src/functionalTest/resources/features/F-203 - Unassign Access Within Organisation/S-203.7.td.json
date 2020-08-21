@@ -11,7 +11,12 @@
   ],
 
   "users": {
-    "_extends_": "F-203_Users"
+    "invokingUser": {
+      "_extends_": "ACA_Users_Becky"
+    },
+    "Benjamin": {
+      "_extends_": "ACA_Users_Benjamin"
+    }
   },
 
   "request": {
@@ -25,7 +30,6 @@
             "[Defendant]"
           ]
         }, {
-          "case_id": " ",
           "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}",
           "case_roles": [
             "[Claimant]",
@@ -40,8 +44,7 @@
     "_extends_": "ACA_400_Response",
     "body": {
       "status" : "BAD_REQUEST",
-      "message" : "Case ID can not be empty.",
-      "errors": []
+      "errors": [ "Case ID can not be empty" ]
     }
   }
 }

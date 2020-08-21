@@ -1,9 +1,9 @@
 {
-  "_guid_": "S-203.7_Verify_Assignments_In_My_Org",
+  "_guid_": "S-203.5_Verify_Assignments_In_My_Org_Becky",
   "_extends_": "Get_Assignments_In_My_Organisation_Base",
 
   "specs": [
-    "by Becky to confirm that Benjamin still has access to the case - C1"
+    "by Becky to confirm that Benjamin still has access to the case"
   ],
 
   "users": {
@@ -14,7 +14,7 @@
 
   "request": {
     "queryParams": {
-      "case_ids": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
+      "case_ids": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_Seperate_Org_Policies_C1][testData][actualResponse][body][id]}"
     }
   },
 
@@ -24,7 +24,7 @@
       "status_message": "Case-User-Role assignments returned successfully",
       "case_assignments": [
         {
-          "case_id": "${}${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+          "case_id": "${}${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_Seperate_Org_Policies_C1][testData][actualResponse][body][id]}",
           "shared_with": [
             {
               "__ordering__": "unordered",
@@ -45,8 +45,7 @@
               "last_name": "Solicington",
               "email": "befta.master.solicitor.benjamin@gmail.com",
               "case_roles": [
-                "[Claimant]",
-                "[Defendant]"
+                "[Claimant]"
               ]
             }
           ]

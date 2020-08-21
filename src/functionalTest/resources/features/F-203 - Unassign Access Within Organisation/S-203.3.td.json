@@ -11,7 +11,15 @@
   ],
 
   "users": {
-    "_extends_": "F-203_Users"
+    "invokingUser": {
+      "_extends_": "ACA_Users_Becky"
+    },
+    "Benjamin": {
+      "_extends_": "ACA_Users_Benjamin"
+    },
+    "Bill": {
+      "_extends_": "ACA_Users_Bill"
+    }
   },
 
   "request": {

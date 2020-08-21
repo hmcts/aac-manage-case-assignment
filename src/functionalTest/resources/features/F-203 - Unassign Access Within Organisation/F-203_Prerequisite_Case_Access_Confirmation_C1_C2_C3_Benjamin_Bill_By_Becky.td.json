@@ -1,5 +1,6 @@
 {
   "_guid_": "F-203_Prerequisite_Case_Access_Confirmation_C1_C2_C3_Benjamin_Bill_By_Becky",
+  "_extends_": "Get_Assignments_In_My_Organisation_Base",
 
   "specs": [
     "by Becky to confirm the access to C1, C2 & C3 for Benjamin & Bill"
@@ -7,26 +8,30 @@
 
   "users": {
     "invokingUser": {
-      "username": "befta.master.solicitor.becky@gmail.com",
-      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
+      "_extends_": "ACA_Users_Becky"
     }
   },
 
   "request": {
-    "_extends_": "Common_Request",
     "queryParams": {
-      "case_ids": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}"
+      "case_ids": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]},${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]},${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}"
     }
   },
 
   "expectedResponse": {
-    "_extends_" : "Common_200_Response",
     "body" : {
-      "status_message": "Case-User-Role assignments returned successfully",
       "case_assignments": [
         {
-          "case_id": "${}${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+          "__ordering__": "unordered",
+          "__elementId__": "case_id"
+        },
+        {
+          "case_id": "${}${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
           "shared_with": [
+            {
+              "__ordering__": "unordered",
+              "__elementId__": "email"
+            },
             {
               "idam_id": "[[ANYTHING_PRESENT]]",
               "first_name": "Benjamin",
@@ -58,8 +63,12 @@
             }
           ]
         }, {
-          "case_id": "${}${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
+          "case_id": "${}${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
           "shared_with": [
+            {
+              "__ordering__": "unordered",
+              "__elementId__": "email"
+            },
             {
               "idam_id": "[[ANYTHING_PRESENT]]",
               "first_name": "Benjamin",
@@ -91,8 +100,12 @@
             }
           ]
         }, {
-          "case_id": "${}${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}",
+          "case_id": "${}${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}",
           "shared_with": [
+            {
+              "__ordering__": "unordered",
+              "__elementId__": "email"
+            },
             {
               "idam_id": "[[ANYTHING_PRESENT]]",
               "first_name": "Benjamin",

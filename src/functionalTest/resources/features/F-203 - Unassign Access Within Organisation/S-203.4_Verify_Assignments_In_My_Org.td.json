@@ -1,8 +1,21 @@
 {
   "_guid_": "S-203.4_Verify_Assignments_In_My_Org",
-  "_extends_": "F-203_Verify_Assignments_In_My_Org_Base",
+  "_extends_": "Get_Assignments_In_My_Organisation_Base",
 
   "specs": [
     "to Get Assignments In My Organisation by CAA to verify unassignment of Becky and Bill from C1, C2 and C3"
-  ]
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA"
+    }
+  },
+
+  "request": {
+    "queryParams": {
+      "case_ids": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]},${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]},${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}"
+    }
+  }
+
 }

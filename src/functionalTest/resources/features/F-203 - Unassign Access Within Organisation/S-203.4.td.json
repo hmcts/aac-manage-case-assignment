@@ -11,10 +11,14 @@
   ],
 
   "users": {
-    "_extends_": "F-203_Users",
+    "Becky": {
+      "_extends_": "ACA_Users_Becky"
+    },
     "invokingUser": {
-      "username": "befta.pui.caa.1@gmail.com",
-      "password": "[[$CCD_BEFTA_PUI_CAA_1_PWD]]"
+      "_extends_": "ACA_Users_CAA"
+    },
+    "Bill": {
+      "_extends_": "ACA_Users_Bill"
     }
   },
 

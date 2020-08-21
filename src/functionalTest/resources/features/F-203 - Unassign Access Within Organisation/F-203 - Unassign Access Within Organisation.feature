@@ -38,7 +38,7 @@ Scenario: CAA successfully removing case access for another solicitor in their o
       And a user [Bill - with a solicitor role for the same jurisdiction within the same organisation, to get assigned and unassigned access to a case],
       And a case [by Becky to create a case - C1] created as in [F-203_Prerequisite_Case_Creation_C1],
       And a wait time of [5] seconds [to allow for the case just created to appear in search results],
-      And a successful call [by CAA to grant access to C1 for Becky] as in [F-203_Prerequisite_Case_Assignment_C1_Becky],
+      And a successful call [by CAA to grant access to C1 for Becky] as in [F-203_Prerequisite_Case_Assignment_C1_Becky_BY_CAA],
       And a successful call [by CAA to grant access to C1 for Bill] as in [F-203_Prerequisite_Case_Assignment_C1_Bill_By_CAA],
       And a successful call [by CAA to confirm the access to C1 for Becky & Bill] as in [F-203_Prerequisite_Case_Access_Confirmation_C1_Becky_Bill_By_CAA],
 
@@ -91,7 +91,7 @@ Scenario: Pui-caa successfully removing access to multiple cases for multiple so
       And a case [by Becky to create a case - C3] created as in [F-203_Prerequisite_Case_Creation_C3],
       And a wait time of [5] seconds [to allow for the case just created to appear in search results],
       And a successful call [by CAA to grant access to C1 for Bill] as in [F-203_Prerequisite_Case_Assignment_C1_Bill_By_CAA],
-      And a successful call [by CAA grant access to C2 for Bill] as in [F-203_Prerequisite_Case_Assignment_C2_Bill_By_CAA],
+      And a successful call [by CAA to grant access to C2 for Bill] as in [F-203_Prerequisite_Case_Assignment_C2_Bill_By_CAA],
       And a successful call [by CAA to grant access to C3 for Bill] as in [F-203_Prerequisite_Case_Assignment_C3_Bill_By_CAA],
       And a successful call [by CAA to confirm the access to C1, C2 & C3 for Bill] as in [F-203_Prerequisite_Case_Access_Confirmation_C1_C2_C3_Bill_By_CAA],
 
@@ -112,12 +112,12 @@ Scenario: Must return an error response if intended unassignee doesn't exist in 
       And a user [Benjamin - with a solicitor role for the same jurisdiction within organisation - O1],
       And a user [Bill - with a solicitor role for the same jurisdiction within a different organisation from Becky - O2],
       And a user [CAA - with a Pui-CAA role for the same jurisdiction and in organisation - O2],
-      And a case [by Becky to create a case - C1 with Organisation policies containing R1 and R2] created as in [Prerequisite Case Creation Call for Case Assignment],
+      And a case [by Becky to create a case - C1 with Organisation policies containing R1 and R2] created as in [F-203_Prerequisite_Case_Creation_Seperate_Org_Policies_C1],
       And a wait time of [5] seconds [to allow for the case just created to appear in search results],
-      And a successful call [by Becky to grant access to C1 for Benjamin with role R1] as in [Prerequisite Case Creation Call for Case Assignment],
-      And a successful call [by CAA to grant access to C1 for Bill with role R2] as in [Prerequisite Case Creation Call for Case Assignment],
-      And a successful call [by Becky to confirm the access to C1 for Benjamin] as in [Prerequisite access confirmation call],
-      And a successful call [by CAA to confirm the access to C1 for Bill] as in [Prerequisite access confirmation call],
+      And a successful call [by Becky to grant access to C1 for Benjamin with role R1] as in [F-203_Prerequisite_Case_Assignment_Seperate_Org_Policies_C1_Benjamin_By_Becky],
+    #  And a successful call [by CAA to grant access to C1 for Bill with role R2] as in [F-203_Prerequisite_Case_Assignment_Seperate_Org_Policies_C1_Bill_By_CAA_Org2],
+      And a successful call [by Becky to confirm the access to C1 for Benjamin] as in [F-203_Prerequisite_Case_Access_Confirmation_Seperate_Org_Policies_C1_Benjamin_By_Becky],
+    #  And a successful call [by CAA to confirm the access to C1 for Bill] as in [F-203_Prerequisite_Case_Access_Confirmation_Seperate_Org_Policies_C1_Bill_By_CAA_Org2],
 
     When a request is prepared with appropriate values,
       And the request [is made by Becky and intends to unassign access to C1 for Benjamin and Bill],
@@ -125,9 +125,8 @@ Scenario: Must return an error response if intended unassignee doesn't exist in 
 
     Then a negative response is received,
       And the response has all the details as expected,
-      And a call [by Becky to confirm that Benjamin still has access to the case] will get the expected response as in [they will still be able to access the case],
-      And a call [by CAA to confirm that Bill still has access to the case] will get the expected response as in [they will still be able to access the case].
-
+      And a call [by Becky to confirm that Benjamin still has access to the case] will get the expected response as in [S-203.5_Verify_Assignments_In_My_Org_Becky],
+    #  And a call [by CAA to confirm that Bill still has access to the case] will get the expected response as in [S-203.5_Verify_Assignments_In_My_Org_CAA_Org2].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 6
@@ -194,7 +193,7 @@ Scenario: Must return an error response if the invoker is a solicitor in a diffe
 Scenario: Must return an error response if the invoker doesn't have access to the case of the user they are trying to remove access for
 
     Given a user [Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation],
-      And a user [Benjamin - with a solicitor role for the same jurisdiction within the same organisation as U1],
+      And a user [Benjamin - with a solicitor role for the same jurisdiction within the same organisation as Becky],
       And a case [by Becky to create a case - C1] created as in [F-203_Prerequisite_Case_Creation_C1],
       And a wait time of [5] seconds [to allow for the case just created to appear in search results],
       And a successful call [by Becky to confirm the access to C1 for Becky] as in [F-203_Prerequisite_Case_Access_Confirmation_C1_Becky_By_Becky],

@@ -1,14 +1,20 @@
 {
   "_guid_": "S-203.3_Verify_Assignments_In_My_Org",
-  "_extends_": "F-203_Verify_Assignments_In_My_Org_Base",
+  "_extends_": "Get_Assignments_In_My_Organisation_Base",
 
   "specs": [
     "to Get Assignments In My Organisation by Becky to verify unassignment of Benjamin and Bill from C1, C2 and C3"
   ],
 
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Becky"
+    }
+  },
+
   "request": {
     "queryParams": {
-      "case_ids": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}"
+      "case_ids": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]},${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]},${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}"
     }
   },
 
@@ -18,7 +24,11 @@
       "status_message": "Case-User-Role assignments returned successfully",
       "case_assignments": [
         {
-          "case_id": "${}${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+          "__ordering__": "unordered",
+          "__elementId__": "case_id"
+        },
+        {
+          "case_id": "${}${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
           "shared_with": [
             {
               "idam_id": "[[ANYTHING_PRESENT]]",
@@ -31,7 +41,7 @@
             }
           ]
         }, {
-          "case_id": "${}${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
+          "case_id": "${}${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
           "shared_with": [
             {
               "idam_id": "[[ANYTHING_PRESENT]]",
@@ -44,7 +54,7 @@
             }
           ]
         }, {
-          "case_id": "${}${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}",
+          "case_id": "${}${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}",
           "shared_with": [
             {
               "idam_id": "[[ANYTHING_PRESENT]]",

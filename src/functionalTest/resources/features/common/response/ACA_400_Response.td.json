@@ -1,13 +1,13 @@
 {
-  "_guid_": "ACA_400_Response",
-  "_extends_": "Common_Response",
+	"_guid_": "ACA_400_Response",
+	"_extends_": "Common_Response",
 
-  "responseCode": 400,
-  "responseMessage": "Bad Request",
-  "headers": {
-    "_extends_": "Common_400_Response_Headers"
-  },
-  "body": {
-    "status": "BAD_REQUEST"
-  }
+	"responseCode": 400,
+	"responseMessage": "Bad Request",
+	"headers": {
+		"_extends_": "Common_400_Response_Headers"
+	},
+	"body": {
+		"status": "BAD_REQUEST"
+	}
 }

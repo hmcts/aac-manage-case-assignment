@@ -32,7 +32,8 @@
         {
           "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_Seperate_Org_Policies_C1][testData][actualResponse][body][id]}",
           "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}"
-        }, {
+        },
+        {
           "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_Seperate_Org_Policies_C1][testData][actualResponse][body][id]}",
           "assignee_id": "${[scenarioContext][testData][users][Other_Org2][id]}"
         }

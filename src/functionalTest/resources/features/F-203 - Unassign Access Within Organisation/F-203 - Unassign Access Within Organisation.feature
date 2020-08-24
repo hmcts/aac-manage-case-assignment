@@ -38,7 +38,7 @@ Scenario: CAA successfully removing case access for another solicitor in their o
       And a user [Bill - with a solicitor role for the same jurisdiction within the same organisation, to get assigned and unassigned access to a case],
       And a case [by Becky to create a case - C1] created as in [F-203_Prerequisite_Case_Creation_C1],
       And a wait time of [5] seconds [to allow for the case just created to appear in search results],
-      And a successful call [by CAA to grant access to C1 for Becky] as in [F-203_Prerequisite_Case_Assignment_C1_Becky_BY_CAA],
+      And a successful call [by CAA to grant access to C1 for Becky] as in [F-203_Prerequisite_Case_Assignment_C1_Becky_By_CAA],
       And a successful call [by CAA to grant access to C1 for Bill] as in [F-203_Prerequisite_Case_Assignment_C1_Bill_By_CAA],
       And a successful call [by CAA to confirm the access to C1 for Becky & Bill] as in [F-203_Prerequisite_Case_Access_Confirmation_C1_Becky_Bill_By_CAA],
 
@@ -79,6 +79,34 @@ Scenario: Solicitor successfully removing access to multiple cases for multiple 
       And a call [to Get Assignments In My Organisation by Becky to verify unassignment of Benjamin and Bill from C1, C2 and C3] will get the expected response as in [S-203.3_Verify_Assignments_In_My_Org].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ACA-51 A/C TBC (Happy path)
+@S-203.3a
+Scenario: Solicitor successfully removing access to multiple cases for multiple solicitors in their org with respect to a specific case role (happy path)
+
+    Given a user [Becky - with a Solicitor role in a jurisdiction under an organisation to assign and Unassign a case role to a solicitor within the same organisation],
+      And a user [Benjamin - with a Solicitor role in the same jurisdiction under the same organisation as Becky to be assigned and unassigned to some cases],
+      And a user [Bill - with a Solicitor role in the same jurisdiction under the same organisation as Becky to be assigned and unassigned to some cases],
+      And a case [by Becky to create a case - C1 which includes Organisation policies that reference case roles R1 and R2] created as in [F-203_Prerequisite_Case_Creation_C1],
+      And a case [by Becky to create a case - C2 which includes Organisation policies that reference case roles R1 and R2] created as in [F-203_Prerequisite_Case_Creation_C2],
+      And a case [by Becky to create a case - C3 which includes Organisation policies that reference case roles R1 and R2] created as in [F-203_Prerequisite_Case_Creation_C3],
+      And a wait time of [5] seconds [to allow for the case just created to appear in search results],
+      And a successful call [by Becky to grant access to C1 for Benjamin] as in [F-203_Prerequisite_Case_Assignment_C1_Benjamin],
+      And a successful call [by Becky to grant access to C1 for Bill] as in [F-203_Prerequisite_Case_Assignment_C1_Bill],
+      And a successful call [by Becky to grant access to C2 for Benjamin] as in [F-203_Prerequisite_Case_Assignment_C2_Benjamin],
+      And a successful call [by Becky to grant access to C2 for Bill] as in [F-203_Prerequisite_Case_Assignment_C2_Bill],
+      And a successful call [by Becky to grant access to C3 for Benjamin] as in [F-203_Prerequisite_Case_Assignment_C3_Benjamin],
+      And a successful call [by Becky to grant access to C3 for Bill] as in [F-203_Prerequisite_Case_Assignment_C3_Bill],
+      And a successful call [by Becky to confirm the access to C1, C2 & C3 for Benjamin & Bill with R1 and R2] as in [F-203_Prerequisite_Case_Access_Confirmation_C1_C2_C3_Benjamin_Bill_By_Becky],
+
+    When a request is prepared with appropriate values,
+      And the request [is made by Becky and intends to unassign access to C1, C2 and C3 for Benjamin & Bill with R1 only],
+      And it is submitted to call the [Unassign Access within Organisation] operation of [Manage Case Assignment Microservice],
+
+    Then a positive response is received,
+      And the response has all the details as expected,
+      And a call [to Get Assignments In My Organisation by Becky to verify remaining assignments of R2 only to Benjamin and Bill for C1, C2 and C3] will get the expected response as in [S-203.3a_Verify_Assignments_In_My_Org].
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 4
 @S-203.4
 Scenario: Pui-caa successfully removing access to multiple cases for multiple solicitors in their org (happy path)
@@ -102,6 +130,34 @@ Scenario: Pui-caa successfully removing access to multiple cases for multiple so
     Then a positive response is received,
       And the response has all the details as expected,
       And a call [to Get Assignments In My Organisation by CAA to verify unassignment of Becky and Bill from C1, C2 and C3] will get the expected response as in [S-203.4_Verify_Assignments_In_My_Org].
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ACA-51 A/C TBC1 (Happy path)
+@S-203.4a
+Scenario: Pui-CAA successfully removing access to multiple cases for multiple solicitors in their org with respect to a specific case role (happy path)
+
+    Given a user [Becky - with a Solicitor role in a jurisdiction under an organisation to assign and Unassign a case role to a solicitor within the same organisation],
+      And a user [CAA - with a Pui-CAA role in the same jurisdiction under the same organisation as Becky to assign and unassign some cases],
+      And a user [Bill - with a Solicitor role in the same jurisdiction under the same organisation as Becky to be assigned and unassigned to some cases],
+      And a case [by Becky to create a case - C1 which includes Organisation policies that reference case roles R1 and R2] created as in [F-203_Prerequisite_Case_Creation_C1],
+      And a case [by Becky to create a case - C2 which includes Organisation policies that reference case roles R1 and R2] created as in [F-203_Prerequisite_Case_Creation_C2],
+      And a case [by Becky to create a case - C3 which includes Organisation policies that reference case roles R1 and R2] created as in [F-203_Prerequisite_Case_Creation_C3],
+      And a wait time of [5] seconds [to allow for the case just created to appear in search results],
+      And a successful call [by CAA to grant access to C1 for Becky] as in [F-203_Prerequisite_Case_Assignment_C1_Becky_By_CAA],
+      And a successful call [by CAA to grant access to C1 for Bill] as in [F-203_Prerequisite_Case_Assignment_C1_Bill_By_CAA],
+      And a successful call [by CAA to grant access to C2 for Becky] as in [F-203_Prerequisite_Case_Assignment_C2_Becky_By_CAA],
+      And a successful call [by CAA to grant access to C2 for Bill] as in [F-203_Prerequisite_Case_Assignment_C2_Bill_By_CAA],
+      And a successful call [by CAA to grant access to C3 for Becky] as in [F-203_Prerequisite_Case_Assignment_C3_Becky_By_CAA],
+      And a successful call [by CAA to grant access to C3 for Bill] as in [F-203_Prerequisite_Case_Assignment_C3_Bill_By_CAA],
+      And a successful call [by CAA to confirm the access to C1, C2 & C3 for Becky & Bill with R1 and R2] as in [F-203_Prerequisite_Case_Access_Confirmation_C1_C2_C3_Becky_Bill_By_CAA],
+
+    When a request is prepared with appropriate values,
+      And the request [is made by CAA and intends to unassign access to C1, C2 and C3 for Becky & Bill with R1 only],
+      And it is submitted to call the [Unassign Access within Organisation] operation of [Manage Case Assignment Microservice],
+
+    Then a positive response is received,
+      And the response has all the details as expected,
+      And a call [to Get Assignments In My Organisation by CAA to verify remaining assignments of R2 only to Becky and Bill for C1, C2 and C3] will get the expected response as in [S-203.4a_Verify_Assignments_In_My_Org].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 5
@@ -170,7 +226,7 @@ Scenario: Must return an error response for a missing Case ID
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 8
-@S-203.8
+@S-203.8 @Ignore
 Scenario: Must return an error response if the invoker is a solicitor in a different jurisdiction from that of the case
 
     Given a user [Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation],
@@ -189,7 +245,7 @@ Scenario: Must return an error response if the invoker is a solicitor in a diffe
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 9
-@S-203.9
+@S-203.9 @Ignore
 Scenario: Must return an error response if the invoker doesn't have access to the case of the user they are trying to remove access for
 
     Given a user [Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation],

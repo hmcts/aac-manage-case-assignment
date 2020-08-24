@@ -1,13 +1,13 @@
 {
-  "_guid_": "S-203.4",
+  "_guid_": "S-203.4a",
   "_extends_": "F-203_Base",
   "title": "Pui-caa successfully removing access to multiple cases for multiple solicitors in their org (happy path)",
 
   "specs": [
-    "Becky - with a solicitor role in a particular jurisdiction within an organisation, to create a case",
-    "CAA - with a pui-caa role within the same organisation to assign and unassign access to a case for a solicitor in their organisation",
-    "Bill - with a solicitor role for the same jurisdiction within the same organisation, to get assigned and unassigned access to a case",
-    "is made by CAA and intends to unassign access to C1, C2 and C3 for Becky & Bill"
+    "Becky - with a Solicitor role in a jurisdiction under an organisation to assign and Unassign a case role to a solicitor within the same organisation",
+    "CAA - with a Pui-CAA role in the same jurisdiction under the same organisation as Becky to assign and unassign some cases",
+    "Bill - with a Solicitor role in the same jurisdiction under the same organisation as Becky to be assigned and unassigned to some cases",
+    "is made by CAA and intends to unassign access to C1, C2 and C3 for Becky & Bill with R1 only"
   ],
 
   "users": {
@@ -27,29 +27,47 @@
       "unassignments": [
         {
           "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
-          "assignee_id": "${[scenarioContext][testData][users][Becky][id]}"
+          "assignee_id": "${[scenarioContext][testData][users][Becky][id]}",
+          "case_roles": [
+            "[Claimant]"
+          ]
         },
         {
           "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
-          "assignee_id": "${[scenarioContext][testData][users][Bill][id]}"
+          "assignee_id": "${[scenarioContext][testData][users][Bill][id]}",
+          "case_roles": [
+            "[Claimant]"
+          ]
         },
 
         {
           "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
-          "assignee_id": "${[scenarioContext][testData][users][Becky][id]}"
+          "assignee_id": "${[scenarioContext][testData][users][Becky][id]}",
+          "case_roles": [
+            "[Claimant]"
+          ]
         },
         {
           "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
-          "assignee_id": "${[scenarioContext][testData][users][Bill][id]}"
+          "assignee_id": "${[scenarioContext][testData][users][Bill][id]}",
+          "case_roles": [
+            "[Claimant]"
+          ]
         },
 
         {
           "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}",
-          "assignee_id": "${[scenarioContext][testData][users][Becky][id]}"
+          "assignee_id": "${[scenarioContext][testData][users][Becky][id]}",
+          "case_roles": [
+            "[Claimant]"
+          ]
         },
         {
           "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}",
-          "assignee_id": "${[scenarioContext][testData][users][Bill][id]}"
+          "assignee_id": "${[scenarioContext][testData][users][Bill][id]}",
+          "case_roles": [
+            "[Claimant]"
+          ]
         }
       ]
     }

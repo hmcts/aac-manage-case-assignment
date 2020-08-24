@@ -3,7 +3,8 @@
   "_extends_": "Prerequisite_Case_Creation_C0_Without_Org_Policies",
 
   "specs": [
-    "by Becky to create a case - C1"
+    "by Becky to create a case - C1",
+    "by Becky to create a case - C1 which includes Organisation policies that reference case roles R1 and R2"
   ],
 
   "users": {

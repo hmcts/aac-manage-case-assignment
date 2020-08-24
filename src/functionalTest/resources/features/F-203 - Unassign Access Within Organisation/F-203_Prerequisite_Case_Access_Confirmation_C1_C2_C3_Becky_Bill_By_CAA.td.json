@@ -1,15 +1,14 @@
 {
-  "_guid_": "F-203_Prerequisite_Case_Access_Confirmation_C1_C2_C3_Benjamin_Bill_By_Becky",
+  "_guid_": "F-203_Prerequisite_Case_Access_Confirmation_C1_C2_C3_Becky_Bill_By_CAA",
   "_extends_": "Get_Assignments_In_My_Organisation_Base",
 
   "specs": [
-    "by Becky to confirm the access to C1, C2 & C3 for Benjamin & Bill",
-    "by Becky to confirm the access to C1, C2 & C3 for Benjamin & Bill with R1 and R2"
+    "by CAA to confirm the access to C1, C2 & C3 for Becky & Bill with R1 and R2"
   ],
 
   "users": {
     "invokingUser": {
-      "_extends_": "ACA_Users_Becky"
+      "_extends_": "ACA_Users_CAA"
     }
   },
 
@@ -35,16 +34,6 @@
             },
             {
               "idam_id": "[[ANYTHING_PRESENT]]",
-              "first_name": "Benjamin",
-              "last_name": "Solicington",
-              "email": "befta.master.solicitor.benjamin@gmail.com",
-              "case_roles": [
-                "[Claimant]",
-                "[Defendant]"
-              ]
-            },
-            {
-              "idam_id": "[[ANYTHING_PRESENT]]",
               "first_name": "Bill",
               "last_name": "Solicington",
               "email": "befta.master.solicitor.bill@gmail.com",
@@ -59,7 +48,9 @@
               "last_name": "Solicington",
               "email": "befta.master.solicitor.becky@gmail.com",
               "case_roles": [
-                "[CREATOR]"
+                "[CREATOR]",
+                "[Claimant]",
+                "[Defendant]"
               ]
             }
           ]
@@ -72,16 +63,6 @@
             },
             {
               "idam_id": "[[ANYTHING_PRESENT]]",
-              "first_name": "Benjamin",
-              "last_name": "Solicington",
-              "email": "befta.master.solicitor.benjamin@gmail.com",
-              "case_roles": [
-                "[Claimant]",
-                "[Defendant]"
-              ]
-            },
-            {
-              "idam_id": "[[ANYTHING_PRESENT]]",
               "first_name": "Bill",
               "last_name": "Solicington",
               "email": "befta.master.solicitor.bill@gmail.com",
@@ -96,7 +77,9 @@
               "last_name": "Solicington",
               "email": "befta.master.solicitor.becky@gmail.com",
               "case_roles": [
-                "[CREATOR]"
+                "[CREATOR]",
+                "[Claimant]",
+                "[Defendant]"
               ]
             }
           ]
@@ -109,16 +92,6 @@
             },
             {
               "idam_id": "[[ANYTHING_PRESENT]]",
-              "first_name": "Benjamin",
-              "last_name": "Solicington",
-              "email": "befta.master.solicitor.benjamin@gmail.com",
-              "case_roles": [
-                "[Claimant]",
-                "[Defendant]"
-              ]
-            },
-            {
-              "idam_id": "[[ANYTHING_PRESENT]]",
               "first_name": "Bill",
               "last_name": "Solicington",
               "email": "befta.master.solicitor.bill@gmail.com",
@@ -133,7 +106,9 @@
               "last_name": "Solicington",
               "email": "befta.master.solicitor.becky@gmail.com",
               "case_roles": [
-                "[CREATOR]"
+                "[CREATOR]",
+                "[Claimant]",
+                "[Defendant]"
               ]
             }
           ]

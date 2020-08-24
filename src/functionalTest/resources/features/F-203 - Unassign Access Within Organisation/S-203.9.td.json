@@ -23,10 +23,7 @@
       "unassignments": [
         {
           "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
-          "assignee_id": "${[scenarioContext][testData][users][Becky][id]}",
-          "case_roles": [
-            "[CREATOR]"
-          ]
+          "assignee_id": "${[scenarioContext][testData][users][Becky][id]}"
         }
       ]
     }

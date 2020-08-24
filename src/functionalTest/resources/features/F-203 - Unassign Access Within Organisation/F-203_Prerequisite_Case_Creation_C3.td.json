@@ -3,7 +3,8 @@
   "_extends_": "F-203_Prerequisite_Case_Creation_C1",
 
   "specs": [
-    "by Becky to create a case - C3"
+    "by Becky to create a case - C3",
+    "by Becky to create a case - C3 which includes Organisation policies that reference case roles R1 and R2"
   ],
 
   "users": {

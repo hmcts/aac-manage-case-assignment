@@ -1,4 +1,6 @@
 # Don't modify this file, it is only needed for the pipeline to set the image and ingressHost
 java:
   image: ${IMAGE_NAME}
-  ingressHost: ${SERVICE_FQDN}
+  ingressHost: ${SERVICE_FQDN}  
+  environment:  
+    CCD_DATA_STORE_API_BASE_URL: http://ccd-data-store-api-staging.service.core-compute-aat.internal  

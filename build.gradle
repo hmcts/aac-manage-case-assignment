@@ -115,8 +115,8 @@ task smoke() {
 }
 
 cucumberReports {
-  outputDir = file("$project.buildDir/reports/tests/befta")
-  reports = files("$project.buildDir/reports/tests/befta/cucumber.json")
+  outputDir = file("${projectDir}/target/cucumber")
+  reports = files("${projectDir}/target/cucumber.json")
 }
 
 task integration(type: Test) {

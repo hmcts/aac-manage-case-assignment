@@ -1,4 +1,4 @@
-@F-001 @Ignore
+@F-001
 Feature: F-001: Assign Access within Organisation
 
   Background:

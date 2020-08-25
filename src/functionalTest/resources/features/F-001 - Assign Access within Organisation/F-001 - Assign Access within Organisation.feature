@@ -92,7 +92,7 @@ Scenario: must return an error response for a missing Case ID
 @S-006
 Scenario: must return an error response for an assignee user who doesn't have a solicitor role for the jurisdiction of the case
 
-      And a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
+    Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
       And a user [S2 - who does not have a solicitor role for the jurisdiction of C1 but works within the same organisation as S1],
       And a case [C1, which S1 has just] created as in [Prerequisite_Case_Creation_C1],
       And a wait time of [5] seconds [to allow for the case just created to appear in search results],

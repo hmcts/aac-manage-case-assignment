@@ -1,9 +1,9 @@
 {
-  "_guid_": "F-203_Prerequisite_Case_Assignment_Seperate_Org_Policies_C1_Bill_By_CAA_Org2",
+  "_guid_": "F-203_Prerequisite_Case_Assignment_Seperate_Org_Policies_C1_Other_Org2_By_CAA_Org2",
   "_extends_": "Prerequisite_Case_Assignment",
 
   "specs": [
-    "by CAA to grant access to C1 for Bill with role R2"
+    "by CAA_Org2 to grant access to C1 for Other_Org2 with role R2"
   ],
 
   "users": {

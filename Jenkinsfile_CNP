@@ -93,11 +93,19 @@ withPipeline("java", product, component) {
   enableAksStagingDeployment()
   disableLegacyDeployment()
 
+  after('smoketest:preview') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*', excludes: '**/reports/tests/befta/**/*.json'
+  }
+
+  after('smoketest:aat') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*', excludes: '**/reports/tests/befta/**/*.json'
+  }
+
   after('functionalTest:preview') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/befta/**/*', excludes: '**/reports/tests/befta/**/*.json'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*', excludes: '**/reports/tests/befta/**/*.json'
   }
 
   after('functionalTest:aat') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/befta/**/*', excludes: '**/reports/tests/befta/**/*.json'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*', excludes: '**/reports/tests/befta/**/*.json'
   }
 }

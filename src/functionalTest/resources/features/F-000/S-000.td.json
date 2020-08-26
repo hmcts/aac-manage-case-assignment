@@ -38,7 +38,7 @@
 			"X-XSS-Protection": "[[ANY_NULLABLE]]"
 		},
 		"body": {
-			"status": "DOWN",
+			"status": "UP",
 			"components": {
 				"discoveryComposite": {
 					"description": "Discovery Client not initialized",

@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.google.common.collect.Lists;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.managecase.BaseTest;
-import uk.gov.hmcts.reform.managecase.domain.EmailNotificationResponse;
+import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequest;
+import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequestStatus;
 import uk.gov.hmcts.reform.managecase.service.NotifyService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,13 +20,12 @@ class NotifyServiceIT extends BaseTest {
     @Test
     public void testEmailNotification() {
 
-        EmailNotificationResponse emailNotificationResponse =
-            this.notifyService.senEmail(
-                Lists.newArrayList("22331112222"),
-                Lists.newArrayList("kiran.yenigala@hmcts.net"));
+        EmailNotificationRequest request = new EmailNotificationRequest("22331112222", "kiran.yenigala@hmcts.net");
+        List<EmailNotificationRequestStatus> notificationRequestStatuses =
+            this.notifyService.senEmail(Lists.newArrayList(request));
 
-        assertNotNull(emailNotificationResponse);
-        assertEquals(1, emailNotificationResponse.getSuccessResponses().size());
+        assertNotNull(notificationRequestStatuses, "response object should not be null");
+        assertEquals(1, notificationRequestStatuses.size(), "size should equals 1");
     }
 
 }

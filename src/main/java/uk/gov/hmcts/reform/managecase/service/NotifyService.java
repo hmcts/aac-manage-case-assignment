@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.managecase.service;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.net.ConnectException;
 import java.util.List;
@@ -10,8 +11,10 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
-import uk.gov.hmcts.reform.managecase.domain.EmailNotificationFailure;
-import uk.gov.hmcts.reform.managecase.domain.EmailNotificationResponse;
+import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequest;
+import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequestFailure;
+import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequestStatus;
+import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequestSuccess;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
@@ -29,41 +32,32 @@ public class NotifyService {
         this.appParams = appParams;
     }
 
-    public EmailNotificationResponse senEmail(final List<String> caseIds,
-                                              final List<String> emailAddresses)  {
-        if (caseIds == null || caseIds.isEmpty()) {
-            throw new ValidationException("At least one case id is required to send notification");
+    public List<EmailNotificationRequestStatus> senEmail(final List<EmailNotificationRequest> notificationRequests) {
+        if (notificationRequests == null || notificationRequests.isEmpty()) {
+            throw new ValidationException("At least one email notification request is required to send notification");
         }
 
-        if (emailAddresses == null || emailAddresses.isEmpty()) {
-            throw new ValidationException("At least one email address is required to send notification");
-        }
-
-        EmailNotificationResponse emailNotificationResponse = new EmailNotificationResponse();
-        for (String caseId : caseIds) {
-            for (String emailAddress : emailAddresses) {
-                try {
-                    emailNotificationResponse.addSuccessResponse(sendNotification(caseId, emailAddress));
-                } catch (NotificationClientException e) {
-                    EmailNotificationFailure notificationFailure = new EmailNotificationFailure();
-                    notificationFailure.setCaseId(caseId);
-                    notificationFailure.setEmailAddress(emailAddress);
-                    notificationFailure.setErrorMessage(e.getMessage());
-                    emailNotificationResponse.addFailureResponse(notificationFailure);
-                }
+        List<EmailNotificationRequestStatus> notificationStatuses = Lists.newArrayList();
+        notificationRequests.forEach(emailNotificationRequest -> {
+            try {
+                notificationStatuses.add(sendNotification(emailNotificationRequest));
+            } catch (Exception e) {
+                notificationStatuses.add(new EmailNotificationRequestFailure(emailNotificationRequest, e));
             }
-        }
-        return emailNotificationResponse;
+        });
+        return notificationStatuses;
     }
 
     @Retryable(value = {ConnectException.class}, backoff = @Backoff(delay = 1000, multiplier = 3))
-    private SendEmailResponse sendNotification(String caseId, String emailAddress) throws NotificationClientException {
-        return this.notificationClient.sendEmail(
+    private EmailNotificationRequestSuccess sendNotification(EmailNotificationRequest request)
+        throws NotificationClientException {
+        SendEmailResponse response = this.notificationClient.sendEmail(
             this.appParams.getEmailTemplateId(),
-            emailAddress,
-            personalisationParams(caseId),
+            request.getEmailAddress(),
+            personalisationParams(request.getCaseId()),
             createReference()
         );
+        return new EmailNotificationRequestSuccess(request, response);
     }
 
     private Map<String, ?> personalisationParams(final String caseId) {

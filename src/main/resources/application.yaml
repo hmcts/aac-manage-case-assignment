@@ -74,5 +74,5 @@ mca:
       enabled: ${MCA_CONDITIONAL_APIS_CASE_ASSIGNMENTS_ENABLED:true}
 
 notify:
-  api-key: ${NOTIFY_MCA_API_KEY:api_keys_api_keys_action_aca_test_api_key-18f9a06b-ee58-4973-937e-ccda99d55386-9fd5ef4a-e92d-4409-9ea7-8d5e49c0120f}
+  api-key: ${NOTIFY_MCA_API_KEY:notify-test-api-key}
   email-template-id: ${NOTIFY_EMAIL_TEMPLATE_ID:a60215dd-08bb-475e-956c-e97fdb7e448c}

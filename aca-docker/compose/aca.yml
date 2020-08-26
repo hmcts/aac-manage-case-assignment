@@ -13,6 +13,7 @@ services:
       MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp
       CCD_DATA_STORE_API_BASE_URL: http://ccd-data-store-api:4452
       PRD_HOST: http://aca-wiremock:8080
+      NOTIFY_MCA_API_KEY: api_keys_api_keys_action_aca_test_api_key-18f9a06b-ee58-4973-937e-ccda99d55386-9fd5ef4a-e92d-4409-9ea7-8d5e49c0120f
     ports:
       - 4454:4454
     depends_on:

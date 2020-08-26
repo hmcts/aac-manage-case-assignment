@@ -65,13 +65,15 @@ public class CaseAssignmentController {
         @ApiResponse(
             code = 400,
             message = "One of the following reasons.\n"
-                + "1. Case ID can not be empty \n"
-                + "2. Case type ID can not be empty \n"
-                + "3. Assignee IDAM ID can not be empty \n"
-                + "4. Intended assignee has to be in the same organisation as that of the invoker. \n"
-                + "5. Case ID has to be one for which a case role is represented by the invoker's organisation. \n"
-                + "6. Case ID has to be for an existing case accessible by the invoker. \n"
-                + "7. Intended assignee has to be a solicitor enabled in the jurisdiction of the case. \n",
+                + "1) Case ID has to be a valid 16-digit Luhn number \n"
+                + "2) Case ID has to be 16-digits long \n"
+                + "3) Case ID can not be empty \n"
+                + "4) Case type ID can not be empty \n"
+                + "5) Assignee IDAM ID can not be empty \n"
+                + "6) Intended assignee has to be in the same organisation as that of the invoker. \n"
+                + "7) Case ID has to be one for which a case role is represented by the invoker's organisation. \n"
+                + "8) Intended assignee has to be a solicitor enabled in the jurisdiction of the case. \n",
+            response = ApiError.class,
             examples = @Example({
                     @ExampleProperty(
                             value = "{\"message\": \"Intended assignee has to be in the same organisation of invoker\","
@@ -88,6 +90,11 @@ public class CaseAssignmentController {
             message = "One of the following reasons.\n"
                 + "1) UnAuthorised S2S service \n"
                 + "2) The user is neither a case access administrator nor a solicitor with access to the jurisdiction"
+        ),
+        @ApiResponse(
+            code = 500,
+            message = "One of the following reasons.\n"
+                + "1) Case could not be fetched"
         )
     })
     public CaseAssignmentResponse assignAccessWithinOrganisation(

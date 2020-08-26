@@ -22,7 +22,7 @@ public interface DataStoreApiClient {
     CaseSearchResponse searchCases(@RequestParam("ctid") String caseTypeId,  @RequestBody String jsonSearchRequest);
 
     @PostMapping(value = "/case-users", consumes = APPLICATION_JSON_VALUE)
-    void assignCase(@RequestBody CaseUserRoleResource userRolesRequest);
+    void assignCase(@RequestBody CaseUserRolesRequest userRolesRequest);
 
     @GetMapping("/case-users")
     CaseUserRoleResource getCaseAssignments(@RequestParam("case_ids") List<String> caseIds,

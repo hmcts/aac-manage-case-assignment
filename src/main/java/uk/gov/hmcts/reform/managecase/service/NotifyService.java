@@ -22,6 +22,8 @@ import uk.gov.service.notify.SendEmailResponse;
 @Service
 public class NotifyService {
 
+    private static final String NOTIFY_EMAIL_REFERENCE = "EMAIL_REFERENCE ";
+
     private final NotificationClient notificationClient;
     private final ApplicationParams appParams;
 
@@ -67,6 +69,6 @@ public class NotifyService {
     }
 
     private String createReference() {
-        return "TestReference";
+        return NOTIFY_EMAIL_REFERENCE + System.currentTimeMillis();
     }
 }

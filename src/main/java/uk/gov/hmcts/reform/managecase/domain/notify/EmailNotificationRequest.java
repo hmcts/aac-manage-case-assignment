@@ -2,11 +2,9 @@ package uk.gov.hmcts.reform.managecase.domain.notify;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
-@Data
-@EqualsAndHashCode
+@Getter
 @AllArgsConstructor
 public class EmailNotificationRequest {
 

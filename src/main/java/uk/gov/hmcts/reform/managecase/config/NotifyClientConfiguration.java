@@ -9,11 +9,8 @@ import uk.gov.service.notify.NotificationClient;
 @Configuration
 public class NotifyClientConfiguration {
 
-    @Autowired
-    private ApplicationParams applicationParams;
-
     @Bean
-    public NotificationClient notificationClient() {
+    public NotificationClient notificationClient(@Autowired ApplicationParams applicationParams) {
         return new NotificationClient(applicationParams.getNotifyApiKey());
     }
 }

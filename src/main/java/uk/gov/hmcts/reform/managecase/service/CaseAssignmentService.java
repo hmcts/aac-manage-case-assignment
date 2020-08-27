@@ -37,12 +37,7 @@ public class CaseAssignmentService {
     public static final String SOLICITOR_ROLE = "caseworker-%s-solicitor";
 
     public static final String CASE_COULD_NOT_BE_FETCHED = "Case could not be fetched";
-    public static final String ASSIGNEE_ROLE_ERROR = "Intended assignee has to be a solicitor "
-            + "enabled in the jurisdiction of the case.";
-    public static final String ASSIGNEE_ORGA_ERROR = "Intended assignee has to be in the same organisation"
-            + " as that of the invoker.";
-    public static final String ORGA_POLICY_ERROR = "Case ID has to be one for which a case role is "
-            + "represented by the invoker's organisation.";
+
 
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
@@ -67,17 +62,17 @@ public class CaseAssignmentService {
 
         FindUsersByOrganisationResponse usersByOrg = prdRepository.findUsersByOrganisation();
         if (!isAssigneePresent(usersByOrg.getUsers(), assignment.getAssigneeId())) {
-            throw new ValidationException(ASSIGNEE_ORGA_ERROR);
+            throw new ValidationException(ValidationError.ASSIGNEE_ORGANISATION_ERROR + ".");
         }
 
         List<String> assigneeRoles = getAssigneeRoles(assignment.getAssigneeId());
         if (!containsIgnoreCase(assigneeRoles, solicitorRole)) {
-            throw new ValidationException(ASSIGNEE_ROLE_ERROR);
+            throw new ValidationException(ValidationError.ASSIGNEE_ROLE_ERROR + ".");
         }
 
         List<String> policyRoles = findInvokerOrgPolicyRoles(caseDetails, usersByOrg.getOrganisationIdentifier());
         if (policyRoles.isEmpty()) {
-            throw new ValidationException(ORGA_POLICY_ERROR);
+            throw new ValidationException(ValidationError.ORGANISATION_POLICY_ERROR + ".");
         }
 
         dataStoreRepository.assignCase(policyRoles, assignment.getCaseId(),
@@ -114,7 +109,7 @@ public class CaseAssignmentService {
             .distinct()
             .forEach(assignee -> {
                 if (!isAssigneePresent(usersByOrg.getUsers(), assignee)) {
-                    throw new ValidationException(ValidationError.INVOKER_NOT_IN_SAME_ORGANISATION_AS_UNASSIGNED_USER);
+                    throw new ValidationException(ValidationError.UNASSIGNEE_ORGANISATION_ERROR + ".");
                 }
             });
 

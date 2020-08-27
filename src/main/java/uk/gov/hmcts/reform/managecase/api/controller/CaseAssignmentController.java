@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentResponse;
@@ -64,37 +65,37 @@ public class CaseAssignmentController {
         ),
         @ApiResponse(
             code = 400,
-            message = "One of the following reasons.\n"
-                + "1) Case ID has to be a valid 16-digit Luhn number \n"
-                + "2) Case ID has to be 16-digits long \n"
-                + "3) Case ID can not be empty \n"
-                + "4) Case type ID can not be empty \n"
-                + "5) Assignee IDAM ID can not be empty \n"
-                + "6) Intended assignee has to be in the same organisation as that of the invoker. \n"
-                + "7) Case ID has to be one for which a case role is represented by the invoker's organisation. \n"
-                + "8) Intended assignee has to be a solicitor enabled in the jurisdiction of the case. \n",
+            message = "One or more of the following reasons"
+                + ": \n1) " + ValidationError.CASE_ID_INVALID
+                + ", \n2) " + ValidationError.CASE_ID_INVALID_LENGTH
+                + ", \n3) " + ValidationError.CASE_ID_EMPTY
+                + ", \n4) " + ValidationError.CASE_TYPE_ID_EMPTY
+                + ", \n5) " + ValidationError.ASSIGNEE_ID_EMPTY
+                + ", \n6) " + ValidationError.ASSIGNEE_ORGANISATION_ERROR
+                + ", \n7) " + ValidationError.ORGANISATION_POLICY_ERROR
+                + ", \n8) " + ValidationError.ASSIGNEE_ROLE_ERROR + ".",
             response = ApiError.class,
             examples = @Example({
                     @ExampleProperty(
-                            value = "{\"message\": \"Intended assignee has to be in the same organisation of invoker\","
-                                    + " \"status\": \"BAD_REQUEST\" }",
-                            mediaType = APPLICATION_JSON_VALUE)
+                        value = "{\n"
+                            + "   \"status\": \"BAD_REQUEST\",\n"
+                            + "   \"message\": \"" + ValidationError.ASSIGNEE_ORGANISATION_ERROR + "\",\n"
+                            + "   \"errors\": [ ]\n"
+                            + "}",
+                        mediaType = APPLICATION_JSON_VALUE)
             })
         ),
         @ApiResponse(
             code = 401,
-            message = "Authentication failure due to invalid / expired tokens (IDAM / S2S)."
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID + "."
         ),
         @ApiResponse(
             code = 403,
-            message = "One of the following reasons.\n"
-                + "1) UnAuthorised S2S service \n"
-                + "2) The user is neither a case access administrator nor a solicitor with access to the jurisdiction"
+            message = AuthError.UNAUTHORISED_S2S_SERVICE + "."
         ),
         @ApiResponse(
             code = 500,
-            message = "One of the following reasons.\n"
-                + "1) Case could not be fetched"
+            message = CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED + "."
         )
     })
     public CaseAssignmentResponse assignAccessWithinOrganisation(
@@ -150,11 +151,11 @@ public class CaseAssignmentController {
             ),
             @ApiResponse(
                     code = 401,
-                    message = "Authentication failure due to invalid / expired tokens (IDAM / S2S)."
+                    message = AuthError.AUTHENTICATION_TOKEN_INVALID + "."
             ),
             @ApiResponse(
                     code = 403,
-                    message = "UnAuthorised S2S service.\n"
+                    message = AuthError.UNAUTHORISED_S2S_SERVICE + "."
             )
     })
     public GetCaseAssignmentsResponse getCaseAssignments(@RequestParam("case_ids")
@@ -175,12 +176,13 @@ public class CaseAssignmentController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons"
-                + ": \n1. " + ValidationError.EMPTY_REQUESTED_UNASSIGNMENTS_LIST
-                + ", \n2. " + ValidationError.CASE_ID_EMPTY
-                + ", \n3. " + ValidationError.CASE_ID_INVALID
-                + ", \n4. " + ValidationError.ASSIGNEE_ID_EMPTY
-                + ", \n5. " + ValidationError.CASE_ROLE_FORMAT_INVALID
-                + ", \n6. " + ValidationError.INVOKER_NOT_IN_SAME_ORGANISATION_AS_UNASSIGNED_USER + ".",
+                + ": \n1) " + ValidationError.EMPTY_REQUESTED_UNASSIGNMENTS_LIST
+                + ": \n2) " + ValidationError.CASE_ID_INVALID
+                + ", \n3) " + ValidationError.CASE_ID_INVALID_LENGTH
+                + ", \n4) " + ValidationError.CASE_ID_EMPTY
+                + ", \n5) " + ValidationError.ASSIGNEE_ID_EMPTY
+                + ", \n6) " + ValidationError.CASE_ROLE_FORMAT_INVALID
+                + ", \n7) " + ValidationError.UNASSIGNEE_ORGANISATION_ERROR + ".",
             response = ApiError.class,
             examples = @Example(value = {
                 @ExampleProperty(
@@ -197,13 +199,11 @@ public class CaseAssignmentController {
         ),
         @ApiResponse(
             code = 401,
-            message = "Authentication failure due to invalid / expired tokens (IDAM / S2S)."
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID + "."
         ),
         @ApiResponse(
             code = 403,
-            message = "One of the following reasons.\n"
-                + "1) UnAuthorised S2S service \n"
-                + "2) The user is neither a case access administrator nor a solicitor with access to the jurisdiction"
+            message = AuthError.UNAUTHORISED_S2S_SERVICE + "."
         )
     })
     public CaseUnassignmentResponse unassignAccessWithinOrganisation(

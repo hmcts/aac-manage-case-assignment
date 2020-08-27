@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
@@ -26,13 +27,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.usersByOrganisation;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.ASSIGNEE_ORGA_ERROR;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.ASSIGNEE_ROLE_ERROR;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
 
 @SuppressWarnings({"PMD.MethodNamingConventions", "PMD.JUnitAssertionsShouldIncludeMessage"})
 class CaseAssignmentServiceTest {
@@ -118,7 +117,7 @@ class CaseAssignmentServiceTest {
 
         assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining(ASSIGNEE_ORGA_ERROR);
+                .hasMessageContaining(ValidationError.ASSIGNEE_ORGANISATION_ERROR);
     }
 
     @Test
@@ -132,6 +131,6 @@ class CaseAssignmentServiceTest {
 
         assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining(ASSIGNEE_ROLE_ERROR);
+                .hasMessageContaining(ValidationError.ASSIGNEE_ROLE_ERROR);
     }
 }

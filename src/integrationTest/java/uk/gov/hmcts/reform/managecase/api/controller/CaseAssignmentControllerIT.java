@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.BaseTest;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 
@@ -39,7 +40,7 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubIdamS
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
-    "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports"})
+    "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "squid:S100"})
 public class CaseAssignmentControllerIT extends BaseTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
@@ -116,7 +117,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message",
-                is("Intended assignee has to be in the same organisation as that of the invoker.")));
+                is(ValidationError.ASSIGNEE_ORGANISATION_ERROR + ".")));
     }
 
     @DisplayName("Must return 400 bad request response if assignee doesn't have a solicitor role for the"
@@ -133,7 +134,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message",
-                   is("Intended assignee has to be a solicitor enabled in the jurisdiction of the case.")));
+                   is(ValidationError.ASSIGNEE_ROLE_ERROR + ".")));
     }
 
     @DisplayName("Must return 400 bad request response if invoker's organisation is not present"
@@ -147,8 +148,7 @@ public class CaseAssignmentControllerIT extends BaseTest {
                                  .contentType(MediaType.APPLICATION_JSON)
                                  .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message", is("Case ID has to be one for which a case role"
-                    + " is represented by the invoker's organisation.")));
+            .andExpect(jsonPath("$.message", is(ValidationError.ORGANISATION_POLICY_ERROR + ".")));
     }
 
     @DisplayName("Successfully return case assignments of my organisation")

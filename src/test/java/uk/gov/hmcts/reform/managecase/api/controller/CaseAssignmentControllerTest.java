@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
 import uk.gov.hmcts.reform.managecase.TestFixtures.CaseAssignedUsersFixture;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.config.SecurityConfiguration;
@@ -43,9 +44,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.GET_ASSIGNMENTS_MESSAGE;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
 
 @WebMvcTest(controllers = CaseAssignmentController.class,
     includeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes = MapperConfig.class),
@@ -116,7 +114,7 @@ public class CaseAssignmentControllerTest {
                                  .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errors", hasSize(1)))
-            .andExpect(jsonPath("$.errors", hasItem("Case type ID can not be empty")));
+            .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_TYPE_ID_EMPTY)));
     }
 
     @DisplayName("should fail with 400 bad request when case id is null")
@@ -129,7 +127,7 @@ public class CaseAssignmentControllerTest {
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errors", hasSize(1)))
-            .andExpect(jsonPath("$.errors", hasItem(CASE_ID_EMPTY)));
+            .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_EMPTY)));
     }
 
     @DisplayName("should fail with 400 bad request when case id is an invalid Luhn number")
@@ -142,8 +140,8 @@ public class CaseAssignmentControllerTest {
                                  .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errors", hasSize(2)))
-            .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID_LENGTH)))
-            .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID)));
+            .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_INVALID_LENGTH)))
+            .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_INVALID)));
     }
 
     @DisplayName("should fail with 400 bad request when assignee id is empty")
@@ -156,7 +154,7 @@ public class CaseAssignmentControllerTest {
              .content(objectMapper.writeValueAsString(request)))
              .andExpect(status().isBadRequest())
              .andExpect(jsonPath("$.errors", hasSize(1)))
-             .andExpect(jsonPath("$.errors", hasItem("IDAM Assignee ID can not be empty")));
+             .andExpect(jsonPath("$.errors", hasItem(ValidationError.ASSIGNEE_ID_EMPTY)));
     }
 
     @DisplayName("should successfully get case assignments")

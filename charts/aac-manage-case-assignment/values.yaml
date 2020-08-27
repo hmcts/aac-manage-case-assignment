@@ -11,7 +11,7 @@ java:
         - idam-mca-client-secret
         - idam-mca-system-user-username
         - idam-mca-system-user-password
-        - notify-mca-api-key
+        - notify-mca-api-key-secret
   environment:
     IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     IDAM_OIDC_URL: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net

@@ -53,18 +53,3 @@ resource "azurerm_key_vault_secret" "aac-manage-case-s2s-secret" {
   key_vault_id = "${module.key-vault.key_vault_id}"
 }
 
-data "azurerm_key_vault" "notify_vault" {
-  name = "notify-mca-api-key-${var.env}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
-}
-
-data "azurerm_key_vault_secret" "notify-mca-api-key-vault-secret" {
-  name = "notify-mca-api-key-vault-secret"
-  key_vault_id = "${data.azurerm_key_vault.notify_vault.id}"
-}
-
-resource "azurerm_key_vault_secret" "notify-mca-api-key-secret" {
-  name = "notify-mca-api-key-secret"
-  value = "${data.azurerm_key_vault_secret.notify-mca-api-key-vault-secret.value}"
-  key_vault_id = "${module.key-vault.key_vault_id}"
-}

@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import java.net.ConnectException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import javax.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
@@ -21,8 +22,6 @@ import uk.gov.service.notify.SendEmailResponse;
 
 @Service
 public class NotifyService {
-
-    private static final String NOTIFY_EMAIL_REFERENCE = "EMAIL_REFERENCE ";
 
     private final NotificationClient notificationClient;
     private final ApplicationParams appParams;
@@ -69,6 +68,6 @@ public class NotifyService {
     }
 
     private String createReference() {
-        return NOTIFY_EMAIL_REFERENCE + System.currentTimeMillis();
+        return UUID.randomUUID().toString();
     }
 }

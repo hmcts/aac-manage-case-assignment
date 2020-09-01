@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequest;
+import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequestFailure;
 import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequestStatus;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -34,6 +35,10 @@ class NotifyServiceTest {
 
     private static final String EMAIL_TEMPLATE_ID = "TestEmailTemplateId";
 
+    private static final String NOT_NULL_MESSAGE = "response statuses should not be null";
+
+    public static final String SIZE_SHOULD_BE_EQUAL_TO_1 = "size should be equal to 1";
+
     @Mock
     private ApplicationParams appParams;
 
@@ -41,6 +46,7 @@ class NotifyServiceTest {
     private NotificationClient notificationClient;
 
     private NotifyService notifyService;
+
 
     @BeforeEach
     void setUp() {
@@ -77,10 +83,10 @@ class NotifyServiceTest {
             Lists.newArrayList(new EmailNotificationRequest("", TEST_EMAIL));
         List<EmailNotificationRequestStatus> requestStatuses = this.notifyService.senEmail(emailNotificationRequests);
 
-        assertNotNull(requestStatuses);
-        assertEquals(1, requestStatuses.size());
-        Exception exception = (Exception) requestStatuses.get(0).getNotificationStatus();
-        assertThat(exception.getMessage()).isEqualTo("case id is required to send notification");
+        assertNotNull(requestStatuses, NOT_NULL_MESSAGE);
+        assertEquals(1, requestStatuses.size(), SIZE_SHOULD_BE_EQUAL_TO_1);
+        EmailNotificationRequestFailure failure = (EmailNotificationRequestFailure) requestStatuses.get(0);
+        assertThat(failure.getException().getMessage()).isEqualTo("case id is required to send notification");
     }
 
     @Test
@@ -90,10 +96,10 @@ class NotifyServiceTest {
             Lists.newArrayList(new EmailNotificationRequest(null, TEST_EMAIL));
         List<EmailNotificationRequestStatus> requestStatuses = this.notifyService.senEmail(emailNotificationRequests);
 
-        assertNotNull(requestStatuses);
-        assertEquals(1, requestStatuses.size());
-        Exception exception = (Exception) requestStatuses.get(0).getNotificationStatus();
-        assertThat(exception.getMessage()).isEqualTo("case id is required to send notification");
+        assertNotNull(requestStatuses, NOT_NULL_MESSAGE);
+        assertEquals(1, requestStatuses.size(), SIZE_SHOULD_BE_EQUAL_TO_1);
+        EmailNotificationRequestFailure failure = (EmailNotificationRequestFailure) requestStatuses.get(0);
+        assertThat(failure.getException().getMessage()).isEqualTo("case id is required to send notification");
     }
 
     @Test
@@ -103,10 +109,10 @@ class NotifyServiceTest {
             Lists.newArrayList(new EmailNotificationRequest(CASE_ID, ""));
         List<EmailNotificationRequestStatus> requestStatuses = this.notifyService.senEmail(emailNotificationRequests);
 
-        assertNotNull(requestStatuses);
-        assertEquals(1, requestStatuses.size());
-        Exception exception = (Exception) requestStatuses.get(0).getNotificationStatus();
-        assertThat(exception.getMessage()).isEqualTo("email address is required to send notification");
+        assertNotNull(requestStatuses, NOT_NULL_MESSAGE);
+        assertEquals(1, requestStatuses.size(), SIZE_SHOULD_BE_EQUAL_TO_1);
+        EmailNotificationRequestFailure failure = (EmailNotificationRequestFailure) requestStatuses.get(0);
+        assertThat(failure.getException().getMessage()).isEqualTo("email address is required to send notification");
     }
 
     @Test
@@ -116,10 +122,10 @@ class NotifyServiceTest {
             Lists.newArrayList(new EmailNotificationRequest(CASE_ID, null));
         List<EmailNotificationRequestStatus> requestStatuses = this.notifyService.senEmail(emailNotificationRequests);
 
-        assertNotNull(requestStatuses);
-        assertEquals(1, requestStatuses.size());
-        Exception exception = (Exception) requestStatuses.get(0).getNotificationStatus();
-        assertThat(exception.getMessage()).isEqualTo("email address is required to send notification");
+        assertNotNull(requestStatuses, NOT_NULL_MESSAGE);
+        assertEquals(1, requestStatuses.size(), SIZE_SHOULD_BE_EQUAL_TO_1);
+        EmailNotificationRequestFailure failure = (EmailNotificationRequestFailure) requestStatuses.get(0);
+        assertThat(failure.getException().getMessage()).isEqualTo("email address is required to send notification");
     }
 
     @Test

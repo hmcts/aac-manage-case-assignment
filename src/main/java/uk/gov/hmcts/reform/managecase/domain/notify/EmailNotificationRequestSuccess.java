@@ -12,8 +12,7 @@ public class EmailNotificationRequestSuccess extends EmailNotificationRequestSta
         this.emailResponse = emailResponse;
     }
 
-    @Override
-    public Object getNotificationStatus() {
+    public SendEmailResponse getResponse() {
         return this.emailResponse;
     }
 }

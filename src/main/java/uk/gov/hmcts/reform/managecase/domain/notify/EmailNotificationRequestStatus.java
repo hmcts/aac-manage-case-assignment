@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.managecase.domain.notify;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
-public abstract class EmailNotificationRequestStatus {
+public class EmailNotificationRequestStatus {
 
     private final EmailNotificationRequest notificationRequest;
 
-    public abstract Object getNotificationStatus();
-
+    protected EmailNotificationRequestStatus(EmailNotificationRequest notificationRequest) {
+        this.notificationRequest = notificationRequest;
+    }
 }

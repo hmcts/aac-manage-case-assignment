@@ -10,8 +10,7 @@ public class EmailNotificationRequestFailure extends EmailNotificationRequestSta
         this.exception = exception;
     }
 
-    @Override
-    public Object getNotificationStatus() {
+    public Exception getException() {
         return this.exception;
     }
 }

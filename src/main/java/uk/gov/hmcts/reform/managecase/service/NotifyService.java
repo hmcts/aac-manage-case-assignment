@@ -52,6 +52,7 @@ public class NotifyService {
     @Retryable(value = {ConnectException.class}, backoff = @Backoff(delay = 1000, multiplier = 3))
     private EmailNotificationRequestSuccess sendNotification(EmailNotificationRequest request)
         throws NotificationClientException {
+        validateRequest(request);
         SendEmailResponse response = this.notificationClient.sendEmail(
             this.appParams.getEmailTemplateId(),
             request.getEmailAddress(),
@@ -59,6 +60,15 @@ public class NotifyService {
             createReference()
         );
         return new EmailNotificationRequestSuccess(request, response);
+    }
+
+    private void validateRequest(EmailNotificationRequest request) {
+        if (request.getCaseId() == null || request.getCaseId().isEmpty()) {
+                throw new ValidationException("case id is required to send notification");
+        }
+        if (request.getEmailAddress() == null || request.getEmailAddress().isEmpty()) {
+            throw new ValidationException("email address is required to send notification");
+        }
     }
 
     private Map<String, ?> personalisationParams(final String caseId) {

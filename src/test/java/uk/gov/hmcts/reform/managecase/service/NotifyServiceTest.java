@@ -50,7 +50,7 @@ class NotifyServiceTest {
 
     @Test
     @DisplayName("should fail when null email notification request list is passed")
-    void shouldThrowValidationExceptionWhenCaseIdsIsNull() {
+    void shouldThrowValidationExceptionWhenNotificationListIsNull() {
         ValidationException exception = assertThrows(
             ValidationException.class,
             () -> this.notifyService.senEmail(null)
@@ -61,13 +61,65 @@ class NotifyServiceTest {
     }
 
     @Test
-    @DisplayName("should fail when emptu email notification request list is passed")
-    void shouldThrowValidationExceptionWhenCaseIdsIsEmpty() {
+    @DisplayName("should fail when empty email notification request list is passed")
+    void shouldThrowValidationExceptionWhenNotificationListIsEmpty() {
         ValidationException exception = assertThrows(ValidationException.class, () ->
             this.notifyService.senEmail(Lists.newArrayList()));
 
         assertThat(exception.getMessage())
             .isEqualTo("At least one email notification request is required to send notification");
+    }
+
+    @Test
+    @DisplayName("should fail when empty case id is passed in email notification object")
+    void shouldThrowValidationExceptionWhenCaseIdIsEmptyInNotificationObject() {
+        List<EmailNotificationRequest> emailNotificationRequests =
+            Lists.newArrayList(new EmailNotificationRequest("", TEST_EMAIL));
+        List<EmailNotificationRequestStatus> requestStatuses = this.notifyService.senEmail(emailNotificationRequests);
+
+        assertNotNull(requestStatuses);
+        assertEquals(1, requestStatuses.size());
+        Exception exception = (Exception) requestStatuses.get(0).getNotificationStatus();
+        assertThat(exception.getMessage()).isEqualTo("case id is required to send notification");
+    }
+
+    @Test
+    @DisplayName("should fail when null case id is passed in email notification object")
+    void shouldThrowValidationExceptionWhenCaseIdIsNullInNotificationObject() {
+        List<EmailNotificationRequest> emailNotificationRequests =
+            Lists.newArrayList(new EmailNotificationRequest(null, TEST_EMAIL));
+        List<EmailNotificationRequestStatus> requestStatuses = this.notifyService.senEmail(emailNotificationRequests);
+
+        assertNotNull(requestStatuses);
+        assertEquals(1, requestStatuses.size());
+        Exception exception = (Exception) requestStatuses.get(0).getNotificationStatus();
+        assertThat(exception.getMessage()).isEqualTo("case id is required to send notification");
+    }
+
+    @Test
+    @DisplayName("should fail when null case id is passed in email notification object")
+    void shouldThrowValidationExceptionWhenEmailAddressIsEmptyInNotificationObject() {
+        List<EmailNotificationRequest> emailNotificationRequests =
+            Lists.newArrayList(new EmailNotificationRequest(CASE_ID, ""));
+        List<EmailNotificationRequestStatus> requestStatuses = this.notifyService.senEmail(emailNotificationRequests);
+
+        assertNotNull(requestStatuses);
+        assertEquals(1, requestStatuses.size());
+        Exception exception = (Exception) requestStatuses.get(0).getNotificationStatus();
+        assertThat(exception.getMessage()).isEqualTo("email address is required to send notification");
+    }
+
+    @Test
+    @DisplayName("should fail when empty case id is passed in email notification object")
+    void shouldThrowValidationExceptionWhenEmailAddressIsNullInNotificationObject() {
+        List<EmailNotificationRequest> emailNotificationRequests =
+            Lists.newArrayList(new EmailNotificationRequest(CASE_ID, null));
+        List<EmailNotificationRequestStatus> requestStatuses = this.notifyService.senEmail(emailNotificationRequests);
+
+        assertNotNull(requestStatuses);
+        assertEquals(1, requestStatuses.size());
+        Exception exception = (Exception) requestStatuses.get(0).getNotificationStatus();
+        assertThat(exception.getMessage()).isEqualTo("email address is required to send notification");
     }
 
     @Test

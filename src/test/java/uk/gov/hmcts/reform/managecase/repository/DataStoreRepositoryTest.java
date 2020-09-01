@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisat
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 
-
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +50,7 @@ class DataStoreRepositoryTest {
     @Test
     @DisplayName("Find case by caseTypeId and caseId")
     void shouldFindCaseBy() {
+        // ARRANGE
         CaseDetails caseDetails = CaseDetails.builder()
                 .caseTypeId(CASE_TYPE_ID)
                 .reference(CASE_ID)
@@ -58,8 +58,10 @@ class DataStoreRepositoryTest {
         CaseSearchResponse response = new CaseSearchResponse(Lists.newArrayList(caseDetails));
         given(dataStoreApi.searchCases(anyString(), anyString())).willReturn(response);
 
+        // ACT
         Optional<CaseDetails> result = repository.findCaseBy(CASE_TYPE_ID, CASE_ID);
 
+        // ASSERT
         assertThat(result).get().isEqualTo(caseDetails);
 
         verify(dataStoreApi).searchCases(eq(CASE_TYPE_ID), eq(String.format(ES_QUERY, CASE_ID)));
@@ -68,21 +70,27 @@ class DataStoreRepositoryTest {
     @Test
     @DisplayName("Find case return no cases")
     void shouldReturnNoCaseForSearch() {
+        // ARRANGE
         CaseSearchResponse response = new CaseSearchResponse(Lists.newArrayList());
         given(dataStoreApi.searchCases(anyString(), anyString())).willReturn(response);
 
+        // ACT
         Optional<CaseDetails> result = repository.findCaseBy(CASE_TYPE_ID, CASE_ID);
 
-        assertThat(result).isEqualTo(Optional.empty());
+        // ASSERT
+        assertThat(result).isNotPresent();
     }
 
     @Test
     @DisplayName("Assign case access")
     void shouldAssignCase() {
+        // ARRANGE
         doNothing().when(dataStoreApi).assignCase(any(CaseUserRolesRequest.class));
 
+        // ACT
         repository.assignCase(List.of(ROLE), CASE_ID, ASSIGNEE_ID, ORG_ID);
 
+        // ASSERT
         ArgumentCaptor<CaseUserRolesRequest> captor = ArgumentCaptor.forClass(CaseUserRolesRequest.class);
         verify(dataStoreApi).assignCase(captor.capture());
         List<CaseUserRoleWithOrganisation> caseUserRoles = captor.getValue().getCaseUsers();
@@ -99,6 +107,7 @@ class DataStoreRepositoryTest {
     @Test
     @DisplayName("Get case assignments")
     void shouldGetCaseAssignments() {
+        // ARRANGE
         List<String> caseIds = List.of(CASE_ID);
         List<String> userIds = List.of(ASSIGNEE_ID);
 
@@ -111,13 +120,42 @@ class DataStoreRepositoryTest {
         given(dataStoreApi.getCaseAssignments(caseIds, userIds))
                 .willReturn(new CaseUserRoleResource(List.of(inputRole)));
 
+        // ACT
         List<CaseUserRole> caseUserRoles = repository.getCaseAssignments(caseIds, userIds);
 
+        // ASSERT
         assertThat(caseUserRoles.size()).isEqualTo(1);
         CaseUserRole caseUserRole = caseUserRoles.get(0);
 
         assertThat(caseUserRole.getCaseId()).isEqualTo(CASE_ID);
         assertThat(caseUserRole.getCaseRole()).isEqualTo(ROLE);
         assertThat(caseUserRole.getUserId()).isEqualTo(ASSIGNEE_ID);
+    }
+
+    @Test
+    @DisplayName("Remove case user roles")
+    void shouldRemoveCaseUserRoles() {
+        // ARRANGE
+        doNothing().when(dataStoreApi).removeCaseUserRoles(any(CaseUserRolesRequest.class));
+
+        List<CaseUserRole> caseUserRoles = List.of(
+            new CaseUserRole(CASE_ID, ASSIGNEE_ID, ROLE)
+        );
+
+        // ACT
+        repository.removeCaseUserRoles(caseUserRoles, ORG_ID);
+
+        // ASSERT
+        ArgumentCaptor<CaseUserRolesRequest> captor = ArgumentCaptor.forClass(CaseUserRolesRequest.class);
+        verify(dataStoreApi).removeCaseUserRoles(captor.capture());
+        List<CaseUserRoleWithOrganisation> caseUserRolesWithOrganisation = captor.getValue().getCaseUsers();
+
+        assertThat(caseUserRolesWithOrganisation.size()).isEqualTo(1);
+        CaseUserRoleWithOrganisation caseUserRole = caseUserRolesWithOrganisation.get(0);
+
+        assertThat(caseUserRole.getCaseId()).isEqualTo(CASE_ID);
+        assertThat(caseUserRole.getCaseRole()).isEqualTo(ROLE);
+        assertThat(caseUserRole.getUserId()).isEqualTo(ASSIGNEE_ID);
+        assertThat(caseUserRole.getOrganisationId()).isEqualTo(ORG_ID);
     }
 }

@@ -42,6 +42,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @ConditionalOnProperty(value = "mca.conditional-apis.case-assignments.enabled", havingValue = "true")
 public class CaseAssignmentController {
 
+    @SuppressWarnings({"squid:S1075"})
+    public static final String CASE_ASSIGNMENTS_PATH = "/case-assignments";
+
     public static final String ASSIGN_ACCESS_MESSAGE =
             "Roles %s from the organisation policies successfully assigned to the assignee.";
     public static final String UNASSIGN_ACCESS_MESSAGE = "Unassignment(s) performed successfully.";
@@ -55,7 +58,7 @@ public class CaseAssignmentController {
         this.mapper = mapper;
     }
 
-    @PostMapping(path = "/case-assignments", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(path = CASE_ASSIGNMENTS_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Assign Access within Organisation", notes = "Assign Access within Organisation")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponses({
@@ -105,7 +108,7 @@ public class CaseAssignmentController {
         return new CaseAssignmentResponse(String.format(ASSIGN_ACCESS_MESSAGE, StringUtils.join(roles, ',')));
     }
 
-    @GetMapping(path = "/case-assignments", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(path = CASE_ASSIGNMENTS_PATH, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get Case Assignments in My Organisation", notes = "Get Assignments in My Organisation")
     @ResponseStatus(HttpStatus.OK)
     @ApiResponses({
@@ -165,12 +168,12 @@ public class CaseAssignmentController {
         return new GetCaseAssignmentsResponse(GET_ASSIGNMENTS_MESSAGE, caseAssignedUsers);
     }
 
-    @DeleteMapping(path = "/case-assignments", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = CASE_ASSIGNMENTS_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Unassign Access within Organisation", notes = "Unassign Access within Organisation")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     @ApiResponses({
         @ApiResponse(
-            code = 201,
+            code = 200,
             message = UNASSIGN_ACCESS_MESSAGE
         ),
         @ApiResponse(

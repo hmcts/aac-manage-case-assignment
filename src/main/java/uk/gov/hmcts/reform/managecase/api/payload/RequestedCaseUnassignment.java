@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.hibernate.validator.constraints.LuhnCheck;
 
@@ -19,12 +20,13 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 
 @Getter
 @AllArgsConstructor
+@EqualsAndHashCode
 @ApiModel("Requested Unassignment From Case")
 public class RequestedCaseUnassignment {
 
     @JsonProperty("case_id")
     @NotEmpty(message = ValidationError.CASE_ID_EMPTY)
-    @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID)
+    @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID_LENGTH)
     @LuhnCheck(message = ValidationError.CASE_ID_INVALID)
     @ApiModelProperty(value = "Case ID to Unassign Access To", required = true, example = "1583841721773828")
     private final String caseId;

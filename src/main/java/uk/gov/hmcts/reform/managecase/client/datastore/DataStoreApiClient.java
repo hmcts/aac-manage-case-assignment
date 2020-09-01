@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.CASE_USERS;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.SEARCH_CASES;
 
 @FeignClient(
     name = "data-store-api",
@@ -18,17 +20,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 )
 public interface DataStoreApiClient {
 
-    @PostMapping(value = "/searchCases", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = SEARCH_CASES, consumes = APPLICATION_JSON_VALUE)
     CaseSearchResponse searchCases(@RequestParam("ctid") String caseTypeId,  @RequestBody String jsonSearchRequest);
 
-    @PostMapping(value = "/case-users", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = CASE_USERS, consumes = APPLICATION_JSON_VALUE)
     void assignCase(@RequestBody CaseUserRolesRequest userRolesRequest);
 
-    @GetMapping("/case-users")
+    @GetMapping(CASE_USERS)
     CaseUserRoleResource getCaseAssignments(@RequestParam("case_ids") List<String> caseIds,
                                             @RequestParam("user_ids") List<String> userIds);
 
-    @DeleteMapping("/case-users")
+    @DeleteMapping(value = CASE_USERS, consumes = APPLICATION_JSON_VALUE)
     void removeCaseUserRoles(@RequestBody CaseUserRolesRequest userRolesRequest);
 
 }

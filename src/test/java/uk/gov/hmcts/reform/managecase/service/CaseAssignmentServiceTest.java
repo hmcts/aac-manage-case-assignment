@@ -119,7 +119,7 @@ class CaseAssignmentServiceTest {
 
         @Test
         @DisplayName("should throw case could not be fetched error error when case is not found")
-        void shouldThrowValidationException_whenCaseNotFound() {
+        void shouldThrowCaseCouldNotBeFetchedException_whenCaseNotFound() {
 
             given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, CASE_ID))
                 .willReturn(Optional.empty());
@@ -166,8 +166,8 @@ class CaseAssignmentServiceTest {
         }
 
         @Test
-        @DisplayName("should un-assign a single case role in the organisation")
-        void shouldUnAssignSingleCaseRole() {
+        @DisplayName("should get case assignments")
+        void shouldGetCaseAssignments() {
             // ARRANGE
             given(prdRepository.findUsersByOrganisation())
                 .willReturn(usersByOrganisation(user(ASSIGNEE_ID), user(ASSIGNEE_ID2)));
@@ -329,6 +329,40 @@ class CaseAssignmentServiceTest {
                 .getCaseAssignments(eq(List.of(CASE_ID, CASE_ID2)), eq(List.of(ASSIGNEE_ID, ASSIGNEE_ID2)));
             // verify no action taken
             verify(dataStoreRepository, never()).removeCaseUserRoles(any(), eq(ORGANIZATION_ID));
+        }
+
+        @Test
+        @DisplayName("should un-assign case roles after stripping duplicates found through lookups or requests.")
+        void shouldUnAssignCaseRoleWithoutDuplicates() {
+            // ARRANGE
+            unassignments = List.of(
+                new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, List.of(CASE_ROLE)),
+                new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, List.of(CASE_ROLE)), // i.e. DUPLICATE
+                new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, null),
+                new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, List.of())
+            );
+
+            List<CaseUserRole> allCaseUserRoles = List.of(
+                new CaseUserRole(CASE_ID, ASSIGNEE_ID, CASE_ROLE) // i.e. DUPLICATE
+            );
+
+            given(dataStoreRepository.getCaseAssignments(eq(List.of(CASE_ID)),
+                                                         eq(List.of(ASSIGNEE_ID))))
+                .willReturn(allCaseUserRoles);
+
+            // ACT
+            service.unassignCaseAccess(unassignments);
+
+            // ASSERT
+            // verify look up of case roles occurred
+            verify(dataStoreRepository, times(1))
+                .getCaseAssignments(eq(List.of(CASE_ID)), eq(List.of(ASSIGNEE_ID)));
+            // verify action taken
+            verify(dataStoreRepository).removeCaseUserRoles(caseUserRolesCaptor.capture(), eq(ORGANIZATION_ID));
+            List<CaseUserRole> captorValue = caseUserRolesCaptor.getValue();
+            assertThat(captorValue)
+                .hasSize(1) // just the one although multiple requested
+                .contains(new CaseUserRole(CASE_ID, ASSIGNEE_ID, CASE_ROLE));
         }
 
         @Test

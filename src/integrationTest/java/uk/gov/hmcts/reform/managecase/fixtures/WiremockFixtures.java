@@ -79,12 +79,14 @@ public final class WiremockFixtures {
     public static void stubSearchCaseWithPrefix(String caseTypeId, String searchQuery,
                                                 CaseDetails caseDetails, String prefix) {
         stubFor(WireMock.post(urlEqualTo(prefix + SEARCH_CASES + "?ctid=" + caseTypeId))
-                .withRequestBody(equalToJson(searchQuery))
-                .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-                .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-                .willReturn(aResponse()
-                        .withStatus(HTTP_OK).withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
-                        .withHeader("Content-Type", "application/json")));
+            .withRequestBody(equalToJson(searchQuery))
+            .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+            .willReturn(aResponse()
+                .withStatus(HTTP_OK)
+                    .withBody(getJsonString(
+                        caseDetails == null ? new CaseSearchResponse() : new CaseSearchResponse(list(caseDetails))))
+                .withHeader("Content-Type", "application/json")));
     }
 
     public static void stubSearchCase(String caseTypeId, String searchQuery, CaseDetails caseDetails) {

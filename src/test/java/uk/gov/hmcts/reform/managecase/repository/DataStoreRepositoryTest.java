@@ -34,6 +34,7 @@ class DataStoreRepositoryTest {
     private static final String ASSIGNEE_ID = "0a5874a4-3f38-4bbd-ba4c";
     private static final String ROLE = "caseworker-probate";
     private static final String CASE_ID = "12345678";
+    private static final String CASE_ID2 = "87654321";
     private static final String ORG_ID = "organisation1";
 
     @Mock
@@ -139,7 +140,8 @@ class DataStoreRepositoryTest {
         doNothing().when(dataStoreApi).removeCaseUserRoles(any(CaseUserRolesRequest.class));
 
         List<CaseUserRole> caseUserRoles = List.of(
-            new CaseUserRole(CASE_ID, ASSIGNEE_ID, ROLE)
+            new CaseUserRole(CASE_ID, ASSIGNEE_ID, ROLE),
+            new CaseUserRole(CASE_ID2, ASSIGNEE_ID, ROLE)
         );
 
         // ACT
@@ -150,12 +152,11 @@ class DataStoreRepositoryTest {
         verify(dataStoreApi).removeCaseUserRoles(captor.capture());
         List<CaseUserRoleWithOrganisation> caseUserRolesWithOrganisation = captor.getValue().getCaseUsers();
 
-        assertThat(caseUserRolesWithOrganisation.size()).isEqualTo(1);
-        CaseUserRoleWithOrganisation caseUserRole = caseUserRolesWithOrganisation.get(0);
-
-        assertThat(caseUserRole.getCaseId()).isEqualTo(CASE_ID);
-        assertThat(caseUserRole.getCaseRole()).isEqualTo(ROLE);
-        assertThat(caseUserRole.getUserId()).isEqualTo(ASSIGNEE_ID);
-        assertThat(caseUserRole.getOrganisationId()).isEqualTo(ORG_ID);
+        assertThat(caseUserRolesWithOrganisation)
+            .hasSameSizeAs(caseUserRoles)
+            .containsAll(List.of(
+                new CaseUserRoleWithOrganisation(CASE_ID, ASSIGNEE_ID, ROLE, ORG_ID),
+                new CaseUserRoleWithOrganisation(CASE_ID2, ASSIGNEE_ID, ROLE, ORG_ID)
+            ));
     }
 }

@@ -45,6 +45,7 @@ public class TestFixtures {
         private IdamFixture() {
         }
 
+        @SuppressWarnings("PMD.LawOfDemeter")
         public static uk.gov.hmcts.reform.idam.client.models.UserDetails userDetails(String id, String... roles) {
             return uk.gov.hmcts.reform.idam.client.models.UserDetails.builder()
                     .id(id)

@@ -12,7 +12,7 @@
 
 	"request": {
 		"body": {
-      "case_type_id" : "FT_MasterCaseType",
+			"case_type_id" : "FT_MasterCaseType",
 			"case_id": null
 		}
 	},

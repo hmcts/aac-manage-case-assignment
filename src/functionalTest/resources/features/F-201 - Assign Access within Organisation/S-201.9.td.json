@@ -1,27 +1,27 @@
 {
-  "_guid_": "S-201.9",
-  "_extends_": "F-201-Base",
-  "title": "Must return an error response for a valid Luhn number used as Case ID but no cases found",
+	"_guid_": "S-201.9",
+	"_extends_": "F-201-Base",
+	"title": "Must return an error response for a valid Luhn number used as Case ID but no cases found",
 
-  "specs": [
-    "S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation",
-    "S2 - with a solicitor role within the same organisation",
-    "intends to assign access within the same organisation for S2 by S1",
-    "contains a valid Luhn number as Case ID"
-  ],
+	"specs": [
+		"S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation",
+		"S2 - with a solicitor role within the same organisation",
+		"intends to assign access within the same organisation for S2 by S1",
+		"contains a valid Luhn number as Case ID"
+	],
 
-  "request": {
-    "body": {
-      "case_type_id": "FT_MasterCaseType",
-      "case_id": "4716416216866173"
-    }
-  },
+	"request": {
+		"body": {
+			"case_type_id": "FT_MasterCaseType",
+			"case_id": "4716416216866173"
+		}
+	},
 
-  "expectedResponse": {
-    "_extends_": "ACA_500_Response",
-    "body": {
-      "message": "Case could not be fetched",
-      "errors": []
-    }
-  }
+	"expectedResponse": {
+		"_extends_": "ACA_500_Response",
+		"body": {
+			"message": "Case could not be fetched",
+			"errors": []
+		}
+	}
 }

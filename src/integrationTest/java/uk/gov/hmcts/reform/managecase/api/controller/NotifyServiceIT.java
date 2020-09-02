@@ -20,7 +20,8 @@ class NotifyServiceIT extends BaseTest {
     @Test
     public void testEmailNotification() {
 
-        EmailNotificationRequest request = new EmailNotificationRequest("22331112222", "kiran.yenigala@hmcts.net");
+        EmailNotificationRequest request =
+            new EmailNotificationRequest("22331112222", "simulate-delivered@notifications.service.gov.uk");
         List<EmailNotificationRequestStatus> notificationRequestStatuses =
             this.notifyService.senEmail(Lists.newArrayList(request));
 

@@ -50,3 +50,6 @@ do
   esac
 done < <(psql "postgres://$DB_USER_NAME:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME" -t --csv -c "$SQL_COMMAND")
 
+echo ""
+echo -e "\e[1m\e[31m*** Values in prd_users.json have been updated ***"
+echo -e "*** Please restart your aca-wiremock docker container for changes to take effect ***\e[0m"

@@ -58,17 +58,10 @@
   
     This script updates placeholders in `aca-docker/mocks/wiremock/__files/prd_users.json`
     
-    **NOTE** You will need `psql` installed to run this script
+    **NOTE** You will need `psql` (at least version 12.4) installed to run this script
     
     You need to run this script every time you run `./bin/add-users.sh`, as adding users will
     use generate new GUIDs.
-    
-    **NOTE** Do not check in 
-    
-    `aca-docker/mocks/wiremock/__files/prd_users.json`
-    
-    after the script has updated it with GUIDs as the script will not be able to find placeholder values to substitute 
-    next time it is run
     
     The `aca-wiremock` container will need to be restarted to read in these new GUIDs
     

@@ -180,7 +180,7 @@ public class CaseAssignmentController {
             code = 400,
             message = "One or more of the following reasons"
                 + ": \n1) " + ValidationError.EMPTY_REQUESTED_UNASSIGNMENTS_LIST
-                + ": \n2) " + ValidationError.CASE_ID_INVALID
+                + ", \n2) " + ValidationError.CASE_ID_INVALID
                 + ", \n3) " + ValidationError.CASE_ID_INVALID_LENGTH
                 + ", \n4) " + ValidationError.CASE_ID_EMPTY
                 + ", \n5) " + ValidationError.ASSIGNEE_ID_EMPTY

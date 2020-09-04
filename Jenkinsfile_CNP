@@ -94,18 +94,29 @@ withPipeline("java", product, component) {
   disableLegacyDeployment()
 
   after('smoketest:preview') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*', excludes: '**/BEFTA Report for Smoke Tests/**/*.json'
+    copyIgnore('./build/reports/tests/befta/smoke/cucumber-html-reports', './BEFTA Report for Smoke Tests/')
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
   }
 
   after('smoketest:aat') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*', excludes: '**/BEFTA Report for Smoke Tests/**/*.json'
+    copyIgnore('./build/reports/tests/befta/smoke/cucumber-html-reports', './BEFTA Report for Smoke Tests/')
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
   }
 
   after('functionalTest:preview') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*', excludes: '**/BEFTA Report for Functional Tests/**/*.json'
+    copyIgnore('./build/reports/tests/befta/functional/cucumber-html-reports', './BEFTA Report for Functional Tests/')
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
   }
 
   after('functionalTest:aat') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*', excludes: '**/BEFTA Report for Functional Tests/**/*.json'
+    copyIgnore('./build/reports/tests/befta/functional/cucumber-html-reports', './BEFTA Report for Functional Tests/')
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
   }
+}
+
+/**
+  * Forces a recursive copy by always returning 0 regardless of errors
+  */
+def copyIgnore(filePath, destinationDir) {
+  steps.sh("cp -R '${filePath}' '${destinationDir}' || :")
 }

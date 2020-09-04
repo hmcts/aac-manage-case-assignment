@@ -74,7 +74,7 @@ task smoke(type: Test) {
 
   doLast {
     generateCucumberReports.enabled = true
-    cucumberReports.outputDir = file("${rootDir}/BEFTA Report for Smoke Tests")
+    cucumberReports.outputDir = file("${project.buildDir}/reports/tests/befta/smoke")
     cucumberReports.reports = files("${cucumberReports.outputDir}/cucumber.json")
 
     javaexec {
@@ -100,7 +100,7 @@ task functional(type: Test) {
 
   doLast {
     generateCucumberReports.enabled = true
-    cucumberReports.outputDir = file("${rootDir}/BEFTA Report for Functional Tests")
+    cucumberReports.outputDir = file("${project.buildDir}/reports/tests/befta/functional")
     cucumberReports.reports = files("${cucumberReports.outputDir}/cucumber.json")
 
     javaexec {

@@ -31,6 +31,7 @@ public class TestFixtures {
     public static final String FIRST_NAME = "Bill";
     public static final String LAST_NAME = "Roberts";
     public static final String EMAIL = "bill.roberts@greatbrsolicitors.co.uk";
+    public static final String IDAM_STATUS = "ACTIVE";
 
     private static final ObjectMapper OBJECT_MAPPER = new Jackson2ObjectMapperBuilder()
             .modules(new Jdk8Module())
@@ -77,12 +78,14 @@ public class TestFixtures {
                     .caseTypeId(CASE_TYPE_ID)
                     .reference(CASE_ID)
                     .jurisdiction(JURISDICTION)
+                    .state(null)
                     .data(Maps.newHashMap("OrganisationPolicy1", jsonNode(ORGANIZATION_ID, CASE_ROLE)));
         }
 
         public static OrganisationPolicy organisationPolicy(String organizationId, String orgPolicyRole) {
             return OrganisationPolicy.builder()
                     .orgPolicyCaseAssignedRole(orgPolicyRole)
+                    .orgPolicyReference(null)
                     .organisation(new Organisation(organizationId, organizationId))
                     .build();
         }
@@ -107,6 +110,7 @@ public class TestFixtures {
                     .firstName(FIRST_NAME)
                     .lastName(LAST_NAME)
                     .email(EMAIL)
+                    .idamStatus(IDAM_STATUS)
                     .build();
         }
 

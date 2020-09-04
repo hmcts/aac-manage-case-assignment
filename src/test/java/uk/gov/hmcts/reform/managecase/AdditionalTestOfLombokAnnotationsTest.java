@@ -14,12 +14,14 @@ import uk.gov.hmcts.reform.managecase.domain.CaseAssignedUsers;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.UserDetails;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Additional tests of Lombok annotations that are hard to reach.
  */
-@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert"})
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions"})
 class AdditionalTestOfLombokAnnotationsTest {
 
     @Nested
@@ -35,6 +37,25 @@ class AdditionalTestOfLombokAnnotationsTest {
                 .verify();
         }
 
+        @Test
+        @DisplayName("RequestedCaseUnassignment should comply with equals and hashCode methods (withRedefinedClasses)")
+        void requestedCaseUnassignmentTestEqualsContract_withRedefine() {
+            class SubRequestedCaseUnassignment extends RequestedCaseUnassignment {
+                public SubRequestedCaseUnassignment(String caseId, String assigneeId, List<String> caseRoles) {
+                    super(caseId, assigneeId, caseRoles);
+                }
+
+                @Override
+                public boolean canEqual(Object obj) {
+                    return false;
+                }
+            }
+
+            EqualsVerifier.forClass(RequestedCaseUnassignment.class)
+                .withRedefinedSuperclass()
+                .withRedefinedSubclass(SubRequestedCaseUnassignment.class)
+                .verify();
+        }
     }
 
     @Nested
@@ -71,6 +92,26 @@ class AdditionalTestOfLombokAnnotationsTest {
         }
 
         @Test
+        @DisplayName("CaseUserRole should comply with equals and hashCode methods (withRedefinedClasses)")
+        void caseUserRoleEqualsContract_withRedefine() {
+            class SubCaseUserRole extends CaseUserRole {
+                public SubCaseUserRole(String caseId, String assigneeId, String caseRole) {
+                    super(caseId, assigneeId, caseRole);
+                }
+
+                @Override
+                public boolean canEqual(Object obj) {
+                    return false;
+                }
+            }
+
+            EqualsVerifier.forClass(CaseUserRole.class)
+                .withRedefinedSuperclass()
+                .withRedefinedSubclass(SubCaseUserRole.class)
+                .verify();
+        }
+
+        @Test
         @DisplayName("CaseUserRoleWithOrganisation.CaseUserRoleWithOrganisationBuilder has a toString method")
         void caseUserRoleWithOrganisationBuilderHasToStringMethod() {
             // ARRANGE
@@ -87,6 +128,28 @@ class AdditionalTestOfLombokAnnotationsTest {
             EqualsVerifier
                 .forClass(CaseUserRoleWithOrganisation.class)
                 .suppress(Warning.STRICT_INHERITANCE)
+                .verify();
+        }
+
+        @Test
+        @DisplayName(
+            "CaseUserRoleWithOrganisation should comply with equals and hashCode methods (withRedefinedClasses)")
+        void caseUserRoleWithOrganisationEqualsContract_withRedefine() {
+            class SubCaseUserRoleWithOrganisation extends CaseUserRoleWithOrganisation {
+                public SubCaseUserRoleWithOrganisation(String caseId, String assigneeId, String caseRole,
+                                                       String orgId) {
+                    super(caseId, assigneeId, caseRole, orgId);
+                }
+
+                @Override
+                public boolean canEqual(Object obj) {
+                    return false;
+                }
+            }
+
+            EqualsVerifier.forClass(CaseUserRoleWithOrganisation.class)
+                .withRedefinedSuperclass()
+                .withRedefinedSubclass(SubCaseUserRoleWithOrganisation.class)
                 .verify();
         }
     }

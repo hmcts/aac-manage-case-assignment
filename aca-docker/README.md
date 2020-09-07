@@ -7,46 +7,46 @@
 ## Prerequisites
 
 - [Docker](https://www.docker.com)
+- psql (Tested with version 12.4)
+- `ccd-docker` environment configured and running,
+see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
 
 ### Environment Variables
-- Ensure the relevant environment variables in `aca-docker\bin\env_variables-all` are set by either
-
-    - exporting them all in your bash profile (`~/.bash_profile`)
-    - from `aca-docker/bin` running `source set-environment-variables.sh`
-    
-    **NOTE**: Using `source set-environment-variables.sh` does not deal with exported values containing spaces.
-    If using this method you will need to manually export the following environment variable
+- Ensure the relevant environment variables in `aca-docker/bin/env_variables-all.txt` are set by running 
     
     ```bash
-    export BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP="profile openid roles"   
-    ```
+    cd aca-docker/bin
+    source env_variables_all.txt
+  ```
+    
 
 ### IDAM Configuration
 
 - Create ACA test roles, services and users using scripts located in the bin directory.
     
     Export following variables required for the scripts to run
-    ```
+    ```bash
     export IDAM_ADMIN_USER=<enter email>
     export IDAM_ADMIN_PASSWORD=<enter password>
     ```
-    `IDAM_ADMIN_USER` and `IDAM_ADMIN_PASSWORD` details can be found on [confluence](https://tools.hmcts.net/confluence/x/eQP3P)
+  
+    The value for `IDAM_ADMIN_USER` and `IDAM_ADMIN_PASSWORD` details can be found on [confluence](https://tools.hmcts.net/confluence/x/eQP3P)
 
-    - To add idam client services (eg: xui-web) :
+    - To add idam client services (eg: `xuiwebapp`) :
 
-    ```
+    ```bash
       ./bin/add-idam-clients.sh
     ```
     
     - To add roles required to import ccd definition:
     
-    ```
+    ```bash
       ./bin/add-roles.sh
     ```
     
     - To add users:
     
-    ```
+    ```bash
       ./bin/add-users.sh
     ```
 
@@ -57,16 +57,14 @@
     ```
   
     This script updates placeholders in `aca-docker/mocks/wiremock/__files/prd_users.json`
-    
-    **NOTE** You will need `psql` (at least version 12.4) installed to run this script
-    
+        
     You need to run this script every time you run `./bin/add-users.sh`, as adding users will
     use generate new GUIDs.
     
     The `aca-wiremock` container will need to be restarted to read in these new GUIDs
     
-    ```
-    > cd aca_docker
+    ```bash
+    > cd aca-docker
     > docker-compose -f compose/aca.yml restart -aca-wiremock
     ```
 
@@ -75,7 +73,7 @@
   
     Please enable elasticsearch along with other ccd components.
       
-    ```
+    ```bash
     ./ccd enable backend sidam sidam-local sidam-local-ccd elasticsearch
     ```
   
@@ -91,7 +89,7 @@
 
 Please run aca docker as follows. 
 ```
-> cd aca_docker
+> cd aca-docker
 > docker-compose -f compose/aca.yml up -d
 ```
 

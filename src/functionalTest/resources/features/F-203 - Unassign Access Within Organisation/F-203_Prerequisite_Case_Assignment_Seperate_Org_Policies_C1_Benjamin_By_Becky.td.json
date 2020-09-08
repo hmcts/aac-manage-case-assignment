@@ -23,9 +23,9 @@
     }
   },
 
-	"expectedResponse": {
-		"body": {
-			"status_message": "Roles [Claimant] from the organisation policies successfully assigned to the assignee."
-		}
-	}
+  "expectedResponse": {
+    "body": {
+      "status_message": "Roles [Claimant] from the organisation policies successfully assigned to the assignee."
+    }
+  }
 }

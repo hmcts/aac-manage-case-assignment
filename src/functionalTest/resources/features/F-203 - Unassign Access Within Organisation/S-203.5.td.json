@@ -6,9 +6,8 @@
   "specs": [
     "Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation - O1",
     "Benjamin - with a solicitor role for the same jurisdiction within organisation - O1",
-    "Other_Org2 - with a solicitor role for the same jurisdiction within a different organisation from Becky - O2",
-    "CAA_Org2 - with a Pui-CAA role for the same jurisdiction and in organisation - O2",
-    "is made by Becky and intends to unassign access to C1 for Benjamin and Bill"
+    "Other_User - with a solicitor role for the same jurisdiction but not in the organisation",
+    "is made by Becky and intends to unassign access to C1 for Benjamin and Other_User"
   ],
 
   "users": {
@@ -18,11 +17,8 @@
     "Benjamin": {
       "_extends_": "ACA_Users_Benjamin"
     },
-    "Other_Org2": {
-      "_extends_": "ACA_Users_Other_Org2"
-    },
-    "CAA_Org2": {
-      "_extends_": "ACA_Users_CAA_Org2"
+    "Other_User": {
+      "_extends_": "ACA_Users_befta_caseworker_2_solicitor_1"
     }
   },
 
@@ -35,7 +31,7 @@
         },
         {
           "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_Seperate_Org_Policies_C1][testData][actualResponse][body][id]}",
-          "assignee_id": "${[scenarioContext][testData][users][Other_Org2][id]}"
+          "assignee_id": "${[scenarioContext][testData][users][Other_User][id]}"
         }
       ]
     }

@@ -1,13 +1,13 @@
 {
-  "_guid_": "S-203.8",
+  "_guid_": "S-203.11",
   "_extends_": "F-203_Base",
-  "title": "Must return an error response for a malformed Case-Role",
+  "title": "Must return an error response for a missing Assignee ID",
 
   "specs": [
     "Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation",
     "Benjamin - with a solicitor role for the same jurisdiction within the same organisation as Becky",
     "is made by Becky and intends to unassign access for Benjamin to some cases",
-    "contains the Case-Role(s) of C1 plus an additional malformed Case-Role"
+    "does not contain an Assignee ID"
   ],
 
   "users": {
@@ -24,18 +24,11 @@
       "unassignments": [
         {
           "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
-          "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}",
-          "case_roles": [
-            "[Claimant]",
-            "[Defendant]"
-          ]
+          "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}"
         },
         {
           "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
-          "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}",
-          "case_roles": [
-            "bad-role-name"
-          ]
+          "assignee_id": ""
         }
       ]
     }
@@ -45,7 +38,7 @@
     "_extends_": "ACA_400_Response",
     "body": {
       "status" : "BAD_REQUEST",
-      "errors": [ "Case role name format is invalid" ]
+      "errors": [ "IDAM Assignee ID can not be empty" ]
     }
   }
 }

@@ -1,20 +1,24 @@
 {
   "_guid_": "S-203.9",
   "_extends_": "F-203_Base",
-  "title": "Must return an error response if the invoker doesn't have access to the case of the user they are trying to remove access for",
+  "title": "Solicitor successfully removing access to multiple cases for multiple solicitors in their org (happy path)",
 
   "specs": [
-    "Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation",
-    "Benjamin - with a solicitor role for the same jurisdiction within the same organisation as Becky",
-    "is made by Benjamin and intends to unassign access to C1 for Becky"
+    "Becky - with a Solicitor role in a jurisdiction under an organisation to assign and Unassign a case role to a solicitor within the same organisation",
+    "Benjamin - with a Solicitor role in the same jurisdiction under the same organisation as Becky to be assigned and unassigned to some cases",
+    "Bill - with a Solicitor role in the same jurisdiction under the same organisation as Becky to be assigned and unassigned to some cases",
+    "is made by Becky and intends to unassign access to C1, C2 and C3 for Benjamin & Bill with R1 only"
   ],
 
   "users": {
-    "Becky": {
+    "invokingUser": {
       "_extends_": "ACA_Users_Becky"
     },
-    "invokingUser": {
+    "Benjamin": {
       "_extends_": "ACA_Users_Benjamin"
+    },
+    "Bill": {
+      "_extends_": "ACA_Users_Bill"
     }
   },
 
@@ -23,16 +27,56 @@
       "unassignments": [
         {
           "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
-          "assignee_id": "${[scenarioContext][testData][users][Becky][id]}"
+          "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}",
+          "case_roles": [
+            "[Claimant]"
+          ]
+        },
+        {
+          "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Bill][id]}",
+          "case_roles": [
+            "[Claimant]"
+          ]
+        },
+
+        {
+          "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}",
+          "case_roles": [
+            "[Claimant]"
+          ]
+        },
+        {
+          "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Bill][id]}",
+          "case_roles": [
+            "[Claimant]"
+          ]
+        },
+
+        {
+          "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}",
+          "case_roles": [
+            "[Claimant]"
+          ]
+        },
+        {
+          "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Bill][id]}",
+          "case_roles": [
+            "[Claimant]"
+          ]
         }
       ]
     }
   },
 
   "expectedResponse": {
-    "_extends_": "Common_403_Response",
+    "_extends_": "Common_200_Response",
     "body": {
-      "message" : "The user is neither a case access administrator nor a solicitor with access to the jurisdiction"
+      "status_message": "Unassignment(s) performed successfully."
     }
   }
 }

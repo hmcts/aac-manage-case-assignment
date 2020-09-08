@@ -62,17 +62,17 @@ public class CaseAssignmentService {
 
         FindUsersByOrganisationResponse usersByOrg = prdRepository.findUsersByOrganisation();
         if (!isAssigneePresent(usersByOrg.getUsers(), assignment.getAssigneeId())) {
-            throw new ValidationException(ValidationError.ASSIGNEE_ORGANISATION_ERROR + ".");
+            throw new ValidationException(ValidationError.ASSIGNEE_ORGANISATION_ERROR);
         }
 
         List<String> assigneeRoles = getAssigneeRoles(assignment.getAssigneeId());
         if (!containsIgnoreCase(assigneeRoles, solicitorRole)) {
-            throw new ValidationException(ValidationError.ASSIGNEE_ROLE_ERROR + ".");
+            throw new ValidationException(ValidationError.ASSIGNEE_ROLE_ERROR);
         }
 
         List<String> policyRoles = findInvokerOrgPolicyRoles(caseDetails, usersByOrg.getOrganisationIdentifier());
         if (policyRoles.isEmpty()) {
-            throw new ValidationException(ValidationError.ORGANISATION_POLICY_ERROR + ".");
+            throw new ValidationException(ValidationError.ORGANISATION_POLICY_ERROR);
         }
 
         dataStoreRepository.assignCase(policyRoles, assignment.getCaseId(),
@@ -100,19 +100,19 @@ public class CaseAssignmentService {
     }
 
     public void unassignCaseAccess(List<RequestedCaseUnassignment> unassignments) {
+        FindUsersByOrganisationResponse usersByOrg = getUsersByOrganisation(unassignments);
 
-        // load all users up front ...
-        FindUsersByOrganisationResponse usersByOrg = prdRepository.findUsersByOrganisation();
-        // ... and validate that all assignees can found in user list
-        unassignments.stream()
-            .map(RequestedCaseUnassignment::getAssigneeId)
-            .distinct()
-            .forEach(assignee -> {
-                if (!isAssigneePresent(usersByOrg.getUsers(), assignee)) {
-                    throw new ValidationException(ValidationError.UNASSIGNEE_ORGANISATION_ERROR + ".");
-                }
-            });
+        final List<CaseUserRole> missingRoleInformation = getMissingRoleInformation(unassignments);
 
+        List<CaseUserRole> caseUserRolesToUnassign = expandUnassignmentsList(unassignments, missingRoleInformation);
+
+        // NB: no processing required if empty (i.e. no roles found to delete)
+        if (!caseUserRolesToUnassign.isEmpty()) {
+            dataStoreRepository.removeCaseUserRoles(caseUserRolesToUnassign, usersByOrg.getOrganisationIdentifier());
+        }
+    }
+
+    private List<CaseUserRole> getMissingRoleInformation(List<RequestedCaseUnassignment> unassignments) {
         // get list of all CaseId-Assignees that are missing list of roles
         List<RequestedCaseUnassignment> unassignmentsMissingRoles = unassignments.stream()
             // filter out those with case roles specified
@@ -132,13 +132,23 @@ public class CaseAssignmentService {
                 .collect(toList());
             missingRoleInformation.addAll(dataStoreRepository.getCaseAssignments(caseIds, userIds));
         }
+        return missingRoleInformation;
+    }
 
-        List<CaseUserRole> caseUserRolesToUnassign = expandUnassignmentsList(unassignments, missingRoleInformation);
+    private FindUsersByOrganisationResponse getUsersByOrganisation(List<RequestedCaseUnassignment> unassignments) {
+        // load all users up front ...
+        FindUsersByOrganisationResponse usersByOrg = prdRepository.findUsersByOrganisation();
+        // ... and validate that all assignees can found in user list
+        unassignments.stream()
+            .map(RequestedCaseUnassignment::getAssigneeId)
+            .distinct()
+            .forEach(assignee -> {
+                if (!isAssigneePresent(usersByOrg.getUsers(), assignee)) {
+                    throw new ValidationException(ValidationError.UNASSIGNEE_ORGANISATION_ERROR);
+                }
+            });
 
-        // NB: no processing required if empty (i.e. no roles found to delete)
-        if (!caseUserRolesToUnassign.isEmpty()) {
-            dataStoreRepository.removeCaseUserRoles(caseUserRolesToUnassign, usersByOrg.getOrganisationIdentifier());
-        }
+        return usersByOrg;
     }
 
     private List<CaseUserRole> expandUnassignmentsList(List<RequestedCaseUnassignment> unassignments,

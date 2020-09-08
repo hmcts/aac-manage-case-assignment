@@ -68,15 +68,15 @@ public class CaseAssignmentController {
         ),
         @ApiResponse(
             code = 400,
-            message = "One or more of the following reasons"
-                + ": \n1) " + ValidationError.CASE_ID_INVALID
-                + ", \n2) " + ValidationError.CASE_ID_INVALID_LENGTH
-                + ", \n3) " + ValidationError.CASE_ID_EMPTY
-                + ", \n4) " + ValidationError.CASE_TYPE_ID_EMPTY
-                + ", \n5) " + ValidationError.ASSIGNEE_ID_EMPTY
-                + ", \n6) " + ValidationError.ASSIGNEE_ORGANISATION_ERROR
-                + ", \n7) " + ValidationError.ORGANISATION_POLICY_ERROR
-                + ", \n8) " + ValidationError.ASSIGNEE_ROLE_ERROR + ".",
+            message = "One or more of the following reasons:"
+                + "\n1) " + ValidationError.CASE_ID_INVALID
+                + "\n2) " + ValidationError.CASE_ID_INVALID_LENGTH
+                + "\n3) " + ValidationError.CASE_ID_EMPTY
+                + "\n4) " + ValidationError.CASE_TYPE_ID_EMPTY
+                + "\n5) " + ValidationError.ASSIGNEE_ID_EMPTY
+                + "\n6) " + ValidationError.ASSIGNEE_ORGANISATION_ERROR
+                + "\n7) " + ValidationError.ORGANISATION_POLICY_ERROR
+                + "\n8) " + ValidationError.ASSIGNEE_ROLE_ERROR,
             response = ApiError.class,
             examples = @Example({
                     @ExampleProperty(
@@ -90,15 +90,15 @@ public class CaseAssignmentController {
         ),
         @ApiResponse(
             code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID + "."
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
         ),
         @ApiResponse(
             code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE + "."
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
         ),
         @ApiResponse(
             code = 500,
-            message = CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED + "."
+            message = CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED
         )
     })
     public CaseAssignmentResponse assignAccessWithinOrganisation(
@@ -154,11 +154,11 @@ public class CaseAssignmentController {
             ),
             @ApiResponse(
                     code = 401,
-                    message = AuthError.AUTHENTICATION_TOKEN_INVALID + "."
+                    message = AuthError.AUTHENTICATION_TOKEN_INVALID
             ),
             @ApiResponse(
                     code = 403,
-                    message = AuthError.UNAUTHORISED_S2S_SERVICE + "."
+                    message = AuthError.UNAUTHORISED_S2S_SERVICE
             )
     })
     public GetCaseAssignmentsResponse getCaseAssignments(@RequestParam("case_ids")
@@ -178,14 +178,14 @@ public class CaseAssignmentController {
         ),
         @ApiResponse(
             code = 400,
-            message = "One or more of the following reasons"
-                + ": \n1) " + ValidationError.EMPTY_REQUESTED_UNASSIGNMENTS_LIST
-                + ": \n2) " + ValidationError.CASE_ID_INVALID
-                + ", \n3) " + ValidationError.CASE_ID_INVALID_LENGTH
-                + ", \n4) " + ValidationError.CASE_ID_EMPTY
-                + ", \n5) " + ValidationError.ASSIGNEE_ID_EMPTY
-                + ", \n6) " + ValidationError.CASE_ROLE_FORMAT_INVALID
-                + ", \n7) " + ValidationError.UNASSIGNEE_ORGANISATION_ERROR + ".",
+            message = "One or more of the following reasons:"
+                + "\n1) " + ValidationError.EMPTY_REQUESTED_UNASSIGNMENTS_LIST
+                + "\n2) " + ValidationError.CASE_ID_INVALID
+                + "\n3) " + ValidationError.CASE_ID_INVALID_LENGTH
+                + "\n4) " + ValidationError.CASE_ID_EMPTY
+                + "\n5) " + ValidationError.ASSIGNEE_ID_EMPTY
+                + "\n6) " + ValidationError.CASE_ROLE_FORMAT_INVALID
+                + "\n7) " + ValidationError.UNASSIGNEE_ORGANISATION_ERROR,
             response = ApiError.class,
             examples = @Example(value = {
                 @ExampleProperty(
@@ -202,11 +202,11 @@ public class CaseAssignmentController {
         ),
         @ApiResponse(
             code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID + "."
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
         ),
         @ApiResponse(
             code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE + "."
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
     public CaseUnassignmentResponse unassignAccessWithinOrganisation(

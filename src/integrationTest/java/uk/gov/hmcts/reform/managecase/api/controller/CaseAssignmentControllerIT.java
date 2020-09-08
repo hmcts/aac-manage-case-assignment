@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
@@ -71,6 +72,7 @@ public class CaseAssignmentControllerIT {
 
     private static final String RAW_QUERY = "{\"query\":{\"bool\":{\"filter\":{\"term\":{\"reference\":%s}}}}}";
     private static final String ES_QUERY = String.format(RAW_QUERY, CASE_ID);
+    private static final List<String> NULL_CASE_ROLES = null;
 
     @Nested
     @DisplayName("POST /case-assignments")
@@ -140,7 +142,7 @@ public class CaseAssignmentControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath(
                     "$.message",
-                    is(ValidationError.ASSIGNEE_ORGANISATION_ERROR + ".")
+                    is(ValidationError.ASSIGNEE_ORGANISATION_ERROR)
                 ));
         }
 
@@ -159,7 +161,7 @@ public class CaseAssignmentControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath(
                     "$.message",
-                    is(ValidationError.ASSIGNEE_ROLE_ERROR + ".")
+                    is(ValidationError.ASSIGNEE_ROLE_ERROR)
                 ));
         }
 
@@ -174,7 +176,7 @@ public class CaseAssignmentControllerIT {
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", is(ValidationError.ORGANISATION_POLICY_ERROR + ".")));
+                .andExpect(jsonPath("$.message", is(ValidationError.ORGANISATION_POLICY_ERROR)));
         }
 
         @DisplayName("Must return 500 server error response if case could not be found")
@@ -332,8 +334,8 @@ public class CaseAssignmentControllerIT {
             // ARRANGE
             // :: request data
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, null),
-                new RequestedCaseUnassignment(CASE_ID2, ANOTHER_USER, null)
+                new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, NULL_CASE_ROLES),
+                new RequestedCaseUnassignment(CASE_ID2, ANOTHER_USER, NULL_CASE_ROLES)
             );
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
@@ -374,8 +376,8 @@ public class CaseAssignmentControllerIT {
             // ARRANGE
             // :: request data
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, null),
-                new RequestedCaseUnassignment(CASE_ID2, ANOTHER_USER, null)
+                new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, NULL_CASE_ROLES),
+                new RequestedCaseUnassignment(CASE_ID2, ANOTHER_USER, NULL_CASE_ROLES)
             );
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
@@ -405,7 +407,7 @@ public class CaseAssignmentControllerIT {
             // ARRANGE
             // :: request data
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment(CASE_ID, "ASSIGNEE-NOT-IN-ORG", null)
+                new RequestedCaseUnassignment(CASE_ID, "ASSIGNEE-NOT-IN-ORG", NULL_CASE_ROLES)
             );
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
@@ -417,7 +419,7 @@ public class CaseAssignmentControllerIT {
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", is(ValidationError.UNASSIGNEE_ORGANISATION_ERROR + ".")));
+                .andExpect(jsonPath("$.message", is(ValidationError.UNASSIGNEE_ORGANISATION_ERROR)));
 
             // ASSERT
             verify(exactly(0), deleteRequestedFor(urlEqualTo(CASE_USERS)));
@@ -464,7 +466,7 @@ public class CaseAssignmentControllerIT {
         void shouldReturn400_whenCaseIdIsNull() throws Exception {
             // ARRANGE
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment(null, ASSIGNEE_ID, List.of())
+                new RequestedCaseUnassignment(null, ASSIGNEE_ID, Collections.emptyList())
             );
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
@@ -507,7 +509,7 @@ public class CaseAssignmentControllerIT {
         void shouldReturn400_whenAssigneeIdIsNull() throws Exception {
             // ARRANGE
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment(CASE_ID, null, List.of())
+                new RequestedCaseUnassignment(CASE_ID, null, Collections.emptyList())
             );
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 

@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 
 import java.util.List;
@@ -43,11 +45,12 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public void assignCase(List<String> caseRoles, String caseId, String userId) {
-        List<CaseUserRole> caseUserRoles = caseRoles.stream()
-                .map(role -> CaseUserRole.builder().caseRole(role).caseId(caseId).userId(userId).build())
+    public void assignCase(List<String> caseRoles, String caseId, String userId, String organisationId) {
+        List<CaseUserRoleWithOrganisation> caseUserRoles = caseRoles.stream()
+                .map(role -> CaseUserRoleWithOrganisation.withOrganisationBuilder()
+                    .caseRole(role).caseId(caseId).userId(userId).organisationId(organisationId).build())
                 .collect(Collectors.toList());
-        dataStoreApi.assignCase(new CaseUserRoleResource(caseUserRoles));
+        dataStoreApi.assignCase(new CaseUserRolesRequest(caseUserRoles));
     }
 
     @Override

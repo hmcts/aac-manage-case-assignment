@@ -1,0 +1,26 @@
+{
+	"_guid_": "S-201.2",
+	"_extends_": "F-201-Base",
+	"title": "CAA successfully sharing case access with another solicitor in their org",
+
+	"specs": [
+		"S1 - a solicitor, to create a case under their organisation",
+		"S2 - another solicitor in the same organisation, with whom a CAA will share a case with an assignment within organisation",
+		"CAA - a PUI case access admin, to share a case with a solicitor in the same organisation",
+		"is to be invoked by CAA to assign access over C1 for S2 within the same organisation"
+	],
+
+	"users": {
+		"invokingUser": {
+			"username": "befta.pui.caa.1@gmail.com",
+			"password": "[[$CCD_BEFTA_PUI_CAA_1_PWD]]"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_201_Response",
+		"body": {
+			"status_message": "Roles [Defendant],[Claimant] from the organisation policies successfully assigned to the assignee."
+		}
+	}
+}

@@ -1,0 +1,29 @@
+{
+	"_guid_": "F-202_Prerequisite_Case_Assignment_C2_Bill",
+	"_extends_": "F-202_Prerequisite_Case_Assignment",
+
+	"specs": [
+		"to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Bill access to C2"
+	],
+
+	"users": {
+		"Becky": {
+			"username": "befta.master.solicitor.becky@gmail.com",
+			"password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]",
+			"id": "${[scenarioContext][parentContext][testData][users][Becky][id]}"
+		},
+		"Bill": {
+			"username": "befta.master.solicitor.bill@gmail.com",
+			"password": "[[$CCD_BEFTA_MASTER_SOLICITOR_3_PWD]]",
+			"id": "${[scenarioContext][parentContext][testData][users][Bill][id]}"
+		}
+	},
+
+	"request": {
+		"body": {
+			"case_type_id": "${[scenarioContext][siblingContexts][F-202_Prerequisite_Case_Creation_C2][testData][actualResponse][body][case_type_id]}",
+			"case_id": "${[scenarioContext][siblingContexts][F-202_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}",
+			"assignee_id": "${[scenarioContext][testData][users][Bill][id]}"
+		}
+	}
+}

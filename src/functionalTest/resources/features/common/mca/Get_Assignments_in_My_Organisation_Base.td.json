@@ -1,0 +1,24 @@
+{
+  "_guid_": "Get_Assignments_In_My_Organisation_Base",
+
+  "productName": "Manage Case Assignment Microservice",
+  "operationName": "Get Assignments in My Organisation",
+
+  "method": "GET",
+  "uri": "/case-assignments",
+
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
+
+  "request": {
+    "_extends_": "Common_Request"
+  },
+
+  "expectedResponse": {
+		"_extends_": "Common_200_Response",
+    "body" : {
+      "status_message": "Case-User-Role assignments returned successfully",
+      "case_assignments": []
+    }
+  }
+}

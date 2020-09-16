@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 public class CaseAssignmentRequest {
 
     @JsonProperty("case_type_id")
-    @NotEmpty(message = "Case type ID can not be empty")
+    @NotEmpty(message = ValidationError.CASE_TYPE_ID_EMPTY)
     @ApiModelProperty(value = "Case type ID of the requested case", required = true, example = "PROBATE-TEST")
     private String caseTypeId;
 
@@ -30,7 +30,7 @@ public class CaseAssignmentRequest {
     private String caseId;
 
     @JsonProperty("assignee_id")
-    @NotEmpty(message = "IDAM Assignee ID can not be empty")
+    @NotEmpty(message = ValidationError.ASSIGNEE_ID_EMPTY)
     @ApiModelProperty(value = "IDAM ID of the Assign User", required = true, example = "ecb5edf4-2f5f-4031-a0ec")
     private String assigneeId;
 }

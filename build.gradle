@@ -269,6 +269,9 @@ dependencies {
   testImplementation group: 'io.rest-assured', name: 'json-path', version: versions.restAssured
   testImplementation group: 'io.rest-assured', name: 'xml-path', version: versions.restAssured
 
+  // https://mvnrepository.com/artifact/nl.jqno.equalsverifier/equalsverifier
+  testCompile group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '3.4.2'
+
   // groovy v3.* added to avoid 'WARNING: Illegal reflective access by org.codehaus.groovy.reflection.CachedClass'
   // in groovy:2.5.* when running functional/befta tests
   testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.3'

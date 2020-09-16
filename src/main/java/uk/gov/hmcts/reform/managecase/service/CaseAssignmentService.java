@@ -16,6 +16,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestedCaseUnassignment;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
@@ -35,12 +37,7 @@ public class CaseAssignmentService {
     public static final String SOLICITOR_ROLE = "caseworker-%s-solicitor";
 
     public static final String CASE_COULD_NOT_BE_FETCHED = "Case could not be fetched";
-    public static final String ASSIGNEE_ROLE_ERROR = "Intended assignee has to be a solicitor "
-            + "enabled in the jurisdiction of the case.";
-    public static final String ASSIGNEE_ORGA_ERROR = "Intended assignee has to be in the same organisation"
-            + " as that of the invoker.";
-    public static final String ORGA_POLICY_ERROR = "Case ID has to be one for which a case role is "
-            + "represented by the invoker's organisation.";
+
 
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
@@ -65,17 +62,17 @@ public class CaseAssignmentService {
 
         FindUsersByOrganisationResponse usersByOrg = prdRepository.findUsersByOrganisation();
         if (!isAssigneePresent(usersByOrg.getUsers(), assignment.getAssigneeId())) {
-            throw new ValidationException(ASSIGNEE_ORGA_ERROR);
+            throw new ValidationException(ValidationError.ASSIGNEE_ORGANISATION_ERROR);
         }
 
         List<String> assigneeRoles = getAssigneeRoles(assignment.getAssigneeId());
         if (!containsIgnoreCase(assigneeRoles, solicitorRole)) {
-            throw new ValidationException(ASSIGNEE_ROLE_ERROR);
+            throw new ValidationException(ValidationError.ASSIGNEE_ROLE_ERROR);
         }
 
         List<String> policyRoles = findInvokerOrgPolicyRoles(caseDetails, usersByOrg.getOrganisationIdentifier());
         if (policyRoles.isEmpty()) {
-            throw new ValidationException(ORGA_POLICY_ERROR);
+            throw new ValidationException(ValidationError.ORGANISATION_POLICY_ERROR);
         }
 
         dataStoreRepository.assignCase(policyRoles, assignment.getCaseId(),
@@ -100,6 +97,81 @@ public class CaseAssignmentService {
         return rolesByUserIdAndByCaseId.entrySet().stream()
                 .map(entry -> toCaseAssignedUsers(entry.getKey(), entry.getValue(), prdUsersMap))
                 .collect(toList());
+    }
+
+    public void unassignCaseAccess(List<RequestedCaseUnassignment> unassignments) {
+        FindUsersByOrganisationResponse usersByOrg = getUsersByOrganisation(unassignments);
+
+        final List<CaseUserRole> missingRoleInformation = getMissingRoleInformation(unassignments);
+
+        List<CaseUserRole> caseUserRolesToUnassign = expandUnassignmentsList(unassignments, missingRoleInformation);
+
+        // NB: no processing required if empty (i.e. no roles found to delete)
+        if (!caseUserRolesToUnassign.isEmpty()) {
+            dataStoreRepository.removeCaseUserRoles(caseUserRolesToUnassign, usersByOrg.getOrganisationIdentifier());
+        }
+    }
+
+    private List<CaseUserRole> getMissingRoleInformation(List<RequestedCaseUnassignment> unassignments) {
+        // get list of all CaseId-Assignees that are missing list of roles
+        List<RequestedCaseUnassignment> unassignmentsMissingRoles = unassignments.stream()
+            // filter out those with case roles specified
+            .filter(unassignment -> !unassignment.hasCaseRoles())
+            .collect(toList());
+
+        // load missing role information up front in single data store call
+        final List<CaseUserRole> missingRoleInformation = new ArrayList<>();
+        if (!unassignmentsMissingRoles.isEmpty()) {
+            List<String> caseIds =  unassignmentsMissingRoles.stream()
+                .map(RequestedCaseUnassignment::getCaseId)
+                .distinct()
+                .collect(toList());
+            List<String> userIds =  unassignmentsMissingRoles.stream()
+                .map(RequestedCaseUnassignment::getAssigneeId)
+                .distinct()
+                .collect(toList());
+            missingRoleInformation.addAll(dataStoreRepository.getCaseAssignments(caseIds, userIds));
+        }
+        return missingRoleInformation;
+    }
+
+    private FindUsersByOrganisationResponse getUsersByOrganisation(List<RequestedCaseUnassignment> unassignments) {
+        // load all users up front ...
+        FindUsersByOrganisationResponse usersByOrg = prdRepository.findUsersByOrganisation();
+        // ... and validate that all assignees can found in user list
+        unassignments.stream()
+            .map(RequestedCaseUnassignment::getAssigneeId)
+            .distinct()
+            .forEach(assignee -> {
+                if (!isAssigneePresent(usersByOrg.getUsers(), assignee)) {
+                    throw new ValidationException(ValidationError.UNASSIGNEE_ORGANISATION_ERROR);
+                }
+            });
+
+        return usersByOrg;
+    }
+
+    private List<CaseUserRole> expandUnassignmentsList(List<RequestedCaseUnassignment> unassignments,
+                                                       List<CaseUserRole> missingRoleInformation) {
+
+        return unassignments.stream()
+            .map(unassignment -> {
+                // if roles defined :: expand into list of CaseUserRole objects
+                if (unassignment.hasCaseRoles()) {
+                    return unassignment.getCaseRoles().stream()
+                        .map(role -> new CaseUserRole(unassignment.getCaseId(), unassignment.getAssigneeId(), role))
+                        .collect(toList());
+                    // otherwise :: expand using missingRoleInformation
+                } else {
+                    return missingRoleInformation.stream()
+                        .filter(caseUserRole -> caseUserRole.getCaseId().equals(unassignment.getCaseId())
+                            && caseUserRole.getUserId().equals(unassignment.getAssigneeId()))
+                        .collect(toList());
+                }
+            })
+            .flatMap(List::stream)
+            .distinct()
+            .collect(toList());
     }
 
     private CaseAssignedUsers toCaseAssignedUsers(String caseId, Map<String, List<String>> userRolesMap,

@@ -3,9 +3,11 @@ package uk.gov.hmcts.reform.managecase.client.datastore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter
+@EqualsAndHashCode(callSuper = true)
 public class CaseUserRoleWithOrganisation extends CaseUserRole {
 
     @JsonProperty("organisation_id")

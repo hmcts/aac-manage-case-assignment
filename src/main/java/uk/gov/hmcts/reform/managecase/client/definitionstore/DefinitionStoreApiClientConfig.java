@@ -1,14 +1,12 @@
-package uk.gov.hmcts.reform.managecase.client.datastore;
+package uk.gov.hmcts.reform.managecase.client.definitionstore;
 
 import org.springframework.context.annotation.Bean;
 import uk.gov.hmcts.reform.managecase.client.SystemUserAuthHeadersInterceptor;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
-public class DataStoreApiClientConfig {
+public class DefinitionStoreApiClientConfig {
 
-    public static final String SEARCH_CASES = "/searchCases";
-    public static final String CASE_USERS = "/case-users";
-    public static final String INTERNAL_CASES = "/internal/cases";
+    public static final String CHALLENGE_QUESTIONS = "api/display/challenge-questions/case-type/{ctid}/question-groups/{id}";;
 
     @Bean
     public SystemUserAuthHeadersInterceptor systemUserAuthHeadersInterceptor(SecurityUtils securityUtils) {

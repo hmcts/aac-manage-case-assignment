@@ -6,11 +6,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.CASE_USERS;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.INTERNAL_CASES;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.SEARCH_CASES;
 
 @FeignClient(
@@ -29,6 +31,9 @@ public interface DataStoreApiClient {
     @GetMapping(CASE_USERS)
     CaseUserRoleResource getCaseAssignments(@RequestParam("case_ids") List<String> caseIds,
                                             @RequestParam("user_ids") List<String> userIds);
+
+    @GetMapping(INTERNAL_CASES)
+    CaseViewResource getCaseDetailsByCaseId(@RequestParam("case_ids") String caseId);
 
     @DeleteMapping(value = CASE_USERS, consumes = APPLICATION_JSON_VALUE)
     void removeCaseUserRoles(@RequestBody CaseUserRolesRequest userRolesRequest);

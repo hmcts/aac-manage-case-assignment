@@ -65,7 +65,7 @@ see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
     
     ```bash
     > cd aca-docker
-    > docker-compose -f compose/aca.yml restart -aca-wiremock
+    > docker-compose -f compose/aca.yml restart aca-wiremock
     ```
 
 ### Run `ccd-docker` containers  

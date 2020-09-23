@@ -1,0 +1,57 @@
+{
+  "_guid_": "F-203_Prerequisite_Case_Creation_Seperate_Org_Policies_C1",
+  "_extends_": "F-203_Prerequisite_Case_Creation_C1",
+
+  "specs": [
+    "by Becky to create a case - C1 with Organisation policies containing R1 and R2"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Becky"
+    }
+  },
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_Seperate_Org_Policies_C1_Token_Creation][testData][actualResponse][body][token]}",
+      "data": {
+        "OrganisationPolicyField1": {
+          "OrgPolicyReference": "ClaimantPolicy",
+          "Organisation": {
+            "OrganisationID": "QUK822N",
+            "OrganisationName": "CCD Solicitors Limited"
+          }
+        },
+        "OrganisationPolicyField2": {
+          "OrgPolicyReference": "DefendantPolicy",
+          "Organisation": {
+            "OrganisationID": "Org-Two",
+            "OrganisationName": "CCD Solicitors Limited"
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "OrganisationPolicyField1": {
+          "OrgPolicyReference": "ClaimantPolicy",
+          "Organisation": {
+            "OrganisationID": "QUK822N",
+            "OrganisationName": "CCD Solicitors Limited"
+          }
+        },
+        "OrganisationPolicyField2": {
+          "OrgPolicyReference": "DefendantPolicy",
+          "Organisation": {
+            "OrganisationID": "Org-Two",
+            "OrganisationName": "CCD Solicitors Limited"
+          }
+        }
+      }
+    }
+  }
+}

@@ -54,8 +54,8 @@
 					"Country": "UK"
 				},
 				"DocumentField": {
-					"document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4",
-					"document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4/binary",
+					"document_url": "{{DM_STORE_BASE_URL}}/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4",
+					"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4/binary",
 					"document_filename": "Sample.pdf"
 				}
 			},
@@ -101,8 +101,8 @@
 					"Country": null
 				},
 				"DocumentField": {
-					"document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4",
-					"document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4/binary",
+					"document_url": "{{DM_STORE_BASE_URL}}/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4",
+					"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4/binary",
 					"document_filename": "Sample.pdf"
 				},
 				"MoneyField": "20000",

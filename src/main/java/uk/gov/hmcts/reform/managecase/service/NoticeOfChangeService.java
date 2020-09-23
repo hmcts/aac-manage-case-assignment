@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
@@ -78,6 +79,7 @@ public class NoticeOfChangeService {
         // check if empty and throw error
         //step 10 n/a
         //step 11 For each set of answers in the config, check that there is an OrganisationPolicy field in the case containing the case role, returning an error if this is not true.
+        CaseSearchResultViewResource casefields = findCaseBy(caseType, caseId);
 
         challengeQuestionsResult.getQuestions().forEach(challengeQuestion -> {
             String[] answers = challengeQuestion.getAnswerField().split(",");
@@ -131,19 +133,11 @@ public class NoticeOfChangeService {
         return dataStoreRepository.findCaseByCaseId(caseId);
     }
 
-    private void getCaseFields(CaseViewResource caseViewResource) {
-        List<CaseViewField> caseViewFields = caseViewResource.getMetadataFields().stream()
-            .filter(caseViewField -> caseViewField.getFieldTypeDefinition().getType().equals(CHANGE_ORG_REQUEST)).collect(Collectors.toList());
-        caseViewFields.forEach(caseViewField -> {
-            if (caseViewField.getId().equals("CaseRoleId")) {
-                if (caseViewField.getValue() != null) {
-                    throw new ValidationException("on going NoC request in progress");
-                }
-            }
-        });
+    private CaseSearchResultViewResource findCaseBy(String caseTypeId, String caseId) {
+        return dataStoreRepository.findCaseBy(caseTypeId, null, caseId);
     }
 
-    private void getCaseFields(CaseViewResource caseViewResource, String role) {
+    private void getCaseFields(CaseViewResource caseViewResource) {
         List<CaseViewField> caseViewFields = caseViewResource.getMetadataFields().stream()
             .filter(caseViewField -> caseViewField.getFieldTypeDefinition().getType().equals(CHANGE_ORG_REQUEST)).collect(Collectors.toList());
         caseViewFields.forEach(caseViewField -> {

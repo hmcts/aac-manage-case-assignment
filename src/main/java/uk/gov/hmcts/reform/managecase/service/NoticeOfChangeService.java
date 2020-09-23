@@ -82,11 +82,10 @@ public class NoticeOfChangeService {
         CaseSearchResultViewResource casefields = findCaseBy(caseType, caseId);
 
         challengeQuestionsResult.getQuestions().forEach(challengeQuestion -> {
-            String[] answers = challengeQuestion.getAnswerField().split(",");
-            for (String answer : answers) {
-                String role = answer.substring(answer.indexOf(":"));
-              //  findInvokerOrgPolicyRoles(caseViewResource.getMetadataFields(),role);
-                    List<CaseViewField> temp = caseViewResource.getMetadataFields();
+            for (ChallengeAnswer answer : challengeQuestion.getAnswers()) {
+                String role = answer.getCaseRoleId();
+                //  findInvokerOrgPolicyRoles(caseViewResource.getMetadataFields(),role);
+                List<CaseViewField> temp = caseViewResource.getMetadataFields();
             }
         });
         return challengeQuestionsResult;

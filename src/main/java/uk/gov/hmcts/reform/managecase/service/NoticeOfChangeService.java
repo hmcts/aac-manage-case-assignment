@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
@@ -84,18 +85,9 @@ public class NoticeOfChangeService {
         challengeQuestionsResult.getQuestions().forEach(challengeQuestion -> {
             for (ChallengeAnswer answer : challengeQuestion.getAnswers()) {
                 String role = answer.getCaseRoleId();
-                //  findInvokerOrgPolicyRoles(caseViewResource.getMetadataFields(),role);
-                List<CaseViewField> temp = caseViewResource.getMetadataFields();
             }
         });
         return challengeQuestionsResult;
-    }
-
-    private List<OrganisationPolicy> findInvokerOrgPolicyRoles(CaseDetails caseDetails, String role) {
-        List<OrganisationPolicy> policies = findPolicies(caseDetails);
-        return policies.stream()
-            .filter(policy -> policy.getOrganisation() != null && policy.getOrgPolicyCaseAssignedRole().equals(role))
-            .collect(toList());
     }
 
     private List<OrganisationPolicy> findPolicies(CaseDetails caseDetails) {

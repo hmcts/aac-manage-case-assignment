@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.search.CommonViewHeader;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CommonViewHeader;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
 
 @NoArgsConstructor
 @AllArgsConstructor

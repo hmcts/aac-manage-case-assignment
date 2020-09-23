@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.ccd.domain.model.search.CommonViewItem;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CommonViewItem;
 
 import java.util.Map;
 

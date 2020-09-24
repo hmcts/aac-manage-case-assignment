@@ -34,12 +34,6 @@ public class CaseViewResource extends RepresentationModel {
     @JsonProperty("events")
     private CaseViewEvent[] caseViewEvents;
 
-//    public CaseViewResource(@NonNull CaseView caseView) {
-//        copyProperties(caseView);
-//
-//        add(linkTo(methodOn(UICaseController.class).getCaseView(reference)).withSelfRel());
-//    }
-
     private void copyProperties(CaseView caseView) {
         this.reference = caseView.getCaseId();
         this.caseType = caseView.getCaseType();

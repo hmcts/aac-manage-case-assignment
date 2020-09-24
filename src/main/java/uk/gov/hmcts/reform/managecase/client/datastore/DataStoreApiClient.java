@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.managecase.client.datastore;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +30,7 @@ public interface DataStoreApiClient {
 
     @PostMapping(value = INTERNAL_SEARCH_CASES, consumes = APPLICATION_JSON_VALUE)
     CaseSearchResultViewResource internalSearchCases(@RequestParam("ctid") String caseTypeId,
-                                                     @RequestParam Optional<String> use_case,
+                                                     @RequestParam ("use_case") Optional<String> useCase,
                                                      @RequestBody String jsonSearchRequest);
 
     @PostMapping(value = CASE_USERS, consumes = APPLICATION_JSON_VALUE)

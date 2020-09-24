@@ -31,11 +31,16 @@ public class MetaData {
         CaseField.LAST_STATE_MODIFIED_DATE
     );
     private static final List<String> METADATA_QUERY_PARAMETERS = newArrayList(CaseField.STATE.getParameterName(),
-                                                                               CaseField.CASE_REFERENCE.getParameterName(),
-                                                                               CaseField.CREATED_DATE.getParameterName(),
-                                                                               CaseField.LAST_MODIFIED_DATE.getParameterName(),
-                                                                               CaseField.LAST_STATE_MODIFIED_DATE.getParameterName(),
-                                                                               CaseField.SECURITY_CLASSIFICATION.getParameterName(),
+                                                                               CaseField.CASE_REFERENCE
+                                                                                   .getParameterName(),
+                                                                               CaseField.CREATED_DATE
+                                                                                   .getParameterName(),
+                                                                               CaseField.LAST_MODIFIED_DATE
+                                                                                   .getParameterName(),
+                                                                               CaseField.LAST_STATE_MODIFIED_DATE
+                                                                                   .getParameterName(),
+                                                                               CaseField.SECURITY_CLASSIFICATION
+                                                                                   .getParameterName(),
                                                                                PAGE_PARAM, SORT_PARAM);
 
     // Metadata case fields
@@ -77,7 +82,8 @@ public class MetaData {
             return Arrays.stream(values())
                 .filter(v -> v.getDbColumnName().equals(dbColumnName))
                 .findAny()
-                .orElseThrow(() -> new IllegalArgumentException(String.format("No MetaData field exists with column name '%s'", dbColumnName)));
+                .orElseThrow(() -> new IllegalArgumentException(
+                    String.format("No MetaData field exists with column name '%s'", dbColumnName)));
         }
     }
 

@@ -25,7 +25,8 @@ public class CaseFieldPathUtils {
      * @param path The full stop (".") separated path
      * @return The case field; empty if no such field exists
      */
-    public static <T extends CommonField> Optional<T> getFieldDefinitionByPath(CaseTypeDefinition caseTypeDefinition, String path) {
+    public static <T extends CommonField> Optional<T> getFieldDefinitionByPath(CaseTypeDefinition caseTypeDefinition,
+                                                                               String path) {
         if (StringUtils.isBlank(path)) {
             return Optional.empty();
         }
@@ -33,7 +34,8 @@ public class CaseFieldPathUtils {
 
         Optional<CaseFieldDefinition> topLevelCaseField = caseTypeDefinition.getCaseField(pathElements.get(0));
 
-        return topLevelCaseField.flatMap(field -> getFieldDefinitionByPath((T) field, getPathElementsTailAsString(pathElements)));
+        return topLevelCaseField.flatMap(field -> getFieldDefinitionByPath((T) field,
+                                                                           getPathElementsTailAsString(pathElements)));
     }
 
     /**
@@ -66,12 +68,14 @@ public class CaseFieldPathUtils {
     public static <T extends CommonField> Optional<T> getFieldDefinitionByPath(FieldTypeDefinition fieldTypeDefinition,
                                                                                String path,
                                                                                boolean pathIncludesParent) {
-        if (StringUtils.isBlank(path) || fieldTypeDefinition.getChildren().isEmpty() || (pathIncludesParent && splitPath(path).length == 1)) {
+        if (StringUtils.isBlank(path) || fieldTypeDefinition.getChildren().isEmpty()
+            || (pathIncludesParent && splitPath(path).length == 1)) {
             return Optional.empty();
         }
         List<String> pathElements = getPathElements(path);
 
-        return reduce((List<T>)fieldTypeDefinition.getChildren(), pathIncludesParent ? getPathElementsTail(pathElements) : pathElements);
+        return reduce((List<T>)fieldTypeDefinition.getChildren(),
+                      pathIncludesParent ? getPathElementsTail(pathElements) : pathElements);
     }
 
     /**

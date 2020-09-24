@@ -134,7 +134,8 @@ public class CaseTypeDefinition implements Serializable {
             .stream()
             .filter(cf -> cf.getId().equals(fieldId))
             .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("CaseFieldId %s not found in CaseType %s", fieldId, name)))
+            .orElseThrow(() -> new RuntimeException(
+                String.format("CaseFieldId %s not found in CaseType %s", fieldId, name)))
             .getSecurityLabel());
     }
 
@@ -171,7 +172,8 @@ public class CaseTypeDefinition implements Serializable {
 
     @JsonIgnore
     public Optional<CaseFieldDefinition> getCaseField(String caseFieldId) {
-        return caseFieldDefinitions.stream().filter(caseField -> caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst();
+        return caseFieldDefinitions.stream().filter(caseField ->
+                                                        caseField.getId().equalsIgnoreCase(caseFieldId)).findFirst();
     }
 
     @JsonIgnore
@@ -184,6 +186,8 @@ public class CaseTypeDefinition implements Serializable {
         return getCaseFieldDefinitions()
             .stream()
             .filter(caseField -> LABEL.equals(caseField.getFieldTypeDefinition().getType()))
-            .collect(Collectors.toMap(CaseFieldDefinition::getId, caseField -> JsonNodeFactory.instance.textNode(caseField.getLabel())));
+            .collect(Collectors
+                         .toMap(CaseFieldDefinition::getId, caseField -> JsonNodeFactory.instance
+                             .textNode(caseField.getLabel())));
     }
 }

@@ -33,4 +33,5 @@ public class CaseDetails {
             .flatMap(List::stream)
             .collect(Collectors.toList());
     }
+
 }

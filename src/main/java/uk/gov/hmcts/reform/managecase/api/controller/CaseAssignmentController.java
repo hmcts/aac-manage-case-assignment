@@ -50,7 +50,6 @@ public class CaseAssignmentController {
     public static final String UNASSIGN_ACCESS_MESSAGE = "Unassignment(s) performed successfully.";
     public static final String GET_ASSIGNMENTS_MESSAGE = "Case-User-Role assignments returned successfully";
 
-
     private final CaseAssignmentService caseAssignmentService;
     private final ModelMapper mapper;
 

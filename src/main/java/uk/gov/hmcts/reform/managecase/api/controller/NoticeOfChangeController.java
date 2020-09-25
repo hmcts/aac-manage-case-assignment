@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -9,14 +10,21 @@ import io.swagger.annotations.ExampleProperty;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
 import uk.gov.hmcts.reform.managecase.api.payload.GetCaseAssignmentsResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
+import uk.gov.hmcts.reform.managecase.domain.Organisation;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 
 import javax.validation.Valid;
@@ -28,11 +36,16 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @Validated
 @ConditionalOnProperty(value = "mca.conditional-apis.case-assignments.enabled", havingValue = "true")
+@RequestMapping(path = "/noc",
+    consumes = MediaType.APPLICATION_JSON_VALUE,
+    produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(value = "/noc")
 public class NoticeOfChangeController {
 
     @SuppressWarnings({"squid:S1075"})
     public static final String CASE_ASSIGNMENTS_PATH = "/noc";
-
+    public static final String REQUEST_NOTICE_OF_CHANGE_PATH = "/noc-requests";
+    public static final String REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE = "The Notice of Change request has been successfully submitted.";
 
     private final NoticeOfChangeService noticeOfChangeService;
     private final ModelMapper mapper;
@@ -122,4 +135,15 @@ public class NoticeOfChangeController {
             throw new ValidationException("Case ID should contain digits only");
         }
     }
+
+    @GetMapping(path = REQUEST_NOTICE_OF_CHANGE_PATH, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Request Notice of Change Event", notes = "Request Notice of Change Event")
+    @ResponseStatus(HttpStatus.OK)
+    public RequestNoticeOfChangeResponse requestNoticeOfChange(@RequestBody RequestNoticeOfChangeRequest noticeOfChangeRequest) {
+        //noticeOfChangeService.callDansQuestionsMethod()
+        final OrganisationPolicy organisationPolicy = null;
+        final Organisation organisation = null;
+        return noticeOfChangeService.requestNoticeOfChange(noticeOfChangeRequest.getCaseId(), organisation, organisationPolicy);
+    }
+
 }

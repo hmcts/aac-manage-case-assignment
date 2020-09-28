@@ -50,20 +50,9 @@ To run all integration tests execute the following command:
 
 ### Functional tests
 These are the tests run against an environment. For example if you would like to test your local
- environment you'll need to export the following variables on your `.bash_profile` script.
-
-```bash
-#Functional Tests
-export TEST_URL=http://localhost:4454
-export S2S_URL=http://localhost:4502
-export IDAM_URL=http://localhost:5000
-export BEFTA_S2S_CLIENT_ID=xui_webapp
-export BEFTA_S2S_CLIENT_SECRET=AAAAAAAAAAAAAAAC
-export CCD_CASEWORKER_AUTOTEST_EMAIL=someemail@blob.com
-export CCD_CASEWORKER_AUTOTEST_PASSWORD=XYZT
-export CCD_IMPORT_AUTOTEST_EMAIL=someemail@blob.com
-export CCD_IMPORT_AUTOTEST_PASSWORD=XYZT
-```
+ environment you'll need to export variables on your `.bash_profile` script.
+ 
+Details of the relevant environment variables can be found in the `aca-docker/README.md` 
 
 > Note: For details of the emails and passwords to use in a local environment see the 
  [Create users and roles](https://github.com/hmcts/ccd-docker#3-create-users-and-roles) steps in
@@ -102,9 +91,11 @@ Alternatively you can run single command for both consumer tests and provider ve
 ### Code quality checks
 We use [checkstyle](http://checkstyle.sourceforge.net/) and [PMD](https://pmd.github.io/).  
 To run all checks execute the following command:
+
 ```bash
 ./gradlew clean checkstyleMain checkstyleTest checkstyleIntegrationTest pmdMain pmdTest pmdIntegrationTest
 ```
+
 ### Docker
 Create docker image:
 

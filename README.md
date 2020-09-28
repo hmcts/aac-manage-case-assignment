@@ -74,6 +74,31 @@ These tests can be run using:
 ./gradlew functional
 ```
 
+### Running contract or pact tests:
+
+You can run and publish your pact tests locally by first running the pact docker-compose:
+
+```
+docker-compose -f docker-pactbroker-compose.yml up
+```
+
+And then using gradle task:
+
+```
+./gradlew runAndPublishConsumerPactTests
+```
+Run below command for the provider pact verification:
+
+```
+./gradlew clean runProviderPactVerification
+```
+
+Alternatively you can run single command for both consumer tests and provider verifications
+
+```
+./gradlew clean contract
+```
+
 ### Code quality checks
 We use [checkstyle](http://checkstyle.sourceforge.net/) and [PMD](https://pmd.github.io/).  
 To run all checks execute the following command:

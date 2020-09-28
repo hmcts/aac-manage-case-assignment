@@ -66,6 +66,9 @@ env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal"
 env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-pr-601.service.core-compute-preview.internal"
 
+env.PACT_BROKER_URL = 'pact-broker.platform.hmcts.net'
+env.PACT_BROKER_SCHEME = 'https'
+
 withPipeline("java", product, component) {
   after('test') {
     builder.gradle('integration')
@@ -112,6 +115,11 @@ withPipeline("java", product, component) {
     copyIgnore('./build/reports/tests/befta/functional/cucumber-html-reports', './BEFTA Report for Functional Tests/')
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
   }
+
+  enablePactAs([
+              AppPipelineDsl.PactRoles.CONSUMER,
+              AppPipelineDsl.PactRoles.PROVIDER
+      ])
 }
 
 /**

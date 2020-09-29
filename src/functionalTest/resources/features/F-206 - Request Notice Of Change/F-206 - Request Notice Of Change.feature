@@ -55,7 +55,7 @@ Feature: F-206: Request Notice Of Change
 
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
-      And a user [Matt - with a pui-caa role for the same jurisdiction within the same organisation from Richard],
+      And a user [Matt - with a pui-caa role for the same jurisdiction within a different organisation from Richard],
       And a successful call [by Richard to create a case - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] as in [Prerequisite Case Creation Call for Case Assignment],
 
     When a request is prepared with appropriate values,
@@ -309,7 +309,7 @@ Feature: F-206: Request Notice Of Change
     Given an appropriate test context as detailed in the test data source,
       And a user [Mario - to initiate a case on his own behalf via a citizen facing application]
       And a user [Jane - with a pui-caa role and a solicitor role for the same jurisdiction as Case C1 below],
-      And a user [Matt - with a pui-caa role for a different organisation to that of Dil],
+      And a user [Matt - with a pui-caa role for the same organisation as Jane],
       And a successful call [by Mario to create a case - C1 which contains 3 Org Policies for 3 case roles: R1, R2 & R3  - via a citizen facing application] as in [Prerequisite Case Creation Call for Case Assignment],
       And a successful call [by Matt to trigger a NoC Request which contains answers identifying case role R1],
 

@@ -1,0 +1,14 @@
+{
+	"_guid_": "S-206.1",
+	"_extends_": "S-206_Base",
+
+	"specs": [
+		"Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+		"Dil - with a solicitor role for the same jurisdiction within a different organisation from Richard's",
+		"a citizen Mario, on behalf of whome Richard will create a case",
+		"is made by Dil to place an NOC Request in order to become Mario's representative on C1",
+		"contains all correct answers in the correct formats",
+		""
+	]
+
+}

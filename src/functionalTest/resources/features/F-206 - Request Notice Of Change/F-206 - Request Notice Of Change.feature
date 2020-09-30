@@ -1,7 +1,7 @@
-#=========================================
-@F-206 @Ignore
-Feature: F-206: Request Notice Of Change
-#=========================================
+#=============================================
+@F-206
+Feature: F-206: Request Notice of Change (NoC)
+#=============================================
 
 Background:
   Given an appropriate test context as detailed in the test data source
@@ -12,17 +12,18 @@ Background:
 Scenario: (Happy Path) : Solicitor successfully Requests NoC to Replace a litigant's current representation - No auto-approval applies
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
-      And a user [Dil - with a solicitor role for the same jurisdiction within a different organisation from Richard],
-      And a successful call [by Richard to create a case - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] as in [Prerequisite Case Creation Call for Case Assignment],
+      And a user [Dil - with a solicitor role for the same jurisdiction within a different organisation from Richard's],
+      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And a successful call [by Richard to create a case C1 on behalf of Mario, auto-assigned to his Richard's organisation] as in [Case Creation Call for NoC Request],
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to place an NOC Request in order to become Mario's representative on C1],
-      And the request [contains all correct answers in the correct format - e.g. a Date of Birth provided in Date format],
+      And the request [contains all correct answers in the correct formats],
       And it is submitted to call the [Request NoC] operation of [Manage Case Assignment Microservice],
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Dil has _*not*_ been granted any case roles for the case] will get the expected response as in [AAA],
+      And a call [to verify that Dil has not been granted any case roles for the case] will get the expected response as in [AAA],
       And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy has _*not*_ been updated] will get the expected response as in [YYY].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -32,16 +33,16 @@ Scenario: (Happy Path) : Solicitor successfully Requests NoC for a non-represent
 
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application]
       And a user [Dil - with a solicitor role for the same jurisdiction as that of a case initiated by Mario],
-      And a successful call [by Mario to create a case - C1 - via a citizen facing application] as in [Prerequisite Case Creation Call for Case Assignment],
+      And a successful call [by Mario to create a case, C1] as in [Prerequisite Case Creation Call for Case Assignment],
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to place an NOC Request in order to become Mario's representative on C1],
-      And the request [contains all correct answers in the correct format - e.g. a Date of Birth provided in Date format],
+      And the request [contains all correct answers in the correct formats],
       And it is submitted to call the [Request NoC] operation of [Manage Case Assignment Microservice],
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Dil has _*not*_ been granted any case roles for the case] will get the expected response as in [AAA],
+      And a call [to verify that Dil has not been granted any case roles for the case] will get the expected response as in [AAA],
       And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy has _*not*_ been updated] will get the expected response as in [YYY].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -51,21 +52,22 @@ Scenario: (Happy Path) : Case Access Administrator successfully Requests NoC to 
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Matt - with a pui-caa role for the same jurisdiction within a different organisation from Richard],
-      And a successful call [by Richard to create a case - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] as in [Prerequisite Case Creation Call for Case Assignment],
+      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And a successful call [by Richard to create a case C1 on behalf of Mario, auto-assigned to Richard's organisation] as in [Prerequisite Case Creation Call for Case Assignment],
 
      When a request is prepared with appropriate values,
       And the request [is made by Matt to place an NOC Request in order to become Mario's representative on C1],
-      And the request [contains all correct answers in the correct format - e.g. a Date of Birth provided in Date format],
+      And the request [contains all correct answers in the correct format],
       And it is submitted to call the [Request NoC] operation of [Manage Case Assignment Microservice],
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Matt has _*not*_ been granted any case roles for the case] will get the expected response as in [AAA],
+      And a call [to verify that Matt has not been granted any case roles for the case] will get the expected response as in [AAA],
       And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy has _*not*_ been updated] will get the expected response as in [YYY].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-4
-@S-206.4
+@S-206.4 @Ignore
 Scenario: (Happy Path) : Case Access Administrator successfully Requests NoC for a non-represented litigant - No auto-approval applies
 
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application]
@@ -79,12 +81,12 @@ Scenario: (Happy Path) : Case Access Administrator successfully Requests NoC for
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Matt has _*not*_ been granted any case roles for the case] will get the expected response as in [AAA],
+      And a call [to verify that Matt has not been granted any case roles for the case] will get the expected response as in [AAA],
       And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy has _*not*_ been updated] will get the expected response as in [YYY].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-5
-@S-206.5
+@S-206.5 @Ignore
 Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a different jurisdiction to that of the case) successfully Requests NoC to Replace a litigant's current representation - No auto-approval applies
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
@@ -103,7 +105,7 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-6
-@S-206.6
+@S-206.6 @Ignore
 Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a different jurisdiction to that of the case)successfully Requests NoC for a non-represented litigant - No auto-approval applies
 
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application]
@@ -122,7 +124,7 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-7
-@S-206.7
+@S-206.7 @Ignore
 Scenario: (Happy Path) : Solicitor successfully Requests NoC to Replace a litigant's current representation - Auto-approval applies
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
@@ -144,7 +146,7 @@ Scenario: (Happy Path) : Solicitor successfully Requests NoC to Replace a litiga
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-8
-@S-206.8
+@S-206.8 @Ignore
 Scenario: (Happy Path) : Solicitor successfully Requests NoC for a non-represented litigant - Auto-approval applies
 
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application]
@@ -166,7 +168,7 @@ Scenario: (Happy Path) : Solicitor successfully Requests NoC for a non-represent
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-9
-@S-206.9
+@S-206.9 @Ignore
 Scenario: (Happy Path) : Case Access Administrator successfully Requests NoC to Replace a litigant's current representation - Auto-approval applies
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
@@ -188,7 +190,7 @@ Scenario: (Happy Path) : Case Access Administrator successfully Requests NoC to 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-10
-@S-206.10
+@S-206.10 @Ignore
 Scenario: (Happy Path) :  Case Access Administrator successfully Requests NoC for a non-represented litigant - Auto-approval applies
 
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application]
@@ -210,7 +212,7 @@ Scenario: (Happy Path) :  Case Access Administrator successfully Requests NoC fo
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-11
-@S-206.11
+@S-206.11 @Ignore
 Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a different jurisdiction to that of the case) successfully Requests NoC to Replace a litigant's current representation - Auto-approval applies
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
@@ -232,7 +234,7 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-12
-@S-206.12
+@S-206.12 @Ignore
 Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a different jurisdiction to that of the case) successfully Requests NoC for a non-represented litigant - Auto-approval applies
 
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application],
@@ -254,7 +256,7 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-13
-@S-206.13
+@S-206.13 @Ignore
 Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for the same jurisdiction to that of the case) successfully Requests NoC to Replace a litigant's current representation - Auto-approval applies - TBC with Nigel
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
@@ -276,7 +278,7 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for th
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-14
-@S-206.14
+@S-206.14 @Ignore
 Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for the same jurisdiction to that of the case) successfully Requests NoC for a non-represented litigant - Auto-approval applies - TBC with Nigel
 
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application]

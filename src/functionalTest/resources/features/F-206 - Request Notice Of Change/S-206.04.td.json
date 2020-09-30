@@ -1,0 +1,13 @@
+{
+	"_guid_": "S-206.4",
+	"_extends_": "S-206_Base",
+    "title": "(Happy Path) : Case Access Administrator successfully Requests NoC for a non-represented litigant - No auto-approval applies",
+
+	"specs": [
+		"Mario - to initiate a case on his own behalf via a citizen facing application",
+		"Matt - with a pui-caa role for the same jurisdiction as that of a case initiated by Mario",
+		"is made by Matt to place an NOC Request in order to become Mario's representative on C1",
+		"contains all correct answers in the correct format"
+	]
+
+}

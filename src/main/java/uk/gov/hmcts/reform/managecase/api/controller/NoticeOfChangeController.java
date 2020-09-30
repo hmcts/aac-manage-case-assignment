@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,10 +30,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @Validated
 @ConditionalOnProperty(value = "mca.conditional-apis.case-assignments.enabled", havingValue = "true")
+@RequestMapping(path = "/noc")
+@Api(value = "/noc")
 public class NoticeOfChangeController {
 
     @SuppressWarnings({"squid:S1075"})
-    public static final String CASE_ASSIGNMENTS_PATH = "/noc";
+    public static final String GET_NOC_QUESTIONS = "/noc-questions";
 
 
     private final NoticeOfChangeService noticeOfChangeService;
@@ -42,7 +46,7 @@ public class NoticeOfChangeController {
         this.mapper = mapper;
     }
 
-    @GetMapping(path = CASE_ASSIGNMENTS_PATH, produces = APPLICATION_JSON_VALUE)
+    @GetMapping(path = GET_NOC_QUESTIONS, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get Notice of Change questions", notes = "Get Notice of Change questions")
     @ResponseStatus(HttpStatus.OK)
     @ApiResponses({

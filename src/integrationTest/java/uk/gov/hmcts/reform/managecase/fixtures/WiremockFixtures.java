@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
@@ -21,6 +22,9 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 
 import java.util.List;
@@ -37,7 +41,10 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static org.assertj.core.util.Lists.list;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.CASE_USERS;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.INTERNAL_CASES;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.INTERNAL_SEARCH_CASES;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.SEARCH_CASES;
+import static uk.gov.hmcts.reform.managecase.client.definitionstore.DefinitionStoreApiClientConfig.CHALLENGE_QUESTIONS;
 
 @SuppressWarnings({"PMD.ExcessiveImports"})
 public final class WiremockFixtures {
@@ -128,6 +135,51 @@ public final class WiremockFixtures {
                 .willReturn(aResponse()
                         .withStatus(HTTP_OK).withBody(getJsonString(new CaseUserRoleResource(caseUserRoles)))
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubGetCaseInternalES(String caseTypeId,
+                                             String searchQuery,
+                                             CaseSearchResultViewResource resource) {
+        stubFor(WireMock.post(urlEqualTo(INTERNAL_SEARCH_CASES + "?ctid=" + caseTypeId))
+                    .withRequestBody(equalToJson(searchQuery))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK).withBody(getJsonString(resource))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubGetCaseInternal(String caseId, CaseViewResource caseViewResource) {
+
+        stubFor(WireMock.get(urlPathEqualTo(INTERNAL_CASES))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .withQueryParam("case_id", equalTo(caseId))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK).withBody(getJsonString(caseViewResource))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubGetChallengeQuestions(String caseTypeId,
+                                                 String id,
+                                                 ChallengeQuestionsResult challengeQuestionsResult) {
+
+        stubFor(WireMock.get(urlPathEqualTo(CHALLENGE_QUESTIONS))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .withQueryParam("ctid", equalTo(caseTypeId))
+                    .withQueryParam("id", equalTo(id))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK).withBody(getJsonString(challengeQuestionsResult))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubIdamGetUserInfo(UserInfo userInfo) {
+        stubFor(WireMock.get(urlPathEqualTo("/o/userinfo"))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK).withBody(getJsonString(userInfo))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     public static void stubIdamSearch(String userId, UserDetails user) {

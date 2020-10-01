@@ -1,6 +1,7 @@
 {
 	"_guid_": "S-206.1",
 	"_extends_": "S-206_Base",
+    "title": "(Happy Path) : Solicitor successfully Requests NoC to Replace a litigant's current representation - No auto-approval applies",
 
 	"specs": [
 		"Richard - with the ability to create a case for a particular jurisdiction within an organisation",

@@ -1,0 +1,8 @@
+{
+	"_guid_": "S-206.2",
+	"_extends_": "S-206_Base",
+    "title": "(Happy Path) : Solicitor successfully Requests NoC for a non-represented litigant - No auto-approval applies",
+
+	"specs": [
+	]
+}

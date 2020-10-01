@@ -133,8 +133,9 @@ public class NoticeOfChangeService {
         if (!userInfo.getRoles().contains(PUI_ROLE)) {
             userInfo.getRoles().forEach(role -> {
                 Optional<String> jurisdiction = extractJurisdiction(role);
-                if (jurisdiction.isPresent() && (!caseViewResource.getCaseType().getJurisdiction().getId().equals(jurisdiction.get()))) {
-                        throw new ValidationException("insufficient privileges");
+                if (jurisdiction.isPresent() && (!caseViewResource.getCaseType().getJurisdiction()
+                    .getId().equals(jurisdiction.get()))) {
+                    throw new ValidationException("insufficient privileges");
                 }
             });
         }
@@ -173,7 +174,9 @@ public class NoticeOfChangeService {
     }
 
     private void checkForCaseEvents(CaseViewResource caseViewResource) {
-        List<CaseViewEvent> caseViewEventsFiltered = Arrays.stream(caseViewResource.getCaseViewEvents()).collect(Collectors.toList());
+        List<CaseViewEvent> caseViewEventsFiltered = Arrays.stream(caseViewResource
+                                                                       .getCaseViewEvents())
+            .collect(Collectors.toList());
         if (caseViewEventsFiltered.isEmpty()) {
             throw new ValidationException("no NoC events available for this case type");
         }

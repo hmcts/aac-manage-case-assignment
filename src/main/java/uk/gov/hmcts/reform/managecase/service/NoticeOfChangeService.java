@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.Searc
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
+import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
@@ -50,7 +51,7 @@ public class NoticeOfChangeService {
     }
 
     public ChallengeQuestionsResult getChallengeQuestions(String caseId) {
-        ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId);
+        ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId).getChallengeQuestionsResult();
         //Step 12 Remove the answer section from the JSON returned byGetTabContents and return success with the
         // remaining JSON
         challengeQuestionsResult.getQuestions().forEach(challengeQuestion -> {
@@ -61,7 +62,7 @@ public class NoticeOfChangeService {
         return challengeQuestionsResult;
     }
 
-    public ChallengeQuestionsResult challengeQuestions(String caseId) {
+    public NoCRequestDetails challengeQuestions(String caseId) {
         //step 2 getCaseUsingGET(case Id) return error if case # invalid/not found
         CaseViewResource caseViewResource = getCase(caseId);
         //step 3 Check to see what events are available on the case (the system user with IdAM Role caseworker-caa only
@@ -90,7 +91,11 @@ public class NoticeOfChangeService {
         // field in the case containing the case role, returning an error if this is not true.
         List<OrganisationPolicy> organisationPolicies = findPolicies(caseFields.getCases().stream().findFirst().get());
         checkOrgPoliciesForRoles(challengeQuestionsResult, organisationPolicies);
-        return challengeQuestionsResult;
+        return NoCRequestDetails.builder()
+            .caseViewResource(caseViewResource)
+            .challengeQuestionsResult(challengeQuestionsResult)
+            .searchResultViewItem(caseFields.getCases().get(0))
+            .build();
     }
 
     private void checkOrgPoliciesForRoles(ChallengeQuestionsResult challengeQuestionsResult,

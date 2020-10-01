@@ -234,7 +234,7 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-12
-@S-206.12 @Ignore
+@S-206.12
 Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a different jurisdiction to that of the case) successfully Requests NoC for a non-represented litigant - Auto-approval applies
 
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application],
@@ -256,7 +256,7 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-13
-@S-206.13 @Ignore
+@S-206.13
 Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for the same jurisdiction to that of the case) successfully Requests NoC to Replace a litigant's current representation - Auto-approval applies - TBC with Nigel
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
@@ -278,7 +278,7 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for th
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-14
-@S-206.14 @Ignore
+@S-206.14
 Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for the same jurisdiction to that of the case) successfully Requests NoC for a non-represented litigant - Auto-approval applies - TBC with Nigel
 
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application]

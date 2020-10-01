@@ -4,7 +4,7 @@ Feature: F-206: Request Notice of Change (NoC)
 #=============================================
 
 Background:
-  Given an appropriate test context as detailed in the test data source
+    Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-1
@@ -91,11 +91,11 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a 
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Alice - with a pui-caa role and a solicitor role for a jurisdiction that does not match Case C1 below],
-      And a successful call [by Richard to create a case - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] as in [Prerequisite Case Creation Call for Case Assignment],
+      And a successful call [by Richard to create a case C1, auto-assigned to Richard's organisation, on behalf of Mario as the applicant] as in [Prerequisite Case Creation Call for Case Assignment],
 
      When a request is prepared with appropriate values,
-      And the request [is made by Alice to place an NOC Request in order to become Mario's representative on C1],
-      And the request [contains all correct answers in the correct format - e.g. a Date of Birth provided in Date format],
+      And the request [is made by Alice to place an NoC Request in order to become Mario's representative on C1],
+      And the request [contains all correct answers in the correct format],
       And it is submitted to call the [Request NoC] operation of [Manage Case Assignment Microservice],
 
      Then a positive response is received,

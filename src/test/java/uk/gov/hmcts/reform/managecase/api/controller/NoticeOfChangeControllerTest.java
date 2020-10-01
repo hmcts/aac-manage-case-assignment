@@ -98,7 +98,7 @@ public class NoticeOfChangeControllerTest {
 
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 
-                NoticeOfChangeController controller = new NoticeOfChangeController(service, new ModelMapper());
+                NoticeOfChangeController controller = new NoticeOfChangeController(service);
 
                 // ACT
                 ChallengeQuestionsResult response = controller.getNoticeOfChangeQuestions(CASE_ID);

@@ -76,7 +76,7 @@ Scenario: (Happy Path) : Case Access Administrator successfully Requests NoC for
 
      When a request is prepared with appropriate values,
       And the request [is made by Matt to place an NOC Request in order to become Mario's representative on C1],
-      And the request [contains all correct answers in the correct format - e.g. a Date of Birth provided in Date format],
+      And the request [contains all correct answers in the correct format],
       And it is submitted to call the [Request NoC] operation of [Manage Case Assignment Microservice],
 
      Then a positive response is received,
@@ -100,8 +100,8 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a 
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Alice has _*not*_ been granted any case roles for the case] will get the expected response as in [AAA],
-      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy has _*not*_ been updated] will get the expected response as in [YYY].
+      And a call [to verify that Alice has NOT been granted any case roles for the case] will get the expected response as in [AAA],
+      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy has NOT been updated] will get the expected response as in [YYY].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-6
@@ -119,8 +119,8 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a 
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Alice has _*not*_ been granted any case roles for the case] will get the expected response as in [AAA],
-      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy has _*not*_ been updated] will get the expected response as in [YYY].
+      And a call [to verify that Alice has NOT been granted any case roles for the case] will get the expected response as in [AAA],
+      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy has NOT been updated] will get the expected response as in [YYY].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-7
@@ -141,8 +141,8 @@ Scenario: (Happy Path) : Solicitor successfully Requests NoC to Replace a litiga
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Dil _*has been*_ granted case roles R1 & R2 for the case but not R3] will get the expected response as in [AAA],
-      And a call [to verify there is _*no*_ pending NOC request on the case and the OrganisationPolicies _*have been*_ updated] will get the expected response as in [BBB].
+      And a call [to verify that Dil HAS been granted case roles R1 & R2 for the case but not R3] will get the expected response as in [AAA],
+      And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicies HAVE been updated] will get the expected response as in [BBB].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-8
@@ -163,8 +163,8 @@ Scenario: (Happy Path) : Solicitor successfully Requests NoC for a non-represent
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Dil _*has been*_ granted case roles R1 & R2 for the case but not R3] will get the expected response as in [AAA],
-      And a call [to verify there is _*no*_ pending NOC request on the case and the OrganisationPolicies _*have been*_ updated] will get the expected response as in [BBB].
+      And a call [to verify that Dil HAS been granted case roles R1 & R2 for the case but not R3] will get the expected response as in [AAA],
+      And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicies HAVE been updated] will get the expected response as in [BBB].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-9
@@ -185,8 +185,8 @@ Scenario: (Happy Path) : Case Access Administrator successfully Requests NoC to 
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Matt has _*not*_ been granted any case roles for the case] will get the expected response as in [XXX],
-      And another call [to verify there is _*no*_ pending NOC request on the case and the OrganisationPolicies _*have been*_ updated] will get the expected response as in [YYY].
+      And a call [to verify that Matt has NOT been granted any case roles for the case] will get the expected response as in [XXX],
+      And another call [to verify there is NO pending NOC request on the case and the OrganisationPolicies HAVE been updated] will get the expected response as in [YYY].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-10
@@ -207,8 +207,8 @@ Scenario: (Happy Path) :  Case Access Administrator successfully Requests NoC fo
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Matt has _*not*_ been granted any case roles for the case] will get the expected response as in [XXX],
-      And another call [to verify there is _*no*_ pending NOC request on the case and the OrganisationPolicies _*have been*_ updated] will get the expected response as in [YYY].
+      And a call [to verify that Matt has NOT been granted any case roles for the case] will get the expected response as in [XXX],
+      And another call [to verify there is NO pending NOC request on the case and the OrganisationPolicies HAVE been updated] will get the expected response as in [YYY].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-11
@@ -229,8 +229,8 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a 
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Alice has _*not*_ been granted any case roles for the case] will get the expected response as in [XXX],
-      And another call [to verify there is _*no*_ pending NOC request on the case and the OrganisationPolicies _*have been*_ updated] will get the expected response as in [YYY].
+      And a call [to verify that Alice has NOT been granted any case roles for the case] will get the expected response as in [XXX],
+      And another call [to verify there is NO pending NOC request on the case and the OrganisationPolicies HAVE been updated] will get the expected response as in [YYY].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-12
@@ -251,8 +251,8 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for a 
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Alice has _*not*_ been granted any case roles for the case] will get the expected response as in [XXX],
-      And another call [to verify there is _*no*_ pending NOC request on the case and the OrganisationPolicies _*have been*_ updated] will get the expected response as in [YYY].
+      And a call [to verify that Alice has NOT been granted any case roles for the case] will get the expected response as in [XXX],
+      And another call [to verify there is NO pending NOC request on the case and the OrganisationPolicies HAVE been updated] will get the expected response as in [YYY].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-13
@@ -267,14 +267,14 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for th
 
      When a request is prepared with appropriate values,
       And the request [is made by Jane to place a NOC Request for C1],
-      And the request [contains all correct answers in the correct format - e.g. a Date of Birth provided in Date format],
+      And the request [contains all correct answers in the correct format],
       And the request [contains answers identifying case role R2],
       And it is submitted to call the [Request NoC] operation of [Manage Case Assignment Microservice],
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Jane _*has been*_ granted case roles R1 & R2 for the case but not R3] will get the expected response as in [XXX],
-      And a call [to verify there is _*no*_ pending NOC request on the case and the OrganisationPolicies _*have been*_ updated] will get the expected response as in [YYY].
+      And a call [to verify that Jane HAS been granted case roles R1 & R2 for the case but not R3] will get the expected response as in [XXX],
+      And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicies HAVE been updated] will get the expected response as in [YYY].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-14
@@ -289,11 +289,11 @@ Scenario: (Happy Path) : Case Access Administrator (with a solicitor role for th
 
      When a request is prepared with appropriate values,
       And the request [is made by Jane to place a NOC Request for C1],
-      And the request [contains all correct answers in the correct format - e.g. a Date of Birth provided in Date format],
+      And the request [contains all correct answers in the correct format],
       And the request [contains answers identifying case role R2],
       And it is submitted to call the [Request NoC] operation of [Manage Case Assignment Microservice],
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Jane _*has been*_ granted case roles R1 & R2 for the case but not R3] will get the expected response as in [XXX],
-      And a call [to verify there is _*no*_ pending NOC request on the case and the OrganisationPolicies _*have been*_ updated] will get the expected response as in [YYY].
+      And a call [to verify that Jane HAS been granted case roles R1 & R2 for the case but not R3] will get the expected response as in [XXX],
+      And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicies HAVE been updated] will get the expected response as in [YYY].

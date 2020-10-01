@@ -54,7 +54,8 @@ public class NoticeOfChangeController {
     public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
 
     public static final String REQUEST_NOTICE_OF_CHANGE_PATH = "/noc-requests";
-    public static final String REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE = "The Notice of Change request has been successfully submitted.";
+    public static final String REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE =
+        "The Notice of Change request has been successfully submitted.";
 
     private final NoticeOfChangeService noticeOfChangeService;
     private final ModelMapper mapper;
@@ -186,11 +187,16 @@ public class NoticeOfChangeController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
-    public RequestNoticeOfChangeResponse requestNoticeOfChange(@RequestBody RequestNoticeOfChangeRequest noticeOfChangeRequest) {
+    public RequestNoticeOfChangeResponse requestNoticeOfChange(@RequestBody RequestNoticeOfChangeRequest
+                                                                       noticeOfChangeRequest) {
         //noticeOfChangeService.callDansQuestionsMethod()
         final OrganisationPolicy organisationPolicy = null;
         final Organisation organisation = null;
-        return noticeOfChangeService.requestNoticeOfChange(noticeOfChangeRequest.getCaseId(), organisation, organisationPolicy);
+        return noticeOfChangeService.requestNoticeOfChange(
+            noticeOfChangeRequest.getCaseId(),
+            organisation,
+            organisationPolicy
+        );
     }
 
 }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.client.datastore;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +18,8 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.INTERNAL_CASES;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.INTERNAL_SEARCH_CASES;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.SEARCH_CASES;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.START_EVENT_TRIGGER;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.SUBMIT_EVENT_FOR_CASE;
 
 @FeignClient(
     name = "data-store-api",
@@ -45,5 +48,13 @@ public interface DataStoreApiClient {
 
     @DeleteMapping(value = CASE_USERS, consumes = APPLICATION_JSON_VALUE)
     void removeCaseUserRoles(@RequestBody CaseUserRolesRequest userRolesRequest);
+
+    @GetMapping(value = START_EVENT_TRIGGER)
+    StartEventResource getStartEventTrigger(@PathVariable("caseId") String caseId,
+                                            @PathVariable("eventId") String eventId);
+
+    @PostMapping(value = SUBMIT_EVENT_FOR_CASE)
+    CaseResource submitEventForCase(@PathVariable("caseId") String caseId,
+                                    @RequestBody CaseDataContent caseDataContent);
 
 }

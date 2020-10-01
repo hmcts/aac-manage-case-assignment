@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
+import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 
@@ -22,4 +24,5 @@ public interface DataStoreRepository {
 
     CaseViewResource findCaseByCaseId(String caseId);
 
+    CaseResource submitEventForCase(String caseId, String eventId, ChangeOrganisationRequest changeOrganisationRequest);
 }

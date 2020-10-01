@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -7,14 +9,21 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
+import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
+import uk.gov.hmcts.reform.managecase.domain.Organisation;
+import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +36,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.ES_QUERY;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOC_REQUEST_DESCRIPTION;
 
 class DataStoreRepositoryTest {
 
@@ -36,9 +46,17 @@ class DataStoreRepositoryTest {
     private static final String CASE_ID = "12345678";
     private static final String CASE_ID2 = "87654321";
     private static final String ORG_ID = "organisation1";
+    private static final String EVENT_ID = "NoCRequest";
+    private static final String EXPECTED_NOC_REQUEST_DATA =
+        "{" +
+            "\"DummyDataKey\": \"Dummy Data Value\"" +
+        "}";
 
     @Mock
     private DataStoreApiClient dataStoreApi;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @InjectMocks
     private DefaultDataStoreRepository repository;
@@ -158,5 +176,63 @@ class DataStoreRepositoryTest {
                 new CaseUserRoleWithOrganisation(CASE_ID, ASSIGNEE_ID, ROLE, ORG_ID),
                 new CaseUserRoleWithOrganisation(CASE_ID2, ASSIGNEE_ID, ROLE, ORG_ID)
             ));
+    }
+
+    @Test
+    @DisplayName("Call ccd-datastore where submitting an event for a case fails")
+    void shouldReturnNullCaseResourceWhenSubmittingEventFails() {
+        // ARRANGE
+        ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder().build();
+
+        given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID))
+            .willReturn(null);
+
+        // ACT
+        CaseResource returnedStartEventResource = repository.submitEventForCase(CASE_ID, EVENT_ID, changeOrganisationRequest);
+
+        // ASSERT
+        verify(dataStoreApi).getStartEventTrigger(CASE_ID, EVENT_ID);
+
+        assertThat(returnedStartEventResource).isNull();
+    }
+
+    @Test
+    @DisplayName("Call ccd-datastore to submit an event for a case")
+    void shouldCaseResourceWhenSubmittingEventSucceeds() throws JsonProcessingException {
+        // ARRANGE
+        ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
+            .organisationToAdd(new Organisation("1", "orgNameToAdd"))
+            .organisationToRemove(new Organisation("2", "orgNameToRemove"))
+            .requestTimestamp(LocalDateTime.now())
+            .build();
+
+        StartEventResource startEventResource = new StartEventResource();
+        startEventResource.setToken("eventToken");
+
+        given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID))
+            .willReturn(startEventResource);
+        given(dataStoreApi.submitEventForCase(any(String.class), any(CaseDataContent.class)))
+            .willReturn(new CaseResource());
+        given(objectMapper.writeValueAsString(changeOrganisationRequest))
+            .willReturn(EXPECTED_NOC_REQUEST_DATA);
+
+        // ACT
+        repository.submitEventForCase(CASE_ID, EVENT_ID, changeOrganisationRequest);
+
+        // ASSERT
+        verify(dataStoreApi).getStartEventTrigger(CASE_ID, EVENT_ID);
+        ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(dataStoreApi).submitEventForCase(any(String.class), captor.capture());
+
+        CaseDataContent caseDataContentCaptorValue = captor.getValue();
+        assertThat(caseDataContentCaptorValue.getToken()).isEqualTo("eventToken");
+
+        assertThat(caseDataContentCaptorValue.getEvent().getDescription())
+            .isEqualTo(NOC_REQUEST_DESCRIPTION);
+        assertThat(caseDataContentCaptorValue.getEvent().getEventId())
+            .isEqualTo(NoticeOfChangeService.NOC_REQUEST);
+
+        assertThat(caseDataContentCaptorValue.getData().get("ChangeOrganisationRequest").asText())
+            .isEqualTo(EXPECTED_NOC_REQUEST_DATA);
     }
 }

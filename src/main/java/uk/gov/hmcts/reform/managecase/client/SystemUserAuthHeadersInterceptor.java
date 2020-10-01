@@ -19,5 +19,6 @@ public class SystemUserAuthHeadersInterceptor implements RequestInterceptor {
     public void apply(RequestTemplate template) {
         template.header(AUTHORIZATION, securityUtils.getSystemUserToken());
         template.header(SERVICE_AUTHORIZATION, securityUtils.getS2SToken());
+        template.header("experimental", "experimental");
     }
 }

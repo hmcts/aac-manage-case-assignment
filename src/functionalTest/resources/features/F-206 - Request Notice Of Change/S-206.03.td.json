@@ -1,0 +1,12 @@
+{
+	"_guid_": "S-206.3",
+	"_extends_": "S-206_Base",
+    "title": "(Happy Path) : Case Access Administrator successfully Requests NoC to Replace a litigant's current representation - No auto-approval applies",
+
+	"specs": [
+		"Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+		"Matt - with a pui-caa role for the same jurisdiction within a different organisation from Richard",
+		"is made by Matt to place an NOC Request in order to become Mario's representative on C1",
+		"contains all correct answers in the correct format"
+	]
+}

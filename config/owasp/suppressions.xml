@@ -142,4 +142,9 @@
     <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-webmvc@.*$</packageUrl>
     <cve>CVE-2020-5421</cve>
   </suppress>
+
+  <suppress>
+  <cve>CVE-2020-5421</cve>
+  </suppress>
+
 </suppressions>

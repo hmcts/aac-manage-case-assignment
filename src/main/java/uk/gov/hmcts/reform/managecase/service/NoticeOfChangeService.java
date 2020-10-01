@@ -67,7 +67,7 @@ public class NoticeOfChangeService {
         CaseViewResource caseViewResource = getCase(caseId);
         //step 3 Check to see what events are available on the case (the system user with IdAM Role caseworker-caa only
         // has access to NoC events).  If no events are available, return an error
-        getCaseEvents(caseViewResource);
+        checkForCaseEvents(caseViewResource);
         //step 4 Check the ChangeOrganisationRequest.CaseRole in the case record.  If it is not null, return an error
         // indicating that there is an ongoing NoCRequest.
         CaseSearchResultViewResource caseFields = findCaseBy(caseViewResource.getCaseType().getName(), caseId);
@@ -133,10 +133,8 @@ public class NoticeOfChangeService {
         if (!userInfo.getRoles().contains(PUI_ROLE)) {
             userInfo.getRoles().forEach(role -> {
                 Optional<String> jurisdiction = extractJurisdiction(role);
-                if (jurisdiction.isPresent()) {
-                    if (!caseViewResource.getCaseType().getJurisdiction().getId().equals(jurisdiction.get())) {
+                if (jurisdiction.isPresent() && (!caseViewResource.getCaseType().getJurisdiction().getId().equals(jurisdiction.get()))) {
                         throw new ValidationException("insufficient privileges");
-                    }
                 }
             });
         }
@@ -174,11 +172,8 @@ public class NoticeOfChangeService {
         }
     }
 
-    private void getCaseEvents(CaseViewResource caseViewResource) {
-        List<CaseViewEvent> caseViewEventsFiltered =
-            Arrays.stream(caseViewResource.getCaseViewEvents())
-                .filter(caseViewEvent -> caseViewEvent.getEventName().equalsIgnoreCase(NOC_EVENTS))
-                .collect(Collectors.toList());
+    private void checkForCaseEvents(CaseViewResource caseViewResource) {
+        List<CaseViewEvent> caseViewEventsFiltered = Arrays.stream(caseViewResource.getCaseViewEvents()).collect(Collectors.toList());
         if (caseViewEventsFiltered.isEmpty()) {
             throw new ValidationException("no NoC events available for this case type");
         }

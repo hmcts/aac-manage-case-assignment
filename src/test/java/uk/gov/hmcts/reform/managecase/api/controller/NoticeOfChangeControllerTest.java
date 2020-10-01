@@ -12,7 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;;
+import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
@@ -61,7 +61,7 @@ public class NoticeOfChangeControllerTest {
     @Nested
     @DisplayName("GET /noc/noc-questions")
     @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
-    class getNoticeOfChangeQuestions extends BaseMvcTest {
+    class GetNoticeOfChangeQuestions extends BaseMvcTest {
 
         @BeforeEach
         void setUp() {
@@ -88,10 +88,13 @@ public class NoticeOfChangeControllerTest {
                 fieldType.setMax(null);
                 challengeQuestion.setAnswerFieldType(fieldType);
                 challengeQuestion.setChallengeQuestionId("NoC");
-                challengeQuestion.setAnswerField("${applicant.individual.fullname}|${applicant.company.name}|${applicant.soletrader.name}:Applicant,"
-                                                     + "${respondent.individual.fullname}|${respondent.company.name}{|${respondent.soletrader.name}:Respondent");
+                challengeQuestion.setAnswerField("${applicant.individual.fullname}|${applicant.company.name}|"
+                                                     + "${applicant.soletrader.name}:Applicant,"
+                                                     + "${respondent.individual.fullname}|${respondent.company.name}"
+                                                     + "{|${respondent.soletrader.name}:Respondent");
                 challengeQuestion.setQuestionId("QuestionId1");
-                ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
+                ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
+                    Arrays.asList(challengeQuestion));
 
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 
@@ -107,7 +110,6 @@ public class NoticeOfChangeControllerTest {
             @DisplayName("should successfully get NoC questions")
             @Test
             void shouldGetCaseAssignmentsForAValidRequest() throws Exception {
-                String caseId = "1588234985453946";
                 ChallengeQuestion challengeQuestion = new ChallengeQuestion();
                 challengeQuestion.setCaseTypeId(CASE_TYPE_ID);
                 challengeQuestion.setOrder(1);
@@ -119,15 +121,18 @@ public class NoticeOfChangeControllerTest {
                 fieldType.setMax(null);
                 challengeQuestion.setAnswerFieldType(fieldType);
                 challengeQuestion.setChallengeQuestionId("NoC");
-                challengeQuestion.setAnswerField("${applicant.individual.fullname}|${applicant.company.name}|${applicant.soletrader.name}:Applicant,"
-                                                     + "${respondent.individual.fullname}|${respondent.company.name}{|${respondent.soletrader.name}:Respondent");
+                challengeQuestion.setAnswerField("${applicant.individual.fullname}|${applicant.company.name}"
+                                                     + "|${applicant.soletrader.name}:Applicant,"
+                                                     + "${respondent.individual.fullname}|${respondent.company.name}"
+                                                     + "{|${respondent.soletrader.name}:Respondent");
                 challengeQuestion.setQuestionId("QuestionId1");
-                ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
+                ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
+                    Arrays.asList(challengeQuestion));
 
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 
                 this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
-                                         .queryParam("case_id", caseId))
+                                         .queryParam("case_id", CASE_ID))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(APPLICATION_JSON_VALUE));
             }

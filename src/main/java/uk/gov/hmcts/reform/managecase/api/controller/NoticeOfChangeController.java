@@ -13,12 +13,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
 import uk.gov.hmcts.reform.managecase.api.payload.GetCaseAssignmentsResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
+import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 
 import javax.validation.Valid;
@@ -36,7 +41,9 @@ public class NoticeOfChangeController {
 
     @SuppressWarnings({"squid:S1075"})
     public static final String GET_NOC_QUESTIONS = "/noc-questions";
+    public static final String VERIFY_NOC_ANSWERS = "/verify-noc-answers";
 
+    public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
 
     private final NoticeOfChangeService noticeOfChangeService;
     private final ModelMapper mapper;
@@ -119,7 +126,14 @@ public class NoticeOfChangeController {
         return challengeQuestion;
     }
 
-
+    // TODO: Swagger
+    @PostMapping(path = VERIFY_NOC_ANSWERS, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Verify Notice of Change answers")
+    public VerifyNoCAnswersResponse verifyNoticeOfChangeAnswers(
+        @Valid @RequestBody VerifyNoCAnswersRequest verifyNoCAnswersRequest) {
+        NoCRequestDetails result = noticeOfChangeService.verifyNoticeOfChangeAnswers(verifyNoCAnswersRequest);
+        return result.toVerifyNoCAnswersResponse(VERIFY_NOC_ANSWERS_MESSAGE);
+    }
 
     private void validateCaseIds(String caseId) {
         if (!StringUtils.isNumeric(caseId)) {

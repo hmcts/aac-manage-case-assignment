@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
+import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +67,10 @@ class NoticeOfChangeServiceTest {
     @Mock
     private IdamRepository idamRepository;
     @Mock
+    private ChallengeQuestionService challengeQuestionService;
+    @Mock
+    private PrdRepository prdRepository;
+    @Mock
     private RequestContext context;
 
     private List<SearchResultViewItem> viewItems = new ArrayList<>();
@@ -87,9 +92,8 @@ class NoticeOfChangeServiceTest {
 
         @BeforeEach
         void setUp()throws JsonProcessingException {
-            noticeOfChangeService = new NoticeOfChangeService(dataStoreRepository,
-                                                              idamRepository,
-                                                              definitionStoreRepository);
+            noticeOfChangeService = new NoticeOfChangeService(dataStoreRepository, idamRepository,
+                definitionStoreRepository, challengeQuestionService, prdRepository);
 
             //internal/cases/caseId
             AuditEvent event = new AuditEvent();

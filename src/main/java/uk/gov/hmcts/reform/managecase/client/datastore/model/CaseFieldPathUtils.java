@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
@@ -76,6 +77,15 @@ public class CaseFieldPathUtils {
 
         return reduce((List<T>)fieldTypeDefinition.getChildren(),
                       pathIncludesParent ? getPathElementsTail(pathElements) : pathElements);
+    }
+
+    public static JsonNode getNestedCaseFieldByPath(Map<String, JsonNode> caseData, String path) {
+        List<String> pathElements = getPathElements(path);
+        JsonNode topLevelNode = caseData.get(pathElements.get(0));
+
+        return pathElements.size() > 1
+            ? getNestedCaseFieldByPath(topLevelNode, getPathElementsTailAsString(pathElements))
+            : topLevelNode;
     }
 
     /**

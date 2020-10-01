@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_POLICY_CASE_ASSIGNED_ROLE;
+import static uk.gov.hmcts.reform.managecase.client.datastore.model.CaseFieldPathUtils.getNestedCaseFieldByPath;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,5 +30,10 @@ public class SearchResultViewItem implements CommonViewItem {
             .map(node -> node.findParents(ORG_POLICY_CASE_ASSIGNED_ROLE))
             .flatMap(List::stream)
             .collect(Collectors.toList());
+    }
+
+    public String getFieldValue(String fieldId) {
+        JsonNode fieldNode = getNestedCaseFieldByPath(fields, fieldId);
+        return fieldNode == null ? null : fieldNode.asText();
     }
 }

@@ -2,14 +2,14 @@ package uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CommonViewHeader;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
 public class SearchResultViewHeader implements CommonViewHeader {
 
     @JsonProperty("case_field_id")

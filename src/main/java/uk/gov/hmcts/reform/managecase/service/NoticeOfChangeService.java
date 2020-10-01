@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
@@ -14,18 +15,20 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.Searc
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
+import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
-import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
+import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 
 import javax.validation.ValidationException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Map;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -34,7 +37,6 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 @Service
 public class NoticeOfChangeService {
 
-    public static final String SOLICITOR_ROLE = "caseworker-%s-solicitor";
     public static final String PUI_ROLE = "pui-caa";
     public static final String NOC_EVENTS = "NOC";
     public static final String CHANGE_ORG_REQUEST = "ChangeOrganisationRequest";
@@ -46,27 +48,57 @@ public class NoticeOfChangeService {
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
     private final IdamRepository idamRepository;
-    private final JacksonUtils jacksonUtils;
+    private final ChallengeQuestionService challengeQuestionService;
+    private final PrdRepository prdRepository;
 
     @Autowired
     public NoticeOfChangeService(DataStoreRepository dataStoreRepository,
                                  IdamRepository idamRepository,
                                  DefinitionStoreRepository definitionStoreRepository,
-                                 JacksonUtils jacksonUtils) {
-
+                                 ChallengeQuestionService challengeQuestionService,
+                                 PrdRepository prdRepository) {
         this.dataStoreRepository = dataStoreRepository;
         this.idamRepository = idamRepository;
         this.definitionStoreRepository = definitionStoreRepository;
-        this.jacksonUtils = jacksonUtils;
+        this.challengeQuestionService = challengeQuestionService;
+        this.prdRepository = prdRepository;
     }
 
     public ChallengeQuestionsResult getChallengeQuestions(String caseId) {
-        ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId);
-        challengeQuestionsResult.getQuestions().forEach(challengeQuestion -> challengeQuestion.setAnswerField(null));
+        ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId).getChallengeQuestionsResult();
+        //Step 12 Remove the answer section from the JSON returned byGetTabContents and return success with the
+        // remaining JSON
+        challengeQuestionsResult.getQuestions().forEach(challengeQuestion -> {
+            if (challengeQuestion.getAnswerField() != null) {
+                challengeQuestion.setAnswers(new ArrayList<ChallengeAnswer>());
+            }
+        });
         return challengeQuestionsResult;
     }
 
-    public ChallengeQuestionsResult challengeQuestions(String caseId) {
+    public NoCRequestDetails verifyNoticeOfChangeAnswers(VerifyNoCAnswersRequest verifyNoCAnswersRequest) {
+        String caseId = verifyNoCAnswersRequest.getCaseId();
+        NoCRequestDetails noCRequestDetails = challengeQuestions(caseId);
+        SearchResultViewItem caseResult = noCRequestDetails.getSearchResultViewItem();
+
+        String caseRoleId = challengeQuestionService
+            .getMatchingCaseRole(noCRequestDetails.getChallengeQuestionsResult(),
+                verifyNoCAnswersRequest.getAnswers(), caseResult);
+
+        OrganisationPolicy organisationPolicy = findOrganisationPolicyForRole(caseResult, caseRoleId)
+            .orElseThrow(() -> new ValidationException(String.format(
+                "No OrganisationPolicy exists on the case for the case role '%s'", caseRoleId)));
+
+        if (organisationEqualsRequestingUsers(organisationPolicy.getOrganisation())) {
+            throw new ValidationException("The requestor has answered questions uniquely identifying"
+                + " a litigant that they are already representing");
+        }
+
+        noCRequestDetails.setOrganisationPolicy(organisationPolicy);
+        return noCRequestDetails;
+    }
+
+    public NoCRequestDetails challengeQuestions(String caseId) {
         //step 2 getCaseUsingGET(case Id) return error if case # invalid/not found
         CaseViewResource caseViewResource = getCase(caseId);
         //step 3 Check to see what events are available on the case (the system user with IdAM Role caseworker-caa only
@@ -74,8 +106,8 @@ public class NoticeOfChangeService {
         getCaseEvents(caseViewResource);
         //step 4 Check the ChangeOrganisationRequest.CaseRole in the case record.  If it is not null, return an error
         // indicating that there is an ongoing NoCRequest.
-        CaseSearchResultViewResource casefields = findCaseBy(caseViewResource.getCaseType().getName(), caseId);
-        getCaseFields(casefields);
+        CaseSearchResultViewResource caseFields = findCaseBy(caseViewResource.getCaseType().getName(), caseId);
+        getCaseFields(caseFields);
         //step 5 Invoke IdAM API to get the IdAM Roles of the invoker.
         UserInfo userInfo = getUserInfo();
         //step 6 If the invoker has the role pui-caa then they are allowed to request an NoC for a case in any
@@ -93,13 +125,20 @@ public class NoticeOfChangeService {
         //step 10 n/a
         //step 11 For each set of answers in the config, check that there is an OrganisationPolicy
         // field in the case containing the case role, returning an error if this is not true.
-        List<OrganisationPolicy> organisationPolicies = findPolicies(casefields.getCases().stream().findFirst().get());
+        List<OrganisationPolicy> organisationPolicies = findPolicies(caseFields.getCases().stream().findFirst().get());
         checkOrgPoliciesForRoles(challengeQuestionsResult, organisationPolicies);
-        return challengeQuestionsResult;
+        return NoCRequestDetails.builder()
+            .caseViewResource(caseViewResource)
+            .challengeQuestionsResult(challengeQuestionsResult)
+            .searchResultViewItem(caseFields.getCases().get(0))
+            .build();
     }
 
     private void checkOrgPoliciesForRoles(ChallengeQuestionsResult challengeQuestionsResult,
                                           List<OrganisationPolicy> organisationPolicies) {
+        if (organisationPolicies.isEmpty()) {
+            throw new ValidationException("No Org Policy with that role");
+        }
         challengeQuestionsResult.getQuestions().forEach(challengeQuestion -> {
             for (ChallengeAnswer answer : challengeQuestion.getAnswers()) {
                 String role = answer.getCaseRoleId();
@@ -115,8 +154,10 @@ public class NoticeOfChangeService {
     private List<OrganisationPolicy> findPolicies(SearchResultViewItem caseFields) {
         List<JsonNode> policyNodes = caseFields.findOrganisationPolicyNodes();
         return policyNodes.stream()
-            .map(node -> jacksonUtils.convertValue(node, OrganisationPolicy.class))
-            .collect(toList());
+            .map(node -> OrganisationPolicy.builder()
+                .orgPolicyCaseAssignedRole(node.get("OrgPolicyCaseAssignedRole").asText())
+                .orgPolicyReference(node.get("OrgPolicyReference").asText()).build())
+            .collect(Collectors.toList());
     }
 
     private Optional<String> extractJurisdiction(String caseworkerRole) {
@@ -129,7 +170,7 @@ public class NoticeOfChangeService {
             userInfo.getRoles().forEach(role -> {
                 Optional<String> jurisdiction = extractJurisdiction(role);
                 if (jurisdiction.isPresent()) {
-                    if (!caseViewResource.getCaseType().getJurisdiction().getName().equals(jurisdiction)) {
+                    if (!caseViewResource.getCaseType().getJurisdiction().getId().equals(jurisdiction.get())) {
                         throw new ValidationException("insufficient privileges");
                     }
                 }
@@ -162,7 +203,7 @@ public class NoticeOfChangeService {
         for (SearchResultViewHeader searchResultViewHeader : filteredSearch) {
             if (caseFields.containsKey(searchResultViewHeader.getCaseFieldId())) {
                 JsonNode node = caseFields.get(searchResultViewHeader.getCaseFieldId());
-                if (node.get("CaseRoleId") != null) {
+                if (node.findValues("CaseRoleId") != null) {
                     throw new ValidationException("on going NoC request in progress");
                 }
             }
@@ -179,6 +220,18 @@ public class NoticeOfChangeService {
         }
     }
 
+    private Optional<OrganisationPolicy> findOrganisationPolicyForRole(SearchResultViewItem caseResult,
+                                                                       String caseRoleId) {
+        return findPolicies(caseResult).stream()
+            .filter(policy -> policy.getOrgPolicyCaseAssignedRole().equals(caseRoleId))
+            .findFirst();
+    }
+
+    private boolean organisationEqualsRequestingUsers(Organisation organisation) {
+        return organisation != null
+            && prdRepository.findUsersByOrganisation()
+            .getOrganisationIdentifier().equals(organisation.getOrganisationID());
+    }
     /**
      * Input parameters to be decided on with Dan, dependant on response from NocAnswers.
      *

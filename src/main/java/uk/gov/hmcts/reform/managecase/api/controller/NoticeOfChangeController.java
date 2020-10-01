@@ -15,6 +15,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +26,10 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.GetCaseAssignmentsResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
+import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
@@ -38,14 +43,16 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @Validated
 @ConditionalOnProperty(value = "mca.conditional-apis.case-assignments.enabled", havingValue = "true")
-@RequestMapping(path = "/noc",
-    consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/noc")
 @Api(value = "/noc")
 public class NoticeOfChangeController {
 
     @SuppressWarnings({"squid:S1075"})
-    public static final String CASE_ASSIGNMENTS_PATH = "/noc";
+    public static final String GET_NOC_QUESTIONS = "/noc-questions";
+    public static final String VERIFY_NOC_ANSWERS = "/verify-noc-answers";
+
+    public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
+
     public static final String REQUEST_NOTICE_OF_CHANGE_PATH = "/noc-requests";
     public static final String REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE = "The Notice of Change request has been successfully submitted.";
 
@@ -57,7 +64,7 @@ public class NoticeOfChangeController {
         this.mapper = mapper;
     }
 
-    @GetMapping(path = CASE_ASSIGNMENTS_PATH, produces = APPLICATION_JSON_VALUE)
+    @GetMapping(path = GET_NOC_QUESTIONS, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get Notice of Change questions", notes = "Get Notice of Change questions")
     @ResponseStatus(HttpStatus.OK)
     @ApiResponses({
@@ -130,7 +137,14 @@ public class NoticeOfChangeController {
         return challengeQuestion;
     }
 
-
+    // TODO: Swagger
+    @PostMapping(path = VERIFY_NOC_ANSWERS, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Verify Notice of Change answers")
+    public VerifyNoCAnswersResponse verifyNoticeOfChangeAnswers(
+        @Valid @RequestBody VerifyNoCAnswersRequest verifyNoCAnswersRequest) {
+        NoCRequestDetails result = noticeOfChangeService.verifyNoticeOfChangeAnswers(verifyNoCAnswersRequest);
+        return result.toVerifyNoCAnswersResponse(VERIFY_NOC_ANSWERS_MESSAGE);
+    }
 
     private void validateCaseIds(String caseId) {
         if (!StringUtils.isNumeric(caseId)) {

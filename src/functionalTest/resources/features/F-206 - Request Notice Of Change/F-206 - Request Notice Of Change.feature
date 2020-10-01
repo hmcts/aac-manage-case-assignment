@@ -31,7 +31,7 @@ Scenario: (Happy Path) : Solicitor successfully Requests NoC to Replace a litiga
 @S-206.2
 Scenario: (Happy Path) : Solicitor successfully Requests NoC for a non-represented litigant - No auto-approval applies
 
-    Given a user [Mario - to initiate a case on his own behalf via a citizen facing application]
+    Given a user [Mario - to initiate a case on his own behalf via a citizen facing application],
       And a user [Dil - with a solicitor role for the same jurisdiction as that of a case initiated by Mario],
       And a successful call [by Mario to create a case, C1] as in [Prerequisite Case Creation Call for Case Assignment],
 

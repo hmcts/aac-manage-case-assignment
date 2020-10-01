@@ -4,5 +4,10 @@
     "title": "(Happy Path) : Solicitor successfully Requests NoC for a non-represented litigant - No auto-approval applies",
 
 	"specs": [
+		"Mario - to initiate a case on his own behalf via a citizen facing application",
+		"Dil - with a solicitor role for the same jurisdiction as that of a case initiated by Mario",
+		"is made by Dil to place an NOC Request in order to become Mario's representative on C1",
+		"contains all correct answers in the correct formats"
 	]
+
 }

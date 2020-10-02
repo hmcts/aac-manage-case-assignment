@@ -9,6 +9,8 @@ import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTH
 
 public class SystemUserAuthHeadersInterceptor implements RequestInterceptor {
 
+    private static final String EXPERIMENTAL = "experimental";
+
     private final SecurityUtils securityUtils;
 
     public SystemUserAuthHeadersInterceptor(SecurityUtils securityUtils) {
@@ -19,5 +21,6 @@ public class SystemUserAuthHeadersInterceptor implements RequestInterceptor {
     public void apply(RequestTemplate template) {
         template.header(AUTHORIZATION, securityUtils.getSystemUserToken());
         template.header(SERVICE_AUTHORIZATION, securityUtils.getS2SToken());
+        template.header(EXPERIMENTAL, "true");
     }
 }

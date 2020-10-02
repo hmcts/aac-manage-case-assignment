@@ -16,9 +16,11 @@ import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -45,7 +47,7 @@ class ChallengeQuestionServiceTest {
     }
 
     @Test
-    void compareAnswersSuccess() {
+    void shouldSuccessfullyIdentifyMatchingCaseRole() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
             challengeQuestion("QuestionId1", "${TextField}|${SomeOtherField}:[Claimant],${AnotherField}:[Defendant]",
@@ -68,7 +70,7 @@ class ChallengeQuestionServiceTest {
     }
 
     @Test
-    void compareAnswersMoreAnswersThanQuestions() {
+    void shouldErrorWhenThereAreMoreAnswersThanQuestions() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
             challengeQuestion("QuestionId1", "${Field1}:[Claimant],${Field1}:[Defendant]", fieldType("Text"))
@@ -87,7 +89,7 @@ class ChallengeQuestionServiceTest {
     }
 
     @Test
-    void compareAnswersQuestionNotFound() {
+    void shouldErrorWhenAQuestionHasNotBeenAnswered() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
             challengeQuestion("OtherQuestionId1", "${Field1}:[Claimant]", fieldType("Text"))
@@ -107,7 +109,7 @@ class ChallengeQuestionServiceTest {
     }
 
     @Test
-    void compareAnswersCannotUniquelyIdentifyRole() {
+    void shouldErrorWhenAnswersCannotUniquelyIdentifyRole() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
             challengeQuestion("QuestionId1", "${TextField}:[Claimant],${TextField}:[Defendant]", fieldType("Text"))
@@ -128,7 +130,7 @@ class ChallengeQuestionServiceTest {
     }
 
     @Test
-    void compareAnswersCannotIdentifyRole() {
+    void shouldErrorWhenAnswersDoNotMatchAnyRole() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
             challengeQuestion("QuestionId1", "${PhoneUKField}:[Claimant]", fieldType("Text"))
@@ -138,6 +140,48 @@ class ChallengeQuestionServiceTest {
         );
         challengeQuestions.add(
             challengeQuestion("QuestionId3", "${YesOrNoField}:[Claimant]", fieldType("YesOrNo"))
+        );
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        ValidationException exception = assertThrows(ValidationException.class,
+            () -> challengeQuestionService.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
+
+        assertEquals("The answers did not match those for any litigant", exception.getMessage());
+    }
+
+    @Test
+    void shouldSuccessfullyIdentifyRoleWhenFieldValueAndAnswerAreNull() {
+        answers = singletonList(new SubmittedChallengeAnswer("QuestionId1", null));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion("QuestionId1", "${TextAreaField}:[Claimant]", fieldType("Text"))
+        );
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        String result = challengeQuestionService
+            .getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult);
+
+        assertEquals("[Claimant]", result);
+    }
+
+    @Test
+    void shouldSuccessfullyIdentifyRoleWhenFieldIsNotPersistedAndAnswerIsNull() {
+        answers = singletonList(new SubmittedChallengeAnswer("QuestionId1", null));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion("QuestionId1", "${NonExistingField}:[Claimant]", fieldType("Text"))
+        );
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        String result = challengeQuestionService
+            .getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult);
+
+        assertEquals("[Claimant]", result);
+    }
+
+    @Test
+    void shouldErrorWhenFieldIsNullButAnswerProvided() {
+        answers = singletonList(new SubmittedChallengeAnswer("QuestionId1", "Answer"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion("QuestionId1", "${TextAreaField}:[Claimant]", fieldType("Text"))
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 

@@ -9,7 +9,8 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
-public class CaseFieldPathUtils {
+@SuppressWarnings({"PMD.AvoidLiteralsInIfCondition", "PMD.TooManyFields"})
+public final class CaseFieldPathUtils {
 
     private static final String SEPARATOR = ".";
     private static final String SEPARATOR_REGEX = "\\.";
@@ -69,7 +70,7 @@ public class CaseFieldPathUtils {
                                                                                String path,
                                                                                boolean pathIncludesParent) {
         if (StringUtils.isBlank(path) || fieldTypeDefinition.getChildren().isEmpty()
-            || (pathIncludesParent && splitPath(path).length == 1)) {
+            || pathIncludesParent && splitPath(path).length == 1) {
             return Optional.empty();
         }
         List<String> pathElements = getPathElements(path);
@@ -104,7 +105,7 @@ public class CaseFieldPathUtils {
             .filter(e -> e.getId().equals(pathElements.get(0)))
             .findFirst()
             .flatMap(caseField -> {
-                if (pathElements.size() == 1) {
+                if (1 == pathElements.size()) {
                     return Optional.of(caseField);
                 } else {
                     List<T> newCaseFields = (List<T>) caseField.getFieldTypeDefinition().getChildren();

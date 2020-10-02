@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 @ToString
+@SuppressWarnings({"PMD.TooManyFields"})
 public class CaseViewField implements CommonField {
 
     public static final String READONLY = "READONLY";
@@ -47,6 +48,7 @@ public class CaseViewField implements CommonField {
     @JsonProperty("default_value")
     private String defaultValue;
 
+    @Override
     public String getId() {
         return id;
     }
@@ -71,6 +73,7 @@ public class CaseViewField implements CommonField {
         this.hintText = hintText;
     }
 
+    @Override
     public FieldTypeDefinition getFieldTypeDefinition() {
         return fieldTypeDefinition;
     }
@@ -119,18 +122,22 @@ public class CaseViewField implements CommonField {
         this.value = value;
     }
 
+    @Override
     public Object getFormattedValue() {
         return formattedValue;
     }
 
+    @Override
     public void setFormattedValue(Object formattedValue) {
         this.formattedValue = formattedValue;
     }
 
+    @Override
     public String getDisplayContext() {
         return displayContext;
     }
 
+    @Override
     public void setDisplayContext(String displayContext) {
         this.displayContext = displayContext;
     }
@@ -159,10 +166,12 @@ public class CaseViewField implements CommonField {
         this.showSummaryContentOption = showSummaryContentOption;
     }
 
+    @Override
     public String getDisplayContextParameter() {
         return displayContextParameter;
     }
 
+    @Override
     public void setDisplayContextParameter(String displayContextParameter) {
         this.displayContextParameter = displayContextParameter;
     }
@@ -175,6 +184,7 @@ public class CaseViewField implements CommonField {
         this.retainHiddenValue = retainHiddenValue;
     }
 
+    @Override
     public List<AccessControlList> getAccessControlLists() {
         return accessControlLists;
     }

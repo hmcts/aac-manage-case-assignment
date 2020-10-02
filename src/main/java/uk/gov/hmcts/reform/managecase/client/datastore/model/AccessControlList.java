@@ -7,6 +7,8 @@ import java.io.Serializable;
 
 public class AccessControlList implements Serializable {
 
+    private static final long serialVersionUID = -4257574164546267919L;
+
     private String role;
     private boolean create;
     private boolean read;

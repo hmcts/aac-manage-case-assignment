@@ -14,6 +14,8 @@ import static java.util.Collections.emptyList;
 
 public class FieldTypeDefinition implements Serializable {
 
+    private static final long serialVersionUID = -4257574164546267919L;
+
     public static final String COLLECTION = "Collection";
     public static final String COMPLEX = "Complex";
     public static final String MULTI_SELECT_LIST = "MultiSelectList";
@@ -32,18 +34,18 @@ public class FieldTypeDefinition implements Serializable {
     public static final String DATETIME = "DateTime";
     public static final String DATE = "Date";
 
-    private String id = null;
-    private String type = null;
-    private BigDecimal min = null;
-    private BigDecimal max = null;
+    private String id;
+    private String type;
+    private BigDecimal min;
+    private BigDecimal max;
     @JsonProperty("regular_expression")
-    private String regularExpression = null;
+    private String regularExpression;
     @JsonProperty("fixed_list_items")
     private List<FixedListItemDefinition> fixedListItemDefinitions = new ArrayList<>();
     @JsonProperty("complex_fields")
     private List<CaseFieldDefinition> complexFields = new ArrayList<>();
     @JsonProperty("collection_field_type")
-    private FieldTypeDefinition collectionFieldTypeDefinition = null;
+    private FieldTypeDefinition collectionFieldTypeDefinition;
 
     public String getType() {
         return type;

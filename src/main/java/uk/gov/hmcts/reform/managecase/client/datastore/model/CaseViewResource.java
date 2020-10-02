@@ -34,13 +34,4 @@ public class CaseViewResource extends RepresentationModel {
     @JsonProperty("events")
     private CaseViewEvent[] caseViewEvents;
 
-    private void copyProperties(CaseView caseView) {
-        this.reference = caseView.getCaseId();
-        this.caseType = caseView.getCaseType();
-        this.tabs = caseView.getTabs();
-        this.metadataFields = caseView.getMetadataFields();
-        this.state = caseView.getState();
-        this.caseViewActionableEvents = caseView.getActionableEvents();
-        this.caseViewEvents = caseView.getEvents();
-    }
 }

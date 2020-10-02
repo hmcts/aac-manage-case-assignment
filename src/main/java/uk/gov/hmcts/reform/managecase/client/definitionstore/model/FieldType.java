@@ -10,14 +10,14 @@ import java.util.List;
 @ApiModel(description = "")
 public class FieldType {
 
-    private String id = null;
-    private String type = null;
-    private String min = null;
-    private String max = null;
-    private String regularExpression = null;
+    private String id;
+    private String type;
+    private String min;
+    private String max;
+    private String regularExpression;
     private List<FixedListItem> fixedListItems = new ArrayList<>();
     private List<CaseField> complexFields = new ArrayList<>();
-    private FieldType collectionFieldType = null;
+    private FieldType collectionFieldType;
 
     @JsonProperty("id")
     public String getId() {
@@ -28,7 +28,7 @@ public class FieldType {
         this.id = id;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("type")
     public String getType() {
         return type;

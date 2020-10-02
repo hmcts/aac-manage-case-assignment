@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 
 @ToString
+@SuppressWarnings({"PMD.MethodReturnsInternalArray",
+    "PMD.UseVarargs",
+    "PMD.ArrayIsStoredDirectly"})
 public class CaseViewTab {
     private String id;
     private String label;

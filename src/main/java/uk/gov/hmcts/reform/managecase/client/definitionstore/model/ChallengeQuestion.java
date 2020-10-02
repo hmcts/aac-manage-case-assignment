@@ -11,6 +11,7 @@ import java.util.List;
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @Data
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
 public class ChallengeQuestion {
 
     private String caseTypeId;

@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 @Service
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 public class CaseAssignmentService {
 
     public static final String SOLICITOR_ROLE = "caseworker-%s-solicitor";

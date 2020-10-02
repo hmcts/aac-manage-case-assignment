@@ -7,14 +7,15 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 
 @ApiModel(description = "")
+@SuppressWarnings({"PMD.UncommentedEmptyConstructor"})
 public class FixedListItemDefinition implements Serializable {
 
     private static final long serialVersionUID = 6196146295016140921L;
-    private String code = null;
-    private String label = null;
-    private String order = null;
+    private String code;
+    private String label;
+    private String order;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("code")
     public String getCode() {
         return code;
@@ -33,7 +34,7 @@ public class FixedListItemDefinition implements Serializable {
         this.label = label;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("order")
     public String getOrder() {
         return order;

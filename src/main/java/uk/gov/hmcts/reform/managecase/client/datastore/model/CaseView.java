@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@SuppressWarnings({"PMD.MethodReturnsInternalArray",
+    "PMD.UseVarargs",
+    "PMD.ArrayIsStoredDirectly"})
 public class CaseView extends AbstractCaseView {
     private ProfileCaseState state;
     private String[] channels;

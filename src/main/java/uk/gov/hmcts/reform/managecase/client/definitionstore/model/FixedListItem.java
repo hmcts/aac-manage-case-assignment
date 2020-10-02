@@ -2,14 +2,14 @@ package uk.gov.hmcts.reform.managecase.client.definitionstore.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "")
+@SuppressWarnings({"PMD.UncommentedEmptyConstructor"})
 public class FixedListItem implements Orderable {
 
-    private String code = null;
-    private String label = null;
-    private Integer order = null;
+    private String code;
+    private String label;
+    private Integer order;
 
     public FixedListItem() {
     }
@@ -20,7 +20,6 @@ public class FixedListItem implements Orderable {
         this.order = order;
     }
 
-    @ApiModelProperty(value = "")
     @JsonProperty("code")
     public String getCode() {
         return code;

@@ -10,14 +10,17 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.DisplayContextParameterType.getParameterTypeFor;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.DisplayContextParameterType.getParameterValueFor;
 
-
+@SuppressWarnings({"PMD.AvoidReassigningParameters",
+    "PMD.PrematureDeclaration",
+    "PMD.DataflowAnomalyAnalysis",
+    "PMD.AvoidInstantiatingObjectsInLoops"})
 public class DisplayContextParameter {
 
     private static final String MULTIPLE_PARAMETERS_STRING = "),";
 
-    private DisplayContextParameterType type;
+    private final DisplayContextParameterType type;
 
-    private String value;
+    private final String value;
 
     public DisplayContextParameter(DisplayContextParameterType type, String value) {
         this.type = type;
@@ -40,10 +43,10 @@ public class DisplayContextParameter {
             return Collections.emptyList();
         }
         while (displayContextParameter.contains(MULTIPLE_PARAMETERS_STRING)) {
-            displayContextParameters.add(displayContextParameter.substring(0, (displayContextParameter
-                .indexOf(MULTIPLE_PARAMETERS_STRING) + 1)));
-            displayContextParameter = displayContextParameter.substring((displayContextParameter
-                .indexOf(MULTIPLE_PARAMETERS_STRING) + 2)).trim();
+            displayContextParameters.add(displayContextParameter.substring(0, displayContextParameter
+                .indexOf(MULTIPLE_PARAMETERS_STRING) + 1));
+            displayContextParameter = displayContextParameter.substring(displayContextParameter
+                .indexOf(MULTIPLE_PARAMETERS_STRING) + 2).trim();
         }
 
         displayContextParameters.add(displayContextParameter.trim());

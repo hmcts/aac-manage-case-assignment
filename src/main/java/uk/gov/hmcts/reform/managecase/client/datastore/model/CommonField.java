@@ -40,7 +40,7 @@ public interface CommonField extends CommonDCPModel {
 
     default DisplayContext displayContextType() {
         return Optional.ofNullable(getDisplayContext())
-            .filter(dc -> !dc.equals("HIDDEN"))
+            .filter(dc -> !"HIDDEN".equals(dc))
             .map(DisplayContext::valueOf)
             .orElse(null);
     }

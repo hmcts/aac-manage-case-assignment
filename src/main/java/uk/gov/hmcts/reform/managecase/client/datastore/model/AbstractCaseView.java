@@ -6,6 +6,10 @@ import lombok.ToString;
 import java.util.List;
 
 @ToString
+@SuppressWarnings({"PMD.AbstractClassWithoutAbstractMethod",
+    "PMD.MethodReturnsInternalArray",
+    "PMD.UseVarargs",
+    "PMD.ArrayIsStoredDirectly"})
 public abstract class AbstractCaseView {
 
     @JsonProperty("case_id")

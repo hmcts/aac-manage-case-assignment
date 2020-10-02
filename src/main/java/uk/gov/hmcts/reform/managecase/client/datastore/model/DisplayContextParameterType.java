@@ -15,10 +15,10 @@ public enum DisplayContextParameterType {
     private static final int VALUE_GROUP = 2;
 
     public static Optional<DisplayContextParameterType> getParameterTypeFor(String displayContextParameter) {
-        Matcher m = PATTERN.matcher(displayContextParameter);
-        if (m.matches()) {
+        Matcher matcher = PATTERN.matcher(displayContextParameter);
+        if (matcher.matches()) {
             try {
-                return Optional.of(valueOf(m.group(TYPE_GROUP)));
+                return Optional.of(valueOf(matcher.group(TYPE_GROUP)));
             } catch (IllegalArgumentException e) {
                 return Optional.empty();
             }
@@ -27,9 +27,9 @@ public enum DisplayContextParameterType {
     }
 
     public static Optional<String> getParameterValueFor(String displayContextParameter) {
-        Matcher m = PATTERN.matcher(displayContextParameter);
-        if (m.matches()) {
-            return Optional.of(m.group(VALUE_GROUP));
+        Matcher matcher = PATTERN.matcher(displayContextParameter);
+        if (matcher.matches()) {
+            return Optional.of(matcher.group(VALUE_GROUP));
         }
         return Optional.empty();
     }

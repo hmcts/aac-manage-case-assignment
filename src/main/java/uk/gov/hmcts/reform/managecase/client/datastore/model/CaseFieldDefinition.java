@@ -19,28 +19,29 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @ToString
 @ApiModel(description = "")
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyFields"})
 public class CaseFieldDefinition implements Serializable, CommonField {
 
     private static final long serialVersionUID = -4257574164546267919L;
 
-    private String id = null;
+    private String id;
     @JsonProperty("case_type_id")
-    private String caseTypeId = null;
-    private String label = null;
+    private String caseTypeId;
+    private String label;
     @JsonProperty("hint_text")
-    private String hintText = null;
+    private String hintText;
     @JsonProperty("field_type")
-    private FieldTypeDefinition fieldTypeDefinition = null;
-    private Boolean hidden = null;
+    private FieldTypeDefinition fieldTypeDefinition;
+    private Boolean hidden;
     @JsonProperty("security_classification")
-    private String securityLabel = null;
+    private String securityLabel;
     @JsonProperty("live_from")
-    private String liveFrom = null;
+    private String liveFrom;
     @JsonProperty("live_until")
-    private String liveUntil = null;
+    private String liveUntil;
     private Integer order;
     @JsonProperty("show_condition")
-    private String showConditon = null;
+    private String showConditon;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
     @JsonProperty("complexACLs")
@@ -288,7 +289,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     }
 
     private List<String> filterSiblings(String parent, String me, List<String> allPaths) {
-        if (parent.equalsIgnoreCase("")) {
+        if ("".equalsIgnoreCase(parent)) {
             return allPaths
                 .stream()
                 .filter(s -> s.indexOf('.') == -1
@@ -305,9 +306,9 @@ public class CaseFieldDefinition implements Serializable, CommonField {
         }
     }
 
-    private boolean isNotAChild(final String parent, final String s) {
-        return s.indexOf('.', parent.length()) == parent.length()
-            && (s.split("\\.").length == parent.split("\\.").length + 1);
+    private boolean isNotAChild(final String parent, final String value) {
+        return value.indexOf('.', parent.length()) == parent.length()
+            && value.split("\\.").length == parent.split("\\.").length + 1;
     }
 
     private Optional<String> getParentPath(String path) {

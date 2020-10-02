@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.client.datastore;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,7 +42,7 @@ public interface DataStoreApiClient {
                                             @RequestParam("user_ids") List<String> userIds);
 
     @GetMapping(INTERNAL_CASES)
-    CaseViewResource getCaseDetailsByCaseId(@RequestParam("case_id") String caseId);
+    CaseViewResource getCaseDetailsByCaseId(@PathVariable("caseId") String caseId);
 
     @DeleteMapping(value = CASE_USERS, consumes = APPLICATION_JSON_VALUE)
     void removeCaseUserRoles(@RequestBody CaseUserRolesRequest userRolesRequest);

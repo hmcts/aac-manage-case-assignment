@@ -9,7 +9,7 @@ public class DataStoreApiClientConfig {
     public static final String SEARCH_CASES = "/searchCases";
     public static final String INTERNAL_SEARCH_CASES = "/internal/searchCases";
     public static final String CASE_USERS = "/case-users";
-    public static final String INTERNAL_CASES = "/internal/cases";
+    public static final String INTERNAL_CASES = "/internal/cases/{caseId}";
 
     @Bean
     public SystemUserAuthHeadersInterceptor systemUserAuthHeadersInterceptor(SecurityUtils securityUtils) {

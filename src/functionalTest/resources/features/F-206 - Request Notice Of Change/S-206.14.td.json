@@ -4,10 +4,12 @@
     "title": "(Happy Path) : Case Access Administrator successfully Requests NoC for a non-represented litigant - No auto-approval applies",
 
 	"specs": [
-		"",
-		"",
-		"",
-		""
+		"Mario - to initiate a case on his own behalf via a citizen facing application",
+		"Jane - as a CAA in an organisation with also a solicitor role for the jurisdiction of a Case C1 to be created by Mario",
+		"Matt - as another CAA in Jane's organisation'",
+		"is made by Jane to place a NOC Request for C1",
+		"contains all correct answers in the correct format",
+		"contains answers identifying case role R2"
 	]
 
 }

@@ -110,8 +110,6 @@ public class NoticeOfChangeController {
         return noticeOfChangeService.getChallengeQuestions(caseId);
     }
 
-
-
     private void validateCaseIds(String caseId) {
         if (!StringUtils.isNumeric(caseId)) {
             throw new ValidationException("Case ID should contain digits only");

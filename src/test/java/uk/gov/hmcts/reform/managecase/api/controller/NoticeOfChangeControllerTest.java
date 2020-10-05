@@ -41,6 +41,10 @@ public class NoticeOfChangeControllerTest {
 
     private static final String CASE_ID = "1588234985453946";
     private static final String CASE_TYPE_ID = "caseType";
+    private static final String ANSWER_FIELD = "${applicant.individual.fullname}|${applicant.company.name}|"
+        + "${applicant.soletrader.name}:Applicant,${respondent.individual.fullname}|${respondent.company.name}"
+        + "|${respondent.soletrader.name}:Respondent";
+
 
     @WebMvcTest(controllers = NoticeOfChangeController.class,
         includeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes = MapperConfig.class),
@@ -76,22 +80,19 @@ public class NoticeOfChangeControllerTest {
             void directCallHappyPath() {
                 // created to avoid IDE warnings in controller class that function is never used
                 // ARRANGE
-                ChallengeQuestion challengeQuestion = new ChallengeQuestion();
-                challengeQuestion.setCaseTypeId(CASE_TYPE_ID);
-                challengeQuestion.setOrder(1);
-                challengeQuestion.setQuestionText("QuestionText1");
                 FieldType fieldType = new FieldType();
                 fieldType.setId("Number");
                 fieldType.setType("Number");
                 fieldType.setMin(null);
                 fieldType.setMax(null);
-                challengeQuestion.setAnswerFieldType(fieldType);
-                challengeQuestion.setChallengeQuestionId("NoC");
-                challengeQuestion.setAnswerField("${applicant.individual.fullname}|${applicant.company.name}|"
-                                                     + "${applicant.soletrader.name}:Applicant,"
-                                                     + "${respondent.individual.fullname}|${respondent.company.name}"
-                                                     + "{|${respondent.soletrader.name}:Respondent");
-                challengeQuestion.setQuestionId("QuestionId1");
+                ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
+                                                                            "QuestionText1",
+                                                                            fieldType,
+                                                                            null,
+                                                                            "NoC",
+                                                                            ANSWER_FIELD,
+                                                                            "QuestionId1",
+                                                                            null);
                 ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
                     Arrays.asList(challengeQuestion));
 
@@ -109,24 +110,21 @@ public class NoticeOfChangeControllerTest {
             @DisplayName("should successfully get NoC questions")
             @Test
             void shouldGetCaseAssignmentsForAValidRequest() throws Exception {
-                ChallengeQuestion challengeQuestion = new ChallengeQuestion();
-                challengeQuestion.setCaseTypeId(CASE_TYPE_ID);
-                challengeQuestion.setOrder(1);
-                challengeQuestion.setQuestionText("QuestionText1");
                 FieldType fieldType = new FieldType();
                 fieldType.setId("Number");
                 fieldType.setType("Number");
                 fieldType.setMin(null);
                 fieldType.setMax(null);
-                challengeQuestion.setAnswerFieldType(fieldType);
-                challengeQuestion.setChallengeQuestionId("NoC");
-                challengeQuestion.setAnswerField("${applicant.individual.fullname}|${applicant.company.name}"
-                                                     + "|${applicant.soletrader.name}:Applicant,"
-                                                     + "${respondent.individual.fullname}|${respondent.company.name}"
-                                                     + "{|${respondent.soletrader.name}:Respondent");
-                challengeQuestion.setQuestionId("QuestionId1");
+                ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
+                                                                            "QuestionText1",
+                                                                            fieldType,
+                                                                            null,
+                                                                            "NoC",
+                                                                            ANSWER_FIELD,
+                                                                            "QuestionId1", null);
                 ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
                     Arrays.asList(challengeQuestion));
+
 
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 

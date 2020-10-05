@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.managecase.service;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
-import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import javax.validation.ValidationException;
@@ -80,11 +78,11 @@ public class NoticeOfChangeService {
         // case matches one of the jurisdictions of the user, error and exit if not.
         validateUserRoles(caseViewResource, userInfo);
         //step 7 Identify the case type Id of the retrieved case
-        String caseType = caseViewResource.getCaseType().getName();
+        String caseType = caseViewResource.getCaseType().getId();
         //step 8 n/a
         //step 9 getTabContents - def store
         ChallengeQuestionsResult challengeQuestionsResult =
-            definitionStoreRepository.challengeQuestions(caseType, caseId);
+            definitionStoreRepository.challengeQuestions(caseType, "NoCChallenge");
         // check if empty and throw error
         //step 10 n/a
         //step 11 For each set of answers in the config, check that there is an OrganisationPolicy
@@ -131,13 +129,19 @@ public class NoticeOfChangeService {
 
     private void validateUserRoles(CaseViewResource caseViewResource, UserInfo userInfo) {
         if (!userInfo.getRoles().contains(PUI_ROLE)) {
-            userInfo.getRoles().forEach(role -> {
-                Optional<String> jurisdiction = extractJurisdiction(role);
-                if (jurisdiction.isPresent() && !caseViewResource
-                    .getCaseType().getJurisdiction().getId().equals(jurisdiction.get())) {
-                    throw new ValidationException("insufficient privileges");
+            validate:
+            {
+                for (String role : userInfo.getRoles()) {
+                    Optional<String> jurisdiction = extractJurisdiction(role);
+                    if (jurisdiction.isPresent() && caseViewResource
+                        .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
+                        break validate;
+                    } else if (jurisdiction.isPresent() && !caseViewResource
+                        .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
+                        throw new ValidationException("insufficient privileges");
+                    }
                 }
-            });
+            }
         }
     }
 

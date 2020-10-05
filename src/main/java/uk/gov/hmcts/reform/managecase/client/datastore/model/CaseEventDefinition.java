@@ -9,19 +9,20 @@ import java.util.List;
 import java.util.Optional;
 
 @ToString
+@SuppressWarnings({"PMD.TooManyFields", "PMD.MissingSerialVersionUID"})
 public class CaseEventDefinition implements Serializable {
 
-    private String id = null;
-    private String name = null;
-    private String description = null;
+    private String id;
+    private String name;
+    private String description;
     @JsonProperty("order")
-    private Integer displayOrder = null;
+    private Integer displayOrder;
     @JsonProperty("case_fields")
     private List<CaseEventFieldDefinition> caseFields = new ArrayList<>();
     @JsonProperty("pre_states")
     private List<String> preStates = new ArrayList<>();
     @JsonProperty("post_state")
-    private String postState = null;
+    private String postState;
     @JsonProperty("callback_url_about_to_start_event")
     private String callBackURLAboutToStartEvent;
     @JsonProperty("retries_timeout_about_to_start_event")
@@ -37,13 +38,13 @@ public class CaseEventDefinition implements Serializable {
     @JsonProperty("security_classification")
     private SecurityClassification securityClassification;
     @JsonProperty("show_summary")
-    private Boolean showSummary = null;
+    private Boolean showSummary;
     @JsonProperty("show_event_notes")
-    private Boolean showEventNotes = null;
+    private Boolean showEventNotes;
     @JsonProperty("end_button_label")
-    private String endButtonLabel = null;
+    private String endButtonLabel;
     @JsonProperty("can_save_draft")
-    private Boolean canSaveDraft = null;
+    private Boolean canSaveDraft;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
 

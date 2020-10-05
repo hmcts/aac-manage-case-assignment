@@ -31,13 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
 
 @Service
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 public class NoticeOfChangeService {
 
     public static final String PUI_ROLE = "pui-caa";
@@ -107,11 +107,11 @@ public class NoticeOfChangeService {
         CaseViewResource caseViewResource = getCase(caseId);
         //step 3 Check to see what events are available on the case (the system user with IdAM Role caseworker-caa only
         // has access to NoC events).  If no events are available, return an error
-        getCaseEvents(caseViewResource);
+        checkForCaseEvents(caseViewResource);
         //step 4 Check the ChangeOrganisationRequest.CaseRole in the case record.  If it is not null, return an error
         // indicating that there is an ongoing NoCRequest.
         CaseSearchResultViewResource caseFields = findCaseBy(caseViewResource.getCaseType().getName(), caseId);
-        getCaseFields(caseFields);
+        checkCaseFields(caseFields);
         //step 5 Invoke IdAM API to get the IdAM Roles of the invoker.
         UserInfo userInfo = getUserInfo();
         //step 6 If the invoker has the role pui-caa then they are allowed to request an NoC for a case in any
@@ -173,10 +173,9 @@ public class NoticeOfChangeService {
         if (!userInfo.getRoles().contains(PUI_ROLE)) {
             userInfo.getRoles().forEach(role -> {
                 Optional<String> jurisdiction = extractJurisdiction(role);
-                if (jurisdiction.isPresent()) {
-                    if (!caseViewResource.getCaseType().getJurisdiction().getId().equals(jurisdiction.get())) {
-                        throw new ValidationException("insufficient privileges");
-                    }
+                if (jurisdiction.isPresent() && !caseViewResource
+                    .getCaseType().getJurisdiction().getId().equals(jurisdiction.get())) {
+                    throw new ValidationException("insufficient privileges");
                 }
             });
         }
@@ -195,7 +194,7 @@ public class NoticeOfChangeService {
         return dataStoreRepository.findCaseBy(caseTypeId, null, caseId);
     }
 
-    private void getCaseFields(CaseSearchResultViewResource caseDetails) {
+    private void checkCaseFields(CaseSearchResultViewResource caseDetails) {
         Map<String, JsonNode> caseFields = caseDetails.getCases().stream().findFirst().get().getFields();
         List<SearchResultViewHeader> searchResultViewHeaderList =
             caseDetails.getHeaders().stream().findFirst().get().getFields();
@@ -214,12 +213,8 @@ public class NoticeOfChangeService {
         }
     }
 
-    private void getCaseEvents(CaseViewResource caseViewResource) {
-        List<CaseViewEvent> caseViewEventsFiltered =
-            Arrays.stream(caseViewResource.getCaseViewEvents())
-                .filter(caseViewEvent -> caseViewEvent.getEventName().equalsIgnoreCase(NOC_EVENTS))
-                .collect(Collectors.toList());
-        if (caseViewEventsFiltered.isEmpty()) {
+    private void checkForCaseEvents(CaseViewResource caseViewResource) {
+        if (caseViewResource.getCaseViewEvents() == null) {
             throw new ValidationException("no NoC events available for this case type");
         }
     }

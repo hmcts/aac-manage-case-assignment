@@ -49,13 +49,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
 
-@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.JUnitAssertionsShouldIncludeMessage", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.UseConcurrentHashMap"})
 class NoticeOfChangeServiceTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
     private static final String CASE_ID = "1567934206391385";
     private static final String JURISDICTION = "Jurisdiction";
     private static final String CASE_TYPE = "CaseTypeA";
+    private static final String QUESTION_TEXT = "QuestionText1";
+    private static final String FIELD_ID = "Number";
+    private static final String CHALLENGE_QUESTION = "NoC";
 
     @InjectMocks
     private NoticeOfChangeService service;
@@ -73,8 +76,8 @@ class NoticeOfChangeServiceTest {
     @Mock
     private RequestContext context;
 
-    private List<SearchResultViewItem> viewItems = new ArrayList<>();
-    private Map<String, JsonNode> caseFields = new HashMap<>();
+    private final List<SearchResultViewItem> viewItems = new ArrayList<>();
+    private final Map<String, JsonNode> caseFields = new HashMap<>();
     private static final String DATE_FIELD = "DateField";
     private static final String DATETIME_FIELD = "DateTimeField";
     private static final String TEXT_FIELD = "TextField";
@@ -152,14 +155,14 @@ class NoticeOfChangeServiceTest {
             ChallengeQuestion challengeQuestion = new ChallengeQuestion();
             challengeQuestion.setCaseTypeId(CASE_TYPE_ID);
             challengeQuestion.setOrder(1);
-            challengeQuestion.setQuestionText("QuestionText1");
+            challengeQuestion.setQuestionText(QUESTION_TEXT);
             FieldType fieldType = new FieldType();
-            fieldType.setId("Number");
-            fieldType.setType("Number");
+            fieldType.setId(FIELD_ID);
+            fieldType.setType(FIELD_ID);
             fieldType.setMin(null);
             fieldType.setMax(null);
             challengeQuestion.setAnswerFieldType(fieldType);
-            challengeQuestion.setChallengeQuestionId("NoC");
+            challengeQuestion.setChallengeQuestionId(CHALLENGE_QUESTION);
             challengeQuestion.setAnswerField("${applicant.individual.fullname}|${applicant.company.name}|"
                                                  + "${applicant.soletrader.name}:Applicant,"
                                                  + "${respondent.individual.fullname}|${respondent.company.name}"
@@ -187,8 +190,9 @@ class NoticeOfChangeServiceTest {
             assertThat(challengeQuestionsResult).isNotNull();
             assertThat(challengeQuestionsResult.getQuestions().get(0).getCaseTypeId()).isEqualTo(CASE_TYPE_ID);
             assertThat(challengeQuestionsResult.getQuestions().get(0).getOrder()).isEqualTo(1);
-            assertThat(challengeQuestionsResult.getQuestions().get(0).getQuestionText()).isEqualTo("QuestionText1");
-            assertThat(challengeQuestionsResult.getQuestions().get(0).getChallengeQuestionId()).isEqualTo("NoC");
+            assertThat(challengeQuestionsResult.getQuestions().get(0).getQuestionText()).isEqualTo(QUESTION_TEXT);
+            assertThat(challengeQuestionsResult.getQuestions().get(0).getChallengeQuestionId())
+                .isEqualTo(CHALLENGE_QUESTION);
             assertThat(challengeQuestionsResult.getQuestions().get(0).getAnswers().size()).isEqualTo(0);
         }
 
@@ -241,14 +245,14 @@ class NoticeOfChangeServiceTest {
             ChallengeQuestion challengeQuestion = new ChallengeQuestion();
             challengeQuestion.setCaseTypeId(CASE_TYPE_ID);
             challengeQuestion.setOrder(1);
-            challengeQuestion.setQuestionText("QuestionText1");
+            challengeQuestion.setQuestionText(QUESTION_TEXT);
             FieldType fieldType = new FieldType();
-            fieldType.setId("Number");
-            fieldType.setType("Number");
+            fieldType.setId(FIELD_ID);
+            fieldType.setType(FIELD_ID);
             fieldType.setMin(null);
             fieldType.setMax(null);
             challengeQuestion.setAnswerFieldType(fieldType);
-            challengeQuestion.setChallengeQuestionId("NoC");
+            challengeQuestion.setChallengeQuestionId(CHALLENGE_QUESTION);
             challengeQuestion.setAnswerField("${applicant.individual.fullname}|${applicant.company.name}|"
                                                  + "${applicant.soletrader.name}:Applicant,"
                                                  + "${respondent.individual.fullname}|${respondent.company.name}"
@@ -271,14 +275,14 @@ class NoticeOfChangeServiceTest {
             ChallengeQuestion challengeQuestion = new ChallengeQuestion();
             challengeQuestion.setCaseTypeId(CASE_TYPE_ID);
             challengeQuestion.setOrder(1);
-            challengeQuestion.setQuestionText("QuestionText1");
+            challengeQuestion.setQuestionText(QUESTION_TEXT);
             FieldType fieldType = new FieldType();
             fieldType.setId("Number");
             fieldType.setType("Number");
             fieldType.setMin(null);
             fieldType.setMax(null);
             challengeQuestion.setAnswerFieldType(fieldType);
-            challengeQuestion.setChallengeQuestionId("NoC");
+            challengeQuestion.setChallengeQuestionId(CHALLENGE_QUESTION);
             challengeQuestion.setAnswerField("${applicant.individual.fullname}|${applicant.company.name}|"
                                                  + "${applicant.soletrader.name}:Applicant,"
                                                  + "${respondent.individual.fullname}|${respondent.company.name}"
@@ -298,12 +302,7 @@ class NoticeOfChangeServiceTest {
         @Test
         @DisplayName("Must return an error when no NOC Request event is available on the case")
         void shouldThrowErrorNoEventAvailable() {
-            AuditEvent event = new AuditEvent();
-            event.setEventName("NoC Event");
-            CaseViewEvent caseViewEvent = CaseViewEvent.createFrom(event);
             CaseViewResource caseViewResource = new CaseViewResource();
-            CaseViewEvent[] caseViewEventArray = {caseViewEvent};
-            caseViewResource.setCaseViewEvents(caseViewEventArray);
             given(dataStoreRepository.findCaseByCaseId(CASE_ID))
                 .willReturn(caseViewResource);
 

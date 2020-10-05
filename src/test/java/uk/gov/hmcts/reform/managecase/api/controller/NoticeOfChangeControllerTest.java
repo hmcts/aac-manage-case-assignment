@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -98,7 +97,7 @@ public class NoticeOfChangeControllerTest {
 
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 
-                NoticeOfChangeController controller = new NoticeOfChangeController(service, new ModelMapper());
+                NoticeOfChangeController controller = new NoticeOfChangeController(service);
 
                 // ACT
                 ChallengeQuestionsResult response = controller.getNoticeOfChangeQuestions(CASE_ID);

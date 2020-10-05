@@ -12,6 +12,7 @@ import static java.util.Collections.emptyList;
 
 @Data
 @AllArgsConstructor
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 public class CaseSearchResultView {
 
     public static final CaseSearchResultView EMPTY = new CaseSearchResultView(emptyList(), emptyList(), 0L);

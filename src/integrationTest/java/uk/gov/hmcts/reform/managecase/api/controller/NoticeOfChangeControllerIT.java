@@ -50,20 +50,18 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCh
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubIdamGetUserInfo;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
-    "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "PMD.TooManyMethods",
+    "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.UseConcurrentHashMap",
     "squid:S100", "squid:S1192"})
 public class NoticeOfChangeControllerIT {
 
-    private static final String ASSIGNEE_ID = "ae2eb34c-816a-4eea-b714-6654d022fcef";
     private static final String CASE_ID = "1588234985453946";
     private static final String CASE_TYPE_ID = "caseType";
     private static final String JURISDICTION = "Jurisdiction";
 
     private static final String RAW_QUERY = "{\"query\":{\"bool\":{\"filter\":{\"term\":{\"reference\":%s}}}}}";
     private static final String ES_QUERY = String.format(RAW_QUERY, CASE_ID);
-    private Map<String, JsonNode> caseFields = new HashMap<>();
-    private List<SearchResultViewItem> viewItems = new ArrayList<>();
-    private static final List<String> NULL_CASE_ROLES = null;
+    private final Map<String, JsonNode> caseFields = new HashMap<>();
+    private final List<SearchResultViewItem> viewItems = new ArrayList<>();
 
     @Nested
     @DisplayName("GET /noc/noc-questions")
@@ -71,9 +69,6 @@ public class NoticeOfChangeControllerIT {
 
         @Autowired
         private MockMvc mockMvc;
-
-        @Autowired
-        private ObjectMapper objectMapper;
 
         @DisplayName("Successfully return NoC questions for case id")
         @Disabled

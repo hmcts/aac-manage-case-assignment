@@ -10,17 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ApiModel(description = "")
+@SuppressWarnings({"PMD.TooManyFields"})
 public class CaseField implements HasAcls, Orderable {
 
-    private String id = null;
-    private String caseTypeId = null;
-    private String label = null;
-    private String hintText = null;
-    private FieldType fieldType = null;
-    private Boolean hidden = null;
-    private String securityClassification = null;
-    private String liveFrom = null;
-    private String liveUntil = null;
+    private String id;
+    private String caseTypeId;
+    private String label;
+    private String hintText;
+    private FieldType fieldType;
+    private Boolean hidden;
+    private String securityClassification;
+    private String liveFrom;
+    private String liveUntil;
     private List<AccessControlList> acls = new ArrayList<>();
     private List<ComplexACL> complexACLs = new ArrayList<>();
     private Integer order;
@@ -45,7 +46,7 @@ public class CaseField implements HasAcls, Orderable {
     /**
      * Foriegn key to the case type as fields should not work across.
      **/
-    @ApiModelProperty(value = "Foriegn key to the case type as fields should not work across")
+    @ApiModelProperty("Foriegn key to the case type as fields should not work across")
     @JsonProperty("case_type_id")
     public String getCaseTypeId() {
         return caseTypeId;
@@ -71,7 +72,7 @@ public class CaseField implements HasAcls, Orderable {
     /**
      * hint text associated with the field.
      **/
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("hint_text")
     public String getHintText() {
         return hintText;
@@ -97,7 +98,7 @@ public class CaseField implements HasAcls, Orderable {
     /**
      * should the field be hidden.
      **/
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("hidden")
     public Boolean getHidden() {
         return hidden;
@@ -110,7 +111,7 @@ public class CaseField implements HasAcls, Orderable {
     /**
      * Gov security level of the data (official, top secret etc).
      **/
-    @ApiModelProperty(value = "Gov security level of the data (official, top secret etc)")
+    @ApiModelProperty("Gov security level of the data (official, top secret etc)")
     @JsonProperty("security_classification")
     public String getSecurityClassification() {
         return securityClassification;
@@ -123,7 +124,7 @@ public class CaseField implements HasAcls, Orderable {
     /**
      * date the field went live.
      **/
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("live_from")
     public String getLiveFrom() {
         return liveFrom;
@@ -136,7 +137,7 @@ public class CaseField implements HasAcls, Orderable {
     /**
      * date the field should be active until.
      **/
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("live_until")
     public String getLiveUntil() {
         return liveUntil;
@@ -146,7 +147,7 @@ public class CaseField implements HasAcls, Orderable {
         this.liveUntil = liveUntil;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("show_condition")
     public String getShowCondition() {
         return showCondition;
@@ -156,7 +157,7 @@ public class CaseField implements HasAcls, Orderable {
         this.showCondition = showCondition;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("order")
     @Override
     public Integer getOrder() {
@@ -167,7 +168,7 @@ public class CaseField implements HasAcls, Orderable {
         this.order = order;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("acls")
     public List<AccessControlList> getAcls() {
         return this.acls;
@@ -178,7 +179,7 @@ public class CaseField implements HasAcls, Orderable {
         this.acls = acls;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("complexACLs")
     public List<ComplexACL> getComplexACLs() {
         return complexACLs;
@@ -196,7 +197,7 @@ public class CaseField implements HasAcls, Orderable {
         this.metadata = metadata;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("display_context_parameter")
     public String getDisplayContextParameter() {
         return displayContextParameter;
@@ -206,7 +207,7 @@ public class CaseField implements HasAcls, Orderable {
         this.displayContextParameter = displayContextParameter;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("retain_hidden_value")
     public Boolean getRetainHiddenValue() {
         return retainHiddenValue;

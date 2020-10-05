@@ -34,6 +34,6 @@ public class SearchResultViewItem implements CommonViewItem {
 
     public String getFieldValue(String fieldId) {
         JsonNode fieldNode = getNestedCaseFieldByPath(fields, fieldId);
-        return fieldNode == null ? null : fieldNode.asText();
+        return fieldNode == null || fieldNode.isNull() ? null : fieldNode.asText();
     }
 }

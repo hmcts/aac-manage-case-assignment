@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.ToString;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseTypeDefinition;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,11 +15,13 @@ import java.util.stream.Collectors;
 @ToString
 public class JurisdictionDefinition implements Serializable {
 
-    private String id = null;
-    private String name = null;
-    private String description = null;
-    private Date liveFrom = null;
-    private Date liveUntil = null;
+    private static final long serialVersionUID = 6196146295016140921L;
+
+    private String id;
+    private String name;
+    private String description;
+    private Date liveFrom;
+    private Date liveUntil;
 
     private List<CaseTypeDefinition> caseTypeDefinitions = new ArrayList<>();
 
@@ -44,7 +45,7 @@ public class JurisdictionDefinition implements Serializable {
         this.name = name;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("description")
     public String getDescription() {
         return description;
@@ -54,7 +55,7 @@ public class JurisdictionDefinition implements Serializable {
         this.description = description;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("live_from")
     public Date getLiveFrom() {
         return liveFrom;
@@ -64,7 +65,7 @@ public class JurisdictionDefinition implements Serializable {
         this.liveFrom = liveFrom;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("live_until")
     public Date getLiveUntil() {
         return liveUntil;
@@ -74,7 +75,7 @@ public class JurisdictionDefinition implements Serializable {
         this.liveUntil = liveUntil;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("case_types")
     public List<CaseTypeDefinition> getCaseTypeDefinitions() {
         return caseTypeDefinitions;

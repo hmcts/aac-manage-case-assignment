@@ -16,14 +16,15 @@ import java.util.List;
 @ApiModel(description = "")
 public class CaseSearchResultViewResource extends RepresentationModel {
 
-    @ApiModelProperty(value = "Headers for each case type")
+    @ApiModelProperty("Headers for each case type")
     private List<SearchResultViewHeaderGroup> headers;
-    @ApiModelProperty(value = "All cases across case types")
+    @ApiModelProperty("All cases across case types")
     private List<SearchResultViewItem> cases;
-    @ApiModelProperty(value = "Total number of search results (including results not returned due to pagination)")
+    @ApiModelProperty("Total number of search results (including results not returned due to pagination)")
     private Long total;
 
     public CaseSearchResultViewResource(@NonNull CaseSearchResultView caseSearchResultView) {
+        super();
         copyProperties(caseSearchResultView);
     }
 

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
+@SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName"})
 public class CaseViewType {
     private String id;
     private String name;

@@ -1,14 +1,11 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
-import org.modelmapper.ModelMapper;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -42,9 +39,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @Validated
-@ConditionalOnProperty(value = "mca.conditional-apis.case-assignments.enabled", havingValue = "true")
 @RequestMapping(path = "/noc")
-@Api(value = "/noc")
 public class NoticeOfChangeController {
 
     @SuppressWarnings({"squid:S1075"})
@@ -58,11 +53,9 @@ public class NoticeOfChangeController {
         "The Notice of Change request has been successfully submitted.";
 
     private final NoticeOfChangeService noticeOfChangeService;
-    private final ModelMapper mapper;
 
-    public NoticeOfChangeController(NoticeOfChangeService noticeOfChangeService, ModelMapper mapper) {
+    public NoticeOfChangeController(NoticeOfChangeService noticeOfChangeService) {
         this.noticeOfChangeService = noticeOfChangeService;
-        this.mapper = mapper;
     }
 
     @GetMapping(path = GET_NOC_QUESTIONS, produces = APPLICATION_JSON_VALUE)
@@ -134,8 +127,7 @@ public class NoticeOfChangeController {
     public ChallengeQuestionsResult getNoticeOfChangeQuestions(@RequestParam("case_id")
             @Valid @NotEmpty(message = "case_id must be not be empty") String caseId) {
         validateCaseIds(caseId);
-        ChallengeQuestionsResult challengeQuestion = noticeOfChangeService.getChallengeQuestions(caseId);
-        return challengeQuestion;
+        return noticeOfChangeService.getChallengeQuestions(caseId);
     }
 
     // TODO: Swagger

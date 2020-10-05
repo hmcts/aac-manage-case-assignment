@@ -5,7 +5,10 @@ import lombok.Builder;
 import java.io.Serializable;
 
 @Builder
+@SuppressWarnings({"PMD.UncommentedEmptyConstructor"})
 public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPModel {
+
+    private static final long serialVersionUID = -4257574164546267919L;
 
     private String reference;
 
@@ -58,6 +61,7 @@ public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPM
         this.order = order;
     }
 
+    @Override
     public String getDisplayContextParameter() {
         return displayContextParameter;
     }

@@ -8,12 +8,15 @@ import java.io.Serializable;
 
 @ApiModel(description = "")
 public class CaseTypeTabField implements Serializable, CommonDCPModel {
-    private CaseFieldDefinition caseFieldDefinition = null;
-    private Integer displayOrder = null;
-    private String showCondition = null;
+
+    private static final long serialVersionUID = -4257574164546267919L;
+
+    private CaseFieldDefinition caseFieldDefinition;
+    private Integer displayOrder;
+    private String showCondition;
     private String displayContextParameter;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("case_field")
     public CaseFieldDefinition getCaseFieldDefinition() {
         return caseFieldDefinition;
@@ -23,7 +26,7 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
         this.caseFieldDefinition = caseFieldDefinition;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("order")
     public Integer getDisplayOrder() {
         return displayOrder;
@@ -33,7 +36,7 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
         this.displayOrder = displayOrder;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("show_condition")
     public String getShowCondition() {
         return showCondition;
@@ -43,8 +46,9 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
         this.showCondition = showCondition;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty("")
     @JsonProperty("display_context_parameter")
+    @Override
     public String getDisplayContextParameter() {
         return displayContextParameter;
     }

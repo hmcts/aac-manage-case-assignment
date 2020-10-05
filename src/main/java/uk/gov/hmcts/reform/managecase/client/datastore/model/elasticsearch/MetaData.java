@@ -13,6 +13,11 @@ import java.util.Optional;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis",
+    "PMD.UseLocaleWithCaseConversions",
+    "PMD.UseLocaleWithCaseConversions",
+    "PMD.PreserveStackTrace",
+    "PMD.LawOfDemeter"})
 public class MetaData {
     public static final String STATE_FIELD_COL = "state";
     public static final String JURISDICTION_FIELD_COL = "jurisdiction";
@@ -192,8 +197,8 @@ public class MetaData {
         return parameters.stream().filter(p -> !METADATA_QUERY_PARAMETERS.contains(p)).collect(toList());
     }
 
-    private String toTrimmedLowerCase(String s) {
-        return s.trim().toLowerCase();
+    private String toTrimmedLowerCase(String value) {
+        return value.trim().toLowerCase();
     }
 
     @SuppressWarnings("unchecked")
@@ -234,14 +239,14 @@ public class MetaData {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        MetaData metaData = (MetaData) o;
+        MetaData metaData = (MetaData) obj;
         return Objects.equals(caseTypeId, metaData.caseTypeId)
             && Objects.equals(jurisdiction, metaData.jurisdiction)
             && Objects.equals(state, metaData.state)

@@ -10,9 +10,10 @@ import java.util.Date;
 @ApiModel(description = "")
 public class Version implements Serializable {
 
-    private Integer number = null;
-    private Date liveFrom = null;
-    private Date liveUntil = null;
+    private static final long serialVersionUID = 6196146295016140921L;
+    private Integer number;
+    private Date liveFrom;
+    private Date liveUntil;
 
     @ApiModelProperty(required = true, value = "Sequantial version number")
     @JsonProperty("number")
@@ -40,7 +41,7 @@ public class Version implements Serializable {
     /**
      * Date and time this version is to be retired.
      **/
-    @ApiModelProperty(value = "Date and time this version is to be retired")
+    @ApiModelProperty("Date and time this version is to be retired")
     @JsonProperty("live_until")
     public Date getLiveUntil() {
         return liveUntil;

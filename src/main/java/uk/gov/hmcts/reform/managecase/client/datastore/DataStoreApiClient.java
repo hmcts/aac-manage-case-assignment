@@ -44,7 +44,7 @@ public interface DataStoreApiClient {
                                             @RequestParam("user_ids") List<String> userIds);
 
     @GetMapping(INTERNAL_CASES)
-    CaseViewResource getCaseDetailsByCaseId(@RequestParam("case_id") String caseId);
+    CaseViewResource getCaseDetailsByCaseId(@PathVariable("caseId") String caseId);
 
     @DeleteMapping(value = CASE_USERS, consumes = APPLICATION_JSON_VALUE)
     void removeCaseUserRoles(@RequestBody CaseUserRolesRequest userRolesRequest);

@@ -17,12 +17,12 @@ import java.util.List;
 public class SearchResultViewHeaderGroup {
 
     @NonNull
-    @ApiModelProperty(value = "Metadata for the case type")
+    @ApiModelProperty("Metadata for the case type")
     private HeaderGroupMetadata metadata;
     @NonNull
-    @ApiModelProperty(value = "Definition of the fields for the case type")
+    @ApiModelProperty("Definition of the fields for the case type")
     private List<SearchResultViewHeader> fields;
     @NonNull
-    @ApiModelProperty(value = "Case references for the case type that are returned in the search")
+    @ApiModelProperty("Case references for the case type that are returned in the search")
     private List<String> cases;
 }

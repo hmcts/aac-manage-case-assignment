@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
+import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
@@ -37,16 +38,16 @@ public class NoticeOfChangeService {
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
-    private final IdamRepository idamRepository;
+    private final SecurityUtils securityUtils;
 
     @Autowired
     public NoticeOfChangeService(DataStoreRepository dataStoreRepository,
-                                 IdamRepository idamRepository,
-                                 DefinitionStoreRepository definitionStoreRepository) {
+                                 DefinitionStoreRepository definitionStoreRepository,
+                                 SecurityUtils securityUtils) {
 
         this.dataStoreRepository = dataStoreRepository;
-        this.idamRepository = idamRepository;
         this.definitionStoreRepository = definitionStoreRepository;
+        this.securityUtils = securityUtils;
     }
 
     public ChallengeQuestionsResult getChallengeQuestions(String caseId) {
@@ -69,7 +70,7 @@ public class NoticeOfChangeService {
         checkForCaseEvents(caseViewResource);
         //step 4 Check the ChangeOrganisationRequest.CaseRole in the case record.  If it is not null, return an error
         // indicating that there is an ongoing NoCRequest.
-        CaseSearchResultViewResource caseFields = findCaseBy(caseViewResource.getCaseType().getName(), caseId);
+        CaseSearchResultViewResource caseFields = findCaseBy(caseViewResource.getCaseType().getId(), caseId);
         checkCaseFields(caseFields);
         //step 5 Invoke IdAM API to get the IdAM Roles of the invoker.
         UserInfo userInfo = getUserInfo();
@@ -141,8 +142,7 @@ public class NoticeOfChangeService {
     }
 
     private UserInfo getUserInfo() {
-        RequestContext context = RequestContext.getCurrentContext();
-        return idamRepository.getUserInfo(context.getRequest().getAuthType());
+        return securityUtils.getUserInfo();
     }
 
     private CaseViewResource getCase(String caseId) {

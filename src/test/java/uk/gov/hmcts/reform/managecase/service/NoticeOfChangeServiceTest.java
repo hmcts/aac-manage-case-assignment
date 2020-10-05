@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
+import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,7 +68,7 @@ class NoticeOfChangeServiceTest {
     @Mock
     private DefinitionStoreRepository definitionStoreRepository;
     @Mock
-    private IdamRepository idamRepository;
+    private SecurityUtils securityUtils;
 
     private final List<SearchResultViewItem> viewItems = new ArrayList<>();
     private final Map<String, JsonNode> caseFields = new HashMap<>();
@@ -89,8 +90,8 @@ class NoticeOfChangeServiceTest {
         @BeforeEach
         void setUp()throws JsonProcessingException {
             noticeOfChangeService = new NoticeOfChangeService(dataStoreRepository,
-                                                              idamRepository,
-                                                              definitionStoreRepository);
+                                                              definitionStoreRepository,
+                                                              securityUtils);
 
             //internal/cases/caseId
             AuditEvent event = new AuditEvent();
@@ -173,7 +174,7 @@ class NoticeOfChangeServiceTest {
             RequestContext.testSetCurrentContext(context);
 
             UserInfo userInfo = new UserInfo("","","", "", "", Arrays.asList("pui-caa"));
-            given(idamRepository.getUserInfo(context.getRequest().getAuthType())).willReturn(userInfo);
+            given(securityUtils.getUserInfo()).willReturn(userInfo);
         }
 
         @Test
@@ -314,7 +315,7 @@ class NoticeOfChangeServiceTest {
             context.setRequest(request);
             RequestContext.testSetCurrentContext(context);
             UserInfo userInfo = new UserInfo("","","", "", "", Arrays.asList("caseworker-JurisdictionA-solicitor"));
-            given(idamRepository.getUserInfo(context.getRequest().getAuthType())).willReturn(userInfo);
+            given(securityUtils.getUserInfo()).willReturn(userInfo);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)

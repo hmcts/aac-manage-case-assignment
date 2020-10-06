@@ -62,70 +62,68 @@ public class NoticeOfChangeController {
     @ApiOperation(value = "Get Notice of Change questions", notes = "Get Notice of Change questions")
     @ResponseStatus(HttpStatus.OK)
     @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "Case-User-Role assignments returned successfully.",
-                    response = GetCaseAssignmentsResponse.class,
-                    examples = @Example({
-                            @ExampleProperty(
-                                    value = "{\n"
-                                            + "  \"status_message\": \"Case-User-Role assignments returned "
-                                            + "successfully\",\n"
-                                            + "  \"case_assignments\": [\n"
-                                            + "    {\n"
-                                            + "      \"case_id\": \"1588234985453946\",\n"
-                                            + "      \"shared_with\": [\n"
-                                            + "        {\n"
-                                            + "          \"idam_id\": \"221a2877-e1ab-4dc4-a9ff-f9424ad58738\",\n"
-                                            + "          \"first_name\": \"Bill\",\n"
-                                            + "          \"last_name\": \"Roberts\",\n"
-                                            + "          \"email\": \"bill.roberts@greatbrsolicitors.co.uk\",\n"
-                                            + "          \"case_roles\": [\n"
-                                            + "            \"[Claimant]\",\n"
-                                            + "            \"[Defendant]\"\n"
-                                            + "          ]\n"
-                                            + "        }\n"
-                                            + "      ]\n"
-                                            + "    }    \n"
-                                            + "  ]\n"
-                                            + "}",
-                                    mediaType = APPLICATION_JSON_VALUE)
-                    })
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "One or more of the following reasons:\n"
-                    + "1. " + "case_id must be not be empty" + ", \n"
-                    + "2. " + "on going NoC request in progress, \n"
-                    + "3. " + "no NoC events available for this case id, \n",
-                    examples = @Example({
-                            @ExampleProperty(
-                                    value = "{\"message\": \"case_id must be not be empty\","
-                                            + " \"status\": \"BAD_REQUEST\" }",
-                                    mediaType = APPLICATION_JSON_VALUE)
-                    })
-            ),
-            @ApiResponse(
-                code = 404,
-                message = "case_id not found",
-                examples = @Example({
-                    @ExampleProperty(
-                        value = "{\"message\": \"case_id not found\","
-                            + " \"status\": \"NOT_FOUND\" }",
-                        mediaType = APPLICATION_JSON_VALUE)
-                })
-            ),
-            @ApiResponse(
-                    code = 401,
-                    message = AuthError.AUTHENTICATION_TOKEN_INVALID
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = AuthError.UNAUTHORISED_S2S_SERVICE
-            )
+        @ApiResponse(
+            code = 200,
+            message = "Challenge questions returned successfully.",
+            response = ChallengeQuestionsResult.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\"questions\":["
+                        + "{\"case_type_id\":\"caseType\","
+                        + "\"order\":1,"
+                        + "\"question_text\":\"questionText\","
+                        + "\"answer_field_type\""
+                        + ":{\"id\":\"Number\","
+                        + "\"type\":\"Number\","
+                        + "\"min\":null,"
+                        + "\"max\":null,"
+                        + "\"regular_expression\":null,"
+                        + "\"fixed_list_items\":[],"
+                        + "\"complex_fields\":[],"
+                        + "\"collection_field_type\":null"
+                        + "},"
+                        + "\"display_context_parameter\":null,"
+                        + "\"challenge_question_id\":\"NoC\","
+                        + "\"answer_field\":null,"
+                        + "\"question_id\":\"QuestionId1\"}]}\n",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:\n"
+                + "1. " + "case_id must be not be empty" + ", \n"
+                + "2. " + "on going NoC request in progress, \n"
+                + "3. " + "no NoC events available for this case id, \n",
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\"message\": \"case_id must be not be empty\","
+                        + " \"status\": \"BAD_REQUEST\" }",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 404,
+            message = "case_id not found",
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\"message\": \"case_id not found\","
+                        + " \"status\": \"NOT_FOUND\" }",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
+        )
     })
     public ChallengeQuestionsResult getNoticeOfChangeQuestions(@RequestParam("case_id")
-            @Valid @NotEmpty(message = "case_id must be not be empty") String caseId) {
+                                                               @Valid @NotEmpty(message = "case_id must "
+        + "be not be empty") String caseId) {
         validateCaseIds(caseId);
         return noticeOfChangeService.getChallengeQuestions(caseId);
     }

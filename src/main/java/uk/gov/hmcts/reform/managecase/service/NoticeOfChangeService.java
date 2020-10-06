@@ -177,7 +177,8 @@ public class NoticeOfChangeService {
         if (searchResultViewItem.isPresent()) {
             Map<String, JsonNode> caseFields = searchResultViewItem.get().getFields();
             List<SearchResultViewHeader> searchResultViewHeaderList = new ArrayList<>();
-            Optional<SearchResultViewHeaderGroup> searchResultViewHeaderGroup = caseDetails.getHeaders().stream().findFirst();
+            Optional<SearchResultViewHeaderGroup> searchResultViewHeaderGroup =
+                caseDetails.getHeaders().stream().findFirst();
             if (searchResultViewHeaderGroup.isPresent()) {
                 searchResultViewHeaderList = searchResultViewHeaderGroup.get().getFields();
             }

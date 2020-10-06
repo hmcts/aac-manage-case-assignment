@@ -135,7 +135,8 @@ public final class WiremockFixtures {
                     .withQueryParam("case_ids", equalTo(caseIds.get(0)))
                     .withQueryParam("user_ids", equalTo(userIds.get(0)))
                     .willReturn(aResponse()
-                                    .withStatus(HTTP_OK).withBody(getJsonString(new CaseUserRoleResource(caseUserRoles)))
+                                    .withStatus(HTTP_OK)
+                                    .withBody(getJsonString(new CaseUserRoleResource(caseUserRoles)))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 

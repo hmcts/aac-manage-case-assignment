@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.BaseTest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.AuditEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
@@ -47,7 +46,7 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCh
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.UseConcurrentHashMap",
-    "squid:S100", "squid:S1192"})
+    "PMD.DataflowAnomalyAnalysis", "squid:S100", "squid:S1192"})
 public class NoticeOfChangeControllerIT {
 
     private static final String CASE_ID = "1588234985453946";
@@ -120,8 +119,6 @@ public class NoticeOfChangeControllerIT {
             CaseSearchResultView caseSearchResultView = new CaseSearchResultView(headers, cases, total);
             CaseSearchResultViewResource resource = new CaseSearchResultViewResource(caseSearchResultView);
             stubGetCaseInternalES(CASE_TYPE_ID, ES_QUERY, resource);
-
-            UserInfo userInfo = new UserInfo("", "", "", "", "", Arrays.asList("pui-caa"));
 
             FieldType fieldType = new FieldType();
             fieldType.setId("Number");

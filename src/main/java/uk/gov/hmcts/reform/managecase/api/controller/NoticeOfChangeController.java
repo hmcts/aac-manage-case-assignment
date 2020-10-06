@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
-import uk.gov.hmcts.reform.managecase.api.payload.GetCaseAssignmentsResponse;
-import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 
@@ -65,8 +63,8 @@ public class NoticeOfChangeController {
                         + "},"
                         + "\"display_context_parameter\":null,"
                         + "\"challenge_question_id\":\"NoC\","
-                        + "\"answer_field\":null," +
-                        "\"question_id\":\"QuestionId1\"}]}\n",
+                        + "\"answer_field\":null,"
+                        + "\"question_id\":\"QuestionId1\"}]}\n",
                     mediaType = APPLICATION_JSON_VALUE)
             })
         ),
@@ -103,7 +101,8 @@ public class NoticeOfChangeController {
         )
     })
     public ChallengeQuestionsResult getNoticeOfChangeQuestions(@RequestParam("case_id")
-                                                               @Valid @NotEmpty(message = "case_id must be not be empty") String caseId) {
+                                                               @Valid @NotEmpty(message = "case_id must "
+        + "be not be empty") String caseId) {
         validateCaseIds(caseId);
         return noticeOfChangeService.getChallengeQuestions(caseId);
     }

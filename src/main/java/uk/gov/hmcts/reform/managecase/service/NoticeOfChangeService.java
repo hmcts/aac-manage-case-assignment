@@ -20,8 +20,6 @@ import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import javax.validation.ValidationException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
@@ -62,7 +60,7 @@ public class NoticeOfChangeService {
         ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId).getChallengeQuestionsResult();
         //Step 12 Remove the answer section from the JSON returned byGetTabContents and return success with the
         // remaining JSON
-        for (ChallengeQuestion challengeQuestion : challengeQuestionsResult.getQuestions()){
+        for (ChallengeQuestion challengeQuestion : challengeQuestionsResult.getQuestions()) {
             if (!challengeQuestion.getAnswerField().isEmpty()) {
                 challengeQuestion.setAnswers(null);
             }

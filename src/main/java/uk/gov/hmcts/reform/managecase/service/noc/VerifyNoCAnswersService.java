@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
+import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 
 import javax.validation.ValidationException;
 

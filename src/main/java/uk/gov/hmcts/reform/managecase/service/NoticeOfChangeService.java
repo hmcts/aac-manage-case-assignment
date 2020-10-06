@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.managecase.service.noc;
+package uk.gov.hmcts.reform.managecase.service;
 
 
 import com.fasterxml.jackson.databind.JsonNode;

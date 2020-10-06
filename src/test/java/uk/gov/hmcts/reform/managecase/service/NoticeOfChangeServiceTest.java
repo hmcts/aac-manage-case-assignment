@@ -36,7 +36,6 @@ import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
-import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.util.ArrayList;

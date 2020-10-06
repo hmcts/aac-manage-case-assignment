@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeService;
+import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 
 import java.util.Arrays;

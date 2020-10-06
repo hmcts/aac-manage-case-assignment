@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.AuditEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.Heade
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
@@ -60,6 +62,10 @@ class NoticeOfChangeServiceTest {
     private static final String ANSWER_FIELD = "${applicant.individual.fullname}|${applicant.company.name}|"
         + "${applicant.soletrader.name}:Applicant,${respondent.individual.fullname}|${respondent.company.name}"
         + "|${respondent.soletrader.name}:Respondent";
+    private static final String ANSWER_FIELD_APPLICANT = "${applicant.individual.fullname}|${applicant.company.name}|"
+        + "${applicant.soletrader.name}:Applicant";
+    private static final String ANSWER_FIELD_RESPONDENT = "${applicant.individual.fullname}|${applicant.company.name}|"
+        + "${applicant.soletrader.name}:Respondent";
 
     private final List<SearchResultViewItem> viewItems = new ArrayList<>();
     private final Map<String, JsonNode> caseFields = new HashMap<>();
@@ -103,6 +109,7 @@ class NoticeOfChangeServiceTest {
             caseViewResource.setCaseViewEvents(caseViewEventArray);
             CaseViewType caseViewType = new CaseViewType();
             caseViewType.setName(CASE_TYPE_ID);
+            caseViewType.setId(CASE_TYPE_ID);
             CaseViewJurisdiction caseViewJurisdiction = new CaseViewJurisdiction();
             caseViewJurisdiction.setId(JURISDICTION);
             caseViewType.setJurisdiction(caseViewJurisdiction);
@@ -153,16 +160,17 @@ class NoticeOfChangeServiceTest {
             fieldType.setType(FIELD_ID);
             fieldType.setMin(null);
             fieldType.setMax(null);
+            ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_APPLICANT);
             ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
                                                                         fieldType,
                                                                         null,
                                                                         CHALLENGE_QUESTION,
                                                                         ANSWER_FIELD,
                                                                         "QuestionId1",
-                                                                        null);
+                                                                        Arrays.asList(challengeAnswer));
             ChallengeQuestionsResult challengeQuestionsResult =
                 new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
-            given(definitionStoreRepository.challengeQuestions(CASE_TYPE_ID, CASE_ID))
+            given(definitionStoreRepository.challengeQuestions(CASE_TYPE_ID, "NoCChallenge"))
                 .willReturn(challengeQuestionsResult);
 
             UserInfo userInfo = new UserInfo("","","", "", "",
@@ -181,7 +189,6 @@ class NoticeOfChangeServiceTest {
             assertThat(challengeQuestionsResult.getQuestions().get(0).getQuestionText()).isEqualTo(QUESTION_TEXT);
             assertThat(challengeQuestionsResult.getQuestions().get(0).getChallengeQuestionId())
                 .isEqualTo(CHALLENGE_QUESTION);
-            assertThat(challengeQuestionsResult.getQuestions().get(0).getAnswers().size()).isEqualTo(0);
         }
 
         @Test
@@ -224,54 +231,91 @@ class NoticeOfChangeServiceTest {
             given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, null, CASE_ID)).willReturn(resource);
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("on going NoC request in progress");
+                .hasMessageContaining("On going NoC request in progress");
         }
 
         @Test
-        @DisplayName("Must return an error if there is not an Organisation Policy field")
-        void shouldThrowErrorMissingOrgPolicy() {
+        @DisplayName("Must return an error if there is no cases returned")
+        void shouldThrowErrorMissingCasesFromInternalSearch() throws JsonProcessingException {
+            SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
+            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+            fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
+            searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
+            searchResultViewHeader.setCaseFieldId(CHANGE_ORG);
+            caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
+            caseFields.put(DATETIME_FIELD, new TextNode("1985-12-30"));
+            caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode actualObj = mapper.readValue("{\n"
+                                                      + "  \"OrganisationPolicy1\": {\n"
+                                                      + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
+                                                      + "    \"OrgPolicyReference\": \"Reference\",\n"
+                                                      + "    \"Organisation\": {\n"
+                                                      + "      \"OrganisationID\": \"QUK822N\",\n"
+                                                      + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
+                                                      + "    }\n"
+                                                      + "  }\n"
+                                                      + "}", JsonNode.class);
+
+            caseFields.put(PREDEFINED_COMPLEX_ORGANISATION_POLICY, actualObj);
+            SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
+            viewItems.add(item);
+            SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
+                new HeaderGroupMetadata(JURISDICTION, CASE_TYPE),
+                Arrays.asList(searchResultViewHeader), Arrays.asList("111", "222")
+            );
+            List<SearchResultViewHeaderGroup> headers = new ArrayList<>();
+            headers.add(correctHeader);
+            List<SearchResultViewItem> cases = new ArrayList<>();
+            Long total = 3L;
+            CaseSearchResultView caseSearchResultView = new CaseSearchResultView(headers, cases, total);
+            CaseSearchResultViewResource resource = new CaseSearchResultViewResource(caseSearchResultView);
+            given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, null, CASE_ID)).willReturn(resource);
+
             FieldType fieldType = new FieldType();
             fieldType.setId(FIELD_ID);
             fieldType.setType(FIELD_ID);
             fieldType.setMin(null);
             fieldType.setMax(null);
+            ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_APPLICANT);
             ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
                                                                         fieldType,
                                                                         null,
                                                                         CHALLENGE_QUESTION,
                                                                         ANSWER_FIELD,
                                                                         "QuestionId1",
-                                                                        null);
+                                                                        Arrays.asList(challengeAnswer));
             ChallengeQuestionsResult challengeQuestionsResult =
                 new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
-            given(definitionStoreRepository.challengeQuestions(CASE_TYPE_ID, CASE_ID))
+            given(definitionStoreRepository.challengeQuestions(CASE_TYPE_ID, "NoCChallenge"))
                 .willReturn(challengeQuestionsResult);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
-                .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("No Org Policy with that role");
+                .isInstanceOf(CaseCouldNotBeFetchedException.class)
+                .hasMessageContaining("Case could not be found");
         }
 
         @Test
         @DisplayName("Must return an error if there is not an Organisation Policy field containing a "
             + "case role for each set of answers")
-        void shouldThrowErrorMissingRoleInOrgPolicy() throws JsonProcessingException {
+        void shouldThrowErrorMissingRoleInOrgPolicy() {
             FieldType fieldType = new FieldType();
             fieldType.setId(FIELD_ID);
             fieldType.setType(FIELD_ID);
             fieldType.setMin(null);
             fieldType.setMax(null);
+            ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_RESPONDENT);
             ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
                                                                         fieldType,
                                                                         null,
                                                                         CHALLENGE_QUESTION,
                                                                         ANSWER_FIELD,
                                                                         "QuestionId1",
-                                                                        null);
+                                                                        Arrays.asList(challengeAnswer));
             ChallengeQuestionsResult challengeQuestionsResult =
                 new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
             given(definitionStoreRepository
-                      .challengeQuestions(CASE_TYPE_ID, CASE_ID))
+                      .challengeQuestions(CASE_TYPE_ID, "NoCChallenge"))
                 .willReturn(challengeQuestionsResult);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
@@ -288,7 +332,7 @@ class NoticeOfChangeServiceTest {
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("no NoC events available for this case type");
+                .hasMessageContaining("No NoC events available for this case type");
         }
 
         @Test
@@ -301,7 +345,7 @@ class NoticeOfChangeServiceTest {
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("insufficient privileges");
+                .hasMessageContaining("Insufficient privileges");
         }
 
     }

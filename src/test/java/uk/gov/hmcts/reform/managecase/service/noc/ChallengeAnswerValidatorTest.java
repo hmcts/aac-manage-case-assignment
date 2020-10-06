@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.managecase.service;
+package uk.gov.hmcts.reform.managecase.service.noc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.DataflowAnomalyAnalysis", "PMD.TooManyMethods"})
-class ChallengeQuestionServiceTest {
+class ChallengeAnswerValidatorTest {
 
     public static final String QUESTION_ID_1 = "QuestionId1";
     public static final String QUESTION_ID_2 = "QuestionId2";
@@ -32,7 +32,7 @@ class ChallengeQuestionServiceTest {
     public static final String TEXT = "Text";
 
     @InjectMocks
-    private ChallengeQuestionService challengeQuestionService;
+    private ChallengeAnswerValidator challengeAnswerValidator;
 
     private List<SubmittedChallengeAnswer> answers;
     private SearchResultViewItem caseSearchResult;
@@ -68,7 +68,7 @@ class ChallengeQuestionServiceTest {
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
-        String result = challengeQuestionService
+        String result = challengeAnswerValidator
             .getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult);
 
         assertEquals("[Claimant]", result);
@@ -86,7 +86,7 @@ class ChallengeQuestionServiceTest {
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         ValidationException exception = assertThrows(ValidationException.class,
-            () -> challengeQuestionService.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
+            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
 
         assertEquals(
             "The number of provided answers must match the number of questions - expected 2 answers, received 3",
@@ -108,7 +108,7 @@ class ChallengeQuestionServiceTest {
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         ValidationException exception = assertThrows(ValidationException.class,
-            () -> challengeQuestionService.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
+            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
 
         assertEquals("No answer has been provided for question ID 'OtherQuestionId1'", exception.getMessage());
     }
@@ -129,7 +129,7 @@ class ChallengeQuestionServiceTest {
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         ValidationException exception = assertThrows(ValidationException.class,
-            () -> challengeQuestionService.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
+            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
 
         assertEquals("The answers did not uniquely identify a litigant", exception.getMessage());
     }
@@ -149,7 +149,7 @@ class ChallengeQuestionServiceTest {
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         ValidationException exception = assertThrows(ValidationException.class,
-            () -> challengeQuestionService.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
+            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
 
         assertEquals("The answers did not match those for any litigant", exception.getMessage());
     }
@@ -162,7 +162,7 @@ class ChallengeQuestionServiceTest {
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
-        String result = challengeQuestionService
+        String result = challengeAnswerValidator
             .getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult);
 
         assertEquals("[Claimant]", result);
@@ -176,7 +176,7 @@ class ChallengeQuestionServiceTest {
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
-        String result = challengeQuestionService
+        String result = challengeAnswerValidator
             .getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult);
 
         assertEquals("[Claimant]", result);
@@ -191,7 +191,7 @@ class ChallengeQuestionServiceTest {
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         ValidationException exception = assertThrows(ValidationException.class,
-            () -> challengeQuestionService.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
+            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
 
         assertEquals("The answers did not match those for any litigant", exception.getMessage());
     }

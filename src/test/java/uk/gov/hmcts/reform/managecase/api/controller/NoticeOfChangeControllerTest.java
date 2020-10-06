@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
+import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 
 import java.util.Arrays;
 
@@ -59,6 +60,9 @@ public class NoticeOfChangeControllerTest {
 
         @MockBean
         protected NoticeOfChangeService service;
+
+        @MockBean
+        protected VerifyNoCAnswersService VerifyNoCAnswersService;
     }
 
     @Nested
@@ -98,7 +102,7 @@ public class NoticeOfChangeControllerTest {
 
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 
-                NoticeOfChangeController controller = new NoticeOfChangeController(service);
+                NoticeOfChangeController controller = new NoticeOfChangeController(service, VerifyNoCAnswersService);
 
                 // ACT
                 ChallengeQuestionsResult response = controller.getNoticeOfChangeQuestions(CASE_ID);

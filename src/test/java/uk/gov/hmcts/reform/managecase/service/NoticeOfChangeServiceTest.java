@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQues
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
-import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import java.util.ArrayList;
@@ -77,10 +76,6 @@ class NoticeOfChangeServiceTest {
     private DefinitionStoreRepository definitionStoreRepository;
     @Mock
     private SecurityUtils securityUtils;
-    @Mock
-    private ChallengeQuestionService challengeQuestionService;
-    @Mock
-    private PrdRepository prdRepository;
 
     @BeforeEach
     void setUp() {
@@ -97,9 +92,7 @@ class NoticeOfChangeServiceTest {
         void setUp()throws JsonProcessingException {
             noticeOfChangeService = new NoticeOfChangeService(dataStoreRepository,
                                                               definitionStoreRepository,
-                                                              securityUtils,
-                                                              challengeQuestionService,
-                                                              prdRepository);
+                                                              securityUtils);
 
             //internal/cases/caseId
             AuditEvent event = new AuditEvent();

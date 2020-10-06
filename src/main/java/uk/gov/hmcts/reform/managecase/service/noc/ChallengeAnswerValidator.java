@@ -1,6 +1,6 @@
-package uk.gov.hmcts.reform.managecase.service;
+package uk.gov.hmcts.reform.managecase.service.noc;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
@@ -19,9 +19,9 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.TEXT;
 
-@Service
+@Component
 @SuppressWarnings({"PMD.AvoidLiteralsInIfCondition", "PMD.UseConcurrentHashMap"})
-public class ChallengeQuestionService {
+public class ChallengeAnswerValidator {
 
     public String getMatchingCaseRole(ChallengeQuestionsResult challengeQuestions,
                                       List<SubmittedChallengeAnswer> submittedAnswers,

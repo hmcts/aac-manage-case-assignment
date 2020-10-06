@@ -15,14 +15,13 @@ import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
-import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,20 +37,15 @@ public class NoticeOfChangeService {
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
     private final SecurityUtils securityUtils;
-    private final ChallengeQuestionService challengeQuestionService;
-    private final PrdRepository prdRepository;
 
     @Autowired
     public NoticeOfChangeService(DataStoreRepository dataStoreRepository,
                                  DefinitionStoreRepository definitionStoreRepository,
-                                 SecurityUtils securityUtils,
-                                 ChallengeQuestionService challengeQuestionService,
-                                 PrdRepository prdRepository) {
+                                 SecurityUtils securityUtils) {
+
         this.dataStoreRepository = dataStoreRepository;
         this.definitionStoreRepository = definitionStoreRepository;
         this.securityUtils = securityUtils;
-        this.challengeQuestionService = challengeQuestionService;
-        this.prdRepository = prdRepository;
     }
 
     public ChallengeQuestionsResult getChallengeQuestions(String caseId) {
@@ -187,4 +181,5 @@ public class NoticeOfChangeService {
             throw new ValidationException("no NoC events available for this case type");
         }
     }
+
 }

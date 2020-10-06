@@ -134,6 +134,11 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         return caseResource;
     }
 
+    @Override
+    public CaseResource findCaseByCaseIdExternalApi(String caseId) {
+        return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(caseId);
+    }
+
     private Map<String, JsonNode> getCaseDataContentData(ChangeOrganisationRequest changeOrganisationRequest) {
         final JsonNodeFactory jsonNodeFactory = new JsonNodeFactory(false);
         Map<String, JsonNode> data = new HashMap<>();

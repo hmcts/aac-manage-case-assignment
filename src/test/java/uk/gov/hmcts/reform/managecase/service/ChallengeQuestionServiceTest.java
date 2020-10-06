@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 

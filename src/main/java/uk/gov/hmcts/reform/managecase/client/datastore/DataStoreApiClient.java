@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.CASES_WITH_ID;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.CASE_USERS;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.INTERNAL_CASES;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.INTERNAL_SEARCH_CASES;
@@ -49,12 +50,15 @@ public interface DataStoreApiClient {
     @DeleteMapping(value = CASE_USERS, consumes = APPLICATION_JSON_VALUE)
     void removeCaseUserRoles(@RequestBody CaseUserRolesRequest userRolesRequest);
 
-    @GetMapping(value = START_EVENT_TRIGGER)
+    @GetMapping(START_EVENT_TRIGGER)
     StartEventResource getStartEventTrigger(@PathVariable("caseId") String caseId,
                                             @PathVariable("eventId") String eventId);
 
-    @PostMapping(value = SUBMIT_EVENT_FOR_CASE)
+    @PostMapping(SUBMIT_EVENT_FOR_CASE)
     CaseResource submitEventForCase(@PathVariable("caseId") String caseId,
                                     @RequestBody CaseDataContent caseDataContent);
+
+    @GetMapping(CASES_WITH_ID)
+    CaseResource getCaseDetailsByCaseIdViaExternalApi(@PathVariable("caseId") String caseId);
 
 }

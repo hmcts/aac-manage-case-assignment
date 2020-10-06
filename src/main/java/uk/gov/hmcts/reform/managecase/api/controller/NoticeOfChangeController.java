@@ -7,13 +7,11 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,14 +19,11 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.GetCaseAssignmentsResponse;
-import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
-import uk.gov.hmcts.reform.managecase.domain.Organisation;
-import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 
 import javax.validation.Valid;
@@ -179,16 +174,8 @@ public class NoticeOfChangeController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
-    public RequestNoticeOfChangeResponse requestNoticeOfChange(@RequestBody RequestNoticeOfChangeRequest
-                                                                       noticeOfChangeRequest) {
-        //noticeOfChangeService.callDansQuestionsMethod()
-        final OrganisationPolicy organisationPolicy = null;
-        final Organisation organisation = null;
-        return noticeOfChangeService.requestNoticeOfChange(
-            noticeOfChangeRequest.getCaseId(),
-            organisation,
-            organisationPolicy
-        );
+    public RequestNoticeOfChangeResponse requestNoticeOfChange(@RequestBody NoCRequestDetails noCRequestDetails) {
+        return noticeOfChangeService.requestNoticeOfChange(noCRequestDetails);
     }
 
 }

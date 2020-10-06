@@ -48,9 +48,9 @@ class DataStoreRepositoryTest {
     private static final String ORG_ID = "organisation1";
     private static final String EVENT_ID = "NoCRequest";
     private static final String EXPECTED_NOC_REQUEST_DATA =
-        "{" +
-            "\"DummyDataKey\": \"Dummy Data Value\"" +
-        "}";
+        "{"
+            + "\"DummyDataKey\": \"Dummy Data Value\""
+            + "}";
 
     @Mock
     private DataStoreApiClient dataStoreApi;
@@ -188,7 +188,8 @@ class DataStoreRepositoryTest {
             .willReturn(null);
 
         // ACT
-        CaseResource returnedStartEventResource = repository.submitEventForCase(CASE_ID, EVENT_ID, changeOrganisationRequest);
+        CaseResource returnedStartEventResource
+            = repository.submitEventForCase(CASE_ID, EVENT_ID, changeOrganisationRequest);
 
         // ASSERT
         verify(dataStoreApi).getStartEventTrigger(CASE_ID, EVENT_ID);
@@ -200,19 +201,19 @@ class DataStoreRepositoryTest {
     @DisplayName("Call ccd-datastore to submit an event for a case")
     void shouldCaseResourceWhenSubmittingEventSucceeds() throws JsonProcessingException {
         // ARRANGE
+        StartEventResource startEventResource = new StartEventResource();
+        startEventResource.setToken("eventToken");
+
         ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
             .organisationToAdd(new Organisation("1", "orgNameToAdd"))
             .organisationToRemove(new Organisation("2", "orgNameToRemove"))
             .requestTimestamp(LocalDateTime.now())
             .build();
 
-        StartEventResource startEventResource = new StartEventResource();
-        startEventResource.setToken("eventToken");
-
         given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID))
             .willReturn(startEventResource);
         given(dataStoreApi.submitEventForCase(any(String.class), any(CaseDataContent.class)))
-            .willReturn(new CaseResource());
+            .willReturn(CaseResource.builder().build());
         given(objectMapper.writeValueAsString(changeOrganisationRequest))
             .willReturn(EXPECTED_NOC_REQUEST_DATA);
 
@@ -234,5 +235,23 @@ class DataStoreRepositoryTest {
 
         assertThat(caseDataContentCaptorValue.getData().get("ChangeOrganisationRequest").asText())
             .isEqualTo(EXPECTED_NOC_REQUEST_DATA);
+    }
+
+    @Test
+    @DisplayName("find case by id using external facing API")
+    void shouldFindCaseByIdUsingExternalApi() {
+        // ARRANGE
+        CaseResource caseResource = CaseResource.builder().build();
+
+        given(dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(CASE_ID)).willReturn(caseResource);
+
+        // ACT
+        CaseResource result = repository.findCaseByCaseIdExternalApi(CASE_ID);
+
+        // ASSERT
+        assertThat(result).isEqualTo(caseResource);
+
+        verify(dataStoreApi).getCaseDetailsByCaseIdViaExternalApi(eq(CASE_ID));
+
     }
 }

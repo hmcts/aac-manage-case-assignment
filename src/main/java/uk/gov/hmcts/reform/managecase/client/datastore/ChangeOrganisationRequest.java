@@ -19,7 +19,6 @@ public class ChangeOrganisationRequest {
     @JsonProperty("OrganisationToRemove")
     private final Organisation organisationToRemove;
 
-
     @JsonProperty("CaseRoleId")
     private final String caseRoleId;
 

@@ -2,12 +2,10 @@ package uk.gov.hmcts.reform.managecase.service;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
@@ -19,8 +17,8 @@ import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
-import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
+import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
@@ -41,19 +39,19 @@ public class NoticeOfChangeService {
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
-    private final IdamRepository idamRepository;
+    private final SecurityUtils securityUtils;
     private final ChallengeQuestionService challengeQuestionService;
     private final PrdRepository prdRepository;
 
     @Autowired
     public NoticeOfChangeService(DataStoreRepository dataStoreRepository,
-                                 IdamRepository idamRepository,
                                  DefinitionStoreRepository definitionStoreRepository,
+                                 SecurityUtils securityUtils,
                                  ChallengeQuestionService challengeQuestionService,
                                  PrdRepository prdRepository) {
         this.dataStoreRepository = dataStoreRepository;
-        this.idamRepository = idamRepository;
         this.definitionStoreRepository = definitionStoreRepository;
+        this.securityUtils = securityUtils;
         this.challengeQuestionService = challengeQuestionService;
         this.prdRepository = prdRepository;
     }
@@ -100,7 +98,7 @@ public class NoticeOfChangeService {
         checkForCaseEvents(caseViewResource);
         //step 4 Check the ChangeOrganisationRequest.CaseRole in the case record.  If it is not null, return an error
         // indicating that there is an ongoing NoCRequest.
-        CaseSearchResultViewResource caseFields = findCaseBy(caseViewResource.getCaseType().getName(), caseId);
+        CaseSearchResultViewResource caseFields = findCaseBy(caseViewResource.getCaseType().getId(), caseId);
         checkCaseFields(caseFields);
         //step 5 Invoke IdAM API to get the IdAM Roles of the invoker.
         UserInfo userInfo = getUserInfo();
@@ -110,11 +108,11 @@ public class NoticeOfChangeService {
         // case matches one of the jurisdictions of the user, error and exit if not.
         validateUserRoles(caseViewResource, userInfo);
         //step 7 Identify the case type Id of the retrieved case
-        String caseType = caseViewResource.getCaseType().getName();
+        String caseType = caseViewResource.getCaseType().getId();
         //step 8 n/a
         //step 9 getTabContents - def store
         ChallengeQuestionsResult challengeQuestionsResult =
-            definitionStoreRepository.challengeQuestions(caseType, caseId);
+            definitionStoreRepository.challengeQuestions(caseType, "NoCChallenge");
         // check if empty and throw error
         //step 10 n/a
         //step 11 For each set of answers in the config, check that there is an OrganisationPolicy
@@ -161,19 +159,24 @@ public class NoticeOfChangeService {
 
     private void validateUserRoles(CaseViewResource caseViewResource, UserInfo userInfo) {
         if (!userInfo.getRoles().contains(PUI_ROLE)) {
-            userInfo.getRoles().forEach(role -> {
-                Optional<String> jurisdiction = extractJurisdiction(role);
-                if (jurisdiction.isPresent() && !caseViewResource
-                    .getCaseType().getJurisdiction().getId().equals(jurisdiction.get())) {
-                    throw new ValidationException("insufficient privileges");
+            validate:
+            {
+                for (String role : userInfo.getRoles()) {
+                    Optional<String> jurisdiction = extractJurisdiction(role);
+                    if (jurisdiction.isPresent() && caseViewResource
+                        .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
+                        break validate;
+                    } else if (jurisdiction.isPresent() && !caseViewResource
+                        .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
+                        throw new ValidationException("insufficient privileges");
+                    }
                 }
-            });
+            }
         }
     }
 
     private UserInfo getUserInfo() {
-        RequestContext context = RequestContext.getCurrentContext();
-        return idamRepository.getUserInfo(context.getRequest().getAuthType());
+        return securityUtils.getUserInfo();
     }
 
     private CaseViewResource getCase(String caseId) {

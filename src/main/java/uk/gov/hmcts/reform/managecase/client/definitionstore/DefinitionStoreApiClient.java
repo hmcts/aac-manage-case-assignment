@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.managecase.client.definitionstore;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.managecase.client.definitionstore.DefinitionSt
 public interface DefinitionStoreApiClient {
 
     @GetMapping(value = CHALLENGE_QUESTIONS, consumes = APPLICATION_JSON_VALUE)
-    ChallengeQuestionsResult challengeQuestions(@RequestParam("ctid") String caseTypeId,
-                                                @RequestParam("id") String challengeQuestionId);
+    ChallengeQuestionsResult challengeQuestions(@PathVariable("ctid") String caseTypeId,
+                                                @PathVariable("id") String challengeQuestionId);
 
 }

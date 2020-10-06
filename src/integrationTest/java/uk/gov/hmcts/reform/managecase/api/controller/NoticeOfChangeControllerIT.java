@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.BaseTest;
-import uk.gov.hmcts.reform.managecase.TestFixtures;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.AuditEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
@@ -23,7 +21,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.Heade
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
-import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
@@ -41,7 +38,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.managecase.TestFixtures.CASE_ROLE;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
@@ -126,14 +122,12 @@ public class NoticeOfChangeControllerIT {
             stubGetCaseInternalES(CASE_TYPE_ID, ES_QUERY, resource);
 
             UserInfo userInfo = new UserInfo("", "", "", "", "", Arrays.asList("pui-caa"));
-           // stubIdamGetUserInfo(userInfo);
 
             FieldType fieldType = new FieldType();
             fieldType.setId("Number");
             fieldType.setType("Number");
             fieldType.setMin(null);
             fieldType.setMax(null);
-           // ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_APPLICANT);
             ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
                                                                         "questionText",
                                                                         fieldType,
@@ -155,7 +149,8 @@ public class NoticeOfChangeControllerIT {
                 .andExpect(jsonPath("$.questions[0].case_type_id", is(CASE_TYPE_ID)))
                 .andExpect(jsonPath("$.questions[0].order", is(1)))
                 .andExpect(jsonPath("$.questions[0].question_text", is("questionText")))
-                .andExpect(jsonPath("$.questions[0].challenge_question_id", is("NoC")));
+                .andExpect(jsonPath("$.questions[0].challenge_question_id", is("NoC")))
+                .andExpect(jsonPath("$.questions[0].answer_field", is(null)));
 
         }
 

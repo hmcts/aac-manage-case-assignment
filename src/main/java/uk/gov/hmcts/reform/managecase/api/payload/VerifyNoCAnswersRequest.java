@@ -31,7 +31,7 @@ public class VerifyNoCAnswersRequest {
     private String caseId;
 
     @JsonSetter(nulls = AS_EMPTY)
-    @NotEmpty(message = "TODO")
-    @ApiModelProperty(value = "Challenge question challengeAnswers", required = true)
+    @NotEmpty(message = ValidationError.CHALLENGE_QUESTION_ANSWERS_EMPTY)
+    @ApiModelProperty(value = "Submitted challenge question answers", required = true)
     private List<@Valid SubmittedChallengeAnswer> answers;
 }

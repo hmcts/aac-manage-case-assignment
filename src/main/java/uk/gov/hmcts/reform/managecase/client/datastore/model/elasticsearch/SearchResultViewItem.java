@@ -6,9 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CommonViewItem;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_POLICY_CASE_ASSIGNED_ROLE;
@@ -35,5 +37,20 @@ public class SearchResultViewItem implements CommonViewItem {
     public String getFieldValue(String fieldId) {
         JsonNode fieldNode = getNestedCaseFieldByPath(fields, fieldId);
         return fieldNode == null || fieldNode.isNull() ? null : fieldNode.asText();
+    }
+
+    public List<OrganisationPolicy> findPolicies() {
+        List<JsonNode> policyNodes = findOrganisationPolicyNodes();
+        return policyNodes.stream()
+            .map(node -> OrganisationPolicy.builder()
+                .orgPolicyCaseAssignedRole(node.get("OrgPolicyCaseAssignedRole").asText())
+                .orgPolicyReference(node.get("OrgPolicyReference").asText()).build())
+            .collect(Collectors.toList());
+    }
+
+    public Optional<OrganisationPolicy> findOrganisationPolicyForRole(String caseRoleId) {
+        return findPolicies().stream()
+            .filter(policy -> policy.getOrgPolicyCaseAssignedRole().equals(caseRoleId))
+            .findFirst();
     }
 }

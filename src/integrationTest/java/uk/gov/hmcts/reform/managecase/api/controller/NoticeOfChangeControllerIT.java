@@ -127,24 +127,23 @@ public class NoticeOfChangeControllerIT {
             UserInfo userInfo = new UserInfo("", "", "", "", "", Arrays.asList("pui-caa"));
             stubIdamGetUserInfo(userInfo);
 
-            ChallengeQuestion challengeQuestion = new ChallengeQuestion();
-            challengeQuestion.setCaseTypeId(CASE_TYPE_ID);
-            challengeQuestion.setOrder(1);
-            challengeQuestion.setQuestionText("QuestionText1");
             FieldType fieldType = new FieldType();
             fieldType.setId("Number");
             fieldType.setType("Number");
             fieldType.setMin(null);
             fieldType.setMax(null);
-            challengeQuestion.setAnswerFieldType(fieldType);
-            challengeQuestion.setChallengeQuestionId("NoC");
-            challengeQuestion.setAnswerField(
-                "${applicant.individual.fullname}|${applicant.company.name}|${applicant.soletrader.name}:Applicant,"
-                    + "${respondent.individual.fullname}|${respondent.company.name}"
-                    + "{|${respondent.soletrader.name}:Respondent");
-            challengeQuestion.setQuestionId("QuestionId1");
-            ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(Arrays.asList(
-                challengeQuestion));
+            ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
+                                                                        "questionText",
+                                                                        fieldType,
+                                                                        null,
+                                                                        "NoC",
+                                                                        "${applicant.individual.fullname}|"
+                                                                            + "${applicant.company.name}|"
+                                                                            + "${applicant.soletrader.name}:Applicant,"
+                + "${respondent.individual.fullname}|${respondent.company.name}"
+                + "{|${respondent.soletrader.name}:Respondent", "QuestionId1", null);
+            ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
+                Arrays.asList(challengeQuestion));
             stubGetChallengeQuestions(CASE_TYPE_ID, "idOfTab", challengeQuestionsResult);
 
             this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)

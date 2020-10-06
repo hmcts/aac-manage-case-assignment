@@ -6,8 +6,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 
 import java.util.List;
@@ -29,6 +27,8 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         + "   }\n"
         + "}";
 
+    public static final String DUMMY_TITLE = "Dummy Title";
+
     private final DataStoreApiClient dataStoreApi;
 
     @Autowired
@@ -43,31 +43,17 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public void assignCase(List<String> caseRoles, String caseId, String userId, String organisationId) {
-        List<CaseUserRoleWithOrganisation> caseUserRoles = caseRoles.stream()
-                .map(role -> CaseUserRoleWithOrganisation.withOrganisationBuilder()
-                    .caseRole(role).caseId(caseId).userId(userId).organisationId(organisationId).build())
+    public void assignCase(List<String> caseRoles, String caseId, String userId) {
+        List<CaseUserRole> caseUserRoles = caseRoles.stream()
+                .map(role -> CaseUserRole.builder().caseRole(role).caseId(caseId).userId(userId).build())
                 .collect(Collectors.toList());
-        dataStoreApi.assignCase(new CaseUserRolesRequest(caseUserRoles));
+        dataStoreApi.assignCase(new CaseUserRoleResource(caseUserRoles));
     }
 
     @Override
     public List<CaseUserRole> getCaseAssignments(List<String> caseIds, List<String> userIds) {
         CaseUserRoleResource response = dataStoreApi.getCaseAssignments(caseIds, userIds);
         return response.getCaseUsers();
-    }
-
-    @Override
-    public void removeCaseUserRoles(List<CaseUserRole> caseUserRoles, String organisationId) {
-        List<CaseUserRoleWithOrganisation> caseUsers = caseUserRoles.stream()
-            .map(caseUserRole -> CaseUserRoleWithOrganisation.withOrganisationBuilder()
-                .caseRole(caseUserRole.getCaseRole())
-                .caseId(caseUserRole.getCaseId())
-                .userId(caseUserRole.getUserId())
-                .organisationId(organisationId)
-                .build())
-            .collect(Collectors.toList());
-        dataStoreApi.removeCaseUserRoles(new CaseUserRolesRequest(caseUsers));
     }
 
 }

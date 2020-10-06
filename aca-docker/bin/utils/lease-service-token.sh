@@ -2,7 +2,7 @@
 
 set -eu
 
-microservice=${1:-aac_manage_case_assignment}
+microservice=${1}
 
 curl --insecure --fail --show-error --silent -X POST \
   ${SERVICE_AUTH_PROVIDER_API_BASE_URL:-http://localhost:4502}/testing-support/lease \

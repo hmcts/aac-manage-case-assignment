@@ -41,12 +41,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
     }
 
-    @ExceptionHandler(CaseCouldNotBeFetchedException.class)
-    public ResponseEntity<Object> handleCaseCouldNotBeFetchedException(CaseCouldNotBeFetchedException ex) {
-        log.error("Data Store errors: {}", ex.getMessage(), ex);
-        return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
-    }
-
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<Object> handleFeignStatusException(FeignException ex) {
         log.error("Downstream service errors: {}", ex.getMessage(), ex);

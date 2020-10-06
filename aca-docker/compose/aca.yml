@@ -13,7 +13,6 @@ services:
       MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp
       CCD_DATA_STORE_API_BASE_URL: http://ccd-data-store-api:4452
       PRD_HOST: http://aca-wiremock:8080
-      NOTIFY_MCA_API_KEY: "notify-test-api-key"
     ports:
       - 4454:4454
     depends_on:
@@ -27,10 +26,9 @@ services:
     volumes:
       - ./../mocks/wiremock:/home/wiremock:rw
     ports:
-      - 4455:8080
+      - 8765:8080
     networks:
       - ccd-network
-
 
 networks:
   ccd-network:

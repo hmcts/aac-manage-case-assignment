@@ -1,20 +1,16 @@
 {
-	"_guid_": "Case_Assigned_Users_Roles",
-
-	"productName": "CCD Data Store",
-	"operationName": "Get Case-Assigned Users and Roles",
-
-	"method": "GET",
-	"uri": "{{CCD_DATA_STORE_API_BASE_URL}}/case-users",
-
-	"request": {
-		"_extends_": "Common_Request",
-		"queryParams": {
-			"user_ids": "${[scenarioContext][testData][users][invokingUser][id]}"
-		}
-	},
-
-	"expectedResponse": {
-		"_extends_": "Common_200_Response"
-	}
+  "_guid_": "Case_Assigned_Users_Roles",
+  "productName": "CCD Data Store",
+  "operationName": "Get Case-Assigned Users and Roles",
+  "method": "GET",
+  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/case-users",
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "user_ids": "${[scenarioContext][testData][users][invokingUser][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response"
+  }
 }

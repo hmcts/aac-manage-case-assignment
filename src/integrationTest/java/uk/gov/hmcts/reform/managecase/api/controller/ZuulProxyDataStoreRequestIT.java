@@ -128,7 +128,6 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
             .andExpect(status().isForbidden());
     }
 
-    @SuppressWarnings("PMD.LawOfDemeter")
     public static String generateDummyS2SToken(String serviceName) {
         return Jwts.builder()
                 .setSubject(serviceName)

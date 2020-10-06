@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.managecase.service;
+package uk.gov.hmcts.reform.managecase.service.noc;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -6,10 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
-import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
@@ -17,9 +15,11 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.Searc
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
+import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
+import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
@@ -39,30 +38,28 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 public class NoticeOfChangeService {
 
     public static final String PUI_ROLE = "pui-caa";
-    public static final String NOC_EVENTS = "NOC";
     public static final String CHANGE_ORG_REQUEST = "ChangeOrganisationRequest";
     private static final int JURISDICTION_INDEX = 1;
     private static final String APPROVED = "APPROVED";
     private static final String PENDING = "PENDING";
-    public static final String NOC_REQUEST = "NoCRequest";
-
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
-    private final SecurityUtils securityUtils;
+    private final PrdRepository prdRepository;
     private final JacksonUtils jacksonUtils;
+    private final SecurityUtils securityUtils;
 
     @Autowired
     public NoticeOfChangeService(DataStoreRepository dataStoreRepository,
                                  DefinitionStoreRepository definitionStoreRepository,
-                                 ChallengeQuestionService challengeQuestionService,
                                  PrdRepository prdRepository,
-                                 JacksonUtils jacksonUtils) {
+                                 JacksonUtils jacksonUtils,
                                  SecurityUtils securityUtils) {
         this.dataStoreRepository = dataStoreRepository;
         this.definitionStoreRepository = definitionStoreRepository;
-        this.securityUtils = securityUtils;
+        this.prdRepository = prdRepository;
         this.jacksonUtils = jacksonUtils;
+        this.securityUtils = securityUtils;
     }
 
     public ChallengeQuestionsResult getChallengeQuestions(String caseId) {
@@ -136,7 +133,7 @@ public class NoticeOfChangeService {
             .map(node -> OrganisationPolicy.builder()
                 .orgPolicyCaseAssignedRole(node.get("OrgPolicyCaseAssignedRole").asText())
                 .orgPolicyReference(node.get("OrgPolicyReference").asText()).build())
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 
     private List<OrganisationPolicy> findPolicies(CaseResource caseResource) {
@@ -193,7 +190,7 @@ public class NoticeOfChangeService {
             searchResultViewHeaderList.stream()
                 .filter(searchResultViewHeader ->
                             searchResultViewHeader.getCaseFieldTypeDefinition()
-                                .getType().equals(CHANGE_ORG_REQUEST)).collect(Collectors.toList());
+                                .getType().equals(CHANGE_ORG_REQUEST)).collect(toList());
         for (SearchResultViewHeader searchResultViewHeader : filteredSearch) {
             if (caseFields.containsKey(searchResultViewHeader.getCaseFieldId())) {
                 JsonNode node = caseFields.get(searchResultViewHeader.getCaseFieldId());
@@ -208,19 +205,6 @@ public class NoticeOfChangeService {
         if (caseViewResource.getCaseViewEvents() == null) {
             throw new ValidationException("no NoC events available for this case type");
         }
-    }
-
-    private Optional<OrganisationPolicy> findOrganisationPolicyForRole(SearchResultViewItem caseResult,
-                                                                       String caseRoleId) {
-        return findPolicies(caseResult).stream()
-            .filter(policy -> policy.getOrgPolicyCaseAssignedRole().equals(caseRoleId))
-            .findFirst();
-    }
-
-    private boolean organisationEqualsRequestingUsers(Organisation organisation) {
-        return organisation != null
-            && prdRepository.findUsersByOrganisation()
-            .getOrganisationIdentifier().equals(organisation.getOrganisationID());
     }
 
     /**
@@ -257,13 +241,11 @@ public class NoticeOfChangeService {
             autoAssignCaseRoles(caseResource, invokersOrganisation);
         }
 
-        RequestNoticeOfChangeResponse requestNoticeOfChangeResponse = RequestNoticeOfChangeResponse.builder()
+        return RequestNoticeOfChangeResponse.builder()
             .caseRole(caseRoleId)
             .approvalStatus(isApprovalComplete ? APPROVED : PENDING)
             .status(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)
             .build();
-
-        return requestNoticeOfChangeResponse;
     }
 
     private String getEventId(NoCRequestDetails noCRequestDetails) {
@@ -367,12 +349,14 @@ public class NoticeOfChangeService {
                                        getUserInfo().getUid(), invokersOrganisation.getOrganisationID());
     }
 
-    private boolean isRequestToAddOrReplaceRepresentationAndApproved(CaseResource caseResource, Organisation organisation, String caseRoleId) {
-        //   1. get all org policies from the caseResource
-        //      2. find org policy that has case role is matching caseRoleId
-        //      3. check that organisation for that org policy matches the invokersOrganisation - match only on id
+    private boolean isRequestToAddOrReplaceRepresentationAndApproved(CaseResource caseResource,
+                                                                     Organisation organisation,
+                                                                     String caseRoleId) {
+        // 1. get all org policies from the caseResource
+        // 2. find org policy that has case role is matching caseRoleId
+        //3. check that organisation for that org policy matches the invokersOrganisation - match only on id
         return findInvokerOrgPolicyRoles(caseResource, organisation).contains(caseRoleId);
-     }
+    }
 
     private List<String> findInvokerOrgPolicyRoles(CaseResource caseResource, Organisation organisation) {
         List<OrganisationPolicy> policies = findPolicies(caseResource);

@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
-import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -231,7 +230,7 @@ class DataStoreRepositoryTest {
         assertThat(caseDataContentCaptorValue.getEvent().getDescription())
             .isEqualTo(NOC_REQUEST_DESCRIPTION);
         assertThat(caseDataContentCaptorValue.getEvent().getEventId())
-            .isEqualTo(NoticeOfChangeService.NOC_REQUEST);
+            .isEqualTo(EVENT_ID);
 
         assertThat(caseDataContentCaptorValue.getData().get("ChangeOrganisationRequest").asText())
             .isEqualTo(EXPECTED_NOC_REQUEST_DATA);

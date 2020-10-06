@@ -35,7 +35,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
     static final String NOC_REQUEST_DESCRIPTION = "Notice of Change Request Event";
 
-    private static Logger LOG = LoggerFactory.getLogger(DefaultDataStoreRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultDataStoreRepository.class);
 
     public static final String ES_QUERY = "{\n"
         + "   \"query\":{\n"
@@ -145,7 +145,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
         try {
             data.put(CHANGE_ORGANISATION_REQUEST,
-                     jsonNodeFactory.textNode(objectMapper.writeValueAsString(changeOrganisationRequest)));;
+                     jsonNodeFactory.textNode(objectMapper.writeValueAsString(changeOrganisationRequest)));
         } catch (JsonProcessingException jpe) {
             LOG.info("Failed to create ChangeOrganisationRequest JSON", jpe);
         }

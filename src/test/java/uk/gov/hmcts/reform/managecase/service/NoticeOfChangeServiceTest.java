@@ -7,12 +7,14 @@ import javax.validation.ValidationException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.netflix.zuul.context.RequestContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.mock.web.MockHttpServletRequest;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.AuditEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
@@ -31,9 +33,10 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQues
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
-import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
+import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.util.ArrayList;
@@ -49,7 +52,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
 
-@SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"PMD.UseConcurrentHashMap"})
 class NoticeOfChangeServiceTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
@@ -58,17 +61,7 @@ class NoticeOfChangeServiceTest {
     private static final String CASE_TYPE = "CaseTypeA";
     private static final String QUESTION_TEXT = "QuestionText1";
     private static final String FIELD_ID = "Number";
-    private static final String CHANGE_ORG = "changeOrg";
     private static final String CHALLENGE_QUESTION = "NoC";
-    private static final String ANSWER_FIELD = "${applicant.individual.fullname}|${applicant.company.name}|"
-        + "${applicant.soletrader.name}:Applicant,${respondent.individual.fullname}|${respondent.company.name}"
-        + "|${respondent.soletrader.name}:Respondent";
-
-    private final List<SearchResultViewItem> viewItems = new ArrayList<>();
-    private final Map<String, JsonNode> caseFields = new HashMap<>();
-    private static final String DATE_FIELD = "DateField";
-    private static final String DATETIME_FIELD = "DateTimeField";
-    private static final String TEXT_FIELD = "TextField";
 
     @InjectMocks
     private NoticeOfChangeService service;
@@ -78,15 +71,11 @@ class NoticeOfChangeServiceTest {
     @Mock
     private DefinitionStoreRepository definitionStoreRepository;
     @Mock
-    private SecurityUtils securityUtils;
-    @Mock
     private IdamRepository idamRepository;
-    @Mock
-    private ChallengeQuestionService challengeQuestionService;
     @Mock
     private PrdRepository prdRepository;
     @Mock
-    private RequestContext context;
+    private SecurityUtils securityUtils;
     @Mock
     private JacksonUtils jacksonUtils;
 
@@ -111,9 +100,9 @@ class NoticeOfChangeServiceTest {
         void setUp()throws JsonProcessingException {
             noticeOfChangeService = new NoticeOfChangeService(dataStoreRepository,
                                                               definitionStoreRepository,
+                                                              prdRepository,
+                                                              jacksonUtils,
                                                               securityUtils);
-            noticeOfChangeService = new NoticeOfChangeService(dataStoreRepository, idamRepository,
-                definitionStoreRepository, challengeQuestionService, prdRepository, jacksonUtils);
 
             //internal/cases/caseId
             AuditEvent event = new AuditEvent();
@@ -136,7 +125,7 @@ class NoticeOfChangeServiceTest {
             FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
             fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
             searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
-            searchResultViewHeader.setCaseFieldId(CHANGE_ORG);
+            searchResultViewHeader.setCaseFieldId("changeOrg");
             caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
             caseFields.put(DATETIME_FIELD, new TextNode("1985-12-30"));
             caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
@@ -169,26 +158,34 @@ class NoticeOfChangeServiceTest {
             given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, null, CASE_ID)).willReturn(resource);
 
             //Challenge Questions
+            ChallengeQuestion challengeQuestion = new ChallengeQuestion();
+            challengeQuestion.setCaseTypeId(CASE_TYPE_ID);
+            challengeQuestion.setOrder(1);
+            challengeQuestion.setQuestionText(QUESTION_TEXT);
             FieldType fieldType = new FieldType();
             fieldType.setId(FIELD_ID);
             fieldType.setType(FIELD_ID);
             fieldType.setMin(null);
             fieldType.setMax(null);
-            ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
-                                                                        fieldType,
-                                                                        null,
-                                                                        CHALLENGE_QUESTION,
-                                                                        ANSWER_FIELD,
-                                                                        "QuestionId1",
-                                                                        null);
-            ChallengeQuestionsResult challengeQuestionsResult =
-                new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
+            challengeQuestion.setAnswerFieldType(fieldType);
+            challengeQuestion.setChallengeQuestionId(CHALLENGE_QUESTION);
+            challengeQuestion.setAnswerField("${applicant.individual.fullname}|${applicant.company.name}|"
+                                                 + "${applicant.soletrader.name}:Applicant,"
+                                                 + "${respondent.individual.fullname}|${respondent.company.name}"
+                                                 + "{|${respondent.soletrader.name}:Applicant");
+            challengeQuestion.setQuestionId("QuestionId1");
+            ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
+                Arrays.asList(challengeQuestion));
             given(definitionStoreRepository.challengeQuestions(CASE_TYPE_ID, CASE_ID))
                 .willReturn(challengeQuestionsResult);
 
-            UserInfo userInfo = new UserInfo("","","", "", "",
-                                             Arrays.asList("pui-caa"));
-            given(securityUtils.getUserInfo()).willReturn(userInfo);
+            MockHttpServletRequest request = new MockHttpServletRequest("GET", "/url");
+            RequestContext context = new RequestContext();
+            context.setRequest(request);
+            RequestContext.testSetCurrentContext(context);
+
+            UserInfo userInfo = new UserInfo("","","", "", "", Arrays.asList("pui-caa"));
+            given(idamRepository.getUserInfo(context.getRequest().getAuthType())).willReturn(userInfo);
         }
 
         @Test
@@ -213,7 +210,7 @@ class NoticeOfChangeServiceTest {
             FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
             fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
             searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
-            searchResultViewHeader.setCaseFieldId(CHANGE_ORG);
+            searchResultViewHeader.setCaseFieldId("changeOrg");
 
             caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
             caseFields.put(DATETIME_FIELD, new TextNode("1985-12-30"));
@@ -225,7 +222,7 @@ class NoticeOfChangeServiceTest {
                                                       + "                    \"CaseRoleId\": \"role\"\n"
                                                       + "                }\n"
                                                       + "            }", JsonNode.class);
-            caseFields.put(CHANGE_ORG, actualObj);
+            caseFields.put("changeOrg", actualObj);
             SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
             viewItems.add(item);
             SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
@@ -250,21 +247,25 @@ class NoticeOfChangeServiceTest {
 
         @Test
         @DisplayName("Must return an error if there is not an Organisation Policy field")
-        void shouldThrowErrorMissingOrgPolicy() {
+        void shouldThrowErrorMissingOrgPolicy() throws JsonProcessingException {
+            ChallengeQuestion challengeQuestion = new ChallengeQuestion();
+            challengeQuestion.setCaseTypeId(CASE_TYPE_ID);
+            challengeQuestion.setOrder(1);
+            challengeQuestion.setQuestionText(QUESTION_TEXT);
             FieldType fieldType = new FieldType();
             fieldType.setId(FIELD_ID);
             fieldType.setType(FIELD_ID);
             fieldType.setMin(null);
             fieldType.setMax(null);
-            ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
-                                                                        fieldType,
-                                                                        null,
-                                                                        CHALLENGE_QUESTION,
-                                                                        ANSWER_FIELD,
-                                                                        "QuestionId1",
-                                                                        null);
-            ChallengeQuestionsResult challengeQuestionsResult =
-                new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
+            challengeQuestion.setAnswerFieldType(fieldType);
+            challengeQuestion.setChallengeQuestionId(CHALLENGE_QUESTION);
+            challengeQuestion.setAnswerField("${applicant.individual.fullname}|${applicant.company.name}|"
+                                                 + "${applicant.soletrader.name}:Applicant,"
+                                                 + "${respondent.individual.fullname}|${respondent.company.name}"
+                                                 + "{|${respondent.soletrader.name}:Respondent");
+            challengeQuestion.setQuestionId("QuestionId1");
+            ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
+                Arrays.asList(challengeQuestion));
             given(definitionStoreRepository.challengeQuestions(CASE_TYPE_ID, CASE_ID))
                 .willReturn(challengeQuestionsResult);
 
@@ -277,20 +278,24 @@ class NoticeOfChangeServiceTest {
         @DisplayName("Must return an error if there is not an Organisation Policy field containing a "
             + "case role for each set of answers")
         void shouldThrowErrorMissingRoleInOrgPolicy() throws JsonProcessingException {
+            ChallengeQuestion challengeQuestion = new ChallengeQuestion();
+            challengeQuestion.setCaseTypeId(CASE_TYPE_ID);
+            challengeQuestion.setOrder(1);
+            challengeQuestion.setQuestionText(QUESTION_TEXT);
             FieldType fieldType = new FieldType();
-            fieldType.setId(FIELD_ID);
-            fieldType.setType(FIELD_ID);
+            fieldType.setId("Number");
+            fieldType.setType("Number");
             fieldType.setMin(null);
             fieldType.setMax(null);
-            ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
-                                                                        fieldType,
-                                                                        null,
-                                                                        CHALLENGE_QUESTION,
-                                                                        ANSWER_FIELD,
-                                                                        "QuestionId1",
-                                                                        null);
-            ChallengeQuestionsResult challengeQuestionsResult =
-                new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
+            challengeQuestion.setAnswerFieldType(fieldType);
+            challengeQuestion.setChallengeQuestionId(CHALLENGE_QUESTION);
+            challengeQuestion.setAnswerField("${applicant.individual.fullname}|${applicant.company.name}|"
+                                                 + "${applicant.soletrader.name}:Applicant,"
+                                                 + "${respondent.individual.fullname}|${respondent.company.name}"
+                                                 + "{|${respondent.soletrader.name}:Respondent");
+            challengeQuestion.setQuestionId("QuestionId1");
+            ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
+                Arrays.asList(challengeQuestion));
             given(definitionStoreRepository
                       .challengeQuestions(CASE_TYPE_ID, CASE_ID))
                 .willReturn(challengeQuestionsResult);
@@ -316,9 +321,12 @@ class NoticeOfChangeServiceTest {
         @DisplayName(" must return an error response when the solicitor does not have access to the "
             + "jurisdiction of the case")
         void shouldThrowErrorInsufficientPrivilegesForSolicitor() {
-            UserInfo userInfo = new UserInfo("","","", "", "",
-                                             Arrays.asList("caseworker-JurisdictionA-solicitor"));
-            given(securityUtils.getUserInfo()).willReturn(userInfo);
+            MockHttpServletRequest request = new MockHttpServletRequest("GET", "/url");
+            RequestContext context = new RequestContext();
+            context.setRequest(request);
+            RequestContext.testSetCurrentContext(context);
+            UserInfo userInfo = new UserInfo("","","", "", "", Arrays.asList("caseworker-JurisdictionA-solicitor"));
+            given(idamRepository.getUserInfo(context.getRequest().getAuthType())).willReturn(userInfo);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)

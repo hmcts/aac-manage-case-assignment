@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedExc
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
@@ -96,11 +97,13 @@ public class NoticeOfChangeService {
         //step 10 n/a
         //step 11 For each set of answers in the config, check that there is an OrganisationPolicy
         // field in the case containing the case role, returning an error if this is not true.
-        if (caseFields.getCases().stream().findFirst().isPresent()) {
+        Optional<SearchResultViewItem> searchResultViewItem = caseFields.getCases().stream().findFirst();
+        if (searchResultViewItem.isPresent()) {
             List<OrganisationPolicy> organisationPolicies =
-                findPolicies(caseFields.getCases().stream().findFirst().get());
+                findPolicies(searchResultViewItem.get());
             checkOrgPoliciesForRoles(challengeQuestionsResult, organisationPolicies);
         }
+
         return NoCRequestDetails.builder()
             .caseViewResource(caseViewResource)
             .challengeQuestionsResult(challengeQuestionsResult)
@@ -170,11 +173,13 @@ public class NoticeOfChangeService {
         if (caseDetails.getCases().isEmpty()) {
             throw new CaseCouldNotBeFetchedException("Case could not be found");
         }
-        if (caseDetails.getCases().stream().findFirst().isPresent()) {
-            Map<String, JsonNode> caseFields = caseDetails.getCases().stream().findFirst().get().getFields();
+        Optional<SearchResultViewItem> searchResultViewItem = caseDetails.getCases().stream().findFirst();
+        if (searchResultViewItem.isPresent()) {
+            Map<String, JsonNode> caseFields = searchResultViewItem.get().getFields();
             List<SearchResultViewHeader> searchResultViewHeaderList = new ArrayList<>();
-            if (caseDetails.getHeaders().stream().findFirst().isPresent()) {
-                searchResultViewHeaderList = caseDetails.getHeaders().stream().findFirst().get().getFields();
+            Optional<SearchResultViewHeaderGroup> searchResultViewHeaderGroup = caseDetails.getHeaders().stream().findFirst();
+            if (searchResultViewHeaderGroup.isPresent()) {
+                searchResultViewHeaderList = searchResultViewHeaderGroup.get().getFields();
             }
             List<SearchResultViewHeader> filteredSearch =
                 searchResultViewHeaderList.stream()

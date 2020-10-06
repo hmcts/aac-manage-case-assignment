@@ -27,9 +27,10 @@ services:
     volumes:
       - ./../mocks/wiremock:/home/wiremock:rw
     ports:
-      - 8765:8080
+      - 4455:8080
     networks:
       - ccd-network
+
 
 networks:
   ccd-network:

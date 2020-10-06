@@ -1,0 +1,25 @@
+{
+  "_guid_": "F-203_Prerequisite_Case_Assignment_C1_Bill",
+  "_extends_": "Prerequisite_Case_Assignment",
+
+  "specs": [
+    "by Becky to grant access to C1 for Bill"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Becky"
+    },
+    "Bill": {
+      "_extends_": "ACA_Users_Bill"
+    }
+  },
+
+  "request": {
+    "body": {
+      "case_type_id": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][case_type_id]}",
+      "case_id": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+      "assignee_id": "${[scenarioContext][testData][users][Bill][id]}"
+    }
+  }
+}

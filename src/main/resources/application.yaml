@@ -18,6 +18,8 @@ management:
 spring:
   application:
     name: Manage Case Assignment
+  banner:
+    location: classpath:manage-case-assignment-banner.txt
   main:
     allow-bean-definition-overriding: true
   cache:

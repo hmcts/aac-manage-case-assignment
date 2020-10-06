@@ -20,11 +20,12 @@ def secrets = [
     secret('ccd-importer-autotest-password', 'CCD_IMPORT_AUTOTEST_PASSWORD'),
     secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
     secret('ccd-befta-caseworker-2-solicitor-1-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD'),
-    secret('ccd-befta-caseworker-2-solicitor-2-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD'),
     secret('ccd-befta-master-solicitor1-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_1_PWD'),
     secret('ccd-befta-master-solicitor2-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_2_PWD'),
+    secret('ccd-befta-master-solicitor3-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_3_PWD'),
+    secret('ccd-befta-master-solicitor4-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_4_PWD'),
     secret('ccd-befta-solicitor-4-pwd', 'CCD_BEFTA_SOLICITOR_4_PWD'),
-    secret('ccd-befta-pui-caa-1-pwd', 'CCD_BEFTA_PUI_CAA_1_PWD')    
+    secret('ccd-befta-pui-caa-1-pwd', 'CCD_BEFTA_PUI_CAA_1_PWD')
   ],
   's2s-${env}': [
     secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
@@ -76,6 +77,8 @@ withPipeline("java", product, component) {
   }
   onMaster {
     enableSlackNotifications('#ccd-master-builds')
+    env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
+    env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-staging.service.core-compute-aat.internal"
   }
   onDemo {
     enableSlackNotifications('#ccd-demo-builds')
@@ -90,11 +93,30 @@ withPipeline("java", product, component) {
   enableAksStagingDeployment()
   disableLegacyDeployment()
 
+  after('smoketest:preview') {
+    copyIgnore('./build/reports/tests/befta/smoke/cucumber-html-reports', './BEFTA Report for Smoke Tests/')
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
+  }
+
+  after('smoketest:aat') {
+    copyIgnore('./build/reports/tests/befta/smoke/cucumber-html-reports', './BEFTA Report for Smoke Tests/')
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
+  }
+
   after('functionalTest:preview') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/befta/**/*', excludes: '**/reports/tests/befta/**/*.json'
+    copyIgnore('./build/reports/tests/befta/functional/cucumber-html-reports', './BEFTA Report for Functional Tests/')
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
   }
 
   after('functionalTest:aat') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/befta/**/*', excludes: '**/reports/tests/befta/**/*.json'
+    copyIgnore('./build/reports/tests/befta/functional/cucumber-html-reports', './BEFTA Report for Functional Tests/')
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
   }
+}
+
+/**
+  * Forces a recursive copy by always returning 0 regardless of errors
+  */
+def copyIgnore(filePath, destinationDir) {
+  steps.sh("cp -R '${filePath}' '${destinationDir}' || :")
 }

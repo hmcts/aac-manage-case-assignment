@@ -1,0 +1,31 @@
+{
+  "_guid_": "F-203_Prerequisite_Case_Assignment_Seperate_Org_Policies_C1_Benjamin_By_Becky",
+  "_extends_": "Prerequisite_Case_Assignment",
+
+  "specs": [
+    "by Becky to grant access to C1 for Benjamin with role R1"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Becky"
+    },
+    "Benjamin": {
+      "_extends_": "ACA_Users_Benjamin"
+    }
+  },
+
+  "request": {
+    "body": {
+      "case_type_id": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_Seperate_Org_Policies_C1][testData][actualResponse][body][case_type_id]}",
+      "case_id": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_Seperate_Org_Policies_C1][testData][actualResponse][body][id]}",
+      "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "status_message": "Roles [Claimant] from the organisation policies successfully assigned to the assignee."
+    }
+  }
+}

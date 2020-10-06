@@ -151,10 +151,9 @@ public final class WiremockFixtures {
 
     public static void stubGetCaseInternal(String caseId, CaseViewResource caseViewResource) {
 
-        stubFor(WireMock.get(urlPathEqualTo(INTERNAL_CASES))
+        stubFor(WireMock.get(urlPathEqualTo("/internal/cases/" + caseId))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-                    .withQueryParam("case_id", equalTo(caseId))
                     .willReturn(aResponse()
                                     .withStatus(HTTP_OK).withBody(getJsonString(caseViewResource))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
@@ -164,21 +163,12 @@ public final class WiremockFixtures {
                                                  String id,
                                                  ChallengeQuestionsResult challengeQuestionsResult) {
 
-        stubFor(WireMock.get(urlPathEqualTo(CHALLENGE_QUESTIONS))
+        stubFor(WireMock.get(urlPathEqualTo("/api/display/challenge-questions/case-type/"+ caseTypeId
+                                                +"/question-groups/"+ id))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-                    .withQueryParam("ctid", equalTo(caseTypeId))
-                    .withQueryParam("id", equalTo(id))
                     .willReturn(aResponse()
                                     .withStatus(HTTP_OK).withBody(getJsonString(challengeQuestionsResult))
-                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
-    }
-
-    public static void stubIdamGetUserInfo(UserInfo userInfo) {
-        stubFor(WireMock.get(urlPathEqualTo("/o/userinfo"))
-                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-                    .willReturn(aResponse()
-                                    .withStatus(HTTP_OK).withBody(getJsonString(userInfo))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 

@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.Heade
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
@@ -47,7 +48,6 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDef
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternal;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternalES;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetChallengeQuestions;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubIdamGetUserInfo;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.UseConcurrentHashMap",
@@ -62,6 +62,9 @@ public class NoticeOfChangeControllerIT {
     private static final String ES_QUERY = String.format(RAW_QUERY, CASE_ID);
     private final Map<String, JsonNode> caseFields = new HashMap<>();
     private final List<SearchResultViewItem> viewItems = new ArrayList<>();
+    private static final String ANSWER_FIELD_APPLICANT = "${applicant.individual.fullname}|${applicant.company.name}|"
+        + "${applicant.soletrader.name}:Applicant";
+
 
     @Nested
     @DisplayName("GET /noc/noc-questions")
@@ -71,10 +74,8 @@ public class NoticeOfChangeControllerIT {
         private MockMvc mockMvc;
 
         @DisplayName("Successfully return NoC questions for case id")
-        @Disabled
         @Test
         void shouldGetNoCQuestions_forAValidRequest() throws Exception {
-            //TODO
             AuditEvent event = new AuditEvent();
             event.setEventName("NOC");
             CaseViewEvent caseViewEvent = CaseViewEvent.createFrom(event);
@@ -82,7 +83,7 @@ public class NoticeOfChangeControllerIT {
             CaseViewEvent[] caseViewEventArray = {caseViewEvent};
             caseViewResource.setCaseViewEvents(caseViewEventArray);
             CaseViewType caseViewType = new CaseViewType();
-            caseViewType.setName(CASE_TYPE_ID);
+            caseViewType.setId(CASE_TYPE_ID);
             CaseViewJurisdiction caseViewJurisdiction = new CaseViewJurisdiction();
             caseViewJurisdiction.setId(JURISDICTION);
             caseViewType.setJurisdiction(caseViewJurisdiction);
@@ -103,7 +104,7 @@ public class NoticeOfChangeControllerIT {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode actualObj = mapper.readValue("{\n"
                                                       + "  \"OrganisationPolicy1\": {\n"
-                                                      + "    \"OrgPolicyCaseAssignedRole\": \"roleId\",\n"
+                                                      + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
                                                       + "    \"OrgPolicyReference\": \"Reference\",\n"
                                                       + "    \"Organisation\": {\n"
                                                       + "      \"OrganisationID\": \"QUK822N\",\n"
@@ -125,40 +126,37 @@ public class NoticeOfChangeControllerIT {
             stubGetCaseInternalES(CASE_TYPE_ID, ES_QUERY, resource);
 
             UserInfo userInfo = new UserInfo("", "", "", "", "", Arrays.asList("pui-caa"));
-            stubIdamGetUserInfo(userInfo);
+           // stubIdamGetUserInfo(userInfo);
 
             FieldType fieldType = new FieldType();
             fieldType.setId("Number");
             fieldType.setType("Number");
             fieldType.setMin(null);
             fieldType.setMax(null);
+           // ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_APPLICANT);
             ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
                                                                         "questionText",
                                                                         fieldType,
                                                                         null,
                                                                         "NoC",
-                                                                        "${applicant.individual.fullname}|"
-                                                                            + "${applicant.company.name}|"
-                                                                            + "${applicant.soletrader.name}:Applicant,"
-                + "${respondent.individual.fullname}|${respondent.company.name}"
-                + "{|${respondent.soletrader.name}:Respondent", "QuestionId1", null);
+                                                                        ANSWER_FIELD_APPLICANT,
+                                                                        "QuestionId1",
+                                                                        null);
             ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
                 Arrays.asList(challengeQuestion));
-            stubGetChallengeQuestions(CASE_TYPE_ID, "idOfTab", challengeQuestionsResult);
+            stubGetChallengeQuestions(CASE_TYPE_ID, "NoCChallenge", challengeQuestionsResult);
 
             this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
                                      .queryParam("case_id", CASE_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
 
-                .andExpect(jsonPath("$.case_assignments", hasSize(1)))
-                .andExpect(jsonPath("$.case_assignments[0].case_id", is(CASE_ID)))
-                .andExpect(jsonPath("$.case_assignments[0].shared_with", hasSize(1)))
-                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].first_name", is(TestFixtures.FIRST_NAME)))
-                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].last_name", is(TestFixtures.LAST_NAME)))
-                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].email", is(TestFixtures.EMAIL)))
-                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles", hasSize(1)))
-                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles[0]", is(CASE_ROLE)));
+                .andExpect(jsonPath("$.questions", hasSize(1)))
+                .andExpect(jsonPath("$.questions[0].case_type_id", is(CASE_TYPE_ID)))
+                .andExpect(jsonPath("$.questions[0].order", is(1)))
+                .andExpect(jsonPath("$.questions[0].question_text", is("questionText")))
+                .andExpect(jsonPath("$.questions[0].challenge_question_id", is("NoC")));
+
         }
 
         @DisplayName("Must return 400 bad request response if caseIds are missing in GetAssignments request")

@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import javax.validation.ValidationException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
@@ -95,8 +96,11 @@ public class NoticeOfChangeService {
         //step 10 n/a
         //step 11 For each set of answers in the config, check that there is an OrganisationPolicy
         // field in the case containing the case role, returning an error if this is not true.
-        List<OrganisationPolicy> organisationPolicies = findPolicies(caseFields.getCases().stream().findFirst().get());
-        checkOrgPoliciesForRoles(challengeQuestionsResult, organisationPolicies);
+        if (caseFields.getCases().stream().findFirst().isPresent()) {
+            List<OrganisationPolicy> organisationPolicies =
+                findPolicies(caseFields.getCases().stream().findFirst().get());
+            checkOrgPoliciesForRoles(challengeQuestionsResult, organisationPolicies);
+        }
         return NoCRequestDetails.builder()
             .caseViewResource(caseViewResource)
             .challengeQuestionsResult(challengeQuestionsResult)
@@ -137,17 +141,14 @@ public class NoticeOfChangeService {
 
     private void validateUserRoles(CaseViewResource caseViewResource, UserInfo userInfo) {
         if (!userInfo.getRoles().contains(PUI_ROLE)) {
-            validate:
-            {
-                for (String role : userInfo.getRoles()) {
-                    Optional<String> jurisdiction = extractJurisdiction(role);
-                    if (jurisdiction.isPresent() && caseViewResource
-                        .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
-                        break validate;
-                    } else if (jurisdiction.isPresent() && !caseViewResource
-                        .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
-                        throw new ValidationException(INSUFFICIENT_PRIVILEGE);
-                    }
+            for (String role : userInfo.getRoles()) {
+                Optional<String> jurisdiction = extractJurisdiction(role);
+                if (jurisdiction.isPresent() && caseViewResource
+                    .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
+                    break;
+                } else if (jurisdiction.isPresent() && !caseViewResource
+                    .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
+                    throw new ValidationException(INSUFFICIENT_PRIVILEGE);
                 }
             }
         }
@@ -169,19 +170,23 @@ public class NoticeOfChangeService {
         if (caseDetails.getCases().isEmpty()) {
             throw new CaseCouldNotBeFetchedException("Case could not be found");
         }
-        Map<String, JsonNode> caseFields = caseDetails.getCases().stream().findFirst().get().getFields();
-        List<SearchResultViewHeader> searchResultViewHeaderList =
-            caseDetails.getHeaders().stream().findFirst().get().getFields();
-        List<SearchResultViewHeader> filteredSearch =
-            searchResultViewHeaderList.stream()
-                .filter(searchResultViewHeader ->
-                            searchResultViewHeader.getCaseFieldTypeDefinition()
-                                .getType().equals(CHANGE_ORG_REQUEST)).collect(Collectors.toList());
-        for (SearchResultViewHeader searchResultViewHeader : filteredSearch) {
-            if (caseFields.containsKey(searchResultViewHeader.getCaseFieldId())) {
-                JsonNode node = caseFields.get(searchResultViewHeader.getCaseFieldId());
-                if (node.findValues(CASE_ROLE_ID) != null) {
-                    throw new ValidationException(NOC_REQUEST_ONGOING);
+        if (caseDetails.getCases().stream().findFirst().isPresent()) {
+            Map<String, JsonNode> caseFields = caseDetails.getCases().stream().findFirst().get().getFields();
+            List<SearchResultViewHeader> searchResultViewHeaderList = new ArrayList<>();
+            if (caseDetails.getHeaders().stream().findFirst().isPresent()) {
+                searchResultViewHeaderList = caseDetails.getHeaders().stream().findFirst().get().getFields();
+            }
+            List<SearchResultViewHeader> filteredSearch =
+                searchResultViewHeaderList.stream()
+                    .filter(searchResultViewHeader ->
+                                searchResultViewHeader.getCaseFieldTypeDefinition()
+                                    .getType().equals(CHANGE_ORG_REQUEST)).collect(Collectors.toList());
+            for (SearchResultViewHeader searchResultViewHeader : filteredSearch) {
+                if (caseFields.containsKey(searchResultViewHeader.getCaseFieldId())) {
+                    JsonNode node = caseFields.get(searchResultViewHeader.getCaseFieldId());
+                    if (node.findValues(CASE_ROLE_ID) != null) {
+                        throw new ValidationException(NOC_REQUEST_ONGOING);
+                    }
                 }
             }
         }

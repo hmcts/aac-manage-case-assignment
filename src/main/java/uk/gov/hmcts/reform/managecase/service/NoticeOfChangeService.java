@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
@@ -13,7 +12,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.Searc
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
-import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
@@ -23,8 +21,8 @@ import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,28 +64,6 @@ public class NoticeOfChangeService {
             }
         });
         return challengeQuestionsResult;
-    }
-
-    public NoCRequestDetails verifyNoticeOfChangeAnswers(VerifyNoCAnswersRequest verifyNoCAnswersRequest) {
-        String caseId = verifyNoCAnswersRequest.getCaseId();
-        NoCRequestDetails noCRequestDetails = challengeQuestions(caseId);
-        SearchResultViewItem caseResult = noCRequestDetails.getSearchResultViewItem();
-
-        String caseRoleId = challengeQuestionService
-            .getMatchingCaseRole(noCRequestDetails.getChallengeQuestionsResult(),
-                verifyNoCAnswersRequest.getAnswers(), caseResult);
-
-        OrganisationPolicy organisationPolicy = findOrganisationPolicyForRole(caseResult, caseRoleId)
-            .orElseThrow(() -> new ValidationException(String.format(
-                "No OrganisationPolicy exists on the case for the case role '%s'", caseRoleId)));
-
-        if (organisationEqualsRequestingUsers(organisationPolicy.getOrganisation())) {
-            throw new ValidationException("The requestor has answered questions uniquely identifying"
-                + " a litigant that they are already representing");
-        }
-
-        noCRequestDetails.setOrganisationPolicy(organisationPolicy);
-        return noCRequestDetails;
     }
 
     public NoCRequestDetails challengeQuestions(String caseId) {
@@ -210,18 +186,5 @@ public class NoticeOfChangeService {
         if (caseViewResource.getCaseViewEvents() == null) {
             throw new ValidationException("no NoC events available for this case type");
         }
-    }
-
-    private Optional<OrganisationPolicy> findOrganisationPolicyForRole(SearchResultViewItem caseResult,
-                                                                       String caseRoleId) {
-        return findPolicies(caseResult).stream()
-            .filter(policy -> policy.getOrgPolicyCaseAssignedRole().equals(caseRoleId))
-            .findFirst();
-    }
-
-    private boolean organisationEqualsRequestingUsers(Organisation organisation) {
-        return organisation != null
-            && prdRepository.findUsersByOrganisation()
-            .getOrganisationIdentifier().equals(organisation.getOrganisationID());
     }
 }

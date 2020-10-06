@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +23,13 @@ import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.DataflowAnomalyAnalysis", "PMD.TooManyMethods"})
 class ChallengeQuestionServiceTest {
+
+    public static final String QUESTION_ID_1 = "QuestionId1";
+    public static final String QUESTION_ID_2 = "QuestionId2";
+    public static final String QUESTION_ID_3 = "QuestionId3";
+    public static final String TEXT = "Text";
 
     @InjectMocks
     private ChallengeQuestionService challengeQuestionService;
@@ -32,16 +37,16 @@ class ChallengeQuestionServiceTest {
     private List<SubmittedChallengeAnswer> answers;
     private SearchResultViewItem caseSearchResult;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
         MockitoAnnotations.initMocks(this);
 
         answers = new ArrayList<>();
-        answers.add(new SubmittedChallengeAnswer("QuestionId1", " T-e xt'VALUE"));
-        answers.add(new SubmittedChallengeAnswer("QuestionId2", "67890"));
-        answers.add(new SubmittedChallengeAnswer("QuestionId3", "1985-07-25"));
+        answers.add(new SubmittedChallengeAnswer(QUESTION_ID_1, " T-e xt'VALUE"));
+        answers.add(new SubmittedChallengeAnswer(QUESTION_ID_2, "67890"));
+        answers.add(new SubmittedChallengeAnswer(QUESTION_ID_3, "1985-07-25"));
 
         caseSearchResult = createCase();
     }
@@ -50,15 +55,15 @@ class ChallengeQuestionServiceTest {
     void shouldSuccessfullyIdentifyMatchingCaseRole() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
-            challengeQuestion("QuestionId1", "${TextField}|${SomeOtherField}:[Claimant],${AnotherField}:[Defendant]",
-                fieldType("Text"))
+            challengeQuestion(QUESTION_ID_1, "${TextField}|${SomeOtherField}:[Claimant],${AnotherField}:[Defendant]",
+                fieldType(TEXT))
         );
         challengeQuestions.add(
-            challengeQuestion("QuestionId2", "${ComplexField.ComplexNestedField.NestedNumberField}:[Claimant],"
+            challengeQuestion(QUESTION_ID_2, "${ComplexField.ComplexNestedField.NestedNumberField}:[Claimant],"
                 + "${AnotherField}:[Defendant]", fieldType("Number"))
         );
         challengeQuestions.add(
-            challengeQuestion("QuestionId3", "${AnotherField}:[Defendant],${NonExistingField}|${DateField}:[Claimant]",
+            challengeQuestion(QUESTION_ID_3, "${AnotherField}:[Defendant],${NonExistingField}|${DateField}:[Claimant]",
                 fieldType("Date"))
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
@@ -73,10 +78,10 @@ class ChallengeQuestionServiceTest {
     void shouldErrorWhenThereAreMoreAnswersThanQuestions() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
-            challengeQuestion("QuestionId1", "${Field1}:[Claimant],${Field1}:[Defendant]", fieldType("Text"))
+            challengeQuestion(QUESTION_ID_1, "${Field1}:[Claimant],${Field1}:[Defendant]", fieldType(TEXT))
         );
         challengeQuestions.add(
-            challengeQuestion("QuestionId2", "${Field2}:[Claimant],${Field2}:[Defendant]", fieldType("Text"))
+            challengeQuestion(QUESTION_ID_2, "${Field2}:[Claimant],${Field2}:[Defendant]", fieldType(TEXT))
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
@@ -92,13 +97,13 @@ class ChallengeQuestionServiceTest {
     void shouldErrorWhenAQuestionHasNotBeenAnswered() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
-            challengeQuestion("OtherQuestionId1", "${Field1}:[Claimant]", fieldType("Text"))
+            challengeQuestion("OtherQuestionId1", "${Field1}:[Claimant]", fieldType(TEXT))
         );
         challengeQuestions.add(
-            challengeQuestion("OtherQuestionId2", "${Field2}:[Claimant]", fieldType("Text"))
+            challengeQuestion("OtherQuestionId2", "${Field2}:[Claimant]", fieldType(TEXT))
         );
         challengeQuestions.add(
-            challengeQuestion("OtherQuestionId3", "${Field3}:[Claimant]", fieldType("Text"))
+            challengeQuestion("OtherQuestionId3", "${Field3}:[Claimant]", fieldType(TEXT))
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
@@ -112,14 +117,14 @@ class ChallengeQuestionServiceTest {
     void shouldErrorWhenAnswersCannotUniquelyIdentifyRole() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
-            challengeQuestion("QuestionId1", "${TextField}:[Claimant],${TextField}:[Defendant]", fieldType("Text"))
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${TextField}:[Defendant]", fieldType(TEXT))
         );
         challengeQuestions.add(
-            challengeQuestion("QuestionId2", "${ComplexField.ComplexNestedField.NestedNumberField}:[Claimant],"
+            challengeQuestion(QUESTION_ID_2, "${ComplexField.ComplexNestedField.NestedNumberField}:[Claimant],"
                 + "${ComplexField.ComplexNestedField.NestedNumberField}:[Defendant]", fieldType("Number"))
         );
         challengeQuestions.add(
-            challengeQuestion("QuestionId3", "${DateField}:[Claimant],${DateField}:[Defendant]", fieldType("Date"))
+            challengeQuestion(QUESTION_ID_3, "${DateField}:[Claimant],${DateField}:[Defendant]", fieldType("Date"))
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
@@ -133,13 +138,13 @@ class ChallengeQuestionServiceTest {
     void shouldErrorWhenAnswersDoNotMatchAnyRole() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
-            challengeQuestion("QuestionId1", "${PhoneUKField}:[Claimant]", fieldType("Text"))
+            challengeQuestion(QUESTION_ID_1, "${PhoneUKField}:[Claimant]", fieldType(TEXT))
         );
         challengeQuestions.add(
-            challengeQuestion("QuestionId2", "${AddressUKField.County}:[Claimant]", fieldType("Text"))
+            challengeQuestion(QUESTION_ID_2, "${AddressUKField.County}:[Claimant]", fieldType(TEXT))
         );
         challengeQuestions.add(
-            challengeQuestion("QuestionId3", "${YesOrNoField}:[Claimant]", fieldType("YesOrNo"))
+            challengeQuestion(QUESTION_ID_3, "${YesOrNoField}:[Claimant]", fieldType("YesOrNo"))
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
@@ -151,9 +156,9 @@ class ChallengeQuestionServiceTest {
 
     @Test
     void shouldSuccessfullyIdentifyRoleWhenFieldValueAndAnswerAreNull() {
-        answers = singletonList(new SubmittedChallengeAnswer("QuestionId1", null));
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, null));
         List<ChallengeQuestion> challengeQuestions = singletonList(
-            challengeQuestion("QuestionId1", "${TextAreaField}:[Claimant]", fieldType("Text"))
+            challengeQuestion(QUESTION_ID_1, "${TextAreaField}:[Claimant]", fieldType(TEXT))
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
@@ -165,9 +170,9 @@ class ChallengeQuestionServiceTest {
 
     @Test
     void shouldSuccessfullyIdentifyRoleWhenFieldIsNotPersistedAndAnswerIsNull() {
-        answers = singletonList(new SubmittedChallengeAnswer("QuestionId1", null));
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, null));
         List<ChallengeQuestion> challengeQuestions = singletonList(
-            challengeQuestion("QuestionId1", "${NonExistingField}:[Claimant]", fieldType("Text"))
+            challengeQuestion(QUESTION_ID_1, "${NonExistingField}:[Claimant]", fieldType(TEXT))
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
@@ -179,9 +184,9 @@ class ChallengeQuestionServiceTest {
 
     @Test
     void shouldErrorWhenFieldIsNullButAnswerProvided() {
-        answers = singletonList(new SubmittedChallengeAnswer("QuestionId1", "Answer"));
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Answer"));
         List<ChallengeQuestion> challengeQuestions = singletonList(
-            challengeQuestion("QuestionId1", "${TextAreaField}:[Claimant]", fieldType("Text"))
+            challengeQuestion(QUESTION_ID_1, "${TextAreaField}:[Claimant]", fieldType(TEXT))
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 

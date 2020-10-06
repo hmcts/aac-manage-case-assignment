@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.TEXT;
 
 @Service
+@SuppressWarnings({"PMD.AvoidLiteralsInIfCondition", "PMD.UseConcurrentHashMap"})
 public class ChallengeQuestionService {
 
     public String getMatchingCaseRole(ChallengeQuestionsResult challengeQuestions,
@@ -31,6 +32,23 @@ public class ChallengeQuestionService {
             getCaseRoleCorrectAnswers(submittedAnswers, challengeQuestions, caseResult);
 
         return getMatchingCaseRole(caseRoleCorrectAnswers, challengeQuestions);
+    }
+
+    private String getMatchingCaseRole(Map<String, Integer> caseRoleCorrectAnswers,
+                                       ChallengeQuestionsResult challengeQuestions) {
+        List<String> matchingCaseRoleIds = caseRoleCorrectAnswers.keySet().stream()
+            .filter(caseRoleId -> caseRoleCorrectAnswers.get(caseRoleId) == challengeQuestions.getQuestions().size())
+            .collect(toList());
+
+        if (matchingCaseRoleIds.isEmpty()) {
+            throw new ValidationException("The answers did not match those for any litigant");
+        }
+
+        if (matchingCaseRoleIds.size() > 1) {
+            throw new ValidationException("The answers did not uniquely identify a litigant");
+        }
+
+        return matchingCaseRoleIds.get(0);
     }
 
     private Map<String, Integer> getCaseRoleCorrectAnswers(List<SubmittedChallengeAnswer> answers,
@@ -75,24 +93,8 @@ public class ChallengeQuestionService {
         }
     }
 
-    private String getMatchingCaseRole(Map<String, Integer> caseRoleCorrectAnswers,
-                                       ChallengeQuestionsResult challengeQuestions) {
-        List<String> matchingCaseRoleIds = caseRoleCorrectAnswers.keySet().stream()
-            .filter(caseRoleId -> caseRoleCorrectAnswers.get(caseRoleId) == challengeQuestions.getQuestions().size())
-            .collect(toList());
-
-        if (matchingCaseRoleIds.isEmpty()) {
-            throw new ValidationException("The answers did not match those for any litigant");
-        }
-
-        if (matchingCaseRoleIds.size() > 1) {
-            throw new ValidationException("The answers did not uniquely identify a litigant");
-        }
-
-        return matchingCaseRoleIds.get(0);
-    }
-
-    private SubmittedChallengeAnswer getSubmittedAnswerForQuestion(List<SubmittedChallengeAnswer> answers, String questionId) {
+    private SubmittedChallengeAnswer getSubmittedAnswerForQuestion(List<SubmittedChallengeAnswer> answers,
+                                                                   String questionId) {
         return answers.stream()
             .filter(a -> a.getQuestionId().equals(questionId))
             .findFirst()

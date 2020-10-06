@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
+import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
@@ -41,9 +42,13 @@ public class NoticeOfChangeController {
     public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
 
     private final NoticeOfChangeService noticeOfChangeService;
+    private final VerifyNoCAnswersService verifyNoCAnswersService;
 
-    public NoticeOfChangeController(NoticeOfChangeService noticeOfChangeService) {
+    public NoticeOfChangeController(NoticeOfChangeService noticeOfChangeService,
+                                    VerifyNoCAnswersService verifyNoCAnswersService) {
         this.noticeOfChangeService = noticeOfChangeService;
+        this.verifyNoCAnswersService = verifyNoCAnswersService;
+
     }
 
     @GetMapping(path = GET_NOC_QUESTIONS, produces = APPLICATION_JSON_VALUE)
@@ -118,12 +123,61 @@ public class NoticeOfChangeController {
         return noticeOfChangeService.getChallengeQuestions(caseId);
     }
 
-    // TODO: Swagger
     @PostMapping(path = VERIFY_NOC_ANSWERS, produces = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Verify Notice of Change answers")
+    @ApiOperation(
+        value = "Verify Notice of Change answers",
+        notes = "Use to validate the answers provided by a user wishing to raise a "
+            + "Notice of Change Request to gain access to a case"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "Notice of Change answers verified successfully.",
+            response = VerifyNoCAnswersResponse.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "    \"organisation\": {\n"
+                        + "        \"OrganisationID\": \"QUK822NA\",\n"
+                        + "        \"OrganisationName\": \"Some Org\"\n"
+                        + "    },\n"
+                        + "    \"status_message\": \"Notice of Change answers verified successfully\"\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:\n"
+                + "- Any of the `400` errors returned by the `Get Notice of Change questions` operation\n"
+                + "- The number of submitted answers does not match the number of questions\n"
+                + "- No answer has been provided for an expected question ID\n"
+                + "- The submitted answers do not match any litigant\n"
+                + "- The submitted answers do not uniquely identify a litigant\n"
+                + "- No organisation policy exists on the case for the identified case role\n"
+                + "- The submitted answers identify a litigant that the requestor is already representing\n",
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "    \"status\": \"BAD_REQUEST\",\n"
+                        + "    \"message\": \"The answers did not match those for any litigant\",\n"
+                        + "    \"errors\": []\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
+        )
+    })
     public VerifyNoCAnswersResponse verifyNoticeOfChangeAnswers(
         @Valid @RequestBody VerifyNoCAnswersRequest verifyNoCAnswersRequest) {
-        NoCRequestDetails result = noticeOfChangeService.verifyNoticeOfChangeAnswers(verifyNoCAnswersRequest);
+        NoCRequestDetails result = verifyNoCAnswersService.verifyNoCAnswers(verifyNoCAnswersRequest);
         return result.toVerifyNoCAnswersResponse(VERIFY_NOC_ANSWERS_MESSAGE);
     }
 

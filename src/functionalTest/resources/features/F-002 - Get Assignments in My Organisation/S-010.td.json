@@ -1,0 +1,16 @@
+{
+	"_guid_": "S-010",
+	"_extends_": "F-002-Base",
+	"title": "Must return an error response for a missing case ID",
+
+	"specs": [
+		"Becky – with a solicitor role with access to invoke the ‘Get Assignments in My Organisation’ operation of Case Assignment Microservice",
+		"is made by Becky",
+		"does not contain any case ID"
+	],
+
+	"expectedResponse": {
+		"_extends_": "ACA_400_Response",
+		"body": null
+	}
+}

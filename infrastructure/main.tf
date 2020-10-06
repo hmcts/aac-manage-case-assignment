@@ -52,4 +52,3 @@ resource "azurerm_key_vault_secret" "aac-manage-case-s2s-secret" {
   value = "${data.azurerm_key_vault_secret.manage-case-s2s-vault-secret.value}"
   key_vault_id = "${module.key-vault.key_vault_id}"
 }
-

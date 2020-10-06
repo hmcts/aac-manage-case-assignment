@@ -18,8 +18,6 @@ management:
 spring:
   application:
     name: Manage Case Assignment
-  banner:
-    location: classpath:manage-case-assignment-banner.txt
   main:
     allow-bean-definition-overriding: true
   cache:
@@ -74,7 +72,3 @@ mca:
   conditional-apis:
     case-assignments:
       enabled: ${MCA_CONDITIONAL_APIS_CASE_ASSIGNMENTS_ENABLED:true}
-
-notify:
-  api-key: ${NOTIFY_MCA_API_KEY:notify-test-api-key}
-  email-template-id: ${NOTIFY_EMAIL_TEMPLATE_ID:a60215dd-08bb-475e-956c-e97fdb7e448c}

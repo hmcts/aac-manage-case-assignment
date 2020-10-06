@@ -3,12 +3,14 @@ package uk.gov.hmcts.reform.managecase.client.definitionstore.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Data
@@ -46,10 +48,9 @@ public class ChallengeQuestion {
 
     private void initAnswersList() {
         answers = new ArrayList<>();
-        String[] potentialAnswers = answerField.split(",");
-
-        for (String potentialAnswer : potentialAnswers) {
-            answers.add(new ChallengeAnswer(potentialAnswer));
+        if (!Strings.isNullOrEmpty(answerField)) {
+            Arrays.stream(answerField.split(","))
+                .forEach(answer -> answers.add(new ChallengeAnswer(answer)));
         }
     }
 }

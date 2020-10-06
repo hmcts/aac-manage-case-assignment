@@ -1,0 +1,25 @@
+{
+  "_guid_": "F-203_Prerequisite_Case_Assignment_C1_Becky_By_CAA",
+  "_extends_": "Prerequisite_Case_Assignment",
+
+  "specs": [
+    "by CAA to grant access to C1 for Becky"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA"
+    },
+    "Becky": {
+      "_extends_": "ACA_Users_Becky"
+    }
+  },
+
+  "request": {
+    "body": {
+      "case_type_id": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][case_type_id]}",
+      "case_id": "${[scenarioContext][siblingContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+      "assignee_id": "${[scenarioContext][testData][users][Becky][id]}"
+    }
+  }
+}

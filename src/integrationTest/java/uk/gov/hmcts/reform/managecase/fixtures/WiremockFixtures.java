@@ -14,10 +14,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.managecase.TestFixtures;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 
 import java.util.List;
@@ -33,7 +36,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.assertj.core.util.Lists.list;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.CASE_USERS;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.SEARCH_CASES;
 
+@SuppressWarnings({"PMD.ExcessiveImports"})
 public final class WiremockFixtures {
 
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
@@ -72,13 +78,15 @@ public final class WiremockFixtures {
 
     public static void stubSearchCaseWithPrefix(String caseTypeId, String searchQuery,
                                                 CaseDetails caseDetails, String prefix) {
-        stubFor(WireMock.post(urlEqualTo(prefix + "/searchCases?ctid=" + caseTypeId))
-                .withRequestBody(equalToJson(searchQuery))
-                .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-                .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-                .willReturn(aResponse()
-                        .withStatus(HTTP_OK).withBody(getJsonString(new CaseSearchResponse(list(caseDetails))))
-                        .withHeader("Content-Type", "application/json")));
+        stubFor(WireMock.post(urlEqualTo(prefix + SEARCH_CASES + "?ctid=" + caseTypeId))
+            .withRequestBody(equalToJson(searchQuery))
+            .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+            .willReturn(aResponse()
+                .withStatus(HTTP_OK)
+                    .withBody(getJsonString(
+                        caseDetails == null ? new CaseSearchResponse() : new CaseSearchResponse(list(caseDetails))))
+                .withHeader("Content-Type", "application/json")));
     }
 
     public static void stubSearchCase(String caseTypeId, String searchQuery, CaseDetails caseDetails) {
@@ -86,18 +94,33 @@ public final class WiremockFixtures {
     }
 
     public static void stubAssignCase(String caseId, String userId, String... caseRoles) {
-        stubFor(WireMock.post(urlEqualTo("/case-users"))
+        stubFor(WireMock.post(urlEqualTo(CASE_USERS))
                 .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                 .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                 .withRequestBody(matchingJsonPath("$.case_users[0].case_id", equalTo(caseId)))
                 .withRequestBody(matchingJsonPath("$.case_users[0].case_role", equalTo(caseRoles[0])))
                 .withRequestBody(matchingJsonPath("$.case_users[0].user_id", equalTo(userId)))
+                .withRequestBody(matchingJsonPath("$.case_users[0].organisation_id",
+                                                  equalTo(TestFixtures.ORGANIZATION_ID)))
                 .willReturn(aResponse().withStatus(HTTP_OK)));
+    }
+
+    public static void stubUnassignCase(List<CaseUserRoleWithOrganisation> unassignments)
+        throws JsonProcessingException {
+
+        stubFor(WireMock.delete(urlEqualTo(CASE_USERS))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .withRequestBody(
+                        equalToJson(OBJECT_MAPPER.writeValueAsString(new CaseUserRolesRequest(unassignments)),
+                                    true,
+                                    false))
+                    .willReturn(aResponse().withStatus(HTTP_OK)));
     }
 
     public static void stubGetCaseAssignments(List<String> caseIds, List<String> userIds,
                                               List<CaseUserRole> caseUserRoles) {
-        stubFor(WireMock.get(urlPathEqualTo("/case-users"))
+        stubFor(WireMock.get(urlPathEqualTo(CASE_USERS))
                 .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                 .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                 .withQueryParam("case_ids", equalTo(caseIds.get(0)))
@@ -116,7 +139,7 @@ public final class WiremockFixtures {
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
-    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
+    @SuppressWarnings({"PMD.AvoidThrowingRawExceptionTypes", "squid:S112"})
     // Required as wiremock's Json.getObjectMapper().registerModule(..); not working
     // see https://github.com/tomakehurst/wiremock/issues/1127
     private static String getJsonString(Object object) {

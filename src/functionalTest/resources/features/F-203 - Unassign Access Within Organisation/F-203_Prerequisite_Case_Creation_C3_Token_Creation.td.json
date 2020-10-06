@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-203_Prerequisite_Case_Creation_C3_Token_Creation",
+  "_extends_": "Prerequisite_Case_Creation_C0_Without_Org_Policies_Token_Creation",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Becky"
+    }
+  }
+}

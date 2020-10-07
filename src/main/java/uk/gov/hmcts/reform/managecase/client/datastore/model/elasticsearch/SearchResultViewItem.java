@@ -6,12 +6,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CommonViewItem;
+import uk.gov.hmcts.reform.managecase.domain.Organisation;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_ID;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_NAME;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_POLICY_CASE_ASSIGNED_ROLE;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_POLICY_REFERENCE;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,5 +34,20 @@ public class SearchResultViewItem implements CommonViewItem {
             .map(node -> node.findParents(ORG_POLICY_CASE_ASSIGNED_ROLE))
             .flatMap(List::stream)
             .collect(Collectors.toList());
+    }
+
+    public List<OrganisationPolicy> findPolicies() {
+        List<JsonNode> policyNodes = findOrganisationPolicyNodes();
+        return policyNodes.stream()
+            .map(node -> {
+                JsonNode org = node.get("Organisation");
+                return OrganisationPolicy.builder()
+                    .organisation(Organisation.builder()
+                        .organisationID(org.get(ORG_ID).asText())
+                        .organisationName(org.get(ORG_NAME).asText())
+                        .build())
+                    .orgPolicyCaseAssignedRole(node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText())
+                    .orgPolicyReference(node.get(ORG_POLICY_REFERENCE).asText()).build();
+            }).collect(Collectors.toList());
     }
 }

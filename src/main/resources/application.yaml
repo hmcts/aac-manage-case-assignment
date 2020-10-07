@@ -1,6 +1,7 @@
 server:
   port: 4454
-
+  error:
+    include-message: always
 management:
   endpoint:
     health:
@@ -34,9 +35,6 @@ spring:
           oidc:
             client-id: internal
             client-secret: internal
-server:
-  error:
-    include-message: always
 idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}

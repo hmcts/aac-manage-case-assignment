@@ -182,7 +182,7 @@ class NoticeOfChangeServiceTest {
         @DisplayName("NoC questions successfully returned for a Solicitor user")
         void shouldReturnQuestionsForSolicitor() {
             UserInfo userInfo = new UserInfo("","","", "", "",
-                                             Arrays.asList("caseworker-Jurisdiction-solicitor"));
+                                             Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicitor"));
             given(securityUtils.getUserInfo()).willReturn(userInfo);
 
             ChallengeQuestionsResult challengeQuestionsResult = service.getChallengeQuestions(CASE_ID);

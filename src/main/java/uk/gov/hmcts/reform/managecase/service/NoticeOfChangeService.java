@@ -154,15 +154,12 @@ public class NoticeOfChangeService {
 
     private void validateUserRoles(CaseViewResource caseViewResource, UserInfo userInfo) {
         if (!userInfo.getRoles().contains(PUI_ROLE)) {
-            for (String role : userInfo.getRoles()) {
+            boolean match = userInfo.getRoles().stream().anyMatch(role -> {
                 Optional<String> jurisdiction = extractJurisdiction(role);
-                if (jurisdiction.isPresent() && caseViewResource
-                    .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
-                    break;
-                } else if (jurisdiction.isPresent() && !caseViewResource
-                    .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
-                    throw new ValidationException(INSUFFICIENT_PRIVILEGE);
-                }
+                return caseViewResource.getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get());
+            });
+            if (!match) {
+                throw new ValidationException(INSUFFICIENT_PRIVILEGE);
             }
         }
     }

@@ -23,7 +23,8 @@ import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.DataflowAnomalyAnalysis", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.DataflowAnomalyAnalysis",
+    "PMD.TooManyMethods", "PMD.UseConcurrentHashMap"})
 class ChallengeAnswerValidatorTest {
 
     public static final String QUESTION_ID_1 = "QuestionId1";

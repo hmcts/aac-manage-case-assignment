@@ -62,7 +62,7 @@ public class NoticeOfChangeControllerTest {
         protected NoticeOfChangeService service;
 
         @MockBean
-        protected VerifyNoCAnswersService VerifyNoCAnswersService;
+        protected VerifyNoCAnswersService verifyNoCAnswersService;
     }
 
     @Nested
@@ -102,7 +102,7 @@ public class NoticeOfChangeControllerTest {
 
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 
-                NoticeOfChangeController controller = new NoticeOfChangeController(service, VerifyNoCAnswersService);
+                NoticeOfChangeController controller = new NoticeOfChangeController(service, verifyNoCAnswersService);
 
                 // ACT
                 ChallengeQuestionsResult response = controller.getNoticeOfChangeQuestions(CASE_ID);

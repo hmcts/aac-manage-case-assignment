@@ -84,7 +84,7 @@ public final class CaseFieldPathUtils {
         List<String> pathElements = getPathElements(path);
         JsonNode topLevelNode = caseData.get(pathElements.get(0));
 
-        return pathElements.size() > 1
+        return pathElements.size() > 1 && topLevelNode != null && !topLevelNode.isNull()
             ? getNestedCaseFieldByPath(topLevelNode, getPathElementsTailAsString(pathElements))
             : topLevelNode;
     }

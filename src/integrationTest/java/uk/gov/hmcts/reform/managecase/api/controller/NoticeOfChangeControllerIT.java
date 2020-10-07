@@ -65,6 +65,7 @@ public class NoticeOfChangeControllerIT {
     private static final String RAW_QUERY = "{\"query\":{\"bool\":{\"filter\":{\"term\":{\"reference\":%s}}}}}";
     private static final String ES_QUERY = String.format(RAW_QUERY, CASE_ID);
     private static final String QUESTION_ID_1 = "QuestionId1";
+    public static final String ORGANISATION_ID = "QUK822N";
     private final Map<String, JsonNode> caseFields = new HashMap<>();
     private final List<SearchResultViewItem> viewItems = new ArrayList<>();
     private static final String ANSWER_FIELD_APPLICANT = "${applicant.individual.fullname}|${applicant.company.name}|"
@@ -179,21 +180,23 @@ public class NoticeOfChangeControllerIT {
     @DisplayName("POST /noc/verify-noc-answers")
     class VerifyNoticeOfChangeQuestions extends BaseTest {
 
+        public static final String ENDPOINT_URL = "/noc" + VERIFY_NOC_ANSWERS;
         @Autowired
         private MockMvc mockMvc;
 
         @Test
         void shouldVerifyNoCAnswersSuccessfully() throws Exception {
-            SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer(QUESTION_ID_1, "quk822n");
+            SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer(QUESTION_ID_1,
+                ORGANISATION_ID.toLowerCase());
             VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, Collections.singletonList(answer));
 
-            this.mockMvc.perform(post("/noc" + VERIFY_NOC_ANSWERS)
+            this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(VERIFY_NOC_ANSWERS_MESSAGE)))
-                .andExpect(jsonPath("$.organisation.OrganisationID", is("QUK822N")))
+                .andExpect(jsonPath("$.organisation.OrganisationID", is(ORGANISATION_ID)))
                 .andExpect(jsonPath("$.organisation.OrganisationName", is("CCD Solicitors Limited")));
         }
 
@@ -202,7 +205,7 @@ public class NoticeOfChangeControllerIT {
             SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer(QUESTION_ID_1, "Incorrect Answer");
             VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, Collections.singletonList(answer));
 
-            this.mockMvc.perform(post("/noc" + VERIFY_NOC_ANSWERS)
+            this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -212,10 +215,10 @@ public class NoticeOfChangeControllerIT {
 
         @Test
         void shouldReturnErrorWhenExpectedQuestionIdIsNotPassed() throws Exception {
-            SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer("UnknownID", "QUK822N");
+            SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer("UnknownID", ORGANISATION_ID);
             VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, Collections.singletonList(answer));
 
-            this.mockMvc.perform(post("/noc" + VERIFY_NOC_ANSWERS)
+            this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())

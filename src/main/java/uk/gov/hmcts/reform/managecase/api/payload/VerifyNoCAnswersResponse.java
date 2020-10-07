@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 
 @Getter
 @AllArgsConstructor
-@ApiModel("Verify NoC Answers Response")
+@ApiModel("Verify Notice of Change Answers Response")
 public class VerifyNoCAnswersResponse {
 
     @JsonProperty("status_message")

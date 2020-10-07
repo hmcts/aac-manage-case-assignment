@@ -19,7 +19,7 @@ import static com.fasterxml.jackson.annotation.Nulls.AS_EMPTY;
 
 @Getter
 @AllArgsConstructor
-@ApiModel("Verify NoC Answers Request")
+@ApiModel("Verify Notice of Change Answers Request")
 public class VerifyNoCAnswersRequest {
 
     @JsonProperty("case_id")

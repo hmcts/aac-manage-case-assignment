@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -27,6 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.DataflowAnomalyAnalysis",
@@ -70,8 +70,7 @@ class VerifyNoCAnswersServiceTest {
     @Test
     void shouldVerifyNoCAnswersSuccessfully() {
         mockPrdResponse("ORGID1");
-        when(challengeAnswerValidator.getMatchingCaseRole(Mockito.any(), Mockito.any(), Mockito.any()))
-            .thenReturn("[Defendant]");
+        when(challengeAnswerValidator.getMatchingCaseRole(any(), any(), any())).thenReturn("[Defendant]");
 
         VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest("1", emptyList());
 
@@ -90,7 +89,7 @@ class VerifyNoCAnswersServiceTest {
 
     @Test
     void shouldErrorWhenIdentifiedCaseRoleDoesNotExistOnCase() {
-        when(challengeAnswerValidator.getMatchingCaseRole(Mockito.any(), Mockito.any(), Mockito.any()))
+        when(challengeAnswerValidator.getMatchingCaseRole(any(), any(), any()))
             .thenReturn("[OtherRole]");
 
         VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest("1", emptyList());
@@ -107,7 +106,7 @@ class VerifyNoCAnswersServiceTest {
     @Test
     void shouldErrorWhenRequestingUserIsInSameOrganisationAsIdentifiedOrgPolicy() {
         mockPrdResponse("QUK822NA");
-        when(challengeAnswerValidator.getMatchingCaseRole(Mockito.any(), Mockito.any(), Mockito.any()))
+        when(challengeAnswerValidator.getMatchingCaseRole(any(), any(), any()))
             .thenReturn("[Defendant]");
 
         VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest("1", emptyList());

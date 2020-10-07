@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
-import uk.gov.hmcts.reform.managecase.api.payload.GetCaseAssignmentsResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
@@ -192,7 +192,7 @@ public class NoticeOfChangeController {
         }
     }
 
-    @GetMapping(path = REQUEST_NOTICE_OF_CHANGE_PATH, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(path = REQUEST_NOTICE_OF_CHANGE_PATH, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Request Notice of Change Event", notes = "Request Notice of Change Event")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponses({
@@ -226,7 +226,12 @@ public class NoticeOfChangeController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
-    public RequestNoticeOfChangeResponse requestNoticeOfChange(@RequestBody NoCRequestDetails noCRequestDetails) {
+    public RequestNoticeOfChangeResponse requestNoticeOfChange(@Valid @RequestBody RequestNoticeOfChangeRequest
+                                                                                        requestNoticeOfChangeRequest) {
+        VerifyNoCAnswersRequest verifyNoCAnswersRequest
+            = new VerifyNoCAnswersRequest(requestNoticeOfChangeRequest.getCaseId(),
+                                          requestNoticeOfChangeRequest.getAnswers());
+        NoCRequestDetails noCRequestDetails = verifyNoCAnswersService.verifyNoCAnswers(verifyNoCAnswersRequest);
         return noticeOfChangeService.requestNoticeOfChange(noCRequestDetails);
     }
 

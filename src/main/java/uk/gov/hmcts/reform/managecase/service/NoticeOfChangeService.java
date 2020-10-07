@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.service;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnsw
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
+import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
@@ -31,6 +33,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.I
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_POLICY_CASE_ASSIGNED_ROLE;
 
 @Service
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
@@ -43,6 +46,8 @@ public class NoticeOfChangeService {
     private static final String CASE_ROLE_ID = "CaseRoleId";
     private static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
     private static final String ORG_POLICY_REFERENCE = "OrgPolicyReference";
+    private static final String ORG_ID = "OrganisationID";
+    private static final String ORG_NAME = "OrganisationName";
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
@@ -130,11 +135,19 @@ public class NoticeOfChangeService {
 
     private List<OrganisationPolicy> findPolicies(SearchResultViewItem caseFields) {
         List<JsonNode> policyNodes = caseFields.findOrganisationPolicyNodes();
-        return policyNodes.stream()
-            .map(node -> OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText())
-                .orgPolicyReference(node.get(ORG_POLICY_REFERENCE).asText()).build())
-            .collect(Collectors.toList());
+        List<OrganisationPolicy> organisationPolicies = policyNodes.stream()
+            .map(node -> {
+                JsonNode org = node.get("Organisation");
+                OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
+                    .organisation(Organisation.builder()
+                                      .organisationID(org.get(ORG_ID).asText())
+                                      .organisationName(org.get(ORG_NAME).asText())
+                                      .build())
+                    .orgPolicyCaseAssignedRole(node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText())
+                    .orgPolicyReference(node.get(ORG_POLICY_REFERENCE).asText()).build();
+                return organisationPolicy;
+            }).collect(Collectors.toList());
+        return organisationPolicies;
     }
 
     private Optional<String> extractJurisdiction(String caseworkerRole) {

@@ -47,7 +47,6 @@ public class NoticeOfChangeController {
                                     VerifyNoCAnswersService verifyNoCAnswersService) {
         this.noticeOfChangeService = noticeOfChangeService;
         this.verifyNoCAnswersService = verifyNoCAnswersService;
-
     }
 
     @GetMapping(path = GET_NOC_QUESTIONS, produces = APPLICATION_JSON_VALUE)

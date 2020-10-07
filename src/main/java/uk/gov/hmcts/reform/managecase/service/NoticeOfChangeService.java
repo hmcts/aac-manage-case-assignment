@@ -134,19 +134,17 @@ public class NoticeOfChangeService {
 
     private List<OrganisationPolicy> findPolicies(SearchResultViewItem caseFields) {
         List<JsonNode> policyNodes = caseFields.findOrganisationPolicyNodes();
-        List<OrganisationPolicy> organisationPolicies = policyNodes.stream()
+        return policyNodes.stream()
             .map(node -> {
                 JsonNode org = node.get("Organisation");
-                OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
+                return OrganisationPolicy.builder()
                     .organisation(Organisation.builder()
                                       .organisationID(org.get(ORG_ID).asText())
                                       .organisationName(org.get(ORG_NAME).asText())
                                       .build())
                     .orgPolicyCaseAssignedRole(node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText())
                     .orgPolicyReference(node.get(ORG_POLICY_REFERENCE).asText()).build();
-                return organisationPolicy;
             }).collect(Collectors.toList());
-        return organisationPolicies;
     }
 
     private Optional<String> extractJurisdiction(String caseworkerRole) {

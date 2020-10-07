@@ -64,6 +64,7 @@ public class NoticeOfChangeControllerIT {
 
     private static final String RAW_QUERY = "{\"query\":{\"bool\":{\"filter\":{\"term\":{\"reference\":%s}}}}}";
     private static final String ES_QUERY = String.format(RAW_QUERY, CASE_ID);
+    private static final String QUESTION_ID_1 = "QuestionId1";
     private final Map<String, JsonNode> caseFields = new HashMap<>();
     private final List<SearchResultViewItem> viewItems = new ArrayList<>();
     private static final String ANSWER_FIELD_APPLICANT = "${applicant.individual.fullname}|${applicant.company.name}|"
@@ -133,7 +134,7 @@ public class NoticeOfChangeControllerIT {
             null,
             "NoC",
             ANSWER_FIELD_APPLICANT,
-            "QuestionId1",
+            QUESTION_ID_1,
             null);
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
             Arrays.asList(challengeQuestion));
@@ -183,7 +184,7 @@ public class NoticeOfChangeControllerIT {
 
         @Test
         void shouldVerifyNoCAnswersSuccessfully() throws Exception {
-            SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer("QuestionId1", "quk822n");
+            SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer(QUESTION_ID_1, "quk822n");
             VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, Collections.singletonList(answer));
 
             this.mockMvc.perform(post("/noc" + VERIFY_NOC_ANSWERS)
@@ -191,12 +192,14 @@ public class NoticeOfChangeControllerIT {
                 .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(VERIFY_NOC_ANSWERS_MESSAGE)));
+                .andExpect(jsonPath("$.status_message", is(VERIFY_NOC_ANSWERS_MESSAGE)))
+                .andExpect(jsonPath("$.organisation.OrganisationID", is("QUK822N")))
+                .andExpect(jsonPath("$.organisation.OrganisationName", is("CCD Solicitors Limited")));
         }
 
         @Test
         void shouldReturnErrorForIncorrectAnswer() throws Exception {
-            SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer("QuestionId1", "Incorrect Answer");
+            SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer(QUESTION_ID_1, "Incorrect Answer");
             VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, Collections.singletonList(answer));
 
             this.mockMvc.perform(post("/noc" + VERIFY_NOC_ANSWERS)

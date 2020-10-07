@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -48,22 +47,29 @@ class VerifyNoCAnswersServiceTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
+    private SearchResultViewItem searchResultViewItem;
+    private ChallengeQuestionsResult challengeQuestionsResult;
+    private CaseViewResource caseViewResource;
 
-    @Test
-    void shouldVerifyNoCAnswersSuccessfully() throws JsonProcessingException {
-        SearchResultViewItem searchResultViewItem = createCase();
-        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult();
-        CaseViewResource caseViewResource = new CaseViewResource();
+    @BeforeEach
+    void setUp() throws JsonProcessingException {
+        MockitoAnnotations.initMocks(this);
+
+        searchResultViewItem = createCase();
+        challengeQuestionsResult = new ChallengeQuestionsResult();
+        caseViewResource = new CaseViewResource();
         NoCRequestDetails details = NoCRequestDetails.builder()
             .searchResultViewItem(searchResultViewItem)
             .challengeQuestionsResult(challengeQuestionsResult)
             .caseViewResource(caseViewResource)
             .build();
+
         when(noticeOfChangeService.challengeQuestions("1")).thenReturn(details);
+    }
+
+    @Test
+    void shouldVerifyNoCAnswersSuccessfully() {
+        mockPrdResponse("ORGID1");
         when(challengeAnswerValidator.getMatchingCaseRole(Mockito.any(), Mockito.any(), Mockito.any()))
             .thenReturn("[Defendant]");
 
@@ -74,9 +80,8 @@ class VerifyNoCAnswersServiceTest {
         assertAll(
             () -> assertThat(result.getOrganisationPolicy().getOrgPolicyCaseAssignedRole(), is("[Defendant]")),
             () -> assertThat(result.getOrganisationPolicy().getOrgPolicyReference(), is("DefendantPolicy")),
-            // Uncoment below after ACA-71
-            // () -> assertThat(result.getOrganisationPolicy().getOrganisation().getOrganisationID(), is("QUK822NA")),
-            // () -> assertThat(result.getOrganisationPolicy().getOrganisation().getOrganisationName(), is("SomeOrg")),
+            () -> assertThat(result.getOrganisationPolicy().getOrganisation().getOrganisationID(), is("QUK822NA")),
+            () -> assertThat(result.getOrganisationPolicy().getOrganisation().getOrganisationName(), is("SomeOrg")),
             () -> assertThat(result.getSearchResultViewItem(), is(searchResultViewItem)),
             () -> assertThat(result.getChallengeQuestionsResult(), is(challengeQuestionsResult)),
             () -> assertThat(result.getCaseViewResource(), is(caseViewResource))
@@ -84,16 +89,7 @@ class VerifyNoCAnswersServiceTest {
     }
 
     @Test
-    void shouldErrorWhenIdentifiedCaseRoleDoesNotExistOnCase() throws JsonProcessingException {
-        SearchResultViewItem searchResultViewItem = createCase();
-        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult();
-        CaseViewResource caseViewResource = new CaseViewResource();
-        NoCRequestDetails details = NoCRequestDetails.builder()
-            .searchResultViewItem(searchResultViewItem)
-            .challengeQuestionsResult(challengeQuestionsResult)
-            .caseViewResource(caseViewResource)
-            .build();
-        when(noticeOfChangeService.challengeQuestions("1")).thenReturn(details);
+    void shouldErrorWhenIdentifiedCaseRoleDoesNotExistOnCase() {
         when(challengeAnswerValidator.getMatchingCaseRole(Mockito.any(), Mockito.any(), Mockito.any()))
             .thenReturn("[OtherRole]");
 
@@ -108,22 +104,11 @@ class VerifyNoCAnswersServiceTest {
         );
     }
 
-    @Disabled // Requires ACA-71 fix
     @Test
-    void shouldErrorWhenRequestingUserIsInSameOrganisationAsIdentifiedOrgPolicy() throws JsonProcessingException {
-        SearchResultViewItem searchResultViewItem = createCase();
-        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult();
-        CaseViewResource caseViewResource = new CaseViewResource();
-        NoCRequestDetails details = NoCRequestDetails.builder()
-            .searchResultViewItem(searchResultViewItem)
-            .challengeQuestionsResult(challengeQuestionsResult)
-            .caseViewResource(caseViewResource)
-            .build();
-        FindUsersByOrganisationResponse prdOrgResponse = new FindUsersByOrganisationResponse(emptyList(), "QUK822NA");
-        when(noticeOfChangeService.challengeQuestions("1")).thenReturn(details);
+    void shouldErrorWhenRequestingUserIsInSameOrganisationAsIdentifiedOrgPolicy() {
+        mockPrdResponse("QUK822NA");
         when(challengeAnswerValidator.getMatchingCaseRole(Mockito.any(), Mockito.any(), Mockito.any()))
             .thenReturn("[Defendant]");
-        when(prdRepository.findUsersByOrganisation()).thenReturn(prdOrgResponse);
 
         VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest("1", emptyList());
 
@@ -134,6 +119,12 @@ class VerifyNoCAnswersServiceTest {
             () -> assertThat(exception.getMessage(), is("The requestor has answered questions uniquely identifying"
                 + " a litigant that they are already representing"))
         );
+    }
+
+    private void mockPrdResponse(String organisationId) {
+        FindUsersByOrganisationResponse prdOrgResponse =
+            new FindUsersByOrganisationResponse(emptyList(), organisationId);
+        when(prdRepository.findUsersByOrganisation()).thenReturn(prdOrgResponse);
     }
 
     private SearchResultViewItem createCase() throws JsonProcessingException {

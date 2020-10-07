@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnsw
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
-import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;

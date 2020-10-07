@@ -200,6 +200,9 @@ repositories {
   maven {
     url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/'
   }
+  maven {
+    url  "https://dl.bintray.com/gov-uk-notify/maven"
+  }
 }
 
 def versions = [
@@ -229,6 +232,7 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
+  implementation group: 'org.springframework.retry', name: 'spring-retry'
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
@@ -257,6 +261,7 @@ dependencies {
 
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
   implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'
+  implementation 'uk.gov.service.notify:notifications-java-client:3.15.1-RELEASE'
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
@@ -279,7 +284,7 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.1.0'
+  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.9.0'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath

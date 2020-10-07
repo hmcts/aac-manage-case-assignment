@@ -181,6 +181,23 @@ class NoticeOfChangeServiceTest {
         @Test
         @DisplayName("NoC questions successfully returned for a Solicitor user")
         void shouldReturnQuestionsForSolicitor() {
+            UserInfo userInfo = new UserInfo("","","", "", "",
+                                             Arrays.asList("caseworker-Jurisdiction-solicitor"));
+            given(securityUtils.getUserInfo()).willReturn(userInfo);
+
+            ChallengeQuestionsResult challengeQuestionsResult = service.getChallengeQuestions(CASE_ID);
+
+            assertThat(challengeQuestionsResult).isNotNull();
+            assertThat(challengeQuestionsResult.getQuestions().get(0).getCaseTypeId()).isEqualTo(CASE_TYPE_ID);
+            assertThat(challengeQuestionsResult.getQuestions().get(0).getOrder()).isEqualTo(1);
+            assertThat(challengeQuestionsResult.getQuestions().get(0).getQuestionText()).isEqualTo(QUESTION_TEXT);
+            assertThat(challengeQuestionsResult.getQuestions().get(0).getChallengeQuestionId())
+                .isEqualTo(CHALLENGE_QUESTION);
+        }
+
+        @Test
+        @DisplayName("NoC questions successfully returned for a Admin user")
+        void shouldReturnQuestionsForAdmin() {
             ChallengeQuestionsResult challengeQuestionsResult = service.getChallengeQuestions(CASE_ID);
 
             assertThat(challengeQuestionsResult).isNotNull();

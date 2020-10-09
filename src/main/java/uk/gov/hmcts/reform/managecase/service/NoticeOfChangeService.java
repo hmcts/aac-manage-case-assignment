@@ -52,6 +52,8 @@ public class NoticeOfChangeService {
     private static final String PENDING = "PENDING";
     private static final String CHALLENGE_QUESTION_ID = "NoCChallenge";
     private static final String CASE_ROLE_ID = "CaseRoleId";
+    private static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
+    private static final String ORG_POLICY_REFERENCE = "OrgPolicyReference";
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;

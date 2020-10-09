@@ -96,7 +96,7 @@ public class ChallengeAnswerValidator {
     private SubmittedChallengeAnswer getSubmittedAnswerForQuestion(List<SubmittedChallengeAnswer> answers,
                                                                    String questionId) {
         return answers.stream()
-            .filter(a -> a.getQuestionId().equals(questionId))
+            .filter(answer -> answer.getQuestionId().equals(questionId))
             .findFirst()
             .orElseThrow(() -> new ValidationException(String.format(
                 "No answer has been provided for question ID '%s'", questionId)));

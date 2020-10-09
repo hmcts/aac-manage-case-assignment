@@ -11,13 +11,13 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 
 @Getter
 @AllArgsConstructor
-@ApiModel("Verify NoC Answers Response")
+@ApiModel("Verify Notice of Change Answers Response")
 public class VerifyNoCAnswersResponse {
 
     @JsonProperty("status_message")
-    @ApiModelProperty(value = "Domain Status Message", required = true, example = VERIFY_NOC_ANSWERS_MESSAGE)
+    @ApiModelProperty(value = "Domain status message", required = true, example = VERIFY_NOC_ANSWERS_MESSAGE)
     private String status;
 
-    @ApiModelProperty(value = "Organisation", required = true)
+    @ApiModelProperty(value = "Organisation for identified case role", required = true)
     private Organisation organisation;
 }

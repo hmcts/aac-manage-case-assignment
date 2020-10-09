@@ -20,10 +20,12 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.DataflowAnomalyAnalysis", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.DataflowAnomalyAnalysis",
+    "PMD.TooManyMethods", "PMD.UseConcurrentHashMap"})
 class ChallengeAnswerValidatorTest {
 
     public static final String QUESTION_ID_1 = "QuestionId1";
@@ -71,7 +73,7 @@ class ChallengeAnswerValidatorTest {
         String result = challengeAnswerValidator
             .getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult);
 
-        assertEquals("[Claimant]", result);
+        assertThat(result, is("[Claimant]"));
     }
 
     @Test
@@ -88,9 +90,8 @@ class ChallengeAnswerValidatorTest {
         ValidationException exception = assertThrows(ValidationException.class,
             () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
 
-        assertEquals(
-            "The number of provided answers must match the number of questions - expected 2 answers, received 3",
-            exception.getMessage());
+        assertThat(exception.getMessage(),
+            is("The number of provided answers must match the number of questions - expected 2 answers, received 3"));
     }
 
     @Test
@@ -110,7 +111,7 @@ class ChallengeAnswerValidatorTest {
         ValidationException exception = assertThrows(ValidationException.class,
             () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
 
-        assertEquals("No answer has been provided for question ID 'OtherQuestionId1'", exception.getMessage());
+        assertThat(exception.getMessage(), is("No answer has been provided for question ID 'OtherQuestionId1'"));
     }
 
     @Test
@@ -131,7 +132,7 @@ class ChallengeAnswerValidatorTest {
         ValidationException exception = assertThrows(ValidationException.class,
             () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
 
-        assertEquals("The answers did not uniquely identify a litigant", exception.getMessage());
+        assertThat(exception.getMessage(), is("The answers did not uniquely identify a litigant"));
     }
 
     @Test
@@ -151,7 +152,7 @@ class ChallengeAnswerValidatorTest {
         ValidationException exception = assertThrows(ValidationException.class,
             () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
 
-        assertEquals("The answers did not match those for any litigant", exception.getMessage());
+        assertThat(exception.getMessage(), is("The answers did not match those for any litigant"));
     }
 
     @Test
@@ -165,7 +166,7 @@ class ChallengeAnswerValidatorTest {
         String result = challengeAnswerValidator
             .getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult);
 
-        assertEquals("[Claimant]", result);
+        assertThat(result, is("[Claimant]"));
     }
 
     @Test
@@ -179,7 +180,7 @@ class ChallengeAnswerValidatorTest {
         String result = challengeAnswerValidator
             .getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult);
 
-        assertEquals("[Claimant]", result);
+        assertThat(result, is("[Claimant]"));
     }
 
     @Test
@@ -193,7 +194,7 @@ class ChallengeAnswerValidatorTest {
         ValidationException exception = assertThrows(ValidationException.class,
             () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
 
-        assertEquals("The answers did not match those for any litigant", exception.getMessage());
+        assertThat(exception.getMessage(), is("The answers did not match those for any litigant"));
     }
 
     private ChallengeQuestion challengeQuestion(String questionId, String answerField, FieldType answerFieldType) {

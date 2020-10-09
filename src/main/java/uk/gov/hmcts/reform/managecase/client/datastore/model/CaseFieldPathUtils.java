@@ -80,11 +80,18 @@ public final class CaseFieldPathUtils {
                       pathIncludesParent ? getPathElementsTail(pathElements) : pathElements);
     }
 
+    /**
+     * Find a case field JsonNode within case data by its case field path.
+     *
+     * @param caseData The complete case data
+     * @param path The full stop (".") separated path e.g. Field.NestedLevel1.NestedLevel2
+     * @return The node for the path; null if no node exists
+     */
     public static JsonNode getNestedCaseFieldByPath(Map<String, JsonNode> caseData, String path) {
         List<String> pathElements = getPathElements(path);
         JsonNode topLevelNode = caseData.get(pathElements.get(0));
 
-        return pathElements.size() > 1
+        return pathElements.size() > 1 && topLevelNode != null && !topLevelNode.isNull()
             ? getNestedCaseFieldByPath(topLevelNode, getPathElementsTailAsString(pathElements))
             : topLevelNode;
     }

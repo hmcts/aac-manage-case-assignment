@@ -211,7 +211,8 @@ public class NoticeOfChangeControllerTest {
             submittedAnswerList = List.of(new SubmittedChallengeAnswer("question", "value"));
             requestNoticeOfChangeRequest = new RequestNoticeOfChangeRequest(CASE_ID, submittedAnswerList);
 
-            given(verifyNoCAnswersService.verifyNoCAnswers(any(VerifyNoCAnswersRequest.class))).willReturn(noCRequestDetails);
+            given(verifyNoCAnswersService.verifyNoCAnswers(any(VerifyNoCAnswersRequest.class)))
+                .willReturn(noCRequestDetails);
             given(service.requestNoticeOfChange(noCRequestDetails)).willReturn(requestNoticeOfChangeResponse);
         }
 
@@ -272,7 +273,8 @@ public class NoticeOfChangeControllerTest {
         @Test
         void shouldFailWithBadRequestForEmptySubmittedAnswerList() throws Exception {
             requestNoticeOfChangeRequest = new RequestNoticeOfChangeRequest("12345", Collections.emptyList());
-            postCallShouldReturnBadRequestWithErrorMessage(requestNoticeOfChangeRequest, CHALLENGE_QUESTION_ANSWERS_EMPTY);
+            postCallShouldReturnBadRequestWithErrorMessage(requestNoticeOfChangeRequest,
+                                                           CHALLENGE_QUESTION_ANSWERS_EMPTY);
         }
 
         private void postCallShouldReturnBadRequestWithErrorMessage(

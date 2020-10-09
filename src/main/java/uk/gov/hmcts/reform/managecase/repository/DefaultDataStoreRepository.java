@@ -1,13 +1,9 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -23,6 +19,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.Event;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
+import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +28,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
+@SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
 public class DefaultDataStoreRepository implements DataStoreRepository {
 
     static final String NOC_REQUEST_DESCRIPTION = "Notice of Change Request Event";
@@ -52,13 +50,13 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     public static final String CHANGE_ORGANISATION_REQUEST = "ChangeOrganisationRequest";
 
     private final DataStoreApiClient dataStoreApi;
-    private final ObjectMapper objectMapper;
+    private final JacksonUtils jacksonUtils;
 
     @Autowired
     public DefaultDataStoreRepository(DataStoreApiClient dataStoreApi,
-                                      @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper) {
+                                      JacksonUtils jacksonUtils) {
         this.dataStoreApi = dataStoreApi;
-        this.objectMapper = objectMapper;
+        this.jacksonUtils = jacksonUtils;
     }
 
     @Override
@@ -140,15 +138,10 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     private Map<String, JsonNode> getCaseDataContentData(ChangeOrganisationRequest changeOrganisationRequest) {
-        final JsonNodeFactory jsonNodeFactory = new JsonNodeFactory(false);
         Map<String, JsonNode> data = new HashMap<>();
 
-        try {
-            data.put(CHANGE_ORGANISATION_REQUEST,
-                     jsonNodeFactory.textNode(objectMapper.writeValueAsString(changeOrganisationRequest)));
-        } catch (JsonProcessingException jpe) {
-            LOG.info("Failed to create ChangeOrganisationRequest JSON", jpe);
-        }
+        data.put(CHANGE_ORGANISATION_REQUEST, jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
+
         return data;
     }
 

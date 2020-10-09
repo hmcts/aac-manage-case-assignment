@@ -29,11 +29,15 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient
 )
 public interface DataStoreApiClient {
 
+    String CASE_ID = "caseId";
+    String CASE_TYPE_ID = "ctid";
+
     @PostMapping(value = SEARCH_CASES, consumes = APPLICATION_JSON_VALUE)
-    CaseSearchResponse searchCases(@RequestParam("ctid") String caseTypeId,  @RequestBody String jsonSearchRequest);
+    CaseSearchResponse searchCases(@RequestParam(CASE_TYPE_ID) String caseTypeId,
+                                   @RequestBody String jsonSearchRequest);
 
     @PostMapping(value = INTERNAL_SEARCH_CASES, consumes = APPLICATION_JSON_VALUE)
-    CaseSearchResultViewResource internalSearchCases(@RequestParam("ctid") String caseTypeId,
+    CaseSearchResultViewResource internalSearchCases(@RequestParam(CASE_TYPE_ID) String caseTypeId,
                                                      @RequestParam ("use_case") Optional<String> useCase,
                                                      @RequestBody String jsonSearchRequest);
 
@@ -45,13 +49,13 @@ public interface DataStoreApiClient {
                                             @RequestParam("user_ids") List<String> userIds);
 
     @GetMapping(INTERNAL_CASES)
-    CaseViewResource getCaseDetailsByCaseId(@PathVariable("caseId") String caseId);
+    CaseViewResource getCaseDetailsByCaseId(@PathVariable(CASE_ID) String caseId);
 
     @DeleteMapping(value = CASE_USERS, consumes = APPLICATION_JSON_VALUE)
     void removeCaseUserRoles(@RequestBody CaseUserRolesRequest userRolesRequest);
 
     @GetMapping(START_EVENT_TRIGGER)
-    StartEventResource getStartEventTrigger(@PathVariable("caseId") String caseId,
+    StartEventResource getStartEventTrigger(@PathVariable(CASE_ID) String caseId,
                                             @PathVariable("eventId") String eventId);
 
     @PostMapping(SUBMIT_EVENT_FOR_CASE)

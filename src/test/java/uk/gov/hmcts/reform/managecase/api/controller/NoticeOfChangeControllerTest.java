@@ -5,14 +5,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
@@ -22,6 +25,8 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
+import uk.gov.hmcts.reform.managecase.domain.Organisation;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
@@ -31,12 +36,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -47,6 +57,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
@@ -192,7 +204,102 @@ public class NoticeOfChangeControllerTest {
     }
 
     @Nested
-    @DisplayName("POST /nocc/noc-requests")
+    @DisplayName("GET /noc/verify-noc-answers")
+    @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
+    class VerifyNoticeOfChangeAnswers extends BaseMvcTest {
+
+        private static final String ENDPOINT_URL = "/noc" + VERIFY_NOC_ANSWERS;
+
+        private static final String QUESTION_ID = "QuestionId";
+        private static final String ANSWER_VALUE = "Answer";
+
+        private VerifyNoCAnswersRequest request;
+
+        @BeforeEach
+        void setUp() {
+            request = new VerifyNoCAnswersRequest(CASE_ID,
+                singletonList(new SubmittedChallengeAnswer(QUESTION_ID, ANSWER_VALUE)));
+            NoCRequestDetails noCRequestDetails = NoCRequestDetails.builder()
+                .organisationPolicy(OrganisationPolicy.builder()
+                    .organisation(new Organisation("OrganisationID", "OrganisationName"))
+                    .build())
+                .build();
+            given(verifyNoCAnswersService.verifyNoCAnswers(any(VerifyNoCAnswersRequest.class)))
+                .willReturn(noCRequestDetails);
+        }
+
+        @DisplayName("should verify challenge answers successfully for a valid request")
+        @Test
+        void shouldVerifyChallengeAnswers() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status_message", is(VERIFY_NOC_ANSWERS_MESSAGE)));
+        }
+
+        @DisplayName("should delegate to service domain for a valid request")
+        @Test
+        void shouldDelegateToServiceDomain() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+            ArgumentCaptor<VerifyNoCAnswersRequest> captor = ArgumentCaptor.forClass(VerifyNoCAnswersRequest.class);
+            verify(verifyNoCAnswersService).verifyNoCAnswers(captor.capture());
+            assertThat(captor.getValue().getCaseId()).isEqualTo(CASE_ID);
+            assertThat(captor.getValue().getAnswers().size()).isEqualTo(1);
+            assertThat(captor.getValue().getAnswers().get(0).getQuestionId()).isEqualTo(QUESTION_ID);
+            assertThat(captor.getValue().getAnswers().get(0).getValue()).isEqualTo(ANSWER_VALUE);
+        }
+
+        @DisplayName("should fail with 400 bad request when case id is null")
+        @Test
+        void shouldFailWithBadRequestWhenCaseIdIsNull() throws Exception {
+            request = new VerifyNoCAnswersRequest(null,
+                singletonList(new SubmittedChallengeAnswer(QUESTION_ID, ANSWER_VALUE)));
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_EMPTY)));
+        }
+
+        @DisplayName("should fail with 400 bad request when case id is an invalid Luhn number")
+        @Test
+        void shouldFailWithBadRequestWhenCaseIdIsInvalidLuhnNumber() throws Exception {
+            request = new VerifyNoCAnswersRequest("123",
+                singletonList(new SubmittedChallengeAnswer(QUESTION_ID, ANSWER_VALUE)));
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors", hasSize(2)))
+                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_INVALID_LENGTH)))
+                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_INVALID)));
+        }
+
+        @DisplayName("should fail with 400 bad request when no challenge answers are provided")
+        @Test
+        void shouldFailWithBadRequestWhenSubmittedAnswersIsEmpty() throws Exception {
+            request = new VerifyNoCAnswersRequest(CASE_ID, emptyList());
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CHALLENGE_QUESTION_ANSWERS_EMPTY)));
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /noc/noc-requests")
     @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
     class PostNoticeOfChangeRequest extends BaseMvcTest {
 
@@ -285,7 +392,6 @@ public class NoticeOfChangeControllerTest {
                                      .content(objectMapper.writeValueAsString(requestNoticeOfChangeRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasItem(caseIdInvalid)));
-            ;
         }
     }
 }

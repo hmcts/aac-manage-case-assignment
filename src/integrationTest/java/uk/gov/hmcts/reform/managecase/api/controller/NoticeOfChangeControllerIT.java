@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -180,14 +181,15 @@ public class NoticeOfChangeControllerIT {
     @DisplayName("POST /noc/verify-noc-answers")
     class VerifyNoticeOfChangeQuestions extends BaseTest {
 
-        public static final String ENDPOINT_URL = "/noc" + VERIFY_NOC_ANSWERS;
+        private static final String ENDPOINT_URL = "/noc" + VERIFY_NOC_ANSWERS;
+
         @Autowired
         private MockMvc mockMvc;
 
         @Test
         void shouldVerifyNoCAnswersSuccessfully() throws Exception {
             SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer(QUESTION_ID_1,
-                ORGANISATION_ID.toLowerCase());
+                ORGANISATION_ID.toLowerCase(Locale.getDefault()));
             VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, Collections.singletonList(answer));
 
             this.mockMvc.perform(post(ENDPOINT_URL)

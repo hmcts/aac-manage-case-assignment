@@ -12,7 +12,7 @@ public class DataStoreApiClientConfig {
     public static final String INTERNAL_SEARCH_CASES = "/internal/searchCases";
     public static final String CASE_USERS = "/case-users";
     public static final String INTERNAL_CASES = "/internal/cases/{caseId}";
-    public static final String START_EVENT_TRIGGER = CASES_WITH_ID + "/event-triggers/{eventId}";
+    public static final String START_EVENT_TRIGGER = "internal/" + CASES_WITH_ID + "/event-triggers/{eventId}";
     public static final String SUBMIT_EVENT_FOR_CASE = CASES_WITH_ID + "/events";
 
     @Bean

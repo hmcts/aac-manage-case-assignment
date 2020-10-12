@@ -16,8 +16,11 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
-import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPage;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPageComplexFieldOverride;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
@@ -110,26 +113,62 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                                            ChangeOrganisationRequest changeOrganisationRequest) {
 
         CaseResource caseResource = null;
-        StartEventResource startEventResource = dataStoreApi.getStartEventTrigger(caseId, eventId);
+        CaseUpdateViewEvent caseUpdateViewEvent = dataStoreApi.getStartEventTrigger(caseId, eventId);
 
-        if (startEventResource != null && startEventResource.getToken() != null) {
-            Event event = Event.builder()
-                .eventId(eventId)
-                .description(NOC_REQUEST_DESCRIPTION)
-                .build();
+        if (caseUpdateViewEvent != null) {
+            String approvalStatusDefaultValue = getApprovalStatusDefaultValue(caseUpdateViewEvent);
 
-            CaseDataContent caseDataContent = CaseDataContent.builder()
-                .token(startEventResource.getToken())
-                .event(event)
-                .data(getCaseDataContentData(changeOrganisationRequest))
-                .build();
+            if (caseUpdateViewEvent.getEventToken() != null && approvalStatusDefaultValue != null) {
+                Event event = Event.builder()
+                    .eventId(eventId)
+                    .description(NOC_REQUEST_DESCRIPTION)
+                    .build();
 
-            caseResource = dataStoreApi.submitEventForCase(caseId, caseDataContent);
-        } else {
-            LOG.info("Failed to get token from start event");
+                CaseDataContent caseDataContent = CaseDataContent.builder()
+                    .token(caseUpdateViewEvent.getEventToken())
+                    .event(event)
+                    .data(getCaseDataContentData(approvalStatusDefaultValue, changeOrganisationRequest))
+                    .build();
+
+                caseResource = dataStoreApi.submitEventForCase(caseId, caseDataContent);
+            } else {
+                LOG.info("Failed to get token from start event");
+            }
+        }
+        return caseResource;
+    }
+
+    private String getApprovalStatusDefaultValue(CaseUpdateViewEvent caseUpdateViewEvent) {
+
+        String returnValue = null;
+        Optional<CaseViewField> caseViewField = Optional.empty();
+
+        if (caseUpdateViewEvent.getCaseFields() != null) {
+            caseViewField = caseUpdateViewEvent.getCaseFields().stream()
+                .filter(cvf -> cvf.getFieldTypeDefinition().getId().equals(CHANGE_ORGANISATION_REQUEST))
+                .findFirst();
         }
 
-        return caseResource;
+        if (caseViewField.isPresent()) {
+            String caseFieldId = caseViewField.get().getId();
+            String approvalStatusFieldId = caseFieldId + ".ApprovalStatus";
+            Optional<WizardPage> optionalWizardPage = caseUpdateViewEvent.getWizardPages().stream().findFirst();
+
+            if (optionalWizardPage.isPresent()) {
+                WizardPage wizardPage = optionalWizardPage.get();
+                Optional<WizardPageComplexFieldOverride> filteredWizardPageField =
+                    wizardPage.getWizardPageFields().stream()
+                    .filter(wizardPageField -> wizardPageField.getCaseFieldId().equals(caseFieldId)
+                        && wizardPageField.getComplexFieldOverride(approvalStatusFieldId).isPresent())
+                    .map(wizardPageField -> wizardPageField.getComplexFieldOverride(approvalStatusFieldId).get())
+                    .findFirst();
+                if (filteredWizardPageField.isPresent()) {
+                    returnValue = filteredWizardPageField.get().getDefaultValue();
+                }
+            }
+        }
+
+        return returnValue;
     }
 
     @Override
@@ -137,10 +176,11 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(caseId);
     }
 
-    private Map<String, JsonNode> getCaseDataContentData(ChangeOrganisationRequest changeOrganisationRequest) {
+    private Map<String, JsonNode> getCaseDataContentData(String caseFieldId,
+                                                         ChangeOrganisationRequest changeOrganisationRequest) {
         Map<String, JsonNode> data = new HashMap<>();
 
-        data.put(CHANGE_ORGANISATION_REQUEST, jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
+        data.put(caseFieldId, jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
 
         return data;
     }

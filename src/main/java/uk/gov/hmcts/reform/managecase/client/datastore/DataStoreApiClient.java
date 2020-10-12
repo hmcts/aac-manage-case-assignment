@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 
@@ -55,14 +56,14 @@ public interface DataStoreApiClient {
     void removeCaseUserRoles(@RequestBody CaseUserRolesRequest userRolesRequest);
 
     @GetMapping(START_EVENT_TRIGGER)
-    StartEventResource getStartEventTrigger(@PathVariable(CASE_ID) String caseId,
-                                            @PathVariable("eventId") String eventId);
+    CaseUpdateViewEvent getStartEventTrigger(@PathVariable(CASE_ID) String caseId,
+                                                   @PathVariable("eventId") String eventId);
 
     @PostMapping(SUBMIT_EVENT_FOR_CASE)
     CaseResource submitEventForCase(@PathVariable("caseId") String caseId,
                                     @RequestBody CaseDataContent caseDataContent);
 
     @GetMapping(CASES_WITH_ID)
-    CaseResource getCaseDetailsByCaseIdViaExternalApi(@PathVariable("caseId") String caseId);
+    CaseResource getCaseDetailsByCaseIdViaExternalApi(@PathVariable(CASE_ID) String caseId);
 
 }

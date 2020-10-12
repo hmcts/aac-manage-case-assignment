@@ -40,13 +40,14 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.I
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
 
 @Service
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 public class NoticeOfChangeService {
 
     public static final String PUI_ROLE = "pui-caa";
-    public static final String CHANGE_ORG_REQUEST = "ChangeOrganisationRequest";
+
     private static final int JURISDICTION_INDEX = 1;
     private static final String APPROVED = "APPROVED";
     private static final String PENDING = "PENDING";
@@ -212,7 +213,7 @@ public class NoticeOfChangeService {
                 searchResultViewHeaderList.stream()
                     .filter(searchResultViewHeader ->
                                 searchResultViewHeader.getCaseFieldTypeDefinition()
-                                    .getType().equals(CHANGE_ORG_REQUEST)).collect(toList());
+                                    .getType().equals(CHANGE_ORGANISATION_REQUEST)).collect(toList());
             for (SearchResultViewHeader searchResultViewHeader : filteredSearch) {
                 if (caseFields.containsKey(searchResultViewHeader.getCaseFieldId())) {
                     JsonNode node = caseFields.get(searchResultViewHeader.getCaseFieldId());
@@ -275,7 +276,7 @@ public class NoticeOfChangeService {
         // previous NoC related service calls
         // (https://tools.hmcts.net/confluence/display/ACA/API+Operation%3A+Get+NoC+Questions)
         // will have validated that events exist.
-        // Assuming a single event, so always take first element array
+        // Assuming a single event, so always take first array element
         return noCRequestDetails.getCaseViewResource().getCaseViewActionableEvents()[0].getId();
     }
 

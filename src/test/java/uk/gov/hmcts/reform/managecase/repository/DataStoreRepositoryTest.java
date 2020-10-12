@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +19,12 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisat
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
-import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPage;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPageComplexFieldOverride;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPageField;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
@@ -34,8 +38,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.ES_QUERY;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOC_REQUEST_DESCRIPTION;
 
@@ -48,12 +54,15 @@ class DataStoreRepositoryTest {
     private static final String CASE_ID2 = "87654321";
     private static final String ORG_ID = "organisation1";
     private static final String EVENT_ID = "NoCRequest";
+    private static final String CHANGE_ORGANISATION_REQUEST_FIELD = "changeOrganisationRequestField";
     private static final String EXPECTED_NOC_REQUEST_DATA =
         "{\"ChangeOrganisationRequest\":"
             + "{"
             +   "\"DummyDataKey\":\"Dummy Data Value\""
             + "}"
             + "}";
+    private static final String EVENT_TOKEN = "eventToken";
+
 
     @Mock
     private DataStoreApiClient dataStoreApi;
@@ -196,26 +205,27 @@ class DataStoreRepositoryTest {
 
         // ASSERT
         verify(dataStoreApi).getStartEventTrigger(CASE_ID, EVENT_ID);
-
+        verify(dataStoreApi, never()).submitEventForCase(any(), any());
         assertThat(returnedStartEventResource).isNull();
     }
 
     @Test
     @DisplayName("Call ccd-datastore to submit an event for a case")
-    void shouldCaseResourceWhenSubmittingEventSucceeds() throws JsonProcessingException {
+    void shouldReturnCaseResourceWhenSubmittingEventSucceeds() throws JsonProcessingException {
         // ARRANGE
-        StartEventResource startEventResource = new StartEventResource();
-        startEventResource.setToken("eventToken");
+        CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
+            .wizardPages(getWizardPages(CHANGE_ORGANISATION_REQUEST_FIELD))
+            .eventToken(EVENT_TOKEN)
+            .caseFields(getCaseViewFields())
+            .build();
 
-        given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID))
-            .willReturn(startEventResource);
+        given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID)).willReturn(caseUpdateViewEvent);
+
         given(dataStoreApi.submitEventForCase(any(String.class), any(CaseDataContent.class)))
             .willReturn(CaseResource.builder().build());
 
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode actualObj = mapper.readTree(EXPECTED_NOC_REQUEST_DATA);
-        given(jacksonUtils.convertValue(any(), any()))
-            .willReturn(actualObj);
+        given(jacksonUtils.convertValue(any(), any())).willReturn(mapper.readTree(EXPECTED_NOC_REQUEST_DATA));
 
         ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
             .organisationToAdd(new Organisation("1", "orgNameToAdd"))
@@ -232,15 +242,46 @@ class DataStoreRepositoryTest {
         verify(dataStoreApi).submitEventForCase(any(String.class), captor.capture());
 
         CaseDataContent caseDataContentCaptorValue = captor.getValue();
-        assertThat(caseDataContentCaptorValue.getToken()).isEqualTo("eventToken");
+        assertThat(caseDataContentCaptorValue.getToken()).isEqualTo(EVENT_TOKEN);
 
-        assertThat(caseDataContentCaptorValue.getEvent().getDescription())
-            .isEqualTo(NOC_REQUEST_DESCRIPTION);
-        assertThat(caseDataContentCaptorValue.getEvent().getEventId())
-            .isEqualTo(EVENT_ID);
+        assertThat(caseDataContentCaptorValue.getEvent().getDescription()).isEqualTo(NOC_REQUEST_DESCRIPTION);
+        assertThat(caseDataContentCaptorValue.getEvent().getEventId()).isEqualTo(EVENT_ID);
 
-        assertThat(caseDataContentCaptorValue.getData().get("ChangeOrganisationRequest").toString())
+        assertThat(caseDataContentCaptorValue.getData().get(CHANGE_ORGANISATION_REQUEST_FIELD).toString())
             .isEqualTo(EXPECTED_NOC_REQUEST_DATA);
+    }
+
+    @Test
+    @DisplayName("Call ccd-datastore to submit an event for a case fails if cannot get event token")
+    void shouldReturnNullCaseResourceAndNotSubmitEventWithoutAnEventToken() {
+        // ARRANGE
+        given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID)).willReturn(CaseUpdateViewEvent.builder().build());
+
+        // ACT
+        repository.submitEventForCase(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build());
+
+        // ASSERT
+        verify(dataStoreApi, never()).submitEventForCase(any(), any());
+    }
+
+    @Test
+    @DisplayName("Call ccd-datastore to submit an event for a case without finding approval status default value")
+    void shouldReturnNullAndNotSubmitEventWithoutFindingDefaultApprovalStatus() {
+        // ARRANGE
+        CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
+            .wizardPages(getWizardPages("nothingToDoWithNocCaseFieldId"))
+            .eventToken("eventToken")
+            .caseFields(getCaseViewFields())
+            .build();
+
+        given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID)).willReturn(caseUpdateViewEvent);
+
+        // ACT
+        repository.submitEventForCase(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build());
+
+        // ASSERT
+        verify(dataStoreApi).getStartEventTrigger(CASE_ID, EVENT_ID);
+        verify(dataStoreApi, never()).submitEventForCase(any(), any());
     }
 
     @Test
@@ -248,7 +289,6 @@ class DataStoreRepositoryTest {
     void shouldFindCaseByIdUsingExternalApi() {
         // ARRANGE
         CaseResource caseResource = CaseResource.builder().build();
-
         given(dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(CASE_ID)).willReturn(caseResource);
 
         // ACT
@@ -256,8 +296,30 @@ class DataStoreRepositoryTest {
 
         // ASSERT
         assertThat(result).isEqualTo(caseResource);
-
         verify(dataStoreApi).getCaseDetailsByCaseIdViaExternalApi(eq(CASE_ID));
+    }
 
+    private List<CaseViewField> getCaseViewFields() {
+        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+        fieldTypeDefinition.setId(CHANGE_ORGANISATION_REQUEST);
+
+        CaseViewField caseViewFields = new CaseViewField();
+        caseViewFields.setId(CHANGE_ORGANISATION_REQUEST_FIELD);
+        caseViewFields.setFieldTypeDefinition(fieldTypeDefinition);
+        return List.of(caseViewFields);
+    }
+
+    private List<WizardPage> getWizardPages(String caseFieldId) {
+        WizardPageField wizardPageField = new WizardPageField();
+
+        WizardPageComplexFieldOverride wizardPageComplexFieldOverride = new WizardPageComplexFieldOverride();
+        wizardPageComplexFieldOverride.setComplexFieldElementId(caseFieldId + ".ApprovalStatus");
+        wizardPageComplexFieldOverride.setDefaultValue(CHANGE_ORGANISATION_REQUEST_FIELD);
+        wizardPageField.setCaseFieldId(caseFieldId);
+        wizardPageField.setComplexFieldOverrides(List.of(wizardPageComplexFieldOverride));
+
+        WizardPage wizardPage =  new WizardPage();
+        wizardPage.setWizardPageFields(List.of(wizardPageField));
+        return List.of(wizardPage);
     }
 }

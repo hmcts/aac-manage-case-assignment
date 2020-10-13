@@ -116,31 +116,64 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         CaseUpdateViewEvent caseUpdateViewEvent = dataStoreApi.getStartEventTrigger(caseId, eventId);
 
         if (caseUpdateViewEvent != null) {
-            String approvalStatusDefaultValue = getApprovalStatusDefaultValue(caseUpdateViewEvent);
+            Optional<CaseViewField> caseViewField = getCaseViewField(caseUpdateViewEvent);
 
-            if (caseUpdateViewEvent.getEventToken() != null && approvalStatusDefaultValue != null) {
-                Event event = Event.builder()
-                    .eventId(eventId)
-                    .description(NOC_REQUEST_DESCRIPTION)
-                    .build();
+            if (caseViewField.isPresent()) {
+                String caseFieldId = caseViewField.get().getId();
 
-                CaseDataContent caseDataContent = CaseDataContent.builder()
-                    .token(caseUpdateViewEvent.getEventToken())
-                    .event(event)
-                    .data(getCaseDataContentData(approvalStatusDefaultValue, changeOrganisationRequest))
-                    .build();
+                String approvalStatusDefaultValue = getApprovalStatusDefaultValue(
+                    caseUpdateViewEvent.getWizardPages(),
+                    caseFieldId
+                );
 
-                caseResource = dataStoreApi.submitEventForCase(caseId, caseDataContent);
+                if (caseUpdateViewEvent.getEventToken() != null && approvalStatusDefaultValue != null) {
+                    Event event = Event.builder()
+                        .eventId(eventId)
+                        .description(NOC_REQUEST_DESCRIPTION)
+                        .build();
+
+                    changeOrganisationRequest.setApprovalStatus(approvalStatusDefaultValue);
+
+                    CaseDataContent caseDataContent = CaseDataContent.builder()
+                        .token(caseUpdateViewEvent.getEventToken())
+                        .event(event)
+                        .data(getCaseDataContentData(caseFieldId, changeOrganisationRequest))
+                        .build();
+
+                    caseResource = dataStoreApi.submitEventForCase(caseId, caseDataContent);
+                } else {
+                    LOG.info("Failed to get event token from start event");
+                }
             } else {
-                LOG.info("Failed to get token from start event");
+                LOG.info("Failed to create ChangeOrganisationRequest because of missing case field id");
             }
         }
         return caseResource;
     }
 
-    private String getApprovalStatusDefaultValue(CaseUpdateViewEvent caseUpdateViewEvent) {
+    private String getApprovalStatusDefaultValue(List<WizardPage> wizardPages, String caseFieldId) {
 
         String returnValue = null;
+        String approvalStatusFieldId = caseFieldId + ".ApprovalStatus";
+        Optional<WizardPage> optionalWizardPage = wizardPages.stream().findFirst();
+
+        if (optionalWizardPage.isPresent()) {
+            WizardPage wizardPage = optionalWizardPage.get();
+            Optional<WizardPageComplexFieldOverride> filteredWizardPageField =
+                wizardPage.getWizardPageFields().stream()
+                .filter(wizardPageField -> wizardPageField.getCaseFieldId().equals(caseFieldId)
+                    && wizardPageField.getComplexFieldOverride(approvalStatusFieldId).isPresent())
+                .map(wizardPageField -> wizardPageField.getComplexFieldOverride(approvalStatusFieldId).get())
+                .findFirst();
+            if (filteredWizardPageField.isPresent()) {
+                returnValue = filteredWizardPageField.get().getDefaultValue();
+            }
+        }
+
+        return returnValue;
+    }
+
+    private Optional<CaseViewField> getCaseViewField(CaseUpdateViewEvent caseUpdateViewEvent) {
         Optional<CaseViewField> caseViewField = Optional.empty();
 
         if (caseUpdateViewEvent.getCaseFields() != null) {
@@ -148,27 +181,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                 .filter(cvf -> cvf.getFieldTypeDefinition().getId().equals(CHANGE_ORGANISATION_REQUEST))
                 .findFirst();
         }
-
-        if (caseViewField.isPresent()) {
-            String caseFieldId = caseViewField.get().getId();
-            String approvalStatusFieldId = caseFieldId + ".ApprovalStatus";
-            Optional<WizardPage> optionalWizardPage = caseUpdateViewEvent.getWizardPages().stream().findFirst();
-
-            if (optionalWizardPage.isPresent()) {
-                WizardPage wizardPage = optionalWizardPage.get();
-                Optional<WizardPageComplexFieldOverride> filteredWizardPageField =
-                    wizardPage.getWizardPageFields().stream()
-                    .filter(wizardPageField -> wizardPageField.getCaseFieldId().equals(caseFieldId)
-                        && wizardPageField.getComplexFieldOverride(approvalStatusFieldId).isPresent())
-                    .map(wizardPageField -> wizardPageField.getComplexFieldOverride(approvalStatusFieldId).get())
-                    .findFirst();
-                if (filteredWizardPageField.isPresent()) {
-                    returnValue = filteredWizardPageField.get().getDefaultValue();
-                }
-            }
-        }
-
-        return returnValue;
+        return caseViewField;
     }
 
     @Override

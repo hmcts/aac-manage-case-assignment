@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
+import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.SOLICITOR_ROLE;
 
 @Service
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
@@ -281,21 +282,9 @@ public class NoticeOfChangeService {
     }
 
     private boolean isActingAsSolicitor(CaseResource caseResource) {
-        UserInfo userInfo = getUserInfo();
-
-        boolean isActingAsSolicitor = false;
-
-        if (!userInfo.getRoles().contains(PUI_ROLE)) {
-            for (String role: userInfo.getRoles()) {
-                Optional<String> jurisdiction = extractJurisdiction(role);
-                if (jurisdiction.isPresent() && caseResource.getJurisdiction().equals(jurisdiction.get())) {
-                    isActingAsSolicitor = true;
-                    break;
-                }
-            }
-        }
-
-        return isActingAsSolicitor;
+        String solicitorRole = String.format(SOLICITOR_ROLE, caseResource.getJurisdiction());
+        return getUserInfo().getRoles().stream()
+            .anyMatch(solicitorRole::startsWith);
     }
 
     private CaseResource generateNoCRequestEvent(String caseId,

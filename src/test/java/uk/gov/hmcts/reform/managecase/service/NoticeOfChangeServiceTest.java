@@ -393,9 +393,10 @@ class NoticeOfChangeServiceTest {
         private static final String ORG_POLICY_REFERENCE = "orgPolicyReference";
         private static final String CHANGE_ORGANISATION_REQUEST_KEY = "ChangeOrganisationRequest";
         private static final String ORGANISATION_POLICY_KEY = "OrganisationPolicy";
-        private static final String JURISDICTION_ONE = "ONE";
-        private static final String JURISDICTION_1 = JURISDICTION + "-" + JURISDICTION_ONE;
-        public static final String USER_INFO_UID = "userInfoUid";
+        private static final String JURISDICTION_ONE = "JURISDICTION_1";
+        private static final String SOLICITOR_ROLE = "caseworker-" + JURISDICTION_ONE+ "-solicitor";
+        private static final String NON_SOLICITOR_ROLE = "caseworker-" + JURISDICTION_ONE+ "-citizen";
+        private static final String USER_INFO_UID = "userInfoUid";
 
         private NoCRequestDetails noCRequestDetails;
         private Organisation incumbentOrganisation;
@@ -411,8 +412,8 @@ class NoticeOfChangeServiceTest {
             given(prdRepository.findUsersByOrganisation()).willReturn(findUsersByOrganisationResponse);
 
             CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
-            CaseViewActionableEvent[] caseViewActionableEvents = {caseViewActionableEvent};
             caseViewActionableEvent.setId(NOC_REQUEST_EVENT);
+            CaseViewActionableEvent[] caseViewActionableEvents = {caseViewActionableEvent};
             CaseViewResource caseViewResource = new CaseViewResource();
             caseViewResource.setReference(CASE_ID);
             caseViewResource.setCaseViewActionableEvents(caseViewActionableEvents);
@@ -611,7 +612,7 @@ class NoticeOfChangeServiceTest {
         }
 
         private void setInvokerToActAsAnAdminOrSolicitor(boolean actAsAnAdminOrSolicitor) {
-            List<String> roles = actAsAnAdminOrSolicitor ? List.of(JURISDICTION_1) : List.of(PUI_ROLE);
+            List<String> roles = actAsAnAdminOrSolicitor ? List.of(SOLICITOR_ROLE) : List.of(NON_SOLICITOR_ROLE);
             UserInfo userInfo = new UserInfo("sub",
                                              USER_INFO_UID,
                                              "name",

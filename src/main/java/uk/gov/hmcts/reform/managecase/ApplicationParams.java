@@ -19,6 +19,12 @@ public class ApplicationParams {
     @Value("${ccd.data-store.allowed-service}")
     private String ccdDataStoreAllowedService;
 
+    @Value("${notify.email-template-id}")
+    private String emailTemplateId;
+
+    @Value("${notify.api-key}")
+    private String notifyApiKey;
+
     public String getIdamSystemUserId() {
         return idamSystemUserId;
     }
@@ -33,6 +39,14 @@ public class ApplicationParams {
 
     public String getCcdDataStoreAllowedService() {
         return ccdDataStoreAllowedService;
+    }
+
+    public String getEmailTemplateId() {
+        return emailTemplateId;
+    }
+
+    public String getNotifyApiKey() {
+        return notifyApiKey;
     }
 }
 

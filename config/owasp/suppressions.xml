@@ -78,4 +78,11 @@
    ]]></notes>
     <cve>CVE-2019-16884</cve>
   </suppress>
+
+  <suppress>
+    <notes><![CDATA[
+   spring cve issue -- needs to be fixed
+   ]]></notes>
+    <cve>CVE-2020-5421</cve>
+  </suppress>
 </suppressions>

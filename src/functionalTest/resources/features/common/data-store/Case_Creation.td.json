@@ -58,32 +58,12 @@
 					"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4/binary",
 					"document_filename": "Sample.pdf"
 				}
-			},
-			"ignore_warning": false,
-			"draft_id": null
+			}
 		}
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_201_Response",
-		"headers": {
-			"Strict-Transport-Security": "[[ANY_NULLABLE]]",
-			"Content-Encoding": "gzip",
-			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]",
-			"Vary": "accept-encoding"
-		},
 		"body": {
-			"id": "[[ANY_NUMBER_NOT_NULLABLE]]",
-			"version": 0,
-			"created_date": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-			"last_modified": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-			"last_state_modified_date": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-			"security_classification": "PUBLIC",
-			"after_submit_callback_response": null,
-			"callback_response_status_code": null,
-			"callback_response_status": null,
-			"delete_draft_response_status_code": null,
-			"delete_draft_response_status": null,
 			"case_data": {
 				"AddressField": {
 					"AddressLine1": "ABC Street",

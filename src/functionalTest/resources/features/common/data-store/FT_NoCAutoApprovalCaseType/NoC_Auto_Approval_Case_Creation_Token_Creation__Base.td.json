@@ -1,0 +1,18 @@
+{
+	"_guid_": "NoC_Auto_Approval_Case_Creation_Token_Creation__Base",
+	"_extends_": "NoC_Case_Creation_Token_Creation__Base",
+
+	"request": {
+		"pathVariables": {
+			"ctid": "FT_NoCAutoApprovalCaseType"
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"case_details": {
+				"case_type_id": "FT_NoCAutoApprovalCaseType"
+			}
+		}
+	}
+}

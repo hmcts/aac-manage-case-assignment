@@ -1,0 +1,43 @@
+{
+	"_guid_": "Retrieve_Case_By_ID__Base",
+
+	"productName": "CCD Data Store",
+	"operationName": "Retrieve a case by ID",
+
+	"method": "GET",
+	"uri": "{{CCD_DATA_STORE_API_BASE_URL}}/cases/{caseId}",
+
+	"request": {
+		"_extends_": "Common_Request",
+		"headers": {
+			"experimental": "true"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Strict-Transport-Security": "[[ANY_NULLABLE]]",
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]",
+			"Vary": "accept-encoding"
+		},
+		"body": {
+			"_links": {
+				"self": {
+				  "href": "[[ANYTHING_PRESENT]]"
+				}
+			},
+			"id": "[[ANY_NUMBER_NOT_NULLABLE]]",
+			"created_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+			"last_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+			"last_state_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+			"security_classification": "PUBLIC",
+			"after_submit_callback_response": null,
+			"callback_response_status_code": null,
+			"callback_response_status": null,
+			"delete_draft_response_status_code": null,
+			"delete_draft_response_status": null
+		}
+	}
+}

@@ -1,0 +1,16 @@
+{
+  "_guid_": "Request_NoC__Base",
+
+  "productName": "Manage Case Assignment Microservice",
+  "operationName": "Request NoC",
+
+  "method": "POST",
+  "uri": "/noc/noc-requests",
+
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
+
+  "request": {
+    "_extends_": "Common_Request"
+  }
+}

@@ -15,8 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.AuditEvent;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
@@ -101,12 +100,9 @@ class NoticeOfChangeServiceTest {
                                                               securityUtils);
 
             //internal/cases/caseId
-            AuditEvent event = new AuditEvent();
-            event.setEventName("NOC");
-            CaseViewEvent caseViewEvent = CaseViewEvent.createFrom(event);
+            CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
             CaseViewResource caseViewResource = new CaseViewResource();
-            CaseViewEvent[] caseViewEventArray = {caseViewEvent};
-            caseViewResource.setCaseViewEvents(caseViewEventArray);
+            caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[] {caseViewActionableEvent});
             CaseViewType caseViewType = new CaseViewType();
             caseViewType.setName(CASE_TYPE_ID);
             caseViewType.setId(CASE_TYPE_ID);

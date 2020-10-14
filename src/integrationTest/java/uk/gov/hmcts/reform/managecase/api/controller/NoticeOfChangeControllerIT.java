@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.BaseTest;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.AuditEvent;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
@@ -71,12 +70,10 @@ public class NoticeOfChangeControllerIT {
         @DisplayName("Successfully return NoC questions for case id")
         @Test
         void shouldGetNoCQuestions_forAValidRequest() throws Exception {
-            AuditEvent event = new AuditEvent();
-            event.setEventName("NOC");
-            CaseViewEvent caseViewEvent = CaseViewEvent.createFrom(event);
+            CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
+            caseViewActionableEvent.setId("NOC");
             CaseViewResource caseViewResource = new CaseViewResource();
-            CaseViewEvent[] caseViewEventArray = {caseViewEvent};
-            caseViewResource.setCaseViewEvents(caseViewEventArray);
+            caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[] {caseViewActionableEvent});
             CaseViewType caseViewType = new CaseViewType();
             caseViewType.setId(CASE_TYPE_ID);
             CaseViewJurisdiction caseViewJurisdiction = new CaseViewJurisdiction();

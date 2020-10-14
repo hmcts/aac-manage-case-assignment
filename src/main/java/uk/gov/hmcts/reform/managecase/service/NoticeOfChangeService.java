@@ -187,7 +187,7 @@ public class NoticeOfChangeService {
     }
 
     private void checkForCaseEvents(CaseViewResource caseViewResource) {
-        if (caseViewResource.getCaseViewEvents() == null) {
+        if (caseViewResource.getCaseViewActionableEvents() == null) {
             throw new ValidationException(NOC_EVENT_NOT_AVAILABLE);
         }
     }

@@ -1,0 +1,60 @@
+{
+  "_guid_": "F-206_Verify_Case_Data_COR_Pending",
+  "_extends_": "F-206_Verify_Case_Data__Base",
+
+  "specs": [
+    "to verify there is a pending NOC request on the case and the OrganisationPolicy for R2 has NOT been updated"
+  ],
+
+  "request": {
+    "request": {
+      "pathVariables": {
+        "cid": "${[scenarioContext][testData][request][queryParams][case_ids]}"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+
+      "data": {
+        "changeOrganisationRequestField" : {
+          "CaseRoleId" : "[RespondentSolicitor]",
+          "ApprovalStatus" : "0",
+          "RequestTimestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+          "OrganisationToAdd" : {
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}",
+            "OrganisationName" : ""
+          },
+          "OrganisationToRemove" : "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][respondentOrganisationPolicy][Organisation]}"
+        }
+      },
+
+      "data_classification": {
+        "changeOrganisationRequestField" : {
+          "value" : {
+            "CaseRoleId" : "PUBLIC",
+            "ApprovalStatus" : "PUBLIC",
+            "RequestTimestamp" : "PUBLIC",
+            "OrganisationToAdd" : {
+              "value" : {
+                "OrganisationID" : "PUBLIC",
+                "OrganisationName" : "PUBLIC"
+              },
+              "classification" : "PUBLIC"
+            },
+            "OrganisationToRemove" : {
+              "value" : {
+                "OrganisationID" : "PUBLIC",
+                "OrganisationName" : "PUBLIC"
+              },
+              "classification" : "PUBLIC"
+            }
+          },
+          "classification" : "PUBLIC"
+        }
+      }
+
+    }
+  }
+}

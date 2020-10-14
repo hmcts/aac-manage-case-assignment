@@ -1,0 +1,15 @@
+{
+  "_guid_": "F-206_Verify_Not_Granted_Case_Roles_Alice",
+  "_extends_": "F-206_Verify_Not_Granted_Case_Roles__Base",
+
+  "specs": [
+    "to verify that Alice has NOT been granted any case roles for the case"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Alice"
+    }
+  }
+
+}

@@ -1,13 +1,46 @@
 {
-	"_guid_": "S-206.2",
-	"_extends_": "S-206_Base",
-    "title": "(Happy Path) : Solicitor successfully Requests NoC for a non-represented litigant - No auto-approval applies",
+  "_guid_": "S-206.2",
+  "_extends_": "Request_NoC__Base",
 
-	"specs": [
-		"Mario - to initiate a case on his own behalf via a citizen facing application",
-		"Dil - with a solicitor role for the same jurisdiction as that of a case initiated by Mario",
-		"is made by Dil to place an NOC Request in order to become Mario's representative on C1",
-		"contains all correct answers in the correct formats"
-	]
+  "title": "(Happy Path) Solicitor requests NoC for a non-represented litigant - no auto-approval applies",
 
+  "specs": [
+    "Mario - to initiate a case on his own behalf via a citizen facing application",
+    "Dil - with a solicitor role for the same jurisdiction as that of a case initiated by Mario",
+
+    "contains all correct answers in the correct format",
+    "contains answers identifying case role R2",
+
+    "is made by Dil to place an NOC Request for C1"
+  ],
+
+  "users": {
+    "Mario": {
+      "_extends_": "ACA_Users_Mario"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "prerequisites": [
+    { "case_snapshot": "F-206_Take_Case_Data_Snapshot_For_NoC_Case_Created_By_Mario" }
+  ],
+
+  "request": {
+    "body": {
+      "_extends_": "NoC_Valid_Answers_For_Case_Role_R2",
+
+      "case_id": "${[scenarioContext][childContexts][F-206_NoC_Case_Creation_By_Mario_With_Assigned_R1_Org_Policy][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "status_message": "The Notice of Change request has been successfully submitted.",
+      "case_role": "[RespondentSolicitor]",
+      "approval_status": "PENDING"
+    }
+  }
 }

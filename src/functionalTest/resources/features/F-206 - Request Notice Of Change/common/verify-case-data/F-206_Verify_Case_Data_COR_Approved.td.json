@@ -1,0 +1,78 @@
+{
+  "_guid_": "F-206_Verify_Case_Data_COR_Approved",
+  "_extends_": "F-206_Verify_Case_Data__TEMPORARY_HACK",
+
+  "specs": [
+    "to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated",
+
+    "TEMPORARY_HACK: replace 'F-206_Verify_Case_Data__TEMPORARY_HACK' reference with 'F-206_Verify_Case_Data__Base' once 'CheckForNoCApproval' and 'ApplyNoCDecision' are complete"
+  ],
+
+  "request": {
+    "request": {
+      "pathVariables": {
+        "cid": "${[scenarioContext][testData][request][queryParams][case_ids]}"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+
+      "data": {
+        "respondentOrganisationPolicy" : {
+          "Organisation" : {
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}",
+            "OrganisationName" : "BEFTA Organisation"
+          }
+        },
+
+        "changeOrganisationRequestField" : {
+          "Reason": null,
+          "CaseRoleId": null,
+          "NotesReason": null,
+          "ApprovalStatus": null,
+          "RequestTimestamp": null,
+          "OrganisationToAdd": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          },
+          "OrganisationToRemove": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          },
+          "ApprovalRejectionTimestamp": null
+        }
+      },
+
+      "data_classification": {
+        "changeOrganisationRequestField" : {
+          "value" : {
+            "Reason" : "PUBLIC",
+            "CaseRoleId" : "PUBLIC",
+            "NotesReason" : "PUBLIC",
+            "ApprovalStatus" : "PUBLIC",
+            "RequestTimestamp" : "PUBLIC",
+            "OrganisationToAdd" : {
+              "value" : {
+                "OrganisationID" : "PUBLIC",
+                "OrganisationName" : "PUBLIC"
+              },
+              "classification" : "PUBLIC"
+            },
+            "OrganisationToRemove" : {
+              "value" : {
+                "OrganisationID" : "PUBLIC",
+                "OrganisationName" : "PUBLIC"
+              },
+              "classification" : "PUBLIC"
+            },
+            "ApprovalRejectionTimestamp" : "PUBLIC"
+          },
+          "classification" : "PUBLIC"
+        }
+      }
+
+    }
+  }
+}

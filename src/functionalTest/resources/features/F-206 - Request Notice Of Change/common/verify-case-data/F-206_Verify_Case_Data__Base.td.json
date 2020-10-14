@@ -1,0 +1,47 @@
+{
+  "_guid_": "F-206_Verify_Case_Data__Base",
+  "_extends_": "Retrieve_Case_By_ID__Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
+  "prerequisites": [
+    { "Get_Organisation_Identifier": "Get_Organisation_Identifier_For_Any_Org1_User__Prerequisite" }
+  ],
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][parentContext][testData][request][body][case_id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "id": "${}${[scenarioContext][parentContext][testData][request][body][case_id]}",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][case_type]}",
+      "state": "CaseCreated",
+
+      "data": {
+        "_extends_": "NoC_Case_Data_With_Org_Policies",
+
+        "applicantOrganisationPolicy": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][applicantOrganisationPolicy]}",
+        "respondentOrganisationPolicy": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][respondentOrganisationPolicy]}",
+        "otherPartyOrganisationPolicy": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][otherPartyOrganisationPolicy]}"
+      },
+
+      "data_classification": {
+        "_extends_": "NoC_Case_Data_Classification_With_Org_Policies",
+
+        "applicantOrganisationPolicy": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data_classification][applicantOrganisationPolicy]}",
+        "respondentOrganisationPolicy": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data_classification][respondentOrganisationPolicy]}",
+        "otherPartyOrganisationPolicy": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data_classification][otherPartyOrganisationPolicy]}"
+      }
+
+    }
+  }
+}
+

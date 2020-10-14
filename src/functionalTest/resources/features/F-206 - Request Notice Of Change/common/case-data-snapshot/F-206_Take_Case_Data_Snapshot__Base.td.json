@@ -1,0 +1,51 @@
+{
+  "_guid_": "F-206_Take_Case_Data_Snapshot__Base",
+  "_extends_": "Retrieve_Case_By_ID__Base",
+
+  "specs": [
+    "As a prerequisite"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "id": "${}${[scenarioContext][testData][request][pathVariables][caseId]}",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "[[ANY_STRING_NOT_NULLABLE]]",
+      "state": "CaseCreated",
+
+      "data": {
+        "_extends_": "NoC_Case_Data_With_Org_Policies",
+
+        "applicantOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "[[ANY_NULLABLE]]",
+            "OrganisationName": "[[ANY_NULLABLE]]"
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "[[ANY_NULLABLE]]",
+            "OrganisationName": "[[ANY_NULLABLE]]"
+          }
+        },
+        "otherPartyOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "[[ANY_NULLABLE]]",
+            "OrganisationName": "[[ANY_NULLABLE]]"
+          }
+        }
+      },
+
+      "data_classification": {
+        "_extends_": "NoC_Case_Data_Classification_With_Org_Policies"
+      }
+
+    }
+  }
+}

@@ -259,7 +259,8 @@ public class NoticeOfChangeControllerIT {
         @BeforeEach
         public void setup() {
             submittedChallengeAnswers
-               = List.of(new SubmittedChallengeAnswer(QUESTION_ID_1, ORGANISATION_ID.toLowerCase(Locale.getDefault())));
+                = List.of(new SubmittedChallengeAnswer(QUESTION_ID_1,
+                                                       ORGANISATION_ID.toLowerCase(Locale.getDefault())));
 
             requestNoticeOfChangeRequest = new RequestNoticeOfChangeRequest(CASE_ID, submittedChallengeAnswers);
         }

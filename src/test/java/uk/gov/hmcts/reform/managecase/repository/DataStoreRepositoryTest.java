@@ -45,6 +45,7 @@ import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreReposito
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.ES_QUERY;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOC_REQUEST_DESCRIPTION;
 
+@SuppressWarnings("PMD.ExcessiveImports")
 class DataStoreRepositoryTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";

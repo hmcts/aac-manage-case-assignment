@@ -31,7 +31,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
-@SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
 public class DefaultDataStoreRepository implements DataStoreRepository {
 
     static final String NOC_REQUEST_DESCRIPTION = "Notice of Change Request Event";
@@ -126,7 +126,9 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                     caseFieldId
                 );
 
-                if (caseUpdateViewEvent.getEventToken() != null && approvalStatusDefaultValue != null) {
+                if (caseUpdateViewEvent.getEventToken() == null || approvalStatusDefaultValue == null) {
+                    LOG.info("Failed to get enough data from start event to submit an event for the case");
+                } else {
                     Event event = Event.builder()
                         .eventId(eventId)
                         .description(NOC_REQUEST_DESCRIPTION)
@@ -141,8 +143,6 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                         .build();
 
                     caseResource = dataStoreApi.submitEventForCase(caseId, caseDataContent);
-                } else {
-                    LOG.info("Failed to get event token from start event");
                 }
             } else {
                 LOG.info("Failed to create ChangeOrganisationRequest because of missing case field id");

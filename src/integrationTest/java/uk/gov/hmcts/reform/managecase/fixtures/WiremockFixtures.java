@@ -46,8 +46,8 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.INTERNAL_SEARCH_CASES;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.SEARCH_CASES;
 
-@SuppressWarnings({"PMD.ExcessiveImports"})
-public final class WiremockFixtures {
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
+public class WiremockFixtures {
 
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     public static final String SYS_USER_TOKEN = "Bearer eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9aa";
@@ -168,9 +168,10 @@ public final class WiremockFixtures {
     public static void stubGetChallengeQuestions(String caseTypeId,
                                                  String id,
                                                  ChallengeQuestionsResult challengeQuestionsResult) {
-
-        stubFor(WireMock.get(urlPathEqualTo("/api/display/challenge-questions/case-type/" + caseTypeId
-                                                + "/question-groups/" + id))
+        stubFor(WireMock.get(urlPathEqualTo("/api/display/challenge-questions/case-type/"
+                                                + caseTypeId
+                                                + "/question-groups/"
+                                                + id))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
@@ -187,24 +188,26 @@ public final class WiremockFixtures {
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
-    public static void stubGetStartEventTrigger(String caseId, String eventId, CaseUpdateViewEvent caseUpdateViewEvent) {
-        stubFor((WireMock.get(urlPathEqualTo("/internal/cases/" + caseId +"/event-triggers/" + eventId))
+    public static void stubGetStartEventTrigger(String caseId,
+                                                String eventId,
+                                                CaseUpdateViewEvent caseUpdateViewEvent) {
+        stubFor(WireMock.get(urlPathEqualTo("/internal/cases/" + caseId + "/event-triggers/" + eventId))
             .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
             .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
             .willReturn(aResponse()
                             .withStatus(HTTP_OK)
                             .withBody(getJsonString(caseUpdateViewEvent))
-                            .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))));
+                            .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     public static void stubGetCaseViaExternalApi(String caseId, CaseResource caseResource) {
-        stubFor((WireMock.get(urlPathEqualTo("/cases/" + caseId))
+        stubFor(WireMock.get(urlPathEqualTo("/cases/" + caseId))
             .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
             .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
             .willReturn(aResponse()
                             .withStatus(HTTP_CREATED)
                             .withBody(getJsonString(caseResource))
-                            .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))));
+                            .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     @SuppressWarnings({"PMD.AvoidThrowingRawExceptionTypes", "squid:S112"})

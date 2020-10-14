@@ -17,9 +17,10 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
 public class CaseResourceTest {
 
-    private ObjectMapper objectMapper = new JacksonObjectMapperConfig().defaultObjectMapper();
+    private final ObjectMapper objectMapper = new JacksonObjectMapperConfig().defaultObjectMapper();
 
     @Test
     @DisplayName("Find ChangeOrganisationRequest Json nodes from data")
@@ -35,6 +36,7 @@ public class CaseResourceTest {
             .requestTimestamp(now)
             .organisationToAdd(organisationToAdd)
             .organisationToRemove(organisationToRemove)
+            .approvalStatus("APPROVED")
             .build();
 
         final String expectedChangeOrganisationRequestJson =
@@ -48,7 +50,8 @@ public class CaseResourceTest {
             +   "\"OrganisationName\":\"" + organisationToRemove.getOrganisationName() + "\""
             + "},"
             + "\"CaseRoleId\":\"" + cor.getCaseRoleId() + "\","
-            + "\"RequestTimestamp\":\"" + now + "\""
+            + "\"RequestTimestamp\":\"" + now + "\","
+            + "\"ApprovalStatus\":\"APPROVED\""
             + "}";
 
 

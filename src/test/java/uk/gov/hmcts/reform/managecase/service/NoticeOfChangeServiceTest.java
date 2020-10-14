@@ -16,9 +16,7 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedExc
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.AuditEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
@@ -61,9 +59,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
-import static uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService.PUI_ROLE;
 
-@SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"PMD.UseConcurrentHashMap",
+    "PMD.AvoidDuplicateLiterals",
+    "PMD.ExcessiveImports",
+    "PMD.TooManyMethods",
+    "PMD.DataflowAnomalyAnalysis"})
 class NoticeOfChangeServiceTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
@@ -393,15 +394,15 @@ class NoticeOfChangeServiceTest {
         private static final String CHANGE_ORGANISATION_REQUEST_KEY = "ChangeOrganisationRequest";
         private static final String ORGANISATION_POLICY_KEY = "OrganisationPolicy";
         private static final String JURISDICTION_ONE = "JURISDICTION_1";
-        private static final String SOLICITOR_ROLE = "caseworker-" + JURISDICTION_ONE+ "-solicitor";
-        private static final String NON_SOLICITOR_ROLE = "caseworker-" + JURISDICTION_ONE+ "-citizen";
+        private static final String SOLICITOR_ROLE = "caseworker-" + JURISDICTION_ONE + "-solicitor";
+        private static final String NON_SOLICITOR_ROLE = "caseworker-" + JURISDICTION_ONE + "-citizen";
         private static final String USER_INFO_UID = "userInfoUid";
 
         private NoCRequestDetails noCRequestDetails;
         private Organisation incumbentOrganisation;
         private CaseResource caseResource;
 
-        private ObjectMapper objectMapper = new ObjectMapper();
+        private final ObjectMapper objectMapper = new ObjectMapper();
 
         @BeforeEach
         void setUp() {
@@ -621,6 +622,7 @@ class NoticeOfChangeServiceTest {
             given(securityUtils.getUserInfo()).willReturn(userInfo);
         }
 
+        @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
         private List<OrganisationPolicy> updateCaseResourceWithOrganisationPolicies(CaseResource caseResource) {
             List<OrganisationPolicy> organisationPolicies = new ArrayList<>();
             for (int loopCounter = 0; loopCounter < 3; loopCounter++) {

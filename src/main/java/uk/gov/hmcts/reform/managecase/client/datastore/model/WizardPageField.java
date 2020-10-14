@@ -5,24 +5,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Data
 public class WizardPageField implements Serializable {
 
+    private static final long serialVersionUID = 1458618170201792951L;
+
     @JsonProperty("case_field_id")
-    private String caseFieldId = null;
+    private String caseFieldId;
 
     @JsonProperty("order")
-    private Integer order = null;
+    private Integer order;
 
     @JsonProperty("page_column_no")
     private Integer pageColumnNumber;
 
     @JsonProperty("complex_field_overrides")
-    private List<WizardPageComplexFieldOverride> complexFieldOverrides = new ArrayList<>();
+    private List<WizardPageComplexFieldOverride> complexFieldOverrides;
 
     @JsonIgnore
     public Optional<WizardPageComplexFieldOverride> getComplexFieldOverride(String fieldPath) {

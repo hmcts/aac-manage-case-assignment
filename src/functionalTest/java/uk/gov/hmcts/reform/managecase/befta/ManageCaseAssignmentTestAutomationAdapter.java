@@ -5,7 +5,7 @@ import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 
 public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
-    private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
+    private final TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
 
     @Override
     public void doLoadTestData() {

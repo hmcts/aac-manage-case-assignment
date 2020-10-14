@@ -15,7 +15,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
@@ -33,7 +32,6 @@ import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
@@ -63,7 +61,6 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHALLENGE_QUESTION_ANSWERS_EMPTY;
-
 
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports",
     "squid:S2699"})
@@ -266,7 +263,7 @@ public class NoticeOfChangeControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_EMPTY)));
+                .andExpect(jsonPath("$.errors", hasItem(CASE_ID_EMPTY)));
         }
 
         @DisplayName("should fail with 400 bad request when case id is an invalid Luhn number")
@@ -280,8 +277,8 @@ public class NoticeOfChangeControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(2)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_INVALID_LENGTH)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_INVALID)));
+                .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID_LENGTH)))
+                .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID)));
         }
 
         @DisplayName("should fail with 400 bad request when no challenge answers are provided")
@@ -294,7 +291,7 @@ public class NoticeOfChangeControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CHALLENGE_QUESTION_ANSWERS_EMPTY)));
+                .andExpect(jsonPath("$.errors", hasItem(CHALLENGE_QUESTION_ANSWERS_EMPTY)));
         }
     }
 
@@ -345,7 +342,7 @@ public class NoticeOfChangeControllerTest {
                                      .content(objectMapper.writeValueAsString(requestNoticeOfChangeRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)));;
+                .andExpect(jsonPath("$.status_message", is(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)));
         }
 
         @DisplayName("should error if request NoC request body is empty")
@@ -379,7 +376,7 @@ public class NoticeOfChangeControllerTest {
         @DisplayName("should error if request NoC submitted answer list is empty")
         @Test
         void shouldFailWithBadRequestForEmptySubmittedAnswerList() throws Exception {
-            requestNoticeOfChangeRequest = new RequestNoticeOfChangeRequest("12345", Collections.emptyList());
+            requestNoticeOfChangeRequest = new RequestNoticeOfChangeRequest("12345", emptyList());
             postCallShouldReturnBadRequestWithErrorMessage(requestNoticeOfChangeRequest,
                                                            CHALLENGE_QUESTION_ANSWERS_EMPTY);
         }

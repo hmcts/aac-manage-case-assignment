@@ -44,7 +44,7 @@ import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreReposito
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.SOLICITOR_ROLE;
 
 @Service
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.GodClass", "PMD.ExcessiveImports", "PMD.TooManyMethods"})
 public class NoticeOfChangeService {
 
     public static final String PUI_ROLE = "pui-caa";
@@ -54,8 +54,6 @@ public class NoticeOfChangeService {
     private static final String PENDING = "PENDING";
     private static final String CHALLENGE_QUESTION_ID = "NoCChallenge";
     private static final String CASE_ROLE_ID = "CaseRoleId";
-    private static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
-    private static final String ORG_POLICY_REFERENCE = "OrgPolicyReference";
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
@@ -143,15 +141,6 @@ public class NoticeOfChangeService {
                 }
             }
         });
-    }
-
-    private List<OrganisationPolicy> findPolicies(SearchResultViewItem caseFields) {
-        List<JsonNode> policyNodes = caseFields.findOrganisationPolicyNodes();
-        return policyNodes.stream()
-            .map(node -> OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText())
-                .orgPolicyReference(node.get(ORG_POLICY_REFERENCE).asText()).build())
-            .collect(toList());
     }
 
     private List<OrganisationPolicy> findPolicies(CaseResource caseResource) {

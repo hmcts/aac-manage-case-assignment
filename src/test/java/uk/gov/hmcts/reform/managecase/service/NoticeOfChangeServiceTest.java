@@ -113,13 +113,12 @@ class NoticeOfChangeServiceTest {
 
         @BeforeEach
         void setUp()throws JsonProcessingException {
-            //internal/cases/caseId
-            AuditEvent event = new AuditEvent();
-            event.setEventName("NOC");
-            CaseViewEvent caseViewEvent = CaseViewEvent.createFrom(event);
+            // internal/cases/caseId
+            CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
+            caseViewActionableEvent.setId("NOC");
             CaseViewResource caseViewResource = new CaseViewResource();
-            CaseViewEvent[] caseViewEventArray = {caseViewEvent};
-            caseViewResource.setCaseViewEvents(caseViewEventArray);
+            caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[] {caseViewActionableEvent});
+
             CaseViewType caseViewType = new CaseViewType();
             caseViewType.setName(CASE_TYPE_ID);
             caseViewType.setId(CASE_TYPE_ID);

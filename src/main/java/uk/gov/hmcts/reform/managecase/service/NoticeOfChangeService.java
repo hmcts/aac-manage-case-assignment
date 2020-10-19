@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnsw
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
-import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
@@ -32,7 +31,6 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.I
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
-import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_POLICY_CASE_ASSIGNED_ROLE;
 
 @Service
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
@@ -43,10 +41,6 @@ public class NoticeOfChangeService {
     private static final int JURISDICTION_INDEX = 1;
     private static final String CHALLENGE_QUESTION_ID = "NoCChallenge";
     private static final String CASE_ROLE_ID = "CaseRoleId";
-    private static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
-    private static final String ORG_POLICY_REFERENCE = "OrgPolicyReference";
-    private static final String ORG_ID = "OrganisationID";
-    private static final String ORG_NAME = "OrganisationName";
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
@@ -103,8 +97,7 @@ public class NoticeOfChangeService {
         // field in the case containing the case role, returning an error if this is not true.
         Optional<SearchResultViewItem> searchResultViewItem = caseFields.getCases().stream().findFirst();
         if (searchResultViewItem.isPresent()) {
-            List<OrganisationPolicy> organisationPolicies =
-                findPolicies(searchResultViewItem.get());
+            List<OrganisationPolicy> organisationPolicies = searchResultViewItem.get().findPolicies();
             checkOrgPoliciesForRoles(challengeQuestionsResult, organisationPolicies);
         }
 
@@ -130,21 +123,6 @@ public class NoticeOfChangeService {
                 }
             }
         });
-    }
-
-    private List<OrganisationPolicy> findPolicies(SearchResultViewItem caseFields) {
-        List<JsonNode> policyNodes = caseFields.findOrganisationPolicyNodes();
-        return policyNodes.stream()
-            .map(node -> {
-                JsonNode org = node.get("Organisation");
-                return OrganisationPolicy.builder()
-                    .organisation(Organisation.builder()
-                                      .organisationID(org.get(ORG_ID).asText())
-                                      .organisationName(org.get(ORG_NAME).asText())
-                                      .build())
-                    .orgPolicyCaseAssignedRole(node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText())
-                    .orgPolicyReference(node.get(ORG_POLICY_REFERENCE).asText()).build();
-            }).collect(Collectors.toList());
     }
 
     private Optional<String> extractJurisdiction(String caseworkerRole) {
@@ -206,7 +184,7 @@ public class NoticeOfChangeService {
     }
 
     private void checkForCaseEvents(CaseViewResource caseViewResource) {
-        if (caseViewResource.getCaseViewEvents() == null) {
+        if (caseViewResource.getCaseViewActionableEvents() == null) {
             throw new ValidationException(NOC_EVENT_NOT_AVAILABLE);
         }
     }

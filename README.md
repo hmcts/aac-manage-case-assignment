@@ -1,8 +1,8 @@
 # Manage Case Assignment
 
-This micro-service provides a set of APIs to manage case access. 
+This micro-service provides a set of APIs to manage case access.
 
-**TODO**: add more description / architecture diagram etc 
+**TODO**: add more description / architecture diagram etc
 
 ## Getting Started
 
@@ -25,14 +25,14 @@ Run the application by executing:
 ```
 
 ### Consuming this service locally
-This image is available in the HMCTS azure container registry. Image url is: `hmctspublic.azurecr.io/aac/manage-case-assignment`  
+This image is available in the HMCTS azure container registry. Image url is: `hmctspublic.azurecr.io/aac/manage-case-assignment`
 See required config in: [docker-compose.yml](docker-compose.yml)
 
 
 ## API documentation
-API documentation is provided with Swagger.  
-You can view the json spec here: [http://localhost:4454/v2/api-docs](http://localhost:4454/v2/api-docs)  
-Swagger UI is available here: [http://localhost:4454/swagger-ui.html](http://localhost:4454/swagger-ui.html)  
+API documentation is provided with Swagger.
+You can view the json spec here: [http://localhost:4454/v2/api-docs](http://localhost:4454/v2/api-docs)
+Swagger UI is available here: [http://localhost:4454/swagger-ui.html](http://localhost:4454/swagger-ui.html)
 
 ## Developing
 
@@ -51,10 +51,10 @@ To run all integration tests execute the following command:
 ### Functional tests
 These are the tests run against an environment. For example if you would like to test your local
  environment you'll need to export variables on your `.bash_profile` script.
- 
-Details of the relevant environment variables can be found in the `aca-docker/README.md` 
 
-> Note: For details of the emails and passwords to use in a local environment see the 
+Details of the relevant environment variables can be found in the `aca-docker/README.md`
+
+> Note: For details of the emails and passwords to use in a local environment see the
  [Create users and roles](https://github.com/hmcts/ccd-docker#3-create-users-and-roles) steps in
  [ccd-docker](https://github.com/hmcts/ccd-docker) project.
 
@@ -63,8 +63,14 @@ These tests can be run using:
 ./gradlew functional
 ```
 
+#### Test Users
+To make it easier to write and read test scenarios with the many varying users from different organisations,
+jurisdiction and of different roles etc, we can work with a standardised set of users and accounts listed [here](https://tools.hmcts.net/confluence/display/RCCD/MCA+BEFTA+Actors+list)
+
+![Image of users](https://tools.hmcts.net/confluence/rest/gliffy/1.0/embeddedDiagrams/4e2833d3-0013-4674-ad2d-39293a02eb22.png)
+
 ### Code quality checks
-We use [checkstyle](http://checkstyle.sourceforge.net/) and [PMD](https://pmd.github.io/).  
+We use [checkstyle](http://checkstyle.sourceforge.net/) and [PMD](https://pmd.github.io/).
 To run all checks execute the following command:
 
 ```bash
@@ -83,9 +89,9 @@ Run the distribution by executing the following command:
 ```bash
   docker-compose up
 ```
-This will start the API container exposing the application's port 4454. 
+This will start the API container exposing the application's port 4454.
 
-By default, docker-compose.yml is pointing to AAT urls of all downstream dependencies. So, you need to enable hmcts proxy.  
+By default, docker-compose.yml is pointing to AAT urls of all downstream dependencies. So, you need to enable hmcts proxy.
 
 You can spin-up full aca docker stack locally. Instructions are available under `aca-docker/README.md`.
 

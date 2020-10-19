@@ -12,8 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.BaseTest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.AuditEvent;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
@@ -77,12 +76,10 @@ public class NoticeOfChangeControllerIT {
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
-        AuditEvent event = new AuditEvent();
-        event.setEventName("NOC");
-        CaseViewEvent caseViewEvent = CaseViewEvent.createFrom(event);
+        CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
+        caseViewActionableEvent.setId("NOC");
         CaseViewResource caseViewResource = new CaseViewResource();
-        CaseViewEvent[] caseViewEventArray = {caseViewEvent};
-        caseViewResource.setCaseViewEvents(caseViewEventArray);
+        caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[] {caseViewActionableEvent});
         CaseViewType caseViewType = new CaseViewType();
         caseViewType.setId(CASE_TYPE_ID);
         CaseViewJurisdiction caseViewJurisdiction = new CaseViewJurisdiction();
@@ -91,27 +88,26 @@ public class NoticeOfChangeControllerIT {
         caseViewResource.setCaseType(caseViewType);
         stubGetCaseInternal(CASE_ID, caseViewResource);
 
-
         SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
         FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
         fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
         searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
         searchResultViewHeader.setCaseFieldId("changeOrg");
         SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
-            new HeaderGroupMetadata(JURISDICTION, CASE_TYPE_ID),
-            Arrays.asList(searchResultViewHeader),
-            Arrays.asList("111", "222")
+                new HeaderGroupMetadata(JURISDICTION, CASE_TYPE_ID),
+                Arrays.asList(searchResultViewHeader),
+                Arrays.asList("111", "222")
         );
         JsonNode actualObj = mapper.readValue("{\n"
-            + "  \"OrganisationPolicy1\": {\n"
-            + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
-            + "    \"OrgPolicyReference\": \"Reference\",\n"
-            + "    \"Organisation\": {\n"
-            + "      \"OrganisationID\": \"QUK822N\",\n"
-            + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
-            + "    }\n"
-            + "  }\n"
-            + "}", JsonNode.class);
+                + "  \"OrganisationPolicy1\": {\n"
+                + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
+                + "    \"OrgPolicyReference\": \"Reference\",\n"
+                + "    \"Organisation\": {\n"
+                + "      \"OrganisationID\": \"QUK822N\",\n"
+                + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
+                + "    }\n"
+                + "  }\n"
+                + "}", JsonNode.class);
 
         caseFields.put(PREDEFINED_COMPLEX_ORGANISATION_POLICY, actualObj);
         SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
@@ -131,15 +127,15 @@ public class NoticeOfChangeControllerIT {
         fieldType.setMin(null);
         fieldType.setMax(null);
         ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
-            "questionText",
-            fieldType,
-            null,
-            "NoC",
-            ANSWER_FIELD_APPLICANT,
-            QUESTION_ID_1,
-            null);
+                "questionText",
+                fieldType,
+                null,
+                "NoC",
+                ANSWER_FIELD_APPLICANT,
+                "QuestionId1",
+                null);
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
-            Arrays.asList(challengeQuestion));
+                Arrays.asList(challengeQuestion));
         stubGetChallengeQuestions(CASE_TYPE_ID, "NoCChallenge", challengeQuestionsResult);
     }
 

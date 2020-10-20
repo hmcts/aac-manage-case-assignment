@@ -41,7 +41,6 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.SOLICITOR_ROLE;
 
 @Service
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.GodClass", "PMD.ExcessiveImports", "PMD.TooManyMethods"})
@@ -49,7 +48,6 @@ public class NoticeOfChangeService {
 
     public static final String PUI_ROLE = "pui-caa";
 
-    private static final int JURISDICTION_INDEX = 1;
     private static final String APPROVED = "APPROVED";
     private static final String PENDING = "PENDING";
     private static final String CHALLENGE_QUESTION_ID = "NoCChallenge";
@@ -150,23 +148,11 @@ public class NoticeOfChangeService {
             .collect(toList());
     }
 
-    private Optional<String> extractJurisdiction(String caseworkerRole) {
-        String[] parts = caseworkerRole.split("-");
-        return parts.length < 2 ? Optional.empty() : Optional.of(parts[JURISDICTION_INDEX]);
-    }
-
     private void validateUserRoles(CaseViewResource caseViewResource, UserInfo userInfo) {
-        if (!userInfo.getRoles().contains(PUI_ROLE)) {
-            for (String role : userInfo.getRoles()) {
-                Optional<String> jurisdiction = extractJurisdiction(role);
-                if (jurisdiction.isPresent() && caseViewResource
-                    .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
-                    break;
-                } else if (jurisdiction.isPresent() && !caseViewResource
-                    .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
-                    throw new ValidationException(INSUFFICIENT_PRIVILEGE);
-                }
-            }
+        List<String> roles = userInfo.getRoles();
+        if (!roles.contains(PUI_ROLE)
+            && !isActingAsSolicitor(roles, caseViewResource.getCaseType().getJurisdiction().getId())) {
+            throw new ValidationException(INSUFFICIENT_PRIVILEGE);
         }
     }
 
@@ -251,7 +237,7 @@ public class NoticeOfChangeService {
             isNocRequestAutoApprovalCompleted(caseResource, invokersOrganisation, caseRoleId);
 
         // LLD STep 6: Auto-assign relevant case-roles to the invoker if required, i.e.:
-        if (isApprovalComplete && isActingAsSolicitor(caseResource)) {
+        if (isApprovalComplete &&  isActingAsSolicitor(getUserInfo().getRoles(), caseResource.getJurisdiction())) {
             autoAssignCaseRoles(caseResource, invokersOrganisation);
         }
 
@@ -270,10 +256,8 @@ public class NoticeOfChangeService {
         return noCRequestDetails.getCaseViewResource().getCaseViewActionableEvents()[0].getId();
     }
 
-    private boolean isActingAsSolicitor(CaseResource caseResource) {
-        String solicitorRole = String.format(SOLICITOR_ROLE, caseResource.getJurisdiction());
-        return getUserInfo().getRoles().stream()
-            .anyMatch(solicitorRole::startsWith);
+    private boolean isActingAsSolicitor(List<String> roles, String jurisdiction) {
+        return securityUtils.hasSolicitorRole(roles, jurisdiction);
     }
 
     private CaseResource generateNoCRequestEvent(String caseId,

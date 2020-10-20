@@ -41,9 +41,11 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
 
@@ -180,7 +182,7 @@ class NoticeOfChangeServiceTest {
             UserInfo userInfo = new UserInfo("","","", "", "",
                                              Arrays.asList("caseworker-Jurisdiction-solicitor"));
             given(securityUtils.getUserInfo()).willReturn(userInfo);
-
+            given(securityUtils.hasSolicitorRole(anyList(), any())).willReturn(true);
             ChallengeQuestionsResult challengeQuestionsResult = service.getChallengeQuestions(CASE_ID);
 
             assertThat(challengeQuestionsResult).isNotNull();

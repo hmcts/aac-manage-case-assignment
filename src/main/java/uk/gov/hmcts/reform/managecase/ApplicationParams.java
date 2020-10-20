@@ -10,10 +10,14 @@ import java.util.List;
 @Singleton
 public class ApplicationParams {
 
-    @Value("${idam.system-user.username}")
-    private String idamSystemUserId;
-    @Value("${idam.system-user.password}")
-    private String idamSystemUserPassword;
+    @Value("${idam.caa.username}")
+    private String caaSystemUserId;
+    @Value("${idam.caa.password}")
+    private String caaSystemUserPassword;
+    @Value("${idam.noc-approver.username}")
+    private String nocApproverSystemUserId;
+    @Value("${idam.noc-approver.password}")
+    private String nocApproverPassword;
     @Value("${ccd.data-store.allowed-urls}")
     private List<String> ccdDataStoreAllowedUrls;
     @Value("${ccd.data-store.allowed-service}")
@@ -23,12 +27,20 @@ public class ApplicationParams {
     @Value("${ccd.definition-store.allowed-service}")
     private String ccdDefinitionStoreAllowedService;
 
-    public String getIdamSystemUserId() {
-        return idamSystemUserId;
+    public String getCaaSystemUserId() {
+        return caaSystemUserId;
     }
 
-    public String getIdamSystemUserPassword() {
-        return idamSystemUserPassword;
+    public String getCaaSystemUserPassword() {
+        return caaSystemUserPassword;
+    }
+
+    public String getNocApproverSystemUserId() {
+        return nocApproverSystemUserId;
+    }
+
+    public String getNocApproverPassword() {
+        return nocApproverPassword;
     }
 
     public List<String> getCcdDataStoreAllowedUrls() {

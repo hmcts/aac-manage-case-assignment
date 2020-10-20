@@ -46,15 +46,29 @@ class IdamRepositoryTest {
     }
 
     @Test
-    @DisplayName("Get access token")
-    void shouldGetAccessToken() {
-        String userId = "TestUser";
+    @DisplayName("Get caa access token")
+    void shouldGetCaaAccessToken() {
+        String userId = "TestCaaUser";
         String password = "aPassword";
-        given(appParams.getIdamSystemUserId()).willReturn(userId);
-        given(appParams.getIdamSystemUserPassword()).willReturn(password);
+        given(appParams.getCaaSystemUserId()).willReturn(userId);
+        given(appParams.getCaaSystemUserPassword()).willReturn(password);
         given(idamClient.getAccessToken(userId, password)).willReturn(TEST_BEAR_TOKEN);
 
-        String token = idamRepository.getSystemUserAccessToken();
+        String token = idamRepository.getCaaSystemUserAccessToken();
+
+        assertThat(token).isEqualTo(TEST_BEAR_TOKEN);
+    }
+
+    @Test
+    @DisplayName("Get noc approver access token")
+    void shouldGetNocApproverAccessToken() {
+        String userId = "TestNocApprover";
+        String password = "aPassword";
+        given(appParams.getNocApproverSystemUserId()).willReturn(userId);
+        given(appParams.getNocApproverPassword()).willReturn(password);
+        given(idamClient.getAccessToken(userId, password)).willReturn(TEST_BEAR_TOKEN);
+
+        String token = idamRepository.getNocApproverSystemUserAccessToken();
 
         assertThat(token).isEqualTo(TEST_BEAR_TOKEN);
     }

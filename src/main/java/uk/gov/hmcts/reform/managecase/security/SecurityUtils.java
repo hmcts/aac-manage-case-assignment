@@ -29,8 +29,12 @@ public class SecurityUtils {
         return authTokenGenerator.generate();
     }
 
-    public String getSystemUserToken() {
-        return idamRepository.getSystemUserAccessToken();
+    public String getCaaSystemUserToken() {
+        return idamRepository.getCaaSystemUserAccessToken();
+    }
+
+    public String getNocApproverSystemUserAccessToken() {
+        return idamRepository.getNocApproverSystemUserAccessToken();
     }
 
     public String getUserToken() {

@@ -62,14 +62,20 @@ ccd:
     host: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
     allowed-urls: ${MCA_DS_PROXY_URLS_ALLOWED_LIST:/searchCases.*,/internal/searchCases.*}
     allowed-service: xui_webapp
+prd:
+  host: ${PRD_HOST:http://localhost:4455}
+  allowed-urls: ${MCA_PRD_PROXY_URLS_ALLOWED_LIST:/refdata/internal/v1/.*}
+  allowed-service: xui_webapp
 zuul:
   routes:
     data-store:
       path: /ccd/**
       sensitiveHeaders: Cookie,Set-Cookie
       url: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
-prd:
-  host: ${PRD_HOST:http://localhost:4455}
+    prd:
+      path: /prd/**
+      sensitiveHeaders: Cookie,Set-Cookie
+      url: ${PRD_HOST:http://localhost:4455}
 mca:
   conditional-apis:
     case-assignments:

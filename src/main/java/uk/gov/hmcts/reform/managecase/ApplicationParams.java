@@ -18,6 +18,10 @@ public class ApplicationParams {
     private List<String> ccdDataStoreAllowedUrls;
     @Value("${ccd.data-store.allowed-service}")
     private String ccdDataStoreAllowedService;
+    @Value("${prd.allowed-urls}")
+    private List<String> prdAllowedUrls;
+    @Value("${prd.allowed-service}")
+    private String prdAllowedService;
 
     @Value("${notify.email-template-id}")
     private String emailTemplateId;
@@ -39,6 +43,22 @@ public class ApplicationParams {
 
     public String getCcdDataStoreAllowedService() {
         return ccdDataStoreAllowedService;
+    }
+
+    public List<String> getPrdAllowedUrls() {
+        return prdAllowedUrls;
+    }
+
+    public void setPrdAllowedUrls(List<String> prdAllowedUrls) {
+        this.prdAllowedUrls = prdAllowedUrls;
+    }
+
+    public String getPrdAllowedService() {
+        return prdAllowedService;
+    }
+
+    public void setPrdAllowedService(String prdAllowedService) {
+        this.prdAllowedService = prdAllowedService;
     }
 
     public String getEmailTemplateId() {

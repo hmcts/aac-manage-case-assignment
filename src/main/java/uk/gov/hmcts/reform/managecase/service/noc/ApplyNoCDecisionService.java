@@ -29,7 +29,11 @@ import java.util.Optional;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.APPROVAL_STATUS;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CASE_ROLE_ID;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_ADD;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_REMOVE;
 
 @Service
 public class ApplyNoCDecisionService {
@@ -53,27 +57,17 @@ public class ApplyNoCDecisionService {
         this.objectMapper = objectMapper;
     }
 
-    private String getStringFromNode(JsonNode node, String key) {
-        JsonNode valueNode = node.get(key);
-        if (valueNode.isNull() || valueNode == null) {
-            throw new ValidationException("Can't be null key");
-        }
-        return valueNode.asText();
-    }
-
     public Map<String, JsonNode> applyNoCDecision(ApplyNoCDecisionRequest applyNoCDecisionRequest) {
         CaseDetails caseDetails = applyNoCDecisionRequest.getCaseDetails();
-        Map<String, JsonNode> data = caseDetails.getData();
         String caseReference = caseDetails.getReference();
+        Map<String, JsonNode> data = caseDetails.getData();
 
-        // TODO: Use ACA-71 method
+        // TODO: Use ACA-71 method when available on branch (and double-check it errors when required)
         JsonNode changeOrganisationRequestField = data.get("ChangeOrganisationRequestField");
 
-        JsonNode approvalStatusNode = changeOrganisationRequestField.get("ApprovalStatus");
-        if (approvalStatusNode.isNull() || approvalStatusNode == null) {
-            throw new ValidationException("Can't be null approval status");
-        }
-        String approvalStatus = approvalStatusNode.asText();
+        String approvalStatus = getNonNullStringValue(changeOrganisationRequestField, APPROVAL_STATUS);
+        String caseRoleId = getNonNullStringValue(changeOrganisationRequestField, CASE_ROLE_ID);
+        validateCorFieldOrganisations(changeOrganisationRequestField);
 
         if (approvalStatus.equals("Not considered")) {
             throw new ValidationException("Pending request!");
@@ -84,21 +78,15 @@ public class ApplyNoCDecisionService {
             throw new ValidationException("Unknown approval status!");
         }
 
-        JsonNode caseRoleIdNode = changeOrganisationRequestField.get("CaseRoleId");
-        if (approvalStatusNode.isNull() || approvalStatusNode == null) {
-            throw new ValidationException("Can't be null case role");
-        }
-        String caseRoleId = caseRoleIdNode.asText();
-
         JsonNode orgPolicyNode = caseDetails.findOrganisationPolicyNodeForCaseRole(caseRoleId)
-            .orElseThrow(() -> new IllegalStateException("None found"));
+                .orElseThrow(() -> new ValidationException("None found"));
 
-        JsonNode organisationToAddNode = changeOrganisationRequestField.get("OrganisationToAdd");
-        JsonNode organisationToRemoveNode = changeOrganisationRequestField.get("OrganisationToRemove");
+        JsonNode organisationToAddNode = changeOrganisationRequestField.get(ORGANISATION_TO_ADD);
+        JsonNode organisationToRemoveNode = changeOrganisationRequestField.get(ORGANISATION_TO_REMOVE);
         Organisation organisationToAdd = objectMapper.convertValue(organisationToAddNode, Organisation.class);
         Organisation organisationToRemove = objectMapper.convertValue(organisationToRemoveNode, Organisation.class);
 
-        if (isNullOrEmpty(organisationToAdd.getOrganisationID())) {
+        if (organisationToAdd == null || isNullOrEmpty(organisationToAdd.getOrganisationID())) {
             applyRemoveRepresentationDecision(caseReference, orgPolicyNode, organisationToRemove);
         } else {
             applyAddOrReplaceRepresentationDecision(caseReference, caseRoleId, orgPolicyNode,
@@ -106,8 +94,15 @@ public class ApplyNoCDecisionService {
         }
 
         nullifyNode(changeOrganisationRequestField);
-
         return data;
+    }
+
+    private void validateCorFieldOrganisations(JsonNode changeOrganisationRequestField) {
+        if (!changeOrganisationRequestField.has(ORGANISATION_TO_ADD)
+                || !changeOrganisationRequestField.has(ORGANISATION_TO_REMOVE)) {
+            throw new ValidationException("Fields of type ChangeOrganisationRequest must include both an " +
+                    "OrganisationToAdd and OrganisationToRemove field.");
+        }
     }
 
     private void applyAddOrReplaceRepresentationDecision(String caseReference,
@@ -119,7 +114,7 @@ public class ApplyNoCDecisionService {
         setOrgPolicyOrganisation(orgPolicyNode, organisationToAddNode);
         assignAccessToOrganisationUsers(caseReference, organisationToAdd, caseRoleId);
 
-        if (!isNullOrEmpty(organisationToRemove.getOrganisationID())) {
+        if (organisationToRemove != null && !isNullOrEmpty(organisationToRemove.getOrganisationID())) {
             removeOrganisationUsersAccess(caseReference, organisationToRemove);
         }
     }
@@ -151,6 +146,14 @@ public class ApplyNoCDecisionService {
         dataStoreRepository.removeCaseUserRoles(users.getLeft(), organisationToRemove.getOrganisationID());
 
         sendRemovalNotification(caseReference, users.getRight());
+    }
+
+    private String getNonNullStringValue(JsonNode node, String key) {
+        if (node.hasNonNull(key)) {
+            return node.get(key).asText();
+        } else {
+            throw new ValidationException(String.format("A value is expected for '%s'", key));
+        }
     }
 
     private void nullifyNode(JsonNode node) {

@@ -71,8 +71,13 @@ public final class WiremockFixtures {
         }
     }
 
-    public static void stubGetUsersByOrganisation(FindUsersByOrganisationResponse response) {
+    public static void stubGetUsersByOrganisationExternal(FindUsersByOrganisationResponse response) {
         stubFor(WireMock.get(urlEqualTo("/refdata/external/v1/organisations/users?status=Active&returnRoles=false"))
+                .willReturn(okForJson(response)));
+    }
+
+    public static void stubGetUsersByOrganisationInternal(FindUsersByOrganisationResponse response, String orgId) {
+        stubFor(WireMock.get(urlEqualTo(String.format("/refdata/internal/v1/organisations/%s/users?returnRoles=false", orgId)))
                 .willReturn(okForJson(response)));
     }
 

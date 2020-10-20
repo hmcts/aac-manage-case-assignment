@@ -66,8 +66,9 @@ public class AuthHeaderRoutingFilter extends ZuulFilter {
         String serviceName = securityUtils
                 .getServiceNameFromS2SToken(context.getRequest().getHeader(SERVICE_AUTHORIZATION));
 
-        if (!applicationParams.getCcdDataStoreAllowedService().equals(serviceName)) {
-            String errorMessage = String.format("forbidden client id %s for the /ccd endpoint", serviceName);
+        if (!applicationParams.getCcdDataStoreAllowedService().equals(serviceName)
+            || !applicationParams.getPrdAllowedService().equals(serviceName)) {
+            String errorMessage = String.format("forbidden client id %s for the endpoint", serviceName);
             LOG.debug(errorMessage);
 
             ZuulException zuulException = new ZuulException(errorMessage, 403, errorMessage);

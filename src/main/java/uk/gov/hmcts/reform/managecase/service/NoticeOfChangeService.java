@@ -175,7 +175,7 @@ public class NoticeOfChangeService {
     }
 
     private CaseViewResource getCase(String caseId) {
-        return dataStoreRepository.findCaseByCaseId(caseId);
+        return dataStoreRepository.findCaseByCaseId(caseId, securityUtils.getCaaSystemUserToken());
     }
 
     private CaseResource getCaseViaExternalApi(String caseId) {
@@ -288,7 +288,8 @@ public class NoticeOfChangeService {
             .requestTimestamp(LocalDateTime.now())
             .build();
 
-        return dataStoreRepository.submitEventForCase(caseId, eventId, changeOrganisationRequest);
+        return dataStoreRepository.submitEventForCase(caseId, eventId, changeOrganisationRequest,
+            securityUtils.getCaaSystemUserToken());
 
         //        Generate the NoCRequest event:
         //        Call EI-1 to generate an event token for a NoCRequest event for the case, return error if detected

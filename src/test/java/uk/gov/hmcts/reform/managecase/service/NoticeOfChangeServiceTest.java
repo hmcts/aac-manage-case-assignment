@@ -53,6 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -82,6 +83,7 @@ class NoticeOfChangeServiceTest {
         + "${applicant.soletrader.name}:Applicant";
     private static final String ANSWER_FIELD_RESPONDENT = "${applicant.individual.fullname}|${applicant.company.name}|"
         + "${applicant.soletrader.name}:Respondent";
+    public static final String CAA_TOKEN = "Bearer CAA token";
 
     private final List<SearchResultViewItem> viewItems = new ArrayList<>();
     private final Map<String, JsonNode> caseFields = new HashMap<>();
@@ -127,7 +129,10 @@ class NoticeOfChangeServiceTest {
             caseViewJurisdiction.setId(JURISDICTION);
             caseViewType.setJurisdiction(caseViewJurisdiction);
             caseViewResource.setCaseType(caseViewType);
-            given(dataStoreRepository.findCaseByCaseId(CASE_ID))
+
+            given(securityUtils.getCaaSystemUserToken()).willReturn(CAA_TOKEN);
+
+            given(dataStoreRepository.findCaseByCaseId(CASE_ID, CAA_TOKEN))
                 .willReturn(caseViewResource);
 
             // Internal ES query
@@ -357,7 +362,7 @@ class NoticeOfChangeServiceTest {
         @DisplayName("Must return an error when no NOC Request event is available on the case")
         void shouldThrowErrorNoEventAvailable() {
             CaseViewResource caseViewResource = new CaseViewResource();
-            given(dataStoreRepository.findCaseByCaseId(CASE_ID))
+            given(dataStoreRepository.findCaseByCaseId(CASE_ID, CAA_TOKEN))
                 .willReturn(caseViewResource);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
@@ -430,6 +435,8 @@ class NoticeOfChangeServiceTest {
             caseResource = CaseResource.builder().reference(CASE_ID).data(new HashMap<>()).build();
 
             given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseResource);
+
+            given(securityUtils.getCaaSystemUserToken()).willReturn(CAA_TOKEN);
         }
 
         @Test
@@ -460,7 +467,8 @@ class NoticeOfChangeServiceTest {
 
             verify(dataStoreRepository).submitEventForCase(caseIdCaptor.capture(),
                                                            eventIdCaptor.capture(),
-                                                           corArgumentCaptor.capture());
+                                                           corArgumentCaptor.capture(),
+                eq(CAA_TOKEN));
 
             assertThat(caseIdCaptor.getValue()).isEqualTo(CASE_ID);
             assertThat(eventIdCaptor.getValue()).isEqualTo(NOC_REQUEST_EVENT);

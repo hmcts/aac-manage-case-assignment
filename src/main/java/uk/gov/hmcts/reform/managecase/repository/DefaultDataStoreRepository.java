@@ -75,8 +75,8 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public CaseViewResource findCaseByCaseId(String caseId) {
-        return dataStoreApi.getCaseDetailsByCaseId(caseId);
+    public CaseViewResource findCaseByCaseId(String caseId, String userAuthToken) {
+        return dataStoreApi.getCaseDetailsByCaseId(caseId, userAuthToken);
     }
 
     @Override
@@ -110,10 +110,11 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     @Override
     public CaseResource submitEventForCase(String caseId,
                                            String eventId,
-                                           ChangeOrganisationRequest changeOrganisationRequest) {
+                                           ChangeOrganisationRequest changeOrganisationRequest,
+                                           String userAuthToken) {
 
         CaseResource caseResource = null;
-        CaseUpdateViewEvent caseUpdateViewEvent = dataStoreApi.getStartEventTrigger(caseId, eventId);
+        CaseUpdateViewEvent caseUpdateViewEvent = dataStoreApi.getStartEventTrigger(userAuthToken, caseId, eventId);
 
         if (caseUpdateViewEvent != null) {
             Optional<CaseViewField> caseViewField = getCaseViewField(caseUpdateViewEvent);
@@ -142,7 +143,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                         .data(getCaseDataContentData(caseFieldId, changeOrganisationRequest))
                         .build();
 
-                    caseResource = dataStoreApi.submitEventForCase(caseId, caseDataContent);
+                    caseResource = dataStoreApi.submitEventForCase(userAuthToken, caseId, caseDataContent);
                 }
             } else {
                 LOG.info("Failed to create ChangeOrganisationRequest because of missing case field id");

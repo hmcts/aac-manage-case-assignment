@@ -8,7 +8,9 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +42,17 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     public Optional<CaseDetails> findCaseBy(String caseTypeId, String caseId) {
         CaseSearchResponse searchResponse = dataStoreApi.searchCases(caseTypeId, String.format(ES_QUERY, caseId));
         return searchResponse.getCases().stream().findFirst();
+    }
+
+    @Override
+    public CaseSearchResultViewResource findCaseBy(String caseTypeId, Optional<String> useCase, String caseId) {
+        return dataStoreApi.internalSearchCases(caseTypeId,null, String.format(ES_QUERY, caseId));
+
+    }
+
+    @Override
+    public CaseViewResource findCaseByCaseId(String caseId) {
+        return dataStoreApi.getCaseDetailsByCaseId(caseId);
     }
 
     @Override

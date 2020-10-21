@@ -7,8 +7,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class JacksonUtilsTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -41,6 +39,6 @@ class JacksonUtilsTest {
 
         jacksonUtils.nullifyObjectNode((ObjectNode) node);
 
-        System.out.println("test");
+        // Add assertions
     }
 }

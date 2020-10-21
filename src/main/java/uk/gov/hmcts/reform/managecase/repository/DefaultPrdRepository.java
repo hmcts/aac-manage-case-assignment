@@ -23,7 +23,7 @@ public class DefaultPrdRepository implements PrdRepository {
     }
 
     @Override
-    @Cacheable(value = "usersByOrganisationId")
+    @Cacheable("usersByOrganisationId")
     public FindUsersByOrganisationResponse findUsersByOrganisation(String organisationId) {
         return prdApi.findActiveUsersByOrganisation(organisationId);
     }

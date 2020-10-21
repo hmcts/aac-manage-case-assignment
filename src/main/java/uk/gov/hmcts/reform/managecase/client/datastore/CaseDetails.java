@@ -25,6 +25,9 @@ public class CaseDetails {
     public static final String CASE_ROLE_ID = "CaseRoleId";
     public static final String ORGANISATION_TO_ADD = "OrganisationToAdd";
     public static final String ORGANISATION_TO_REMOVE = "OrganisationToRemove";
+    public static final String ORG_POLICY_REFERENCE = "OrgPolicyReference";
+    public static final String ORG_ID = "OrganisationID";
+    public static final String ORG_NAME = "OrganisationName";
 
     private String reference;
     private String jurisdiction;
@@ -45,8 +48,8 @@ public class CaseDetails {
         return findOrganisationPolicyNodes().stream()
                 .filter(node -> node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText().equals(caseRoleId))
                 .reduce((a, b) -> {
-                    throw new ValidationException(String.format("More than one Organisation Policy with " +
-                            "case role ID '%s' exists on case", caseRoleId));
+                    throw new ValidationException(String.format("More than one Organisation Policy with "
+                            + "case role ID '%s' exists on case", caseRoleId));
                 });
     }
 }

@@ -55,6 +55,11 @@ public class AllowedUrlRoutingFilter extends ZuulFilter {
             .map("/ccd"::concat)
             .collect(Collectors.toList());
 
+        List<String> ccdDefinitionStoreAllowedUrls = applicationParams.getCcdDefinitionStoreAllowedUrls()
+            .stream()
+            .map("/ccd"::concat)
+            .collect(Collectors.toList());
+
         List<String> prdAllowedUrls = applicationParams.getPrdAllowedUrls()
             .stream()
             .map("/prd"::concat)
@@ -64,6 +69,7 @@ public class AllowedUrlRoutingFilter extends ZuulFilter {
             + (context.getRequest().getQueryString() == null ? "" : "?" + context.getRequest().getQueryString());
 
         if (ccdDataStoreAllowedUrls.stream().noneMatch(uri::matches)
+            && ccdDefinitionStoreAllowedUrls.stream().noneMatch(uri::matches)
             && prdAllowedUrls.stream().noneMatch(uri::matches)) {
             ZuulException zuulException = new ZuulException("Uri not allowed: " + uri, 403, "Uri not allowed");
             throw new ZuulRuntimeException(zuulException);

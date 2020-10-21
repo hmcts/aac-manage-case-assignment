@@ -12,6 +12,11 @@ public final class ValidationError {
     public static final String CASE_ROLE_FORMAT_INVALID = "Case role name format is invalid";
     public static final String CASE_TYPE_ID_EMPTY = "Case type ID can not be empty";
     public static final String EMPTY_REQUESTED_UNASSIGNMENTS_LIST = "Requested Unassignments can not be empty";
+    public static final String CHALLENGE_QUESTION_ANSWERS_EMPTY = "Challenge question answers can not be empty";
+    public static final String NOC_REQUEST_ONGOING = "On going NoC request in progress";
+    public static final String NOC_EVENT_NOT_AVAILABLE = "No NoC events available for this case type";
+    public static final String INSUFFICIENT_PRIVILEGE = "Insufficient privileges";
+    public static final String NO_ORG_POLICY_WITH_ROLE = "No Org Policy with that role";
 
     public static final String ASSIGNEE_ROLE_ERROR = "Intended assignee has to be a solicitor"
         + " enabled in the jurisdiction of the case.";

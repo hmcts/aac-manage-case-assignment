@@ -33,18 +33,21 @@ import java.util.Map;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.hamcrest.Matchers.is;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.APPROVAL_STATUS;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CASE_ROLE_ID;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_ADD;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_REMOVE;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_POLICY_CASE_ASSIGNED_ROLE;
 
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.DataflowAnomalyAnalysis",
+    "PMD.JUnitAssertionsShouldIncludeMessage"})
 class ApplyNoCDecisionServiceTest {
 
     private static final String CASE_ID = "123";
@@ -64,441 +67,434 @@ class ApplyNoCDecisionServiceTest {
     private static final String USER_ID_1 = "UserId1";
     private static final String USER_ID_2 = "UserId2";
     private static final String USER_ID_3 = "UserId3";
-
+    private final ObjectMapper mapper = new ObjectMapper();
     @InjectMocks
     private ApplyNoCDecisionService applyNoCDecisionService;
-
     @Mock
     private PrdRepository prdRepository;
-
     @Mock
     private DataStoreRepository dataStoreRepository;
-
     @Mock
     private NotifyService notifyService;
-
     @Captor
     private ArgumentCaptor<List<CaseUserRole>> caseUserRolesCaptor;
-
     @Captor
     private ArgumentCaptor<List<EmailNotificationRequest>> emailRequestsCaptor;
-
     @Captor
     private ArgumentCaptor<List<String>> caseRolesCaptor;
-
-    private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
         applyNoCDecisionService = new ApplyNoCDecisionService(prdRepository, dataStoreRepository,
-                notifyService, new JacksonUtils(mapper), mapper);
+            notifyService, new JacksonUtils(mapper), mapper);
     }
 
     @Test
     void shouldUpdateCaseDataWhenRemoveDecisionIsApplied() throws JsonProcessingException {
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(createData())
-                .reference(CASE_ID)
-                .build();
+            .data(createData())
+            .reference(CASE_ID)
+            .build();
 
         when(dataStoreRepository.getCaseAssignments(singletonList(CASE_ID), null)).thenReturn(emptyList());
         when(prdRepository.findUsersByOrganisation(ORG_2_ID))
-                .thenReturn(new FindUsersByOrganisationResponse(emptyList(), ORG_2_ID));
+            .thenReturn(new FindUsersByOrganisationResponse(emptyList(), ORG_2_ID));
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
         Map<String, JsonNode> result = applyNoCDecisionService.applyNoCDecision(request);
 
         assertAll(
-                () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
-                () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
-                        is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
-                                ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
-                () -> assertThat(result.get(ORG_POLICY_2_FIELD).toString(),
-                        is(orgPolicyAsString(null, null,
-                                ORG_POLICY_2_REF, ORG_POLICY_2_ROLE)))
+            () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
+            () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
+                is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
+                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
+            () -> assertThat(result.get(ORG_POLICY_2_FIELD).toString(),
+                is(orgPolicyAsString(null, null,
+                    ORG_POLICY_2_REF, ORG_POLICY_2_ROLE)))
         );
     }
 
     @Test
     void shouldRemoveExistingOrgUsersWithAccessWhenRemoveDecisionIsApplied() throws JsonProcessingException {
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(createData())
-                .reference(CASE_ID)
-                .build();
+            .data(createData())
+            .reference(CASE_ID)
+            .build();
 
         List<CaseUserRole> existingCaseAssignments = List.of(
-                new CaseUserRole(CASE_ID, USER_ID_1, ORG_POLICY_2_ROLE),
-                new CaseUserRole(CASE_ID, USER_ID_2, ORG_POLICY_2_ROLE),
-                new CaseUserRole(CASE_ID, USER_ID_3, ORG_POLICY_2_ROLE)
+            new CaseUserRole(CASE_ID, USER_ID_1, ORG_POLICY_2_ROLE),
+            new CaseUserRole(CASE_ID, USER_ID_2, ORG_POLICY_2_ROLE),
+            new CaseUserRole(CASE_ID, USER_ID_3, ORG_POLICY_2_ROLE)
         );
         when(dataStoreRepository.getCaseAssignments(singletonList(CASE_ID), null))
-                .thenReturn(existingCaseAssignments);
+            .thenReturn(existingCaseAssignments);
 
         FindUsersByOrganisationResponse usersByOrganisation = new FindUsersByOrganisationResponse(List.of(
-                prdUser(1), prdUser(3), prdUser(4)), ORG_2_ID);
+            prdUser(1), prdUser(3), prdUser(4)), ORG_2_ID);
         when(prdRepository.findUsersByOrganisation(ORG_2_ID)).thenReturn(usersByOrganisation);
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
-        Map<String, JsonNode> result = applyNoCDecisionService.applyNoCDecision(request);
+        applyNoCDecisionService.applyNoCDecision(request);
 
         assertAll(
-                () -> verify(dataStoreRepository).removeCaseUserRoles(caseUserRolesCaptor.capture(),
-                        Mockito.eq(ORG_2_ID)),
-                () -> assertThat(caseUserRolesCaptor.getValue().size(), is(2)),
-                () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
-                () -> assertThat(caseUserRolesCaptor.getValue().get(0).getUserId(), is(USER_ID_1)),
-                () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseRole(), is(ORG_POLICY_2_ROLE)),
-                () -> assertThat(caseUserRolesCaptor.getValue().get(1).getCaseId(), is(CASE_ID)),
-                () -> assertThat(caseUserRolesCaptor.getValue().get(1).getUserId(), is(USER_ID_3)),
-                () -> assertThat(caseUserRolesCaptor.getValue().get(1).getCaseRole(), is(ORG_POLICY_2_ROLE)),
-                () -> verify(notifyService).sendEmail(emailRequestsCaptor.capture()),
-                () -> assertThat(emailRequestsCaptor.getValue().size(), is(2)),
-                () -> assertThat(emailRequestsCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
-                () -> assertThat(emailRequestsCaptor.getValue().get(0).getEmailAddress(), is("User1Email")),
-                () -> assertThat(emailRequestsCaptor.getValue().get(1).getCaseId(), is(CASE_ID)),
-                () -> assertThat(emailRequestsCaptor.getValue().get(1).getEmailAddress(), is("User3Email")),
-                () -> verify(dataStoreRepository, never())
-                        .assignCase(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())
+            () -> verify(dataStoreRepository).removeCaseUserRoles(caseUserRolesCaptor.capture(),
+                Mockito.eq(ORG_2_ID)),
+            () -> assertThat(caseUserRolesCaptor.getValue().size(), is(2)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getUserId(), is(USER_ID_1)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseRole(), is(ORG_POLICY_2_ROLE)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(1).getCaseId(), is(CASE_ID)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(1).getUserId(), is(USER_ID_3)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(1).getCaseRole(), is(ORG_POLICY_2_ROLE)),
+            () -> verify(notifyService).sendEmail(emailRequestsCaptor.capture()),
+            () -> assertThat(emailRequestsCaptor.getValue().size(), is(2)),
+            () -> assertThat(emailRequestsCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
+            () -> assertThat(emailRequestsCaptor.getValue().get(0).getEmailAddress(), is("User1Email")),
+            () -> assertThat(emailRequestsCaptor.getValue().get(1).getCaseId(), is(CASE_ID)),
+            () -> assertThat(emailRequestsCaptor.getValue().get(1).getEmailAddress(), is("User3Email")),
+            () -> verify(dataStoreRepository, never())
+                .assignCase(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())
         );
     }
 
     @Test
     void shouldUpdateCaseDataWhenAddDecisionIsApplied() throws JsonProcessingException {
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(createData(
-                        orgPolicyAsString(null, null, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
-                        orgPolicyAsString(null, null, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
-                        organisationAsString(ORG_3_ID, ORG_3_NAME),
-                        organisationAsString(null, null)
-                ))
-                .reference(CASE_ID)
-                .build();
+            .data(createData(
+                orgPolicyAsString(null, null, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
+                orgPolicyAsString(null, null, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
+                organisationAsString(ORG_3_ID, ORG_3_NAME),
+                organisationAsString(null, null)
+            ))
+            .reference(CASE_ID)
+            .build();
 
         when(prdRepository.findUsersByOrganisation(ORG_3_ID))
-                .thenReturn(new FindUsersByOrganisationResponse(emptyList(), ORG_3_ID));
+            .thenReturn(new FindUsersByOrganisationResponse(emptyList(), ORG_3_ID));
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
         Map<String, JsonNode> result = applyNoCDecisionService.applyNoCDecision(request);
 
         assertAll(
-                () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
-                () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
-                        is(orgPolicyAsString(null, null,
-                                ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
-                () -> assertThat(result.get(ORG_POLICY_2_FIELD).toString(),
-                        is(orgPolicyAsString(ORG_3_ID, ORG_3_NAME,
-                                ORG_POLICY_2_REF, ORG_POLICY_2_ROLE)))
+            () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
+            () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
+                is(orgPolicyAsString(null, null,
+                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
+            () -> assertThat(result.get(ORG_POLICY_2_FIELD).toString(),
+                is(orgPolicyAsString(ORG_3_ID, ORG_3_NAME,
+                    ORG_POLICY_2_REF, ORG_POLICY_2_ROLE)))
         );
     }
 
     @Test
     void shouldUpdateOrgUsersAccessWhenAddDecisionIsApplied() throws JsonProcessingException {
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(createData(
-                        orgPolicyAsString(null, null, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
-                        orgPolicyAsString(null, null, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
-                        organisationAsString(ORG_3_ID, ORG_3_NAME),
-                        organisationAsString(null, null)
-                ))
-                .reference(CASE_ID)
-                .build();
+            .data(createData(
+                orgPolicyAsString(null, null, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
+                orgPolicyAsString(null, null, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
+                organisationAsString(ORG_3_ID, ORG_3_NAME),
+                organisationAsString(null, null)
+            ))
+            .reference(CASE_ID)
+            .build();
 
         FindUsersByOrganisationResponse usersByOrganisation2 = new FindUsersByOrganisationResponse(List.of(
-                prdUser(1), prdUser(2)), ORG_3_ID);
+            prdUser(1), prdUser(2)), ORG_3_ID);
         when(prdRepository.findUsersByOrganisation(ORG_3_ID)).thenReturn(usersByOrganisation2);
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
-        Map<String, JsonNode> result = applyNoCDecisionService.applyNoCDecision(request);
+        applyNoCDecisionService.applyNoCDecision(request);
 
         assertAll(
-                () -> verify(dataStoreRepository, times(2))
-                        .assignCase(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()),
-                () -> verify(dataStoreRepository).assignCase(Mockito.any(), Mockito.eq(CASE_ID),
-                        Mockito.eq(USER_ID_1), Mockito.eq(ORG_3_ID)),
-                () -> verify(dataStoreRepository).assignCase(caseRolesCaptor.capture(), Mockito.eq(CASE_ID),
-                        Mockito.eq(USER_ID_2), Mockito.eq(ORG_3_ID)),
-                () -> assertThat(caseRolesCaptor.getValue().size(), is(1)),
-                () -> assertThat(caseRolesCaptor.getValue().get(0), is(ORG_POLICY_2_ROLE)),
-                () -> verify(dataStoreRepository, never()).removeCaseUserRoles(Mockito.any(), Mockito.any()),
-                () -> verify(notifyService, never()).sendEmail(Mockito.any())
+            () -> verify(dataStoreRepository, times(2))
+                .assignCase(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()),
+            () -> verify(dataStoreRepository).assignCase(Mockito.any(), Mockito.eq(CASE_ID),
+                Mockito.eq(USER_ID_1), Mockito.eq(ORG_3_ID)),
+            () -> verify(dataStoreRepository).assignCase(caseRolesCaptor.capture(), Mockito.eq(CASE_ID),
+                Mockito.eq(USER_ID_2), Mockito.eq(ORG_3_ID)),
+            () -> assertThat(caseRolesCaptor.getValue().size(), is(1)),
+            () -> assertThat(caseRolesCaptor.getValue().get(0), is(ORG_POLICY_2_ROLE)),
+            () -> verify(dataStoreRepository, never()).removeCaseUserRoles(Mockito.any(), Mockito.any()),
+            () -> verify(notifyService, never()).sendEmail(Mockito.any())
         );
     }
 
     @Test
     void shouldUpdateCaseDataWhenReplaceDecisionIsApplied() throws JsonProcessingException {
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(createData(
-                        orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
-                        orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
-                        organisationAsString(ORG_3_ID, ORG_3_NAME),
-                        organisationAsString(ORG_2_ID, ORG_2_NAME)
-                ))
-                .reference(CASE_ID)
-                .build();
+            .data(createData(
+                orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
+                orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
+                organisationAsString(ORG_3_ID, ORG_3_NAME),
+                organisationAsString(ORG_2_ID, ORG_2_NAME)
+            ))
+            .reference(CASE_ID)
+            .build();
 
         when(dataStoreRepository.getCaseAssignments(singletonList(CASE_ID), null)).thenReturn(emptyList());
         when(prdRepository.findUsersByOrganisation(ORG_2_ID))
-                .thenReturn(new FindUsersByOrganisationResponse(emptyList(), ORG_2_ID));
+            .thenReturn(new FindUsersByOrganisationResponse(emptyList(), ORG_2_ID));
         when(prdRepository.findUsersByOrganisation(ORG_3_ID))
-                .thenReturn(new FindUsersByOrganisationResponse(emptyList(), ORG_3_ID));
+            .thenReturn(new FindUsersByOrganisationResponse(emptyList(), ORG_3_ID));
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
         Map<String, JsonNode> result = applyNoCDecisionService.applyNoCDecision(request);
 
         assertAll(
-                () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
-                () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
-                        is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
-                                ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
-                () -> assertThat(result.get(ORG_POLICY_2_FIELD).toString(),
-                        is(orgPolicyAsString(ORG_3_ID, ORG_3_NAME,
-                                ORG_POLICY_2_REF, ORG_POLICY_2_ROLE)))
+            () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
+            () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
+                is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
+                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
+            () -> assertThat(result.get(ORG_POLICY_2_FIELD).toString(),
+                is(orgPolicyAsString(ORG_3_ID, ORG_3_NAME,
+                    ORG_POLICY_2_REF, ORG_POLICY_2_ROLE)))
         );
     }
 
     @Test
     void shouldUpdateOrgUsersAccessWhenReplaceDecisionIsApplied() throws JsonProcessingException {
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(createData(
-                        orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
-                        orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
-                        organisationAsString(ORG_3_ID, ORG_3_NAME),
-                        organisationAsString(ORG_2_ID, ORG_2_NAME)
-                ))
-                .reference(CASE_ID)
-                .build();
+            .data(createData(
+                orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
+                orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
+                organisationAsString(ORG_3_ID, ORG_3_NAME),
+                organisationAsString(ORG_2_ID, ORG_2_NAME)
+            ))
+            .reference(CASE_ID)
+            .build();
 
         List<CaseUserRole> existingCaseAssignments = List.of(
-                new CaseUserRole(CASE_ID, USER_ID_1, ORG_POLICY_2_ROLE),
-                new CaseUserRole(CASE_ID, USER_ID_2, ORG_POLICY_2_ROLE),
-                new CaseUserRole(CASE_ID, USER_ID_3, ORG_POLICY_2_ROLE)
+            new CaseUserRole(CASE_ID, USER_ID_1, ORG_POLICY_2_ROLE),
+            new CaseUserRole(CASE_ID, USER_ID_2, ORG_POLICY_2_ROLE),
+            new CaseUserRole(CASE_ID, USER_ID_3, ORG_POLICY_2_ROLE)
         );
         when(dataStoreRepository.getCaseAssignments(singletonList(CASE_ID), null))
-                .thenReturn(existingCaseAssignments);
+            .thenReturn(existingCaseAssignments);
 
         FindUsersByOrganisationResponse usersByOrganisation1 = new FindUsersByOrganisationResponse(List.of(
-                prdUser(1), prdUser(3), prdUser(4)), ORG_2_ID);
+            prdUser(1), prdUser(3), prdUser(4)), ORG_2_ID);
         when(prdRepository.findUsersByOrganisation(ORG_2_ID)).thenReturn(usersByOrganisation1);
 
         FindUsersByOrganisationResponse usersByOrganisation2 = new FindUsersByOrganisationResponse(List.of(
-                prdUser(5), prdUser(6)), ORG_3_ID);
+            prdUser(5), prdUser(6)), ORG_3_ID);
         when(prdRepository.findUsersByOrganisation(ORG_3_ID)).thenReturn(usersByOrganisation2);
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
-        Map<String, JsonNode> result = applyNoCDecisionService.applyNoCDecision(request);
+        applyNoCDecisionService.applyNoCDecision(request);
 
         assertAll(
-                () -> verify(dataStoreRepository).removeCaseUserRoles(caseUserRolesCaptor.capture(), Mockito.eq(ORG_2_ID)),
-                () -> assertThat(caseUserRolesCaptor.getValue().size(), is(2)),
-                () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
-                () -> assertThat(caseUserRolesCaptor.getValue().get(0).getUserId(), is(USER_ID_1)),
-                () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseRole(), is(ORG_POLICY_2_ROLE)),
-                () -> assertThat(caseUserRolesCaptor.getValue().get(1).getCaseId(), is(CASE_ID)),
-                () -> assertThat(caseUserRolesCaptor.getValue().get(1).getUserId(), is(USER_ID_3)),
-                () -> assertThat(caseUserRolesCaptor.getValue().get(1).getCaseRole(), is(ORG_POLICY_2_ROLE)),
-                () -> verify(notifyService).sendEmail(emailRequestsCaptor.capture()),
-                () -> assertThat(emailRequestsCaptor.getValue().size(), is(2)),
-                () -> assertThat(emailRequestsCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
-                () -> assertThat(emailRequestsCaptor.getValue().get(0).getEmailAddress(), is("User1Email")),
-                () -> assertThat(emailRequestsCaptor.getValue().get(1).getCaseId(), is(CASE_ID)),
-                () -> assertThat(emailRequestsCaptor.getValue().get(1).getEmailAddress(), is("User3Email")),
-                () -> verify(dataStoreRepository, times(2))
-                        .assignCase(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()),
-                () -> verify(dataStoreRepository).assignCase(caseRolesCaptor.capture(), Mockito.eq(CASE_ID),
-                        Mockito.eq("UserId5"), Mockito.eq(ORG_3_ID)),
-                () -> assertThat(caseRolesCaptor.getValue().size(), is(1)),
-                () -> assertThat(caseRolesCaptor.getValue().get(0), is(ORG_POLICY_2_ROLE)),
-                () -> verify(dataStoreRepository).assignCase(caseRolesCaptor.capture(), Mockito.eq(CASE_ID),
-                        Mockito.eq("UserId6"), Mockito.eq(ORG_3_ID)),
-                () -> assertThat(caseRolesCaptor.getValue().size(), is(1)),
-                () -> assertThat(caseRolesCaptor.getValue().get(0), is(ORG_POLICY_2_ROLE))
+            () -> verify(dataStoreRepository).removeCaseUserRoles(caseUserRolesCaptor.capture(), Mockito.eq(ORG_2_ID)),
+            () -> assertThat(caseUserRolesCaptor.getValue().size(), is(2)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getUserId(), is(USER_ID_1)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseRole(), is(ORG_POLICY_2_ROLE)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(1).getCaseId(), is(CASE_ID)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(1).getUserId(), is(USER_ID_3)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(1).getCaseRole(), is(ORG_POLICY_2_ROLE)),
+            () -> verify(notifyService).sendEmail(emailRequestsCaptor.capture()),
+            () -> assertThat(emailRequestsCaptor.getValue().size(), is(2)),
+            () -> assertThat(emailRequestsCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
+            () -> assertThat(emailRequestsCaptor.getValue().get(0).getEmailAddress(), is("User1Email")),
+            () -> assertThat(emailRequestsCaptor.getValue().get(1).getCaseId(), is(CASE_ID)),
+            () -> assertThat(emailRequestsCaptor.getValue().get(1).getEmailAddress(), is("User3Email")),
+            () -> verify(dataStoreRepository, times(2))
+                .assignCase(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()),
+            () -> verify(dataStoreRepository).assignCase(caseRolesCaptor.capture(), Mockito.eq(CASE_ID),
+                Mockito.eq("UserId5"), Mockito.eq(ORG_3_ID)),
+            () -> assertThat(caseRolesCaptor.getValue().size(), is(1)),
+            () -> assertThat(caseRolesCaptor.getValue().get(0), is(ORG_POLICY_2_ROLE)),
+            () -> verify(dataStoreRepository).assignCase(caseRolesCaptor.capture(), Mockito.eq(CASE_ID),
+                Mockito.eq("UserId6"), Mockito.eq(ORG_3_ID)),
+            () -> assertThat(caseRolesCaptor.getValue().size(), is(1)),
+            () -> assertThat(caseRolesCaptor.getValue().get(0), is(ORG_POLICY_2_ROLE))
         );
     }
 
     @Test
     void shouldUpdateCaseDataWhenRejectedDecisionIsApplied() throws JsonProcessingException {
         Map<String, JsonNode> data = createData();
-        ((ObjectNode)data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS, new TextNode("Rejected"));
+        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS, new TextNode("Rejected"));
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(data)
-                .reference(CASE_ID)
-                .build();
+            .data(data)
+            .reference(CASE_ID)
+            .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
         Map<String, JsonNode> result = applyNoCDecisionService.applyNoCDecision(request);
 
         assertAll(
-                () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
-                () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
-                        is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
-                                ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
-                () -> assertThat(result.get(ORG_POLICY_2_FIELD).toString(),
-                        is(orgPolicyAsString(ORG_2_ID, ORG_2_NAME,
-                                ORG_POLICY_2_REF, ORG_POLICY_2_ROLE)))
+            () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
+            () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
+                is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
+                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
+            () -> assertThat(result.get(ORG_POLICY_2_FIELD).toString(),
+                is(orgPolicyAsString(ORG_2_ID, ORG_2_NAME,
+                    ORG_POLICY_2_REF, ORG_POLICY_2_ROLE)))
         );
     }
 
     @Test
     void shouldErrorWhenApprovalStatusIsNotSet() throws JsonProcessingException {
         Map<String, JsonNode> data = createData();
-        ((ObjectNode)data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS, mapper.nullNode());
+        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS, mapper.nullNode());
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(data)
-                .reference(CASE_ID)
-                .build();
+            .data(data)
+            .reference(CASE_ID)
+            .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
         ValidationException exception = assertThrows(ValidationException.class,
-                () -> applyNoCDecisionService.applyNoCDecision(request));
+            () -> applyNoCDecisionService.applyNoCDecision(request));
 
         assertAll(
-                () -> assertThat(exception.getMessage(), is("A value is expected for 'ApprovalStatus'"))
+            () -> assertThat(exception.getMessage(), is("A value is expected for 'ApprovalStatus'"))
         );
     }
 
     @Test
     void shouldErrorWhenApprovalStatusIsPending() throws JsonProcessingException {
         Map<String, JsonNode> data = createData();
-        ((ObjectNode)data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS, new TextNode("Not considered"));
+        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS, new TextNode("Not considered"));
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(data)
-                .reference(CASE_ID)
-                .build();
+            .data(data)
+            .reference(CASE_ID)
+            .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
         ValidationException exception = assertThrows(ValidationException.class,
-                () -> applyNoCDecisionService.applyNoCDecision(request));
+            () -> applyNoCDecisionService.applyNoCDecision(request));
 
         assertAll(
-                () -> assertThat(exception.getMessage(), is("Pending request!"))
+            () -> assertThat(exception.getMessage(), is("Pending request!"))
         );
     }
 
     @Test
     void shouldErrorWhenApprovalStatusIsInvalid() throws JsonProcessingException {
         Map<String, JsonNode> data = createData();
-        ((ObjectNode)data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS, new TextNode("Unknown Status"));
+        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS, new TextNode("Unknown Status"));
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(data)
-                .reference(CASE_ID)
-                .build();
+            .data(data)
+            .reference(CASE_ID)
+            .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
         ValidationException exception = assertThrows(ValidationException.class,
-                () -> applyNoCDecisionService.applyNoCDecision(request));
+            () -> applyNoCDecisionService.applyNoCDecision(request));
 
         assertAll(
-                () -> assertThat(exception.getMessage(), is("Unknown approval status!"))
+            () -> assertThat(exception.getMessage(), is("Unknown approval status!"))
         );
     }
 
     @Test
     void shouldErrorWhenCaseRoleIdIsNotSet() throws JsonProcessingException {
         Map<String, JsonNode> data = createData();
-        ((ObjectNode)data.get(CHANGE_ORG_REQUEST_FIELD)).set(CASE_ROLE_ID, mapper.nullNode());
+        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(CASE_ROLE_ID, mapper.nullNode());
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(data)
-                .reference(CASE_ID)
-                .build();
+            .data(data)
+            .reference(CASE_ID)
+            .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
         ValidationException exception = assertThrows(ValidationException.class,
-                () -> applyNoCDecisionService.applyNoCDecision(request));
+            () -> applyNoCDecisionService.applyNoCDecision(request));
 
         assertAll(
-                () -> assertThat(exception.getMessage(), is("A value is expected for 'CaseRoleId'"))
+            () -> assertThat(exception.getMessage(), is("A value is expected for 'CaseRoleId'"))
         );
     }
 
     @Test
     void shouldErrorWhenNoOrgPolicyExistsForCaseRoleId() throws JsonProcessingException {
         Map<String, JsonNode> data = createData();
-        ((ObjectNode)data.get(CHANGE_ORG_REQUEST_FIELD)).set(CASE_ROLE_ID, new TextNode("UnknownCaseRoleId"));
+        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(CASE_ROLE_ID, new TextNode("UnknownCaseRoleId"));
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(data)
-                .reference(CASE_ID)
-                .build();
+            .data(data)
+            .reference(CASE_ID)
+            .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
         ValidationException exception = assertThrows(ValidationException.class,
-                () -> applyNoCDecisionService.applyNoCDecision(request));
+            () -> applyNoCDecisionService.applyNoCDecision(request));
 
         assertAll(
-                () -> assertThat(exception.getMessage(), is("None found"))
+            () -> assertThat(exception.getMessage(), is("None found"))
         );
     }
 
     @Test
     void shouldErrorWhenMultipleOrgPoliciesExistForCaseRoleId() throws JsonProcessingException {
         Map<String, JsonNode> data = createData();
-        ((ObjectNode)data.get(ORG_POLICY_1_FIELD)).set(ORG_POLICY_CASE_ASSIGNED_ROLE, new TextNode(ORG_POLICY_2_ROLE));
+        ((ObjectNode) data.get(ORG_POLICY_1_FIELD)).set(ORG_POLICY_CASE_ASSIGNED_ROLE, new TextNode(ORG_POLICY_2_ROLE));
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(data)
-                .reference(CASE_ID)
-                .build();
+            .data(data)
+            .reference(CASE_ID)
+            .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
         ValidationException exception = assertThrows(ValidationException.class,
-                () -> applyNoCDecisionService.applyNoCDecision(request));
+            () -> applyNoCDecisionService.applyNoCDecision(request));
 
         assertAll(
-                () -> assertThat(exception.getMessage(), is("More than one Organisation Policy with case role ID '[Claimant]' exists on case"))
+            () -> assertThat(exception.getMessage(),
+                is("More than one Organisation Policy with case role ID '[Claimant]' exists on case"))
         );
     }
 
     @Test
     void shouldErrorWhenOrganisationToAddIsNotPresent() throws JsonProcessingException {
         Map<String, JsonNode> data = createData();
-        ((ObjectNode)data.get(CHANGE_ORG_REQUEST_FIELD)).remove(ORGANISATION_TO_ADD);
+        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).remove(ORGANISATION_TO_ADD);
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(data)
-                .reference(CASE_ID)
-                .build();
+            .data(data)
+            .reference(CASE_ID)
+            .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
         ValidationException exception = assertThrows(ValidationException.class,
-                () -> applyNoCDecisionService.applyNoCDecision(request));
+            () -> applyNoCDecisionService.applyNoCDecision(request));
 
         assertAll(
-                () -> assertThat(exception.getMessage(),
-                        is("Fields of type ChangeOrganisationRequest must include both " +
-                                "an OrganisationToAdd and OrganisationToRemove field."))
+            () -> assertThat(exception.getMessage(),
+                is("Fields of type ChangeOrganisationRequest must include both "
+                    + "an OrganisationToAdd and OrganisationToRemove field."))
         );
     }
 
     @Test
     void shouldErrorWhenOrganisationToRemoveIsNotPresent() throws JsonProcessingException {
         Map<String, JsonNode> data = createData();
-        ((ObjectNode)data.get(CHANGE_ORG_REQUEST_FIELD)).remove(ORGANISATION_TO_REMOVE);
+        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).remove(ORGANISATION_TO_REMOVE);
         CaseDetails caseDetails = CaseDetails.builder()
-                .data(data)
-                .reference(CASE_ID)
-                .build();
+            .data(data)
+            .reference(CASE_ID)
+            .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
         ValidationException exception = assertThrows(ValidationException.class,
-                () -> applyNoCDecisionService.applyNoCDecision(request));
+            () -> applyNoCDecisionService.applyNoCDecision(request));
 
         assertAll(
-                () -> assertThat(exception.getMessage(),
-                        is("Fields of type ChangeOrganisationRequest must include both " +
-                                "an OrganisationToAdd and OrganisationToRemove field."))
+            () -> assertThat(exception.getMessage(),
+                is("Fields of type ChangeOrganisationRequest must include both "
+                    + "an OrganisationToAdd and OrganisationToRemove field."))
         );
     }
 
@@ -510,16 +506,15 @@ class ApplyNoCDecisionServiceTest {
                                      String organisationName,
                                      String orgPolicyReference,
                                      String orgPolicyCaseAssignedRole) {
-        return String.format("{\"Organisation\":%s," +
-                        "\"OrgPolicyReference\":%s,\"OrgPolicyCaseAssignedRole\":%s}",
-                organisationAsString(organisationId, organisationName),
-                stringValueAsJson(orgPolicyReference), stringValueAsJson(orgPolicyCaseAssignedRole));
+        return String.format("{\"Organisation\":%s,\"OrgPolicyReference\":%s,\"OrgPolicyCaseAssignedRole\":%s}",
+            organisationAsString(organisationId, organisationName),
+            stringValueAsJson(orgPolicyReference), stringValueAsJson(orgPolicyCaseAssignedRole));
     }
 
     private String organisationAsString(String organisationId,
                                         String organisationName) {
         return String.format("{\"OrganisationID\":%s,\"OrganisationName\":%s}",
-                stringValueAsJson(organisationId), stringValueAsJson(organisationName));
+            stringValueAsJson(organisationId), stringValueAsJson(organisationName));
     }
 
     private String stringValueAsJson(String string) {
@@ -527,39 +522,39 @@ class ApplyNoCDecisionServiceTest {
     }
 
     private String emptyChangeOrgRequestField() {
-        return "{\"Reason\":null,\"CaseRoleId\":null,\"NotesReason\":null," +
-                "\"ApprovalStatus\":null,\"RequestTimestamp\":null,\"OrganisationToAdd\":" +
-                "{\"OrganisationID\":null,\"OrganisationName\":null},\"OrganisationToRemove\":" +
-                "{\"OrganisationID\":null,\"OrganisationName\":null},\"ApprovalRejectionTimestamp\":null}";
+        return "{\"Reason\":null,\"CaseRoleId\":null,\"NotesReason\":null,"
+            + "\"ApprovalStatus\":null,\"RequestTimestamp\":null,\"OrganisationToAdd\":"
+            + "{\"OrganisationID\":null,\"OrganisationName\":null},\"OrganisationToRemove\":"
+            + "{\"OrganisationID\":null,\"OrganisationName\":null},\"ApprovalRejectionTimestamp\":null}";
     }
 
     private Map<String, JsonNode> createData(String organisationPolicy1,
                                              String organisationPolicy2,
                                              String organisationToAdd,
                                              String organisationToRemove) throws JsonProcessingException {
-        return mapper.convertValue(mapper.readTree(String.format("{\n" +
-                "    \"TextField\": \"TextFieldValue\",\n" +
-                "    \"OrganisationPolicyField1\": %s,\n" +
-                "    \"OrganisationPolicyField2\": %s,\n" +
-                "    \"ChangeOrganisationRequestField\": {\n" +
-                "        \"Reason\": null,\n" +
-                "        \"CaseRoleId\": \"[Claimant]\",\n" +
-                "        \"NotesReason\": \"a\",\n" +
-                "        \"ApprovalStatus\": \"Approved\",\n" +
-                "        \"RequestTimestamp\": null,\n" +
-                "        \"OrganisationToAdd\": %s,\n" +
-                "        \"OrganisationToRemove\": %s,\n" +
-                "        \"ApprovalRejectionTimestamp\": null\n" +
-                "    }\n" +
-                "}", organisationPolicy1, organisationPolicy2, organisationToAdd, organisationToRemove)),
-                getHashMapTypeReference());
+        return mapper.convertValue(mapper.readTree(String.format("{\n"
+                + "    \"TextField\": \"TextFieldValue\",\n"
+                + "    \"OrganisationPolicyField1\": %s,\n"
+                + "    \"OrganisationPolicyField2\": %s,\n"
+                + "    \"ChangeOrganisationRequestField\": {\n"
+                + "        \"Reason\": null,\n"
+                + "        \"CaseRoleId\": \"[Claimant]\",\n"
+                + "        \"NotesReason\": \"a\",\n"
+                + "        \"ApprovalStatus\": \"Approved\",\n"
+                + "        \"RequestTimestamp\": null,\n"
+                + "        \"OrganisationToAdd\": %s,\n"
+                + "        \"OrganisationToRemove\": %s,\n"
+                + "        \"ApprovalRejectionTimestamp\": null\n"
+                + "    }\n"
+                + "}", organisationPolicy1, organisationPolicy2, organisationToAdd, organisationToRemove)),
+            getHashMapTypeReference());
     }
 
     private Map<String, JsonNode> createData() throws JsonProcessingException {
         return createData(orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
-                orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
-                organisationAsString(null, null),
-                organisationAsString(ORG_2_ID, ORG_2_NAME));
+            orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
+            organisationAsString(null, null),
+            organisationAsString(ORG_2_ID, ORG_2_NAME));
     }
 
     private TypeReference<HashMap<String, JsonNode>> getHashMapTypeReference() {

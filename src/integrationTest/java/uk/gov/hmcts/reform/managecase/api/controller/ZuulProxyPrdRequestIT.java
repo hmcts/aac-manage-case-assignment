@@ -33,7 +33,8 @@ public class ZuulProxyPrdRequestIT extends BaseTest {
 
     private static final String PATH = "/prd/refdata/internal/v1/organisations/TEST_ORG/users?returnRoles=false";
     private static final String INVALID_PATH = "/prd/invalid";
-    private static final String VALID_NOT_ALLOWED_PATH = "/prd/refdata/external/v1/organisations/users?status=Active&returnRoles=false";
+    private static final String VALID_NOT_ALLOWED_PATH =
+        "/prd/refdata/external/v1/organisations/users?status=Active&returnRoles=false";
     private static final String SERVICE_NAME = "xui_webapp";
     private static final String BEARER = "Bearer ";
 

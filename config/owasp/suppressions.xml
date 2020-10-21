@@ -140,6 +140,11 @@
    file name: spring-webmvc-5.2.6.RELEASE.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-webmvc@.*$</packageUrl>
+
+  <suppress>
+    <notes><![CDATA[
+   spring cve issue -- needs to be fixed
+   ]]></notes>
     <cve>CVE-2020-5421</cve>
   </suppress>
 

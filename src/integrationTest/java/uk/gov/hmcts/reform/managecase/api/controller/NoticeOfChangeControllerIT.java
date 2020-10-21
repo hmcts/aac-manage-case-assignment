@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.BaseTest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
@@ -89,11 +90,8 @@ public class NoticeOfChangeControllerIT {
     void setUp() throws JsonProcessingException {
         CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
         caseViewActionableEvent.setId(NOC);
-
         CaseViewResource caseViewResource = new CaseViewResource();
-        caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[]{caseViewActionableEvent});
-        caseViewResource.setReference(CASE_ID);
-
+        caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[] {caseViewActionableEvent});
         CaseViewType caseViewType = new CaseViewType();
         caseViewType.setId(CASE_TYPE_ID);
         CaseViewJurisdiction caseViewJurisdiction = new CaseViewJurisdiction();
@@ -108,20 +106,20 @@ public class NoticeOfChangeControllerIT {
         searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
         searchResultViewHeader.setCaseFieldId("changeOrg");
         SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
-            new HeaderGroupMetadata(JURISDICTION, CASE_TYPE_ID),
-            Arrays.asList(searchResultViewHeader),
-            Arrays.asList("111", "222")
+                new HeaderGroupMetadata(JURISDICTION, CASE_TYPE_ID),
+                Arrays.asList(searchResultViewHeader),
+                Arrays.asList("111", "222")
         );
         JsonNode actualObj = mapper.readValue("{\n"
-            + "  \"OrganisationPolicy1\": {\n"
-            + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
-            + "    \"OrgPolicyReference\": \"Reference\",\n"
-            + "    \"Organisation\": {\n"
-            + "      \"OrganisationID\": \"QUK822N\",\n"
-            + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
-            + "    }\n"
-            + "  }\n"
-            + "}", JsonNode.class);
+                + "  \"OrganisationPolicy1\": {\n"
+                + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
+                + "    \"OrgPolicyReference\": \"Reference\",\n"
+                + "    \"Organisation\": {\n"
+                + "      \"OrganisationID\": \"QUK822N\",\n"
+                + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
+                + "    }\n"
+                + "  }\n"
+                + "}", JsonNode.class);
 
         caseFields.put(PREDEFINED_COMPLEX_ORGANISATION_POLICY, actualObj);
         SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
@@ -141,15 +139,15 @@ public class NoticeOfChangeControllerIT {
         fieldType.setMin(null);
         fieldType.setMax(null);
         ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
-            "questionText",
-            fieldType,
-            null,
-            "NoC",
-            ANSWER_FIELD_APPLICANT,
-            QUESTION_ID_1,
-            null);
+                "questionText",
+                fieldType,
+                null,
+                "NoC",
+                ANSWER_FIELD_APPLICANT,
+                "QuestionId1",
+                null);
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
-            Arrays.asList(challengeQuestion));
+                Arrays.asList(challengeQuestion));
         stubGetChallengeQuestions(CASE_TYPE_ID, "NoCChallenge", challengeQuestionsResult);
 
         stubGetStartEventTrigger(CASE_ID, NOC, CaseUpdateViewEvent.builder().build());

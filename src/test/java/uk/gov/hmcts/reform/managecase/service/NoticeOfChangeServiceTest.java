@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
@@ -115,12 +116,10 @@ class NoticeOfChangeServiceTest {
 
         @BeforeEach
         void setUp()throws JsonProcessingException {
-            // internal/cases/caseId
             CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
             caseViewActionableEvent.setId("NOC");
             CaseViewResource caseViewResource = new CaseViewResource();
             caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[] {caseViewActionableEvent});
-
             CaseViewType caseViewType = new CaseViewType();
             caseViewType.setName(CASE_TYPE_ID);
             caseViewType.setId(CASE_TYPE_ID);

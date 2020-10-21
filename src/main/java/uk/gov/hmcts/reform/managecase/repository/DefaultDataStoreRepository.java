@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPage;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPageComplexFieldOverride;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
+import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.util.HashMap;
@@ -30,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Repository
+@Repository("defaultDataStoreRepository")
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
 public class DefaultDataStoreRepository implements DataStoreRepository {
 
@@ -54,12 +55,15 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
     private final DataStoreApiClient dataStoreApi;
     private final JacksonUtils jacksonUtils;
+    protected final SecurityUtils securityUtils;
 
     @Autowired
     public DefaultDataStoreRepository(DataStoreApiClient dataStoreApi,
-                                      JacksonUtils jacksonUtils) {
+                                      JacksonUtils jacksonUtils,
+                                      SecurityUtils securityUtils) {
         this.dataStoreApi = dataStoreApi;
         this.jacksonUtils = jacksonUtils;
+        this.securityUtils = securityUtils;
     }
 
     @Override
@@ -75,8 +79,12 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public CaseViewResource findCaseByCaseId(String caseId, String userAuthToken) {
-        return dataStoreApi.getCaseDetailsByCaseId(caseId, userAuthToken);
+    public CaseViewResource findCaseByCaseId(String caseId) {
+        return dataStoreApi.getCaseDetailsByCaseId(caseId, getUserAuthToken());
+    }
+
+    protected String getUserAuthToken() {
+        return securityUtils.getCaaSystemUserToken();
     }
 
     @Override
@@ -110,10 +118,10 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     @Override
     public CaseResource submitEventForCase(String caseId,
                                            String eventId,
-                                           ChangeOrganisationRequest changeOrganisationRequest,
-                                           String userAuthToken) {
+                                           ChangeOrganisationRequest changeOrganisationRequest) {
 
         CaseResource caseResource = null;
+        String userAuthToken = getUserAuthToken();
         CaseUpdateViewEvent caseUpdateViewEvent = dataStoreApi.getStartEventTrigger(userAuthToken, caseId, eventId);
 
         if (caseUpdateViewEvent != null) {

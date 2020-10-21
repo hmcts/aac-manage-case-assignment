@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.service;
 import static java.util.stream.Collectors.toList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -47,7 +48,7 @@ public class CaseAssignmentService {
 
     @Autowired
     public CaseAssignmentService(PrdRepository prdRepository,
-                                 DataStoreRepository dataStoreRepository,
+                                 @Qualifier("defaultDataStoreRepository") DataStoreRepository dataStoreRepository,
                                  IdamRepository idamRepository, JacksonUtils jacksonUtils) {
         this.dataStoreRepository = dataStoreRepository;
         this.prdRepository = prdRepository;

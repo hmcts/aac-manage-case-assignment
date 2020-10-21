@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
@@ -62,7 +63,7 @@ public class NoticeOfChangeService {
     private final SecurityUtils securityUtils;
 
     @Autowired
-    public NoticeOfChangeService(DataStoreRepository dataStoreRepository,
+    public NoticeOfChangeService(@Qualifier("defaultDataStoreRepository") DataStoreRepository dataStoreRepository,
                                  DefinitionStoreRepository definitionStoreRepository,
                                  PrdRepository prdRepository,
                                  JacksonUtils jacksonUtils,
@@ -175,7 +176,7 @@ public class NoticeOfChangeService {
     }
 
     private CaseViewResource getCase(String caseId) {
-        return dataStoreRepository.findCaseByCaseId(caseId, securityUtils.getCaaSystemUserToken());
+        return dataStoreRepository.findCaseByCaseId(caseId);
     }
 
     private CaseResource getCaseViaExternalApi(String caseId) {
@@ -202,8 +203,8 @@ public class NoticeOfChangeService {
             List<SearchResultViewHeader> filteredSearch =
                 searchResultViewHeaderList.stream()
                     .filter(searchResultViewHeader ->
-                                searchResultViewHeader.getCaseFieldTypeDefinition()
-                                    .getType().equals(CHANGE_ORGANISATION_REQUEST)).collect(toList());
+                        searchResultViewHeader.getCaseFieldTypeDefinition()
+                            .getType().equals(CHANGE_ORGANISATION_REQUEST)).collect(toList());
             for (SearchResultViewHeader searchResultViewHeader : filteredSearch) {
                 if (caseFields.containsKey(searchResultViewHeader.getCaseFieldId())) {
                     JsonNode node = caseFields.get(searchResultViewHeader.getCaseFieldId());
@@ -288,8 +289,7 @@ public class NoticeOfChangeService {
             .requestTimestamp(LocalDateTime.now())
             .build();
 
-        return dataStoreRepository.submitEventForCase(caseId, eventId, changeOrganisationRequest,
-            securityUtils.getCaaSystemUserToken());
+        return dataStoreRepository.submitEventForCase(caseId, eventId, changeOrganisationRequest);
 
         //        Generate the NoCRequest event:
         //        Call EI-1 to generate an event token for a NoCRequest event for the case, return error if detected
@@ -329,7 +329,7 @@ public class NoticeOfChangeService {
 
         if (changeOrganisationRequestNode.isPresent()) {
             changeOrganisationRequest = Optional.of(jacksonUtils.convertValue(changeOrganisationRequestNode.get(),
-                                                                              ChangeOrganisationRequest.class));
+                ChangeOrganisationRequest.class));
         }
 
         return changeOrganisationRequest;
@@ -349,7 +349,7 @@ public class NoticeOfChangeService {
             findInvokerOrgPolicyRoles(caseResource, invokersOrganisation);
 
         dataStoreRepository.assignCase(invokerOrgPolicyRoles, caseResource.getReference(),
-                                       getUserInfo().getUid(), invokersOrganisation.getOrganisationID());
+            getUserInfo().getUid(), invokersOrganisation.getOrganisationID());
     }
 
     private boolean isRequestToAddOrReplaceRepresentationAndApproved(CaseResource caseResource,

@@ -22,10 +22,9 @@ public interface DataStoreRepository {
 
     void removeCaseUserRoles(List<CaseUserRole> caseUserRoles, String organisationId);
 
-    CaseViewResource findCaseByCaseId(String caseId, String userAuthToken);
+    CaseViewResource findCaseByCaseId(String caseId);
 
-    CaseResource submitEventForCase(String caseId, String eventId, ChangeOrganisationRequest changeOrganisationRequest,
-                                    String userAuthToken);
+    CaseResource submitEventForCase(String caseId, String eventId, ChangeOrganisationRequest changeOrganisationRequest);
 
     CaseResource findCaseByCaseIdExternalApi(String caseId);
 }

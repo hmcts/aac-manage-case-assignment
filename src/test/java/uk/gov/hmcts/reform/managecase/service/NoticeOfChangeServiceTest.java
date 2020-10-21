@@ -53,7 +53,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -83,7 +82,6 @@ class NoticeOfChangeServiceTest {
         + "${applicant.soletrader.name}:Applicant";
     private static final String ANSWER_FIELD_RESPONDENT = "${applicant.individual.fullname}|${applicant.company.name}|"
         + "${applicant.soletrader.name}:Respondent";
-    public static final String CAA_TOKEN = "Bearer CAA token";
 
     private final List<SearchResultViewItem> viewItems = new ArrayList<>();
     private final Map<String, JsonNode> caseFields = new HashMap<>();
@@ -129,10 +127,7 @@ class NoticeOfChangeServiceTest {
             caseViewJurisdiction.setId(JURISDICTION);
             caseViewType.setJurisdiction(caseViewJurisdiction);
             caseViewResource.setCaseType(caseViewType);
-
-            given(securityUtils.getCaaSystemUserToken()).willReturn(CAA_TOKEN);
-
-            given(dataStoreRepository.findCaseByCaseId(CASE_ID, CAA_TOKEN))
+            given(dataStoreRepository.findCaseByCaseId(CASE_ID))
                 .willReturn(caseViewResource);
 
             // Internal ES query
@@ -146,15 +141,15 @@ class NoticeOfChangeServiceTest {
             caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
             ObjectMapper mapper = new ObjectMapper();
             JsonNode actualObj = mapper.readValue("{\n"
-                                                      + "  \"OrganisationPolicy1\": {\n"
-                                                      + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
-                                                      + "    \"OrgPolicyReference\": \"Reference\",\n"
-                                                      + "    \"Organisation\": {\n"
-                                                      + "      \"OrganisationID\": \"QUK822N\",\n"
-                                                      + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
-                                                      + "    }\n"
-                                                      + "  }\n"
-                                                      + "}", JsonNode.class);
+                + "  \"OrganisationPolicy1\": {\n"
+                + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
+                + "    \"OrgPolicyReference\": \"Reference\",\n"
+                + "    \"Organisation\": {\n"
+                + "      \"OrganisationID\": \"QUK822N\",\n"
+                + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
+                + "    }\n"
+                + "  }\n"
+                + "}", JsonNode.class);
 
             caseFields.put(PREDEFINED_COMPLEX_ORGANISATION_POLICY, actualObj);
             SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
@@ -180,19 +175,19 @@ class NoticeOfChangeServiceTest {
             fieldType.setMax(null);
             ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_APPLICANT);
             ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
-                                                                        fieldType,
-                                                                        null,
-                                                                        CHALLENGE_QUESTION,
-                                                                        ANSWER_FIELD,
-                                                                        "QuestionId1",
-                                                                        Arrays.asList(challengeAnswer));
+                fieldType,
+                null,
+                CHALLENGE_QUESTION,
+                ANSWER_FIELD,
+                "QuestionId1",
+                Arrays.asList(challengeAnswer));
             ChallengeQuestionsResult challengeQuestionsResult =
                 new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
             given(definitionStoreRepository.challengeQuestions(CASE_TYPE_ID, "NoCChallenge"))
                 .willReturn(challengeQuestionsResult);
 
             UserInfo userInfo = new UserInfo("","","", "", "",
-                                             Arrays.asList("pui-caa"));
+                Arrays.asList("pui-caa"));
             given(securityUtils.getUserInfo()).willReturn(userInfo);
         }
 
@@ -200,7 +195,7 @@ class NoticeOfChangeServiceTest {
         @DisplayName("NoC questions successfully returned for a Solicitor user")
         void shouldReturnQuestionsForSolicitor() {
             UserInfo userInfo = new UserInfo("","","", "", "",
-                                             Arrays.asList("caseworker-Jurisdiction-solicitor"));
+                Arrays.asList("caseworker-Jurisdiction-solicitor"));
             given(securityUtils.getUserInfo()).willReturn(userInfo);
 
             ChallengeQuestionsResult challengeQuestionsResult = service.getChallengeQuestions(CASE_ID);
@@ -241,11 +236,11 @@ class NoticeOfChangeServiceTest {
             caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
             ObjectMapper mapper = new ObjectMapper();
             JsonNode actualObj = mapper.readValue("   {\n"
-                                                      + "                \"changeOrg\":\n"
-                                                      + "                {\n"
-                                                      + "                    \"CaseRoleId\": \"role\"\n"
-                                                      + "                }\n"
-                                                      + "            }", JsonNode.class);
+                + "                \"changeOrg\":\n"
+                + "                {\n"
+                + "                    \"CaseRoleId\": \"role\"\n"
+                + "                }\n"
+                + "            }", JsonNode.class);
             caseFields.put(CHANGE_ORG, actualObj);
             SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
             viewItems.add(item);
@@ -282,15 +277,15 @@ class NoticeOfChangeServiceTest {
             caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
             ObjectMapper mapper = new ObjectMapper();
             JsonNode actualObj = mapper.readValue("{\n"
-                                                      + "  \"OrganisationPolicy1\": {\n"
-                                                      + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
-                                                      + "    \"OrgPolicyReference\": \"Reference\",\n"
-                                                      + "    \"Organisation\": {\n"
-                                                      + "      \"OrganisationID\": \"QUK822N\",\n"
-                                                      + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
-                                                      + "    }\n"
-                                                      + "  }\n"
-                                                      + "}", JsonNode.class);
+                + "  \"OrganisationPolicy1\": {\n"
+                + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
+                + "    \"OrgPolicyReference\": \"Reference\",\n"
+                + "    \"Organisation\": {\n"
+                + "      \"OrganisationID\": \"QUK822N\",\n"
+                + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
+                + "    }\n"
+                + "  }\n"
+                + "}", JsonNode.class);
 
             caseFields.put(PREDEFINED_COMPLEX_ORGANISATION_POLICY, actualObj);
             SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
@@ -314,12 +309,12 @@ class NoticeOfChangeServiceTest {
             fieldType.setMax(null);
             ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_APPLICANT);
             ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
-                                                                        fieldType,
-                                                                        null,
-                                                                        CHALLENGE_QUESTION,
-                                                                        ANSWER_FIELD,
-                                                                        "QuestionId1",
-                                                                        Arrays.asList(challengeAnswer));
+                fieldType,
+                null,
+                CHALLENGE_QUESTION,
+                ANSWER_FIELD,
+                "QuestionId1",
+                Arrays.asList(challengeAnswer));
             ChallengeQuestionsResult challengeQuestionsResult =
                 new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
             given(definitionStoreRepository.challengeQuestions(CASE_TYPE_ID, "NoCChallenge"))
@@ -341,16 +336,16 @@ class NoticeOfChangeServiceTest {
             fieldType.setMax(null);
             ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_RESPONDENT);
             ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
-                                                                        fieldType,
-                                                                        null,
-                                                                        CHALLENGE_QUESTION,
-                                                                        ANSWER_FIELD,
-                                                                        "QuestionId1",
-                                                                        Arrays.asList(challengeAnswer));
+                fieldType,
+                null,
+                CHALLENGE_QUESTION,
+                ANSWER_FIELD,
+                "QuestionId1",
+                Arrays.asList(challengeAnswer));
             ChallengeQuestionsResult challengeQuestionsResult =
                 new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
             given(definitionStoreRepository
-                      .challengeQuestions(CASE_TYPE_ID, "NoCChallenge"))
+                .challengeQuestions(CASE_TYPE_ID, "NoCChallenge"))
                 .willReturn(challengeQuestionsResult);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
@@ -362,7 +357,7 @@ class NoticeOfChangeServiceTest {
         @DisplayName("Must return an error when no NOC Request event is available on the case")
         void shouldThrowErrorNoEventAvailable() {
             CaseViewResource caseViewResource = new CaseViewResource();
-            given(dataStoreRepository.findCaseByCaseId(CASE_ID, CAA_TOKEN))
+            given(dataStoreRepository.findCaseByCaseId(CASE_ID))
                 .willReturn(caseViewResource);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
@@ -375,7 +370,7 @@ class NoticeOfChangeServiceTest {
             + "jurisdiction of the case")
         void shouldThrowErrorInsufficientPrivilegesForSolicitor() {
             UserInfo userInfo = new UserInfo("","","", "", "",
-                                             Arrays.asList("caseworker-JurisdictionA-solicitor"));
+                Arrays.asList("caseworker-JurisdictionA-solicitor"));
             given(securityUtils.getUserInfo()).willReturn(userInfo);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
@@ -425,7 +420,7 @@ class NoticeOfChangeServiceTest {
 
             incumbentOrganisation = new Organisation(INCUMBENT_ORGANISATION_ID, INCUMBENT_ORGANISATION_NAME);
             OrganisationPolicy organisationPolicy = new OrganisationPolicy(incumbentOrganisation,
-                                                                           ORG_POLICY_REFERENCE, CASE_ASSIGNED_ROLE);
+                ORG_POLICY_REFERENCE, CASE_ASSIGNED_ROLE);
 
             noCRequestDetails = NoCRequestDetails.builder()
                 .caseViewResource(caseViewResource)
@@ -435,8 +430,6 @@ class NoticeOfChangeServiceTest {
             caseResource = CaseResource.builder().reference(CASE_ID).data(new HashMap<>()).build();
 
             given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseResource);
-
-            given(securityUtils.getCaaSystemUserToken()).willReturn(CAA_TOKEN);
         }
 
         @Test
@@ -451,8 +444,8 @@ class NoticeOfChangeServiceTest {
         @DisplayName("Generate a Notice Of Change Request with no Incumbent Organisation")
         void testGenerateNocRequestWithOutIncumbentOrganisation() {
             noCRequestDetails.setOrganisationPolicy(new OrganisationPolicy(null,
-                                                                           ORG_POLICY_REFERENCE,
-                                                                           CASE_ASSIGNED_ROLE));
+                ORG_POLICY_REFERENCE,
+                CASE_ASSIGNED_ROLE));
             final Organisation nullIncumbentOrganisation = null;
             service.requestNoticeOfChange(noCRequestDetails);
 
@@ -466,9 +459,8 @@ class NoticeOfChangeServiceTest {
                 = ArgumentCaptor.forClass(ChangeOrganisationRequest.class);
 
             verify(dataStoreRepository).submitEventForCase(caseIdCaptor.capture(),
-                                                           eventIdCaptor.capture(),
-                                                           corArgumentCaptor.capture(),
-                eq(CAA_TOKEN));
+                eventIdCaptor.capture(),
+                corArgumentCaptor.capture());
 
             assertThat(caseIdCaptor.getValue()).isEqualTo(CASE_ID);
             assertThat(eventIdCaptor.getValue()).isEqualTo(NOC_REQUEST_EVENT);
@@ -497,8 +489,8 @@ class NoticeOfChangeServiceTest {
         @DisplayName("NoC auto approval with Change Organisation Request and Case Role present returns PENDING state")
         void testAutoApprovalCorPresentCaseRolePresent() {
             ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
-                                                                    .caseRoleId(CASE_ASSIGNED_ROLE)
-                                                                    .build();
+                .caseRoleId(CASE_ASSIGNED_ROLE)
+                .build();
             updateCaseResourceData(caseResource, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
 
             given(jacksonUtils.convertValue(any(), any())).willReturn(changeOrganisationRequest);
@@ -514,7 +506,7 @@ class NoticeOfChangeServiceTest {
 
         @Test
         @DisplayName("NoC auto approval with Change Organisation Request and no Case Role present and no assigned "
-                    + "Organisation Policies returns PENDING state")
+            + "Organisation Policies returns PENDING state")
         void testAutoApprovalCorPresentBlankCaseRoleOrgPoliciesNotAssigned() {
             ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder().build();
             updateCaseResourceData(caseResource, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
@@ -558,8 +550,8 @@ class NoticeOfChangeServiceTest {
             Organisation invokersOrganisation =
                 new Organisation(INVOKERS_ORGANISATION_IDENTIFIER, "InvokersOrganisationName");
             OrganisationPolicy invokersOrganisationPolicy = new OrganisationPolicy(invokersOrganisation,
-                                                                                   ORG_POLICY_REFERENCE,
-                                                                                   CASE_ASSIGNED_ROLE);
+                ORG_POLICY_REFERENCE,
+                CASE_ASSIGNED_ROLE);
 
             updateCaseResourceData(caseResource, ORGANISATION_POLICY_KEY, invokersOrganisationPolicy);
 
@@ -593,9 +585,9 @@ class NoticeOfChangeServiceTest {
             ArgumentCaptor<String> organisationIdCaptor = ArgumentCaptor.forClass(String.class);
 
             verify(dataStoreRepository).assignCase(caseRolesCaptor.capture(),
-                                                   caseIdCaptor.capture(),
-                                                   userIdCaptor.capture(),
-                                                   organisationIdCaptor.capture());
+                caseIdCaptor.capture(),
+                userIdCaptor.capture(),
+                organisationIdCaptor.capture());
 
             assertThat(caseRolesCaptor.getValue()).isNotEmpty();
             assertThat(caseIdCaptor.getValue()).isEqualTo(CASE_ID);
@@ -622,11 +614,11 @@ class NoticeOfChangeServiceTest {
         private void setInvokerToActAsAnAdminOrSolicitor(boolean actAsAnAdminOrSolicitor) {
             List<String> roles = actAsAnAdminOrSolicitor ? List.of(SOLICITOR_ROLE) : List.of(NON_SOLICITOR_ROLE);
             UserInfo userInfo = new UserInfo("sub",
-                                             USER_INFO_UID,
-                                             "name",
-                                             "givenName",
-                                             "familyName",
-                                             roles);
+                USER_INFO_UID,
+                "name",
+                "givenName",
+                "familyName",
+                roles);
             given(securityUtils.getUserInfo()).willReturn(userInfo);
         }
 
@@ -636,10 +628,10 @@ class NoticeOfChangeServiceTest {
             for (int loopCounter = 0; loopCounter < 3; loopCounter++) {
                 Organisation organisation =
                     new Organisation("OrganisationId" + loopCounter,
-                                     "OrganisationName" + loopCounter);
+                        "OrganisationName" + loopCounter);
                 OrganisationPolicy organisationPolicy =
                     new OrganisationPolicy(organisation, ORG_POLICY_REFERENCE,
-                                           "CaseRole" + loopCounter);
+                        "CaseRole" + loopCounter);
                 organisationPolicies.add(organisationPolicy);
                 updateCaseResourceData(caseResource, "OrganisationPolicy" + loopCounter, organisationPolicy);
             }

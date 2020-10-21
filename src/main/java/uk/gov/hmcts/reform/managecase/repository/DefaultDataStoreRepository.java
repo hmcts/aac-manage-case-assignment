@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
@@ -36,7 +34,12 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
     static final String NOC_REQUEST_DESCRIPTION = "Notice of Change Request Event";
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultDataStoreRepository.class);
+    static final String NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT = "Failed to get enough data from start event "
+        + "to submit an event for the case";
+
+    static final String MISSING_CASE_FIELD_ID = "Failed to create ChangeOrganisationRequest because of "
+        + "missing case field id";
+
 
     public static final String ES_QUERY = "{\n"
         + "   \"query\":{\n"
@@ -127,7 +130,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                 );
 
                 if (caseUpdateViewEvent.getEventToken() == null || approvalStatusDefaultValue == null) {
-                    LOG.info("Failed to get enough data from start event to submit an event for the case");
+                    throw new IllegalStateException(NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT);
                 } else {
                     Event event = Event.builder()
                         .eventId(eventId)
@@ -145,7 +148,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                     caseResource = dataStoreApi.submitEventForCase(caseId, caseDataContent);
                 }
             } else {
-                LOG.info("Failed to create ChangeOrganisationRequest because of missing case field id");
+                throw new IllegalStateException(MISSING_CASE_FIELD_ID);
             }
         }
         return caseResource;

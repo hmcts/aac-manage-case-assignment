@@ -80,7 +80,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
     @Override
     public CaseViewResource findCaseByCaseId(String caseId) {
-        return dataStoreApi.getCaseDetailsByCaseId(caseId, getUserAuthToken());
+        return dataStoreApi.getCaseDetailsByCaseId(getUserAuthToken(), caseId);
     }
 
     protected String getUserAuthToken() {

@@ -42,9 +42,9 @@ import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.assertj.core.util.Lists.list;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.CASE_USERS;
-import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.INTERNAL_SEARCH_CASES;
-import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.SEARCH_CASES;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient.CASE_USERS;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient.INTERNAL_SEARCH_CASES;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient.SEARCH_CASES;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
 public class WiremockFixtures {

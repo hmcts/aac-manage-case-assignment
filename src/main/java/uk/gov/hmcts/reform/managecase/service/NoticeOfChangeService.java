@@ -38,7 +38,6 @@ public class NoticeOfChangeService {
 
     public static final String PUI_ROLE = "pui-caa";
     public static final String CHANGE_ORG_REQUEST = "ChangeOrganisationRequest";
-    private static final int JURISDICTION_INDEX = 1;
     private static final String CHALLENGE_QUESTION_ID = "NoCChallenge";
     private static final String CASE_ROLE_ID = "CaseRoleId";
 
@@ -125,21 +124,16 @@ public class NoticeOfChangeService {
         });
     }
 
-    private Optional<String> extractJurisdiction(String caseworkerRole) {
-        String[] parts = caseworkerRole.split("-");
-        return parts.length < 2 ? Optional.empty() : Optional.of(parts[JURISDICTION_INDEX]);
+    private void validateUserRoles(CaseViewResource caseViewResource, UserInfo userInfo) {
+        List<String> roles = userInfo.getRoles();
+        if (!roles.contains(PUI_ROLE)
+            && !isActingAsSolicitor(roles, caseViewResource.getCaseType().getJurisdiction().getId())) {
+            throw new ValidationException(INSUFFICIENT_PRIVILEGE);
+        }
     }
 
-    private void validateUserRoles(CaseViewResource caseViewResource, UserInfo userInfo) {
-        if (!userInfo.getRoles().contains(PUI_ROLE)) {
-            boolean match = userInfo.getRoles().stream().anyMatch(role -> {
-                Optional<String> jurisdiction = extractJurisdiction(role);
-                return caseViewResource.getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get());
-            });
-            if (!match) {
-                throw new ValidationException(INSUFFICIENT_PRIVILEGE);
-            }
-        }
+    private boolean isActingAsSolicitor(List<String> roles, String jurisdiction) {
+        return securityUtils.hasSolicitorRole(roles, jurisdiction);
     }
 
     private UserInfo getUserInfo() {

@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
 
 @Service
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ExcessiveImports", "PMD.AvoidDeeplyNestedIfStmts"})
 public class NoticeOfChangeService {
 
     public static final String PUI_ROLE = "pui-caa";

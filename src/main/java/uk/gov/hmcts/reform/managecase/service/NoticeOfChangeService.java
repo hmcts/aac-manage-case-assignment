@@ -132,13 +132,22 @@ public class NoticeOfChangeService {
         challengeQuestionsResult.getQuestions().forEach(challengeQuestion -> {
             for (ChallengeAnswer answer : challengeQuestion.getAnswers()) {
                 String role = answer.getCaseRoleId();
-                for (OrganisationPolicy organisationPolicy : organisationPolicies) {
-                    if (!organisationPolicy.getOrgPolicyCaseAssignedRole().equals(role)) {
-                        throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
-                    }
-                }
+                if (!isRoleInOrganisationPolicies(organisationPolicies, role)) {
+                    throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
+                };
             }
         });
+    }
+
+    private boolean isRoleInOrganisationPolicies(List<OrganisationPolicy> organisationPolicies, String role) {
+        boolean roleFound = false;
+        for (OrganisationPolicy organisationPolicy : organisationPolicies) {
+            if (organisationPolicy.getOrgPolicyCaseAssignedRole().equals(role)) {
+                roleFound = true;
+            }
+        }
+
+        return roleFound;
     }
 
     private List<OrganisationPolicy> findPolicies(CaseResource caseResource) {

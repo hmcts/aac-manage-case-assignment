@@ -203,7 +203,7 @@ class DataStoreRepositoryTest {
     void shouldReturnCaseUpdateViewEventWhenStartEventTriggerSucceeds() {
         CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder().build();
 
-        given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID))
+        given(dataStoreApi.getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID))
             .willReturn(caseUpdateViewEvent);
 
         CaseUpdateViewEvent returnedCaseUpdateViewEvent
@@ -215,7 +215,7 @@ class DataStoreRepositoryTest {
     @Test
     @DisplayName("getStartEventTrigger returns null")
     void shouldReturnNullCaseResourceOnStartEventTrigger() {
-        given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID))
+        given(dataStoreApi.getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID))
             .willReturn(null);
 
         CaseUpdateViewEvent returnedCaseUpdateViewEvent
@@ -230,7 +230,7 @@ class DataStoreRepositoryTest {
         CaseDataContent caseDataContent = CaseDataContent.builder().build();
         CaseResource caseResource = CaseResource.builder().build();
 
-        given(dataStoreApi.submitEventForCase(eq(CASE_ID), any(CaseDataContent.class)))
+        given(dataStoreApi.submitEventForCase(eq(USER_TOKEN), eq(CASE_ID), any(CaseDataContent.class)))
             .willReturn(caseResource);
 
         CaseResource returnedCaseResource
@@ -244,7 +244,7 @@ class DataStoreRepositoryTest {
     void shouldReturnNullCaseResourceOnEventSubmission() {
         CaseDataContent caseDataContent = CaseDataContent.builder().build();
 
-        given(dataStoreApi.submitEventForCase(eq(CASE_ID), any(CaseDataContent.class)))
+        given(dataStoreApi.submitEventForCase(eq(USER_TOKEN), eq(CASE_ID), any(CaseDataContent.class)))
             .willReturn(null);
 
         CaseResource returnedCaseResource

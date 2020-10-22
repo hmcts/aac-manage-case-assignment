@@ -117,12 +117,14 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
     @Override
     public CaseUpdateViewEvent getStartEventTrigger(String caseId, String eventId) {
-        return dataStoreApi.getStartEventTrigger(caseId, eventId);
+        String userAuthToken = getUserAuthToken();
+        return dataStoreApi.getStartEventTrigger(userAuthToken, caseId, eventId);
     }
 
     @Override
     public CaseResource submitEventForCaseOnly(String caseId, CaseDataContent caseDataContent) {
-        return dataStoreApi.submitEventForCase(caseId, caseDataContent);
+        String userAuthToken = getUserAuthToken();
+        return dataStoreApi.submitEventForCase(userAuthToken, caseId, caseDataContent);
     }
 
     @Override

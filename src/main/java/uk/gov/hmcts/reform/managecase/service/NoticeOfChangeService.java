@@ -33,12 +33,15 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
-
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.EVENT_TOKEN_NOT_PRESENT;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
@@ -55,11 +58,13 @@ public class NoticeOfChangeService {
     public static final String PUI_ROLE = "pui-caa";
 
     private static final int JURISDICTION_INDEX = 1;
+    private static final int EXPECTED_NUMBER_OF_EVENTS = 1;
     private static final String APPROVED = "APPROVED";
     private static final String PENDING = "PENDING";
     private static final String CHALLENGE_QUESTION_ID = "NoCChallenge";
     private static final String CASE_ROLE_ID = "CaseRoleId";
     private static final String NOC_DECISION_EVENT_UNIDENTIFIABLE = "NoC Decision event could not be identified";
+    static final String CHECK_NOC_APPROVAL_DESCRIPTION = "Check Notice of Change Approval Event";
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
@@ -272,7 +277,8 @@ public class NoticeOfChangeService {
         CaseViewResource caseViewResource = getCase(caseId);
         CaseViewEvent[] events = caseViewResource.getCaseViewEvents();
 
-        if (events.length != 1) {
+
+        if (events.length != EXPECTED_NUMBER_OF_EVENTS) {
             throw new ValidationException(NOC_DECISION_EVENT_UNIDENTIFIABLE);
         }
 
@@ -281,20 +287,21 @@ public class NoticeOfChangeService {
         CaseUpdateViewEvent caseUpdateViewEvent = dataStoreRepository.getStartEventTrigger(caseId, eventId);
 
         if (caseUpdateViewEvent != null) {
+            if (caseUpdateViewEvent.getEventToken() == null) {
+                throw new ValidationException(EVENT_TOKEN_NOT_PRESENT);
+            }
+
             Map<String, JsonNode> data =
                 caseUpdateViewEvent.getCaseFields().stream()
                     .filter(cvf -> cvf.getFieldTypeDefinition().getId().equals(PREDEFINED_COMPLEX_ORGANISATION_POLICY)
                         || cvf.getFieldTypeDefinition().getId().equals(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST))
-                    .collect(Collectors.toMap(CaseViewField::getId, c -> jacksonUtils.convertValue(c, JsonNode.class)));
+                    .collect(Collectors.toMap(
+                        CaseViewField::getId, cvf -> jacksonUtils.convertValue(cvf, JsonNode.class)));
 
-
-            if (caseUpdateViewEvent.getEventToken() == null) {
-                throw new ValidationException("Event token not present");
-            }
 
             Event event = Event.builder()
                 .eventId(eventId)
-                .description("NOC Approval String to be replaced")
+                .description(CHECK_NOC_APPROVAL_DESCRIPTION)
                 .build();
 
             CaseDataContent caseDataContent = CaseDataContent.builder()

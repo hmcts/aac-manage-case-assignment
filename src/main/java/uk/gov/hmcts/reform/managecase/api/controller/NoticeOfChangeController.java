@@ -19,8 +19,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
-import uk.gov.hmcts.reform.managecase.api.payload.*;
+import uk.gov.hmcts.reform.managecase.api.payload.CheckNoticeOfChangeApprovalRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
@@ -36,7 +39,11 @@ import javax.validation.constraints.NotEmpty;
 import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_DECISION_EVENT_UNIDENTIFIABLE;
 
 @RestController
 @Validated
@@ -52,6 +59,9 @@ public class NoticeOfChangeController {
     public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
     public static final String REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE =
         "The Notice of Change request has been successfully submitted.";
+
+    private static final String APPROVED = "APPROVED";
+    private static final String APPROVED_NUMERIC = "1";
 
     private final NoticeOfChangeService noticeOfChangeService;
     private final VerifyNoCAnswersService verifyNoCAnswersService;
@@ -210,15 +220,15 @@ public class NoticeOfChangeController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                + "\n1) " + ValidationError.CASE_ID_INVALID
-                + "\n2) " + ValidationError.CASE_ID_INVALID_LENGTH
-                + "\n3) " + ValidationError.CASE_ID_EMPTY,
+                + "\n1) " + CASE_ID_INVALID
+                + "\n2) " + CASE_ID_INVALID_LENGTH
+                + "\n3) " + CASE_ID_EMPTY,
             response = ApiError.class,
             examples = @Example({
                 @ExampleProperty(
                     value = "{\n"
                         + "   \"status\": \"BAD_REQUEST\",\n"
-                        + "   \"message\": \"" + ValidationError.CASE_ID_EMPTY + "\",\n"
+                        + "   \"message\": \"" + CASE_ID_EMPTY + "\",\n"
                         + "   \"errors\": [ ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
@@ -247,22 +257,22 @@ public class NoticeOfChangeController {
     @ApiResponses({
         @ApiResponse(
             code = 200,
-            message = ""
+            message = StringUtils.EMPTY
         ),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                + "\n1) " + ValidationError.CASE_ID_INVALID
-                + "\n2) " + ValidationError.CASE_ID_INVALID_LENGTH
-                + "\n3) " + ValidationError.CASE_ID_EMPTY
+                + "\n1) " + CASE_ID_INVALID
+                + "\n2) " + CASE_ID_INVALID_LENGTH
+                + "\n3) " + CASE_ID_EMPTY
                 + "\n4) " + CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID
-                + "\n5) " + ValidationError.NOC_DECISION_EVENT_UNIDENTIFIABLE,
+                + "\n5) " + NOC_DECISION_EVENT_UNIDENTIFIABLE,
             response = ApiError.class,
             examples = @Example({
                 @ExampleProperty(
                     value = "{\n"
                         + "   \"status\": \"BAD_REQUEST\",\n"
-                        + "   \"message\": \"" + ValidationError.CASE_ID_EMPTY + "\",\n"
+                        + "   \"message\": \"" + CASE_ID_EMPTY + "\",\n"
                         + "   \"errors\": [ ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
@@ -277,25 +287,27 @@ public class NoticeOfChangeController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
-    public ResponseEntity checkNoticeOfChangeApproval(@Valid @RequestBody CheckNoticeOfChangeApprovalRequest checkNoticeOfChangeApprovalRequest) {
-        // TODO - Luhn check, length check and empty check for case Id / reference. And Unit tests and integration tests
+    public ResponseEntity checkNoticeOfChangeApproval(@Valid @RequestBody CheckNoticeOfChangeApprovalRequest
+                                                              checkNoticeOfChangeApprovalRequest) {
         CaseDetails caseDetails = checkNoticeOfChangeApprovalRequest.getCaseDetails();
-        String caseId = caseDetails.getReference();
         Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
 
         if (changeOrganisationRequestFieldJson.isEmpty()) {
             throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
         }
 
-        ChangeOrganisationRequest changeOrganisationRequest = jacksonUtils.convertValue(changeOrganisationRequestFieldJson.get(), ChangeOrganisationRequest.class);
+        ChangeOrganisationRequest changeOrganisationRequest =
+            jacksonUtils.convertValue(changeOrganisationRequestFieldJson.get(), ChangeOrganisationRequest.class);
+
         validateNoCApproval(changeOrganisationRequest);
 
-        if (!changeOrganisationRequest.getApprovalStatus().equals("1")
-            && !changeOrganisationRequest.getApprovalStatus().equals("APPROVED")) {
+        if (!changeOrganisationRequest.getApprovalStatus().equals(APPROVED_NUMERIC)
+            && !changeOrganisationRequest.getApprovalStatus().equals(APPROVED)) {
             return ResponseEntity.ok().build();
         }
 
-        noticeOfChangeService.checkNoticeOfChangeApproval(caseId);
+        noticeOfChangeService.checkNoticeOfChangeApproval(caseDetails.getReference());
+
         return ResponseEntity.ok().build();
     }
 

@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 
+import javax.validation.Valid;
+
 @Getter
 @AllArgsConstructor
 @ApiModel("Check Notice of Change Approval Request")
@@ -17,6 +19,7 @@ public class CheckNoticeOfChangeApprovalRequest {
     @JsonProperty("case_details_before")
     private CaseDetails caseDetailsBefore;
 
+    @Valid
     @JsonProperty("case_details")
     private CaseDetails caseDetails;
 }

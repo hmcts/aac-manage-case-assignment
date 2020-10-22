@@ -14,9 +14,13 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
@@ -53,10 +57,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_DECISION_EVENT_UNIDENTIFIABLE;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
 
@@ -113,7 +121,7 @@ class NoticeOfChangeServiceTest {
     class AssignCaseAccess {
 
         @BeforeEach
-        void setUp()throws JsonProcessingException {
+        void setUp() throws JsonProcessingException {
             // internal/cases/caseId
             CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
             caseViewActionableEvent.setId("NOC");
@@ -489,8 +497,8 @@ class NoticeOfChangeServiceTest {
         @DisplayName("NoC auto approval with Change Organisation Request and Case Role present returns PENDING state")
         void testAutoApprovalCorPresentCaseRolePresent() {
             ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
-                .caseRoleId(CASE_ASSIGNED_ROLE)
-                .build();
+                                                                    .caseRoleId(CASE_ASSIGNED_ROLE)
+                                                                    .build();
             updateCaseResourceData(caseResource, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
 
             given(jacksonUtils.convertValue(any(), any())).willReturn(changeOrganisationRequest);
@@ -506,7 +514,7 @@ class NoticeOfChangeServiceTest {
 
         @Test
         @DisplayName("NoC auto approval with Change Organisation Request and no Case Role present and no assigned "
-            + "Organisation Policies returns PENDING state")
+                    + "Organisation Policies returns PENDING state")
         void testAutoApprovalCorPresentBlankCaseRoleOrgPoliciesNotAssigned() {
             ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder().build();
             updateCaseResourceData(caseResource, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
@@ -649,4 +657,78 @@ class NoticeOfChangeServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("Check Notice of Change Approval")
+    class CheckNoticeOfChangeApproval {
+
+        private CaseViewEvent caseViewEvent;
+        private CaseViewResource caseViewResource;
+        private CaseUpdateViewEvent caseUpdateViewEvent;
+        private CaseViewField caseViewField;
+        private FieldTypeDefinition fieldTypeDefinition;
+        private JsonNode node;
+
+        @BeforeEach
+        void setUp() {
+            node = mock(JsonNode.class);
+            caseViewField = new CaseViewField();
+            fieldTypeDefinition = new FieldTypeDefinition();
+            fieldTypeDefinition.setId("OrganisationPolicy");
+            caseViewField.setFieldTypeDefinition(fieldTypeDefinition);
+
+            caseUpdateViewEvent = CaseUpdateViewEvent.builder()
+                .caseFields(new ArrayList<>(Arrays.asList(caseViewField)))
+                .eventToken("eventToken")
+                .build();
+
+            caseViewEvent = new CaseViewEvent();
+            caseViewEvent.setEventId("NOC");
+            caseViewResource = new CaseViewResource();
+            caseViewResource.setCaseViewEvents(new CaseViewEvent[]{caseViewEvent});
+
+            given(dataStoreRepository.findCaseByCaseId(CASE_ID))
+                .willReturn(caseViewResource);
+            given(dataStoreRepository.getStartEventTrigger(anyString(), anyString()))
+                .willReturn(caseUpdateViewEvent);
+            given(jacksonUtils.convertValue(any(CaseViewField.class), any()))
+                .willReturn(node);
+        }
+
+        @Test
+        @DisplayName("Submit Event for Check NoC Approval")
+        public void checkNoticeOfChangeApproval() {
+            service.checkNoticeOfChangeApproval(CASE_ID);
+            verify(dataStoreRepository).submitEventForCaseOnly(eq(CASE_ID), any(CaseDataContent.class));
+        }
+
+        @Test
+        @DisplayName("must return an error when the CaseUpdateViewEvent token is null")
+        public void shouldThrowErrorWhenCaseUpdateViewEventTokenIsNull() {
+            caseUpdateViewEvent.setEventToken(null);
+
+            assertThatThrownBy(() -> service.checkNoticeOfChangeApproval(CASE_ID))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("Event token not present");
+        }
+
+        @Test
+        @DisplayName("must return an error when the CaseViewEvent list is empty")
+        public void shouldThrowErrorWhenCaseViewEventListIsEmpty() {
+            caseViewResource.setCaseViewEvents(new CaseViewEvent[]{});
+
+            assertThatThrownBy(() -> service.checkNoticeOfChangeApproval(CASE_ID))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining(NOC_DECISION_EVENT_UNIDENTIFIABLE);
+        }
+
+        @Test
+        @DisplayName("must return an error when the CaseViewEvent list length is greater than one")
+        public void shouldThrowErrorWhenCaseViewEventListLengthGreaterThanOne() {
+            caseViewResource.setCaseViewEvents(new CaseViewEvent[]{caseViewEvent, caseViewEvent});
+
+            assertThatThrownBy(() -> service.checkNoticeOfChangeApproval(CASE_ID))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining(NOC_DECISION_EVENT_UNIDENTIFIABLE);
+        }
+    }
 }

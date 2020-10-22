@@ -8,8 +8,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.Event;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
@@ -33,14 +38,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
-
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.EVENT_TOKEN_NOT_PRESENT;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
+import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
+import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.SOLICITOR_ROLE;
 
@@ -51,10 +59,13 @@ public class NoticeOfChangeService {
     public static final String PUI_ROLE = "pui-caa";
 
     private static final int JURISDICTION_INDEX = 1;
+    private static final int EXPECTED_NUMBER_OF_EVENTS = 1;
     private static final String APPROVED = "APPROVED";
     private static final String PENDING = "PENDING";
     private static final String CHALLENGE_QUESTION_ID = "NoCChallenge";
     private static final String CASE_ROLE_ID = "CaseRoleId";
+    private static final String NOC_DECISION_EVENT_UNIDENTIFIABLE = "NoC Decision event could not be identified";
+    static final String CHECK_NOC_APPROVAL_DESCRIPTION = "Check Notice of Change Approval Event";
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
@@ -261,6 +272,46 @@ public class NoticeOfChangeService {
             .approvalStatus(isApprovalComplete ? APPROVED : PENDING)
             .status(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)
             .build();
+    }
+
+    public void checkNoticeOfChangeApproval(String caseId) {
+        CaseViewResource caseViewResource = getCase(caseId);
+        CaseViewEvent[] events = caseViewResource.getCaseViewEvents();
+
+
+        if (events.length != EXPECTED_NUMBER_OF_EVENTS) {
+            throw new ValidationException(NOC_DECISION_EVENT_UNIDENTIFIABLE);
+        }
+
+        String eventId = events[0].getEventId();
+
+        CaseUpdateViewEvent caseUpdateViewEvent = dataStoreRepository.getStartEventTrigger(caseId, eventId);
+
+        if (caseUpdateViewEvent != null) {
+            if (caseUpdateViewEvent.getEventToken() == null) {
+                throw new ValidationException(EVENT_TOKEN_NOT_PRESENT);
+            }
+
+            Map<String, JsonNode> data =
+                caseUpdateViewEvent.getCaseFields().stream()
+                    .filter(cvf -> cvf.getFieldTypeDefinition().getId().equals(PREDEFINED_COMPLEX_ORGANISATION_POLICY)
+                        || cvf.getFieldTypeDefinition().getId().equals(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST))
+                    .collect(Collectors.toMap(
+                        CaseViewField::getId, cvf -> jacksonUtils.convertValue(cvf, JsonNode.class)));
+
+
+            Event event = Event.builder()
+                .eventId(eventId)
+                .description(CHECK_NOC_APPROVAL_DESCRIPTION)
+                .build();
+
+            CaseDataContent caseDataContent = CaseDataContent.builder()
+                .token(caseUpdateViewEvent.getEventToken())
+                .event(event)
+                .data(data)
+                .build();
+            dataStoreRepository.submitEventForCaseOnly(caseId, caseDataContent);
+        }
     }
 
     private String getEventId(NoCRequestDetails noCRequestDetails) {

@@ -199,6 +199,61 @@ class DataStoreRepositoryTest {
     }
 
     @Test
+    @DisplayName("getStartEventTrigger returns successfully a CaseUpdateViewEvent")
+    void shouldReturnCaseUpdateViewEventWhenStartEventTriggerSucceeds() {
+        CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder().build();
+
+        given(dataStoreApi.getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID))
+            .willReturn(caseUpdateViewEvent);
+
+        CaseUpdateViewEvent returnedCaseUpdateViewEvent
+            = repository.getStartEventTrigger(CASE_ID, EVENT_ID);
+
+        assertThat(returnedCaseUpdateViewEvent).isEqualTo(caseUpdateViewEvent);
+    }
+
+    @Test
+    @DisplayName("getStartEventTrigger returns null")
+    void shouldReturnNullCaseResourceOnStartEventTrigger() {
+        given(dataStoreApi.getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID))
+            .willReturn(null);
+
+        CaseUpdateViewEvent returnedCaseUpdateViewEvent
+            = repository.getStartEventTrigger(CASE_ID, EVENT_ID);
+
+        assertThat(returnedCaseUpdateViewEvent).isNull();
+    }
+
+    @Test
+    @DisplayName("submitEventForCaseOnly returns successfully a CaseResource")
+    void shouldReturnCaseResourceWhenEventSubmissionSucceeds() {
+        CaseDataContent caseDataContent = CaseDataContent.builder().build();
+        CaseResource caseResource = CaseResource.builder().build();
+
+        given(dataStoreApi.submitEventForCase(eq(USER_TOKEN), eq(CASE_ID), any(CaseDataContent.class)))
+            .willReturn(caseResource);
+
+        CaseResource returnedCaseResource
+            = repository.submitEventForCaseOnly(CASE_ID, caseDataContent);
+
+        assertThat(returnedCaseResource).isEqualTo(caseResource);
+    }
+
+    @Test
+    @DisplayName("submitEventForCaseOnly returns null")
+    void shouldReturnNullCaseResourceOnEventSubmission() {
+        CaseDataContent caseDataContent = CaseDataContent.builder().build();
+
+        given(dataStoreApi.submitEventForCase(eq(USER_TOKEN), eq(CASE_ID), any(CaseDataContent.class)))
+            .willReturn(null);
+
+        CaseResource returnedCaseResource
+            = repository.submitEventForCaseOnly(CASE_ID, caseDataContent);
+
+        assertThat(returnedCaseResource).isNull();
+    }
+
+    @Test
     @DisplayName("Call ccd-datastore where submitting an event for a case fails")
     void shouldReturnNullCaseResourceWhenSubmittingEventFails() {
         // ARRANGE

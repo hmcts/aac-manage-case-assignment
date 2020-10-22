@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
 
 @Service
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ExcessiveImports"})
 public class NoticeOfChangeService {
 
     public static final String PUI_ROLE = "pui-caa";
@@ -115,13 +115,21 @@ public class NoticeOfChangeService {
         challengeQuestionsResult.getQuestions().forEach(challengeQuestion -> {
             for (ChallengeAnswer answer : challengeQuestion.getAnswers()) {
                 String role = answer.getCaseRoleId();
-                for (OrganisationPolicy organisationPolicy : organisationPolicies) {
-                    if (!organisationPolicy.getOrgPolicyCaseAssignedRole().equals(role)) {
-                        throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
-                    }
+                if (!isRoleInOrganisationPolicies(organisationPolicies, role)) {
+                    throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
                 }
             }
         });
+    }
+
+    private boolean isRoleInOrganisationPolicies(List<OrganisationPolicy> organisationPolicies, String role) {
+        boolean roleFound = false;
+        for (OrganisationPolicy organisationPolicy : organisationPolicies) {
+            if (organisationPolicy.getOrgPolicyCaseAssignedRole().equals(role)) {
+                roleFound = true;
+            }
+        }
+        return roleFound;
     }
 
     private void validateUserRoles(CaseViewResource caseViewResource, UserInfo userInfo) {

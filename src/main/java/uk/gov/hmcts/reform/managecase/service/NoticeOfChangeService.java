@@ -134,7 +134,7 @@ public class NoticeOfChangeService {
                 String role = answer.getCaseRoleId();
                 if (!isRoleInOrganisationPolicies(organisationPolicies, role)) {
                     throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
-                };
+                }
             }
         });
     }

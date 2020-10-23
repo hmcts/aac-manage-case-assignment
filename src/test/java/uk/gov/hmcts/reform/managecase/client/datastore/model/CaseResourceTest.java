@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.Month;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +26,7 @@ public class CaseResourceTest {
     @DisplayName("Find ChangeOrganisationRequest Json nodes from data")
     void shouldFindChangeOrganisationRequestNodes() {
         // ARRANGE
-        LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        LocalDateTime now = LocalDateTime.of(2020, Month.MAY, 16, 11, 48, 32);
 
         Organisation organisationToAdd = new Organisation("id1", "name1");
         Organisation organisationToRemove = new Organisation("id2", "name2");

@@ -315,7 +315,7 @@ class DataStoreRepositoryTest {
         assertThat(caseDataContentCaptorValue.getEvent().getEventId()).isEqualTo(EVENT_ID);
 
         assertThat(caseDataContentCaptorValue.getData().get(CHANGE_ORGANISATION_REQUEST_FIELD).toString())
-            .isEqualTo(EXPECTED_NOC_REQUEST_DATA);
+            .hasToString(EXPECTED_NOC_REQUEST_DATA);
     }
 
     @Test

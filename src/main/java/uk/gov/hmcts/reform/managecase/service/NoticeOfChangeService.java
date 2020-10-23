@@ -48,7 +48,6 @@ public class NoticeOfChangeService {
 
     public static final String PUI_ROLE = "pui-caa";
 
-    private static final int JURISDICTION_INDEX = 1;
     private static final String APPROVED = "APPROVED";
     private static final String PENDING = "PENDING";
     private static final String CHALLENGE_QUESTION_ID = "NoCChallenge";

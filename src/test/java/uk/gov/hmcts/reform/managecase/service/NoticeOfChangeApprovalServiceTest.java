@@ -87,14 +87,14 @@ public class NoticeOfChangeApprovalServiceTest {
 
         @Test
         @DisplayName("Submit Event for Check NoC Approval")
-        public void checkNoticeOfChangeApproval() {
+        void checkNoticeOfChangeApproval() {
             service.checkNoticeOfChangeApproval(CASE_ID);
             verify(repository).submitEventForCaseOnly(eq(CASE_ID), any(CaseDataContent.class));
         }
 
         @Test
         @DisplayName("must return an error when the CaseUpdateViewEvent token is null")
-        public void shouldThrowErrorWhenCaseUpdateViewEventTokenIsNull() {
+        void shouldThrowErrorWhenCaseUpdateViewEventTokenIsNull() {
             caseUpdateViewEvent.setEventToken(null);
 
             assertThatThrownBy(() -> service.checkNoticeOfChangeApproval(CASE_ID))
@@ -104,7 +104,7 @@ public class NoticeOfChangeApprovalServiceTest {
 
         @Test
         @DisplayName("must return an error when the CaseViewEvent list is empty")
-        public void shouldThrowErrorWhenCaseViewEventListIsEmpty() {
+        void shouldThrowErrorWhenCaseViewEventListIsEmpty() {
             caseViewResource.setCaseViewEvents(new CaseViewEvent[]{});
 
             assertThatThrownBy(() -> service.checkNoticeOfChangeApproval(CASE_ID))
@@ -114,7 +114,7 @@ public class NoticeOfChangeApprovalServiceTest {
 
         @Test
         @DisplayName("must return an error when the CaseViewEvent list length is greater than one")
-        public void shouldThrowErrorWhenCaseViewEventListLengthGreaterThanOne() {
+        void shouldThrowErrorWhenCaseViewEventListLengthGreaterThanOne() {
             caseViewResource.setCaseViewEvents(new CaseViewEvent[]{caseViewEvent, caseViewEvent});
 
             assertThatThrownBy(() -> service.checkNoticeOfChangeApproval(CASE_ID))

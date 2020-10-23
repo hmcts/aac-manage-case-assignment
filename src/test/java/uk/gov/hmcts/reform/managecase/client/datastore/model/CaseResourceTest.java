@@ -18,7 +18,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
-public class CaseResourceTest {
+class CaseResourceTest {
 
     private final ObjectMapper objectMapper = new JacksonObjectMapperConfig().defaultObjectMapper();
 

@@ -350,8 +350,9 @@ public class NoticeOfChangeControllerTest {
             RequestNoticeOfChangeResponse response = controller.requestNoticeOfChange(requestNoticeOfChangeRequest);
 
             // ASSERT
-            assertThat(response).isNotNull();
-            assertThat(response).isEqualTo(requestNoticeOfChangeResponse);
+            assertThat(response)
+                .isNotNull()
+                .isEqualTo(requestNoticeOfChangeResponse);
         }
 
         @DisplayName("should successfully get NoC request")

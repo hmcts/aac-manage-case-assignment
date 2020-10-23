@@ -206,9 +206,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     private FieldType fieldType(String type) {
-        FieldType fieldType = new FieldType();
-        fieldType.setType(type);
-        return fieldType;
+        return FieldType.builder().type(type).build();
     }
 
     private SearchResultViewItem createCase() throws JsonProcessingException {

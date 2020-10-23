@@ -20,15 +20,6 @@ public class FixedListItem implements Orderable {
         this.order = order;
     }
 
-    @JsonProperty("code")
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     @JsonProperty("label")
     public String getLabel() {
         return label;
@@ -36,6 +27,15 @@ public class FixedListItem implements Orderable {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    @JsonProperty("code")
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     @JsonProperty("order")

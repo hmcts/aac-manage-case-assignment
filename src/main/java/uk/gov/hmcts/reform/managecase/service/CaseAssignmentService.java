@@ -48,7 +48,8 @@ public class CaseAssignmentService {
     @Autowired
     public CaseAssignmentService(PrdRepository prdRepository,
                                  @Qualifier("defaultDataStoreRepository") DataStoreRepository dataStoreRepository,
-                                 IdamRepository idamRepository, JacksonUtils jacksonUtils, SecurityUtils securityUtils) {
+                                 IdamRepository idamRepository, JacksonUtils jacksonUtils,
+                                 SecurityUtils securityUtils) {
         this.dataStoreRepository = dataStoreRepository;
         this.prdRepository = prdRepository;
         this.idamRepository = idamRepository;

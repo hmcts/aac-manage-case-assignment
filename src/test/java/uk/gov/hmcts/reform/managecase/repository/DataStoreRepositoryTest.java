@@ -344,7 +344,7 @@ class DataStoreRepositoryTest {
             .wizardPages(getWizardPages("testCVaseField"))
             .build();
 
-        given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID)).willReturn(caseUpdateViewEvent);
+        given(dataStoreApi.getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID)).willReturn(caseUpdateViewEvent);
 
         // ACT & ASSERT
         IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () ->
@@ -354,7 +354,7 @@ class DataStoreRepositoryTest {
         assertThat(illegalStateException.getMessage())
             .isEqualTo(NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT);
 
-        verify(dataStoreApi, never()).submitEventForCase(any(), any());
+        verify(dataStoreApi, never()).submitEventForCase(any(), any(), any());
     }
 
     @Test
@@ -383,7 +383,8 @@ class DataStoreRepositoryTest {
     void shouldThrowExceptionWhenSubmitEventForCaseCalledWithoutCaseViewField() {
 
         // ARRANGE
-        given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID)).willReturn(CaseUpdateViewEvent.builder().build());
+        given(dataStoreApi.getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID))
+            .willReturn(CaseUpdateViewEvent.builder().build());
 
         // ACT & ASSERT
         IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () ->

@@ -11,3 +11,4 @@ spring:
         idam-mca-system-user-password: IDAM_CAA_PASSWORD
         idam-noc-approver-username: IDAM_NOC_APPROVER_USERNAME
         idam-noc-approver-password: IDAM_NOC_APPROVER_PASSWORD
+        notify-mca-api-key-secret: NOTIFY_MCA_API_KEY

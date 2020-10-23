@@ -9,9 +9,14 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 
 import javax.inject.Named;
+import java.util.List;
+import java.util.Locale;
 
 @Named
+@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 public class SecurityUtils {
+
+    private static final String SOLICITOR_ROLE = "caseworker-%s-solicitor";
 
     public static final String BEARER = "Bearer ";
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
@@ -56,4 +61,8 @@ public class SecurityUtils {
         return token.startsWith(BEARER) ? token.substring(BEARER.length()) : token;
     }
 
+    public boolean hasSolicitorRole(List<String> roles, String jurisdiction) {
+        String solicitorRole = String.format(SOLICITOR_ROLE, jurisdiction).toLowerCase(Locale.getDefault());
+        return roles.stream().anyMatch(role -> role.toLowerCase(Locale.getDefault()).startsWith(solicitorRole));
+    }
 }

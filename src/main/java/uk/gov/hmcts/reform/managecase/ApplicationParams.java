@@ -26,6 +26,10 @@ public class ApplicationParams {
     private List<String> ccdDefinitionStoreAllowedUrls;
     @Value("${ccd.definition-store.allowed-service}")
     private String ccdDefinitionStoreAllowedService;
+    @Value("${notify.email-template-id}")
+    private String emailTemplateId;
+    @Value("${notify.api-key}")
+    private String notifyApiKey;
 
     public String getCaaSystemUserId() {
         return caaSystemUserId;
@@ -58,5 +62,12 @@ public class ApplicationParams {
     public String getCcdDefinitionStoreAllowedService() {
         return ccdDefinitionStoreAllowedService;
     }
-}
 
+    public String getEmailTemplateId() {
+        return emailTemplateId;
+    }
+
+    public String getNotifyApiKey() {
+        return notifyApiKey;
+    }
+}

@@ -50,7 +50,6 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.SOLICITOR_ROLE;
 
 @Service
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.GodClass", "PMD.ExcessiveImports", "PMD.TooManyMethods"})
@@ -146,13 +145,22 @@ public class NoticeOfChangeService {
         challengeQuestionsResult.getQuestions().forEach(challengeQuestion -> {
             for (ChallengeAnswer answer : challengeQuestion.getAnswers()) {
                 String role = answer.getCaseRoleId();
-                for (OrganisationPolicy organisationPolicy : organisationPolicies) {
-                    if (!organisationPolicy.getOrgPolicyCaseAssignedRole().equals(role)) {
-                        throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
-                    }
+                if (!isRoleInOrganisationPolicies(organisationPolicies, role)) {
+                    throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
                 }
             }
         });
+    }
+
+    private boolean isRoleInOrganisationPolicies(List<OrganisationPolicy> organisationPolicies, String role) {
+        boolean roleFound = false;
+        for (OrganisationPolicy organisationPolicy : organisationPolicies) {
+            if (organisationPolicy.getOrgPolicyCaseAssignedRole().equals(role)) {
+                roleFound = true;
+            }
+        }
+
+        return roleFound;
     }
 
     private List<OrganisationPolicy> findPolicies(CaseResource caseResource) {
@@ -162,23 +170,11 @@ public class NoticeOfChangeService {
             .collect(toList());
     }
 
-    private Optional<String> extractJurisdiction(String caseworkerRole) {
-        String[] parts = caseworkerRole.split("-");
-        return parts.length < 2 ? Optional.empty() : Optional.of(parts[JURISDICTION_INDEX]);
-    }
-
     private void validateUserRoles(CaseViewResource caseViewResource, UserInfo userInfo) {
-        if (!userInfo.getRoles().contains(PUI_ROLE)) {
-            for (String role : userInfo.getRoles()) {
-                Optional<String> jurisdiction = extractJurisdiction(role);
-                if (jurisdiction.isPresent() && caseViewResource
-                    .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
-                    break;
-                } else if (jurisdiction.isPresent() && !caseViewResource
-                    .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
-                    throw new ValidationException(INSUFFICIENT_PRIVILEGE);
-                }
-            }
+        List<String> roles = userInfo.getRoles();
+        if (!roles.contains(PUI_ROLE)
+            && !isActingAsSolicitor(roles, caseViewResource.getCaseType().getJurisdiction().getId())) {
+            throw new ValidationException(INSUFFICIENT_PRIVILEGE);
         }
     }
 
@@ -263,7 +259,7 @@ public class NoticeOfChangeService {
             isNocRequestAutoApprovalCompleted(caseResource, invokersOrganisation, caseRoleId);
 
         // LLD STep 6: Auto-assign relevant case-roles to the invoker if required, i.e.:
-        if (isApprovalComplete && isActingAsSolicitor(caseResource)) {
+        if (isApprovalComplete &&  isActingAsSolicitor(getUserInfo().getRoles(), caseResource.getJurisdiction())) {
             autoAssignCaseRoles(caseResource, invokersOrganisation);
         }
 
@@ -322,10 +318,8 @@ public class NoticeOfChangeService {
         return noCRequestDetails.getCaseViewResource().getCaseViewActionableEvents()[0].getId();
     }
 
-    private boolean isActingAsSolicitor(CaseResource caseResource) {
-        String solicitorRole = String.format(SOLICITOR_ROLE, caseResource.getJurisdiction());
-        return getUserInfo().getRoles().stream()
-            .anyMatch(solicitorRole::startsWith);
+    private boolean isActingAsSolicitor(List<String> roles, String jurisdiction) {
+        return securityUtils.hasSolicitorRole(roles, jurisdiction);
     }
 
     private CaseResource generateNoCRequestEvent(String caseId,

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -100,11 +101,8 @@ public class NoticeOfChangeControllerIT {
     void setUp() throws JsonProcessingException {
         CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
         caseViewActionableEvent.setId(NOC);
-
         CaseViewResource caseViewResource = new CaseViewResource();
-        caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[]{caseViewActionableEvent});
-        caseViewResource.setReference(CASE_ID);
-
+        caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[] {caseViewActionableEvent});
         CaseViewType caseViewType = new CaseViewType();
         caseViewType.setId(CASE_TYPE_ID);
         CaseViewJurisdiction caseViewJurisdiction = new CaseViewJurisdiction();
@@ -119,20 +117,20 @@ public class NoticeOfChangeControllerIT {
         searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
         searchResultViewHeader.setCaseFieldId("changeOrg");
         SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
-            new HeaderGroupMetadata(JURISDICTION, CASE_TYPE_ID),
-            Arrays.asList(searchResultViewHeader),
-            Arrays.asList("111", "222")
+                new HeaderGroupMetadata(JURISDICTION, CASE_TYPE_ID),
+                Arrays.asList(searchResultViewHeader),
+                Arrays.asList("111", "222")
         );
         JsonNode actualObj = mapper.readValue("{\n"
-                                                  + "  \"OrganisationPolicy1\": {\n"
-                                                  + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
-                                                  + "    \"OrgPolicyReference\": \"Reference\",\n"
-                                                  + "    \"Organisation\": {\n"
-                                                  + "      \"OrganisationID\": \"QUK822N\",\n"
-                                                  + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
-                                                  + "    }\n"
-                                                  + "  }\n"
-                                                  + "}", JsonNode.class);
+              + "  \"OrganisationPolicy1\": {\n"
+              + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
+              + "    \"OrgPolicyReference\": \"Reference\",\n"
+              + "    \"Organisation\": {\n"
+              + "      \"OrganisationID\": \"QUK822N\",\n"
+              + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
+              + "    }\n"
+              + "  }\n"
+              + "}", JsonNode.class);
 
         caseFields.put(PREDEFINED_COMPLEX_ORGANISATION_POLICY, actualObj);
         SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
@@ -152,15 +150,15 @@ public class NoticeOfChangeControllerIT {
         fieldType.setMin(null);
         fieldType.setMax(null);
         ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
-                                                                    "questionText",
-                                                                    fieldType,
-                                                                    null,
-                                                                    "NoC",
-                                                                    ANSWER_FIELD_APPLICANT,
-                                                                    QUESTION_ID_1,
-                                                                    null);
+            "questionText",
+            fieldType,
+            null,
+            "NoC",
+            ANSWER_FIELD_APPLICANT,
+            "QuestionId1",
+            null);
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
-            Arrays.asList(challengeQuestion));
+                Arrays.asList(challengeQuestion));
         stubGetChallengeQuestions(CASE_TYPE_ID, "NoCChallenge", challengeQuestionsResult);
 
         stubGetStartEventTrigger(CASE_ID, NOC, CaseUpdateViewEvent.builder().build());
@@ -219,8 +217,8 @@ public class NoticeOfChangeControllerIT {
             VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, Collections.singletonList(answer));
 
             this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(VERIFY_NOC_ANSWERS_MESSAGE)))
@@ -234,8 +232,8 @@ public class NoticeOfChangeControllerIT {
             VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, Collections.singletonList(answer));
 
             this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.message", is("The answers did not match those for any litigant")));
@@ -247,14 +245,15 @@ public class NoticeOfChangeControllerIT {
             VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, Collections.singletonList(answer));
 
             this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.message", is("No answer has been provided for question ID 'QuestionId1'")));
         }
     }
 
+    @Disabled
     @Nested
     @DisplayName("POST /noc/noc-requests")
     class PostNoticeOfChangeRequests extends BaseTest {
@@ -383,8 +382,8 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldSuccessfullyCheckNoCApprovalWithAutoApproval() throws Exception {
             this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk());
         }
@@ -406,8 +405,8 @@ public class NoticeOfChangeControllerIT {
             checkNoticeOfChangeApprovalRequest = new CheckNoticeOfChangeApprovalRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
                 .andExpect(status().isOk());
         }
 
@@ -419,8 +418,8 @@ public class NoticeOfChangeControllerIT {
             checkNoticeOfChangeApprovalRequest = new CheckNoticeOfChangeApprovalRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
@@ -436,8 +435,8 @@ public class NoticeOfChangeControllerIT {
             checkNoticeOfChangeApprovalRequest = new CheckNoticeOfChangeApprovalRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));

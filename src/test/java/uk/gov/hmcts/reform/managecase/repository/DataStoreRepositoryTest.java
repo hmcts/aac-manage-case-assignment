@@ -30,10 +30,12 @@ import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -44,9 +46,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.ES_QUERY;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.MISSING_CASE_FIELD_ID;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOC_REQUEST_DESCRIPTION;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT;
 
-@SuppressWarnings("PMD.ExcessiveImports")
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class DataStoreRepositoryTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
@@ -315,40 +319,6 @@ class DataStoreRepositoryTest {
     }
 
     @Test
-    @DisplayName("Call ccd-datastore to submit an event for a case fails if cannot get event token")
-    void shouldReturnNullCaseResourceAndNotSubmitEventWithoutAnEventToken() {
-        // ARRANGE
-        given(dataStoreApi.getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID))
-            .willReturn(CaseUpdateViewEvent.builder().build());
-
-        // ACT
-        repository.submitEventForCase(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build());
-
-        // ASSERT
-        verify(dataStoreApi, never()).submitEventForCase(any(), any(), any());
-    }
-
-    @Test
-    @DisplayName("Call ccd-datastore to submit an event for a case without finding approval status default value")
-    void shouldReturnNullAndNotSubmitEventWithoutFindingDefaultApprovalStatus() {
-        // ARRANGE
-        CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
-            .wizardPages(getWizardPages("nothingToDoWithNocCaseFieldId"))
-            .eventToken("eventToken")
-            .caseFields(getCaseViewFields())
-            .build();
-
-        given(dataStoreApi.getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID)).willReturn(caseUpdateViewEvent);
-
-        // ACT
-        repository.submitEventForCase(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build());
-
-        // ASSERT
-        verify(dataStoreApi).getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID);
-        verify(dataStoreApi, never()).submitEventForCase(any(), any(), any());
-    }
-
-    @Test
     @DisplayName("find case by id using external facing API")
     void shouldFindCaseByIdUsingExternalApi() {
         // ARRANGE
@@ -359,8 +329,72 @@ class DataStoreRepositoryTest {
         CaseResource result = repository.findCaseByCaseIdExternalApi(CASE_ID);
 
         // ASSERT
+        verify(dataStoreApi, never()).submitEventForCase(any(), any(), any());
         assertThat(result).isEqualTo(caseResource);
         verify(dataStoreApi).getCaseDetailsByCaseIdViaExternalApi(eq(CASE_ID));
+    }
+
+    @Test
+    @DisplayName("handle missing event token when calling submit event for case")
+    void shouldThrowExceptionWhenSubmitEventForCaseCalledWithoutEventToken() {
+
+        // ARRANGE
+        CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
+            .caseFields(getCaseViewFields())
+            .wizardPages(getWizardPages("testCVaseField"))
+            .build();
+
+        given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID)).willReturn(caseUpdateViewEvent);
+
+        // ACT & ASSERT
+        IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () ->
+            repository.submitEventForCase(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build())
+        );
+
+        assertThat(illegalStateException.getMessage())
+            .isEqualTo(NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT);
+
+        verify(dataStoreApi, never()).submitEventForCase(any(), any());
+    }
+
+    @Test
+    @DisplayName("handle missing approval status default value when calling submit event for case")
+    void shouldThrowExceptionWhenSubmitEventForCaseCalledWithoutDefaultApprovalStatusDefaultValue() {
+        // ARRANGE
+        CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
+            .caseFields(getCaseViewFields())
+            .eventToken(EVENT_TOKEN)
+            .wizardPages(Collections.emptyList())
+            .build();
+
+        given(dataStoreApi.getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID)).willReturn(caseUpdateViewEvent);
+
+        // ACT & ASSERT
+        IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () ->
+            repository.submitEventForCase(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build())
+        );
+
+        assertThat(illegalStateException.getMessage())
+            .isEqualTo(NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT);
+    }
+
+    @Test
+    @DisplayName("handle missing case view field when calling submit event for case")
+    void shouldThrowExceptionWhenSubmitEventForCaseCalledWithoutCaseViewField() {
+
+        // ARRANGE
+        given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID)).willReturn(CaseUpdateViewEvent.builder().build());
+
+        // ACT & ASSERT
+        IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () ->
+            repository.submitEventForCase(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build())
+        );
+
+        assertThat(illegalStateException.getMessage()).isEqualTo(MISSING_CASE_FIELD_ID);
+
+        // ASSERT
+        verify(dataStoreApi).getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID);
+        verify(dataStoreApi, never()).submitEventForCase(any(), any(), any());
     }
 
     private List<CaseViewField> getCaseViewFields() {

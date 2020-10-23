@@ -53,6 +53,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -114,12 +117,10 @@ class NoticeOfChangeServiceTest {
 
         @BeforeEach
         void setUp() throws JsonProcessingException {
-            // internal/cases/caseId
             CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
             caseViewActionableEvent.setId("NOC");
             CaseViewResource caseViewResource = new CaseViewResource();
             caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[] {caseViewActionableEvent});
-
             CaseViewType caseViewType = new CaseViewType();
             caseViewType.setName(CASE_TYPE_ID);
             caseViewType.setId(CASE_TYPE_ID);
@@ -197,7 +198,7 @@ class NoticeOfChangeServiceTest {
             UserInfo userInfo = new UserInfo("","","", "", "",
                 Arrays.asList("caseworker-Jurisdiction-solicitor"));
             given(securityUtils.getUserInfo()).willReturn(userInfo);
-
+            given(securityUtils.hasSolicitorRole(anyList(), any())).willReturn(true);
             ChallengeQuestionsResult challengeQuestionsResult = service.getChallengeQuestions(CASE_ID);
 
             assertThat(challengeQuestionsResult).isNotNull();
@@ -620,6 +621,7 @@ class NoticeOfChangeServiceTest {
                 "familyName",
                 roles);
             given(securityUtils.getUserInfo()).willReturn(userInfo);
+            given(securityUtils.hasSolicitorRole(any(), any())).willReturn(actAsAnAdminOrSolicitor);
         }
 
         @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")

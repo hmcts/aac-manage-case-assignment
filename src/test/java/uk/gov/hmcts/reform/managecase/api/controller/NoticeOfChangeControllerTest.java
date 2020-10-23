@@ -451,8 +451,9 @@ public class NoticeOfChangeControllerTest {
 
             ResponseEntity response = controller.checkNoticeOfChangeApproval(request);
 
-            assertThat(response).isNotNull();
-            assertThat(response).isEqualTo(ResponseEntity.ok().build());
+            assertThat(response)
+                .isNotNull()
+                .isEqualTo(ResponseEntity.ok().build());
         }
 
         @DisplayName("should return 200 status code if all data is valid (ApprovalStatus as a Number)")

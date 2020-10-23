@@ -78,6 +78,6 @@ class CaseResourceTest {
         CaseResource caseResource = CaseResource.builder().data(data).build();
 
         // ASSERT
-        assertThat(caseResource.findChangeOrganisationRequestNode().isPresent()).isFalse();
+        assertThat(caseResource.findChangeOrganisationRequestNode()).isNotPresent();
     }
 }

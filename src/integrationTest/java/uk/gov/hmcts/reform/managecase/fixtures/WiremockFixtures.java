@@ -52,6 +52,7 @@ public class WiremockFixtures {
 
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     public static final String SYS_USER_TOKEN = "Bearer eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9aa";
+    public static final String APPROVER_USER_TOKEN = "Bearer eyJzdWIiOiJjY6ShZ3ciLCJleHAiOlD1OEM0NDUyOTd7co";
     public static final String S2S_TOKEN = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9"
         + ".WWRzROlKxLQCJw5h0h0dHb9hHfbBhF2Idwv1z4L4FnqSw3VZ38ZRLuDmwr3tj-8oOv6EfLAxV0dJAPtUT203Iw";
 
@@ -205,7 +206,7 @@ public class WiremockFixtures {
                                               CaseDataContent caseDataContent,
                                               CaseResource caseResource) throws JsonProcessingException {
         stubFor(WireMock.post(urlPathEqualTo("/cases/" + caseId + "/events"))
-                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .withRequestBody(equalToJson(
                         OBJECT_MAPPER.writeValueAsString(caseDataContent)
@@ -223,6 +224,29 @@ public class WiremockFixtures {
                     .willReturn(aResponse()
                                     .withStatus(HTTP_CREATED)
                                     .withBody(getJsonString(caseResource))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    // APPROVER INTERCEPTORS BELOW
+    public static void stubGetCaseInternalAsApprover(String caseId, CaseViewResource caseViewResource) {
+
+        stubFor(WireMock.get(urlPathEqualTo("/internal/cases/" + caseId))
+                    .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK).withBody(getJsonString(caseViewResource))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubGetStartEventTriggerAsApprover(String caseId,
+                                                          String eventId,
+                                                          CaseUpdateViewEvent caseUpdateViewEvent) {
+        stubFor(WireMock.get(urlPathEqualTo("/internal/cases/" + caseId + "/event-triggers/" + eventId))
+                    .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK)
+                                    .withBody(getJsonString(caseUpdateViewEvent))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 

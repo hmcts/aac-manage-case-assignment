@@ -74,6 +74,10 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCa
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetChallengeQuestions;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetStartEventTrigger;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSubmitEventForCase;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternalAsApprover;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetStartEventTriggerAsApprover;
+
+
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.UseConcurrentHashMap",
@@ -374,8 +378,8 @@ public class NoticeOfChangeControllerIT {
 
             CaseResource caseResource = CaseResource.builder().build();
 
-            stubGetCaseInternal(CASE_ID, caseViewResource);
-            stubGetStartEventTrigger(CASE_ID, NOC, caseUpdateViewEvent);
+            stubGetCaseInternalAsApprover(CASE_ID, caseViewResource);
+            stubGetStartEventTriggerAsApprover(CASE_ID, NOC, caseUpdateViewEvent);
             stubSubmitEventForCase(CASE_ID, caseDataContent, caseResource);
         }
 

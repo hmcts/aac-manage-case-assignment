@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.managecase.service;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -68,10 +67,14 @@ public class NoticeOfChangeService {
                                .caseTypeId(challengeQuestion.getCaseTypeId())
                                .order(challengeQuestion.getOrder())
                                .answerFieldType(FieldType.builder()
-                                                    .collectionFieldType(challengeQuestion.getAnswerFieldType().getCollectionFieldType())
-                                                    .complexFields(challengeQuestion.getAnswerFieldType().getComplexFields())
-                                                    .fixedListItems(challengeQuestion.getAnswerFieldType().getFixedListItems())
-                                                    .regularExpression(challengeQuestion.getAnswerFieldType().getRegularExpression())
+                                                    .collectionFieldType(challengeQuestion.getAnswerFieldType()
+                                                                             .getCollectionFieldType())
+                                                    .complexFields(challengeQuestion.getAnswerFieldType()
+                                                                       .getComplexFields())
+                                                    .fixedListItems(challengeQuestion.getAnswerFieldType()
+                                                                        .getFixedListItems())
+                                                    .regularExpression(challengeQuestion.getAnswerFieldType()
+                                                                           .getRegularExpression())
                                                     .max(challengeQuestion.getAnswerFieldType().getMax())
                                                     .min(challengeQuestion.getAnswerFieldType().getMin())
                                                     .id(challengeQuestion.getAnswerFieldType().getId())

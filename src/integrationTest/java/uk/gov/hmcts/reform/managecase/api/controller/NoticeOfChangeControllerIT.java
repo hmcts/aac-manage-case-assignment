@@ -118,6 +118,7 @@ public class NoticeOfChangeControllerIT {
             stubGetCaseInternalES(CASE_TYPE_ID, ES_QUERY, resource);
 
             FieldType fieldType = FieldType.builder()
+                .regularExpression("regular expression")
                 .max(null)
                 .min(null)
                 .id("Number")
@@ -144,8 +145,7 @@ public class NoticeOfChangeControllerIT {
                 .andExpect(jsonPath("$.questions[0].case_type_id", is(CASE_TYPE_ID)))
                 .andExpect(jsonPath("$.questions[0].order", is(1)))
                 .andExpect(jsonPath("$.questions[0].question_text", is("questionText")))
-                .andExpect(jsonPath("$.questions[0].challenge_question_id", is("NoC")))
-                .andExpect(jsonPath("$.questions[0].answer_field", is(null)));
+                .andExpect(jsonPath("$.questions[0].challenge_question_id", is("NoC")));
 
         }
 

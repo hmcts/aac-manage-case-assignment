@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.Searc
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
@@ -33,12 +34,11 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
 
 @Service
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ExcessiveImports", "PMD.AvoidDeeplyNestedIfStmts"})
 public class NoticeOfChangeService {
 
     public static final String PUI_ROLE = "pui-caa";
     public static final String CHANGE_ORG_REQUEST = "ChangeOrganisationRequest";
-    private static final int JURISDICTION_INDEX = 1;
     private static final String CHALLENGE_QUESTION_ID = "NoCChallenge";
     private static final String CASE_ROLE_ID = "CaseRoleId";
 
@@ -59,13 +59,34 @@ public class NoticeOfChangeService {
     public ChallengeQuestionsResult getChallengeQuestions(String caseId) {
         ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId).getChallengeQuestionsResult();
         //Step 12 Remove the answer section from the JSON returned byGetTabContents and return success with the
-        // remaining JSON
-        for (ChallengeQuestion challengeQuestion : challengeQuestionsResult.getQuestions()) {
-            if (!challengeQuestion.getAnswerField().isEmpty()) {
-                challengeQuestion.setAnswers(null);
-            }
-        }
-        return challengeQuestionsResult;
+        // remaining JSOn
+
+        List<ChallengeQuestion> challengeQuestionsResponse = challengeQuestionsResult.getQuestions().stream()
+            .map(challengeQuestion -> ChallengeQuestion.builder()
+                               .questionText(challengeQuestion.getQuestionText())
+                               .caseTypeId(challengeQuestion.getCaseTypeId())
+                               .order(challengeQuestion.getOrder())
+                               .answerFieldType(FieldType.builder()
+                                                    .collectionFieldType(challengeQuestion.getAnswerFieldType()
+                                                                             .getCollectionFieldType())
+                                                    .complexFields(challengeQuestion.getAnswerFieldType()
+                                                                       .getComplexFields())
+                                                    .fixedListItems(challengeQuestion.getAnswerFieldType()
+                                                                        .getFixedListItems())
+                                                    .regularExpression(challengeQuestion.getAnswerFieldType()
+                                                                           .getRegularExpression())
+                                                    .max(challengeQuestion.getAnswerFieldType().getMax())
+                                                    .min(challengeQuestion.getAnswerFieldType().getMin())
+                                                    .id(challengeQuestion.getAnswerFieldType().getId())
+                                                    .type(challengeQuestion.getAnswerFieldType().getType())
+                                                    .build())
+                               .displayContextParameter(challengeQuestion.getDisplayContextParameter())
+                               .challengeQuestionId(challengeQuestion.getChallengeQuestionId())
+                .build())
+            .collect(Collectors.toList());
+
+
+        return ChallengeQuestionsResult.builder().questions(challengeQuestionsResponse).build();
     }
 
     public NoCRequestDetails challengeQuestions(String caseId) {
@@ -116,33 +137,33 @@ public class NoticeOfChangeService {
         challengeQuestionsResult.getQuestions().forEach(challengeQuestion -> {
             for (ChallengeAnswer answer : challengeQuestion.getAnswers()) {
                 String role = answer.getCaseRoleId();
-                for (OrganisationPolicy organisationPolicy : organisationPolicies) {
-                    if (!organisationPolicy.getOrgPolicyCaseAssignedRole().equals(role)) {
-                        throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
-                    }
+                if (!isRoleInOrganisationPolicies(organisationPolicies, role)) {
+                    throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
                 }
             }
         });
     }
 
-    private Optional<String> extractJurisdiction(String caseworkerRole) {
-        String[] parts = caseworkerRole.split("-");
-        return parts.length < 2 ? Optional.empty() : Optional.of(parts[JURISDICTION_INDEX]);
+    private boolean isRoleInOrganisationPolicies(List<OrganisationPolicy> organisationPolicies, String role) {
+        boolean roleFound = false;
+        for (OrganisationPolicy organisationPolicy : organisationPolicies) {
+            if (organisationPolicy.getOrgPolicyCaseAssignedRole().equals(role)) {
+                roleFound = true;
+            }
+        }
+        return roleFound;
     }
 
     private void validateUserRoles(CaseViewResource caseViewResource, UserInfo userInfo) {
-        if (!userInfo.getRoles().contains(PUI_ROLE)) {
-            for (String role : userInfo.getRoles()) {
-                Optional<String> jurisdiction = extractJurisdiction(role);
-                if (jurisdiction.isPresent() && caseViewResource
-                    .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
-                    break;
-                } else if (jurisdiction.isPresent() && !caseViewResource
-                    .getCaseType().getJurisdiction().getId().equalsIgnoreCase(jurisdiction.get())) {
-                    throw new ValidationException(INSUFFICIENT_PRIVILEGE);
-                }
-            }
+        List<String> roles = userInfo.getRoles();
+        if (!roles.contains(PUI_ROLE)
+            && !isActingAsSolicitor(roles, caseViewResource.getCaseType().getJurisdiction().getId())) {
+            throw new ValidationException(INSUFFICIENT_PRIVILEGE);
         }
+    }
+
+    private boolean isActingAsSolicitor(List<String> roles, String jurisdiction) {
+        return securityUtils.hasSolicitorRole(roles, jurisdiction);
     }
 
     private UserInfo getUserInfo() {

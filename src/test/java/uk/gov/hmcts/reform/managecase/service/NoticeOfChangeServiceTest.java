@@ -190,7 +190,8 @@ class NoticeOfChangeServiceTest {
             assertThat(challengeQuestionsResult.getQuestions().get(0).getCaseTypeId()).isEqualTo(CASE_TYPE_ID);
             assertThat(challengeQuestionsResult.getQuestions().get(0).getOrder()).isEqualTo(1);
             assertThat(challengeQuestionsResult.getQuestions().get(0).getQuestionText()).isEqualTo(QUESTION_TEXT);
-            assertThat(challengeQuestionsResult.getQuestions().get(0).getChallengeQuestionId()).isEqualTo(CHALLENGE_QUESTION);
+            assertThat(challengeQuestionsResult.getQuestions().get(0).getChallengeQuestionId())
+                .isEqualTo(CHALLENGE_QUESTION);
             assertThat(challengeQuestionsResult.getQuestions().get(0).getAnswers()).isEqualTo(null);
             assertThat(challengeQuestionsResult.getQuestions().get(0).getAnswerField()).isEqualTo(null);
 

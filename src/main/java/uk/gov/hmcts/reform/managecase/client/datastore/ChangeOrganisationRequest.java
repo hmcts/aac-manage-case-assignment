@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.managecase.client.datastore;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +26,7 @@ public class ChangeOrganisationRequest {
     private final String caseRoleId;
 
     @JsonProperty("RequestTimestamp")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime requestTimestamp;
 
     @Setter

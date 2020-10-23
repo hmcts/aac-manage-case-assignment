@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
@@ -192,22 +193,37 @@ public class WiremockFixtures {
                                                 String eventId,
                                                 CaseUpdateViewEvent caseUpdateViewEvent) {
         stubFor(WireMock.get(urlPathEqualTo("/internal/cases/" + caseId + "/event-triggers/" + eventId))
-            .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-            .willReturn(aResponse()
-                            .withStatus(HTTP_OK)
-                            .withBody(getJsonString(caseUpdateViewEvent))
-                            .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK)
+                                    .withBody(getJsonString(caseUpdateViewEvent))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubSubmitEventForCase(String caseId,
+                                              CaseDataContent caseDataContent,
+                                              CaseResource caseResource) throws JsonProcessingException {
+        stubFor(WireMock.post(urlPathEqualTo("/cases/" + caseId + "/events"))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .withRequestBody(equalToJson(
+                        OBJECT_MAPPER.writeValueAsString(caseDataContent)
+                    ))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_CREATED)
+                                    .withBody(getJsonString(caseResource))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     public static void stubGetCaseViaExternalApi(String caseId, CaseResource caseResource) {
         stubFor(WireMock.get(urlPathEqualTo("/cases/" + caseId))
-            .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-            .willReturn(aResponse()
-                            .withStatus(HTTP_CREATED)
-                            .withBody(getJsonString(caseResource))
-                            .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_CREATED)
+                                    .withBody(getJsonString(caseResource))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     @SuppressWarnings({"PMD.AvoidThrowingRawExceptionTypes", "squid:S112"})

@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeApprovalService;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
@@ -99,6 +100,9 @@ public class NoticeOfChangeControllerTest {
         protected NoticeOfChangeService service;
 
         @MockBean
+        protected NoticeOfChangeApprovalService approvalService;
+
+        @MockBean
         protected VerifyNoCAnswersService verifyNoCAnswersService;
 
         @MockBean
@@ -146,7 +150,7 @@ public class NoticeOfChangeControllerTest {
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 
                 NoticeOfChangeController controller =
-                    new NoticeOfChangeController(service, verifyNoCAnswersService, jacksonUtils);
+                    new NoticeOfChangeController(service, approvalService, verifyNoCAnswersService, jacksonUtils);
 
                 // ACT
                 ChallengeQuestionsResult response = controller.getNoticeOfChangeQuestions(CASE_ID);
@@ -340,7 +344,7 @@ public class NoticeOfChangeControllerTest {
         void directCallHappyPath() {
             // ARRANGE
             NoticeOfChangeController controller =
-                new NoticeOfChangeController(service, verifyNoCAnswersService, jacksonUtils);
+                new NoticeOfChangeController(service, approvalService, verifyNoCAnswersService, jacksonUtils);
 
             // ACT
             RequestNoticeOfChangeResponse response = controller.requestNoticeOfChange(requestNoticeOfChangeRequest);
@@ -442,7 +446,7 @@ public class NoticeOfChangeControllerTest {
                                                  objectMapper.convertValue(changeOrganisationRequest, JsonNode.class)));
             request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
             NoticeOfChangeController controller =
-                new NoticeOfChangeController(service, verifyNoCAnswersService, jacksonUtils);
+                new NoticeOfChangeController(service, approvalService, verifyNoCAnswersService, jacksonUtils);
 
             ResponseEntity response = controller.checkNoticeOfChangeApproval(request);
 

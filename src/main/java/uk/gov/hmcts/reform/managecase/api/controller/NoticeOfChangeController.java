@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
+import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeApprovalService;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
@@ -64,13 +65,16 @@ public class NoticeOfChangeController {
     private static final String APPROVED_NUMERIC = "1";
 
     private final NoticeOfChangeService noticeOfChangeService;
+    private final NoticeOfChangeApprovalService noticeOfChangeApprovalService;
     private final VerifyNoCAnswersService verifyNoCAnswersService;
     private final JacksonUtils jacksonUtils;
 
     public NoticeOfChangeController(NoticeOfChangeService noticeOfChangeService,
+                                    NoticeOfChangeApprovalService noticeOfChangeApprovalService,
                                     VerifyNoCAnswersService verifyNoCAnswersService,
                                     JacksonUtils jacksonUtils) {
         this.noticeOfChangeService = noticeOfChangeService;
+        this.noticeOfChangeApprovalService = noticeOfChangeApprovalService;
         this.verifyNoCAnswersService = verifyNoCAnswersService;
         this.jacksonUtils = jacksonUtils;
     }
@@ -306,7 +310,7 @@ public class NoticeOfChangeController {
             return ResponseEntity.ok().build();
         }
 
-        noticeOfChangeService.checkNoticeOfChangeApproval(caseDetails.getReference());
+        noticeOfChangeApprovalService.checkNoticeOfChangeApproval(caseDetails.getReference());
 
         return ResponseEntity.ok().build();
     }

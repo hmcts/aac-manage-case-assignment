@@ -153,11 +153,12 @@ class NoticeOfChangeServiceTest {
             given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, null, CASE_ID)).willReturn(resource);
 
             //Challenge Questions
-            FieldType fieldType = new FieldType();
-            fieldType.setId(FIELD_ID);
-            fieldType.setType(FIELD_ID);
-            fieldType.setMin(null);
-            fieldType.setMax(null);
+            FieldType fieldType = FieldType.builder()
+                .max(null)
+                .min(null)
+                .id(FIELD_ID)
+                .type(FIELD_ID)
+                .build();
             ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_APPLICANT);
             ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
                                                                         fieldType,
@@ -189,8 +190,10 @@ class NoticeOfChangeServiceTest {
             assertThat(challengeQuestionsResult.getQuestions().get(0).getCaseTypeId()).isEqualTo(CASE_TYPE_ID);
             assertThat(challengeQuestionsResult.getQuestions().get(0).getOrder()).isEqualTo(1);
             assertThat(challengeQuestionsResult.getQuestions().get(0).getQuestionText()).isEqualTo(QUESTION_TEXT);
-            assertThat(challengeQuestionsResult.getQuestions().get(0).getChallengeQuestionId())
-                .isEqualTo(CHALLENGE_QUESTION);
+            assertThat(challengeQuestionsResult.getQuestions().get(0).getChallengeQuestionId()).isEqualTo(CHALLENGE_QUESTION);
+            assertThat(challengeQuestionsResult.getQuestions().get(0).getAnswers()).isEqualTo(null);
+            assertThat(challengeQuestionsResult.getQuestions().get(0).getAnswerField()).isEqualTo(null);
+
         }
 
         @Test
@@ -287,11 +290,12 @@ class NoticeOfChangeServiceTest {
             CaseSearchResultViewResource resource = new CaseSearchResultViewResource(caseSearchResultView);
             given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, null, CASE_ID)).willReturn(resource);
 
-            FieldType fieldType = new FieldType();
-            fieldType.setId(FIELD_ID);
-            fieldType.setType(FIELD_ID);
-            fieldType.setMin(null);
-            fieldType.setMax(null);
+            FieldType fieldType = FieldType.builder()
+                .max(null)
+                .min(null)
+                .id(FIELD_ID)
+                .type(FIELD_ID)
+                .build();
             ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_APPLICANT);
             ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
                                                                         fieldType,
@@ -314,11 +318,12 @@ class NoticeOfChangeServiceTest {
         @DisplayName("Must return an error if there is not an Organisation Policy field containing a "
             + "case role for each set of answers")
         void shouldThrowErrorMissingRoleInOrgPolicy() {
-            FieldType fieldType = new FieldType();
-            fieldType.setId(FIELD_ID);
-            fieldType.setType(FIELD_ID);
-            fieldType.setMin(null);
-            fieldType.setMax(null);
+            FieldType fieldType = FieldType.builder()
+                .max(null)
+                .min(null)
+                .id(FIELD_ID)
+                .type(FIELD_ID)
+                .build();
             ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_RESPONDENT);
             ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
                                                                         fieldType,

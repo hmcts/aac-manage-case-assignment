@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.service;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.Searc
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
@@ -58,13 +60,30 @@ public class NoticeOfChangeService {
     public ChallengeQuestionsResult getChallengeQuestions(String caseId) {
         ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId).getChallengeQuestionsResult();
         //Step 12 Remove the answer section from the JSON returned byGetTabContents and return success with the
-        // remaining JSON
-        for (ChallengeQuestion challengeQuestion : challengeQuestionsResult.getQuestions()) {
-            if (!challengeQuestion.getAnswerField().isEmpty()) {
-                challengeQuestion.setAnswers(null);
-            }
-        }
-        return challengeQuestionsResult;
+        // remaining JSOn
+
+        List<ChallengeQuestion> challengeQuestionsResponse = challengeQuestionsResult.getQuestions().stream()
+            .map(challengeQuestion -> ChallengeQuestion.builder()
+                               .questionText(challengeQuestion.getQuestionText())
+                               .caseTypeId(challengeQuestion.getCaseTypeId())
+                               .order(challengeQuestion.getOrder())
+                               .answerFieldType(FieldType.builder()
+                                                    .collectionFieldType(challengeQuestion.getAnswerFieldType().getCollectionFieldType())
+                                                    .complexFields(challengeQuestion.getAnswerFieldType().getComplexFields())
+                                                    .fixedListItems(challengeQuestion.getAnswerFieldType().getFixedListItems())
+                                                    .regularExpression(challengeQuestion.getAnswerFieldType().getRegularExpression())
+                                                    .max(challengeQuestion.getAnswerFieldType().getMax())
+                                                    .min(challengeQuestion.getAnswerFieldType().getMin())
+                                                    .id(challengeQuestion.getAnswerFieldType().getId())
+                                                    .type(challengeQuestion.getAnswerFieldType().getType())
+                                                    .build())
+                               .displayContextParameter(challengeQuestion.getDisplayContextParameter())
+                               .challengeQuestionId(challengeQuestion.getChallengeQuestionId())
+                .build())
+            .collect(Collectors.toList());
+
+
+        return ChallengeQuestionsResult.builder().questions(challengeQuestionsResponse).build();
     }
 
     public NoCRequestDetails challengeQuestions(String caseId) {

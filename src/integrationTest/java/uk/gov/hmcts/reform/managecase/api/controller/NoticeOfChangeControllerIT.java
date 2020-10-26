@@ -69,7 +69,6 @@ public class NoticeOfChangeControllerIT {
         private MockMvc mockMvc;
 
         @DisplayName("Successfully return NoC questions for case id")
-        @Disabled
         @Test
         void shouldGetNoCQuestions_forAValidRequest() throws Exception {
             CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();

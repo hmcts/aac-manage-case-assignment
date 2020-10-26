@@ -75,14 +75,6 @@ public class CaseFieldDefinition implements Serializable, CommonField {
         this.caseTypeId = caseTypeId;
     }
 
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
     public String getHintText() {
         return hintText;
     }
@@ -98,6 +90,14 @@ public class CaseFieldDefinition implements Serializable, CommonField {
 
     public void setFieldTypeDefinition(FieldTypeDefinition fieldTypeDefinition) {
         this.fieldTypeDefinition = fieldTypeDefinition;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public Boolean getHidden() {

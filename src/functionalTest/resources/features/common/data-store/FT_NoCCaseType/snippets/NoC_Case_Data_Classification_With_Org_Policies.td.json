@@ -7,7 +7,7 @@
 		"value": {
 			"OrgPolicyReference": "PUBLIC",
 			"OrgPolicyCaseAssignedRole": "PUBLIC",
-            "Organisation": "[[ANY_NULLABLE]]"
+			"Organisation": "[[ANY_NULLABLE]]"
 		}
 	},
 	"respondentOrganisationPolicy": {
@@ -15,7 +15,7 @@
 		"value": {
 			"OrgPolicyReference": "PUBLIC",
 			"OrgPolicyCaseAssignedRole": "PUBLIC",
-            "Organisation": "[[ANY_NULLABLE]]"
+			"Organisation": "[[ANY_NULLABLE]]"
 		}
 	},
 	"otherPartyOrganisationPolicy": {
@@ -23,7 +23,7 @@
 		"value": {
 			"OrgPolicyReference": "PUBLIC",
 			"OrgPolicyCaseAssignedRole": "PUBLIC",
-            "Organisation": "[[ANY_NULLABLE]]"
+			"Organisation": "[[ANY_NULLABLE]]"
 		}
 	}
 

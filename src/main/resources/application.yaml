@@ -1,6 +1,7 @@
 server:
   port: 4454
-
+  error:
+    include-message: always
 management:
   endpoint:
     health:

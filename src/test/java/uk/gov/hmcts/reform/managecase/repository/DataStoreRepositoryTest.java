@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
@@ -20,11 +21,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPage;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPageComplexFieldOverride;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPageField;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
@@ -44,7 +40,9 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.CHANGE_ORGANISATION_REQUEST_FIELD;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getCaseViewFields;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getWizardPages;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.ES_QUERY;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.MISSING_CASE_FIELD_ID;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOC_REQUEST_DESCRIPTION;
@@ -60,7 +58,7 @@ class DataStoreRepositoryTest {
     private static final String CASE_ID2 = "87654321";
     private static final String ORG_ID = "organisation1";
     private static final String EVENT_ID = "NoCRequest";
-    private static final String CHANGE_ORGANISATION_REQUEST_FIELD = "changeOrganisationRequestField";
+
     private static final String EXPECTED_NOC_REQUEST_DATA =
         "{\"ChangeOrganisationRequest\":"
             + "{"
@@ -281,7 +279,7 @@ class DataStoreRepositoryTest {
     void shouldReturnCaseResourceWhenSubmittingEventSucceeds() throws JsonProcessingException {
         // ARRANGE
         CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
-            .wizardPages(getWizardPages(CHANGE_ORGANISATION_REQUEST_FIELD))
+            .wizardPages(CaseUpdateViewEventFixture.getWizardPages())
             .eventToken(EVENT_TOKEN)
             .caseFields(getCaseViewFields())
             .build();
@@ -396,29 +394,5 @@ class DataStoreRepositoryTest {
         // ASSERT
         verify(dataStoreApi).getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID);
         verify(dataStoreApi, never()).submitEventForCase(any(), any(), any());
-    }
-
-    private List<CaseViewField> getCaseViewFields() {
-        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setId(CHANGE_ORGANISATION_REQUEST);
-
-        CaseViewField caseViewFields = new CaseViewField();
-        caseViewFields.setId(CHANGE_ORGANISATION_REQUEST_FIELD);
-        caseViewFields.setFieldTypeDefinition(fieldTypeDefinition);
-        return List.of(caseViewFields);
-    }
-
-    private List<WizardPage> getWizardPages(String caseFieldId) {
-        WizardPageField wizardPageField = new WizardPageField();
-
-        WizardPageComplexFieldOverride wizardPageComplexFieldOverride = new WizardPageComplexFieldOverride();
-        wizardPageComplexFieldOverride.setComplexFieldElementId(caseFieldId + ".ApprovalStatus");
-        wizardPageComplexFieldOverride.setDefaultValue(CHANGE_ORGANISATION_REQUEST_FIELD);
-        wizardPageField.setCaseFieldId(caseFieldId);
-        wizardPageField.setComplexFieldOverrides(List.of(wizardPageComplexFieldOverride));
-
-        WizardPage wizardPage =  new WizardPage();
-        wizardPage.setWizardPageFields(List.of(wizardPageField));
-        return List.of(wizardPage);
     }
 }

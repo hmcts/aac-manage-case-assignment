@@ -1,0 +1,16 @@
+{
+	"_guid_": "NoC_WithoutEvents_Case_Creation__Base",
+	"_extends_": "NoC_Case_Creation__Base",
+
+	"request": {
+		"pathVariables": {
+			"ctid": "FT_NoCWithoutEventsCaseType"
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"case_type_id": "FT_NoCWithoutEventsCaseType"
+		}
+	}
+}

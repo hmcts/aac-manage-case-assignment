@@ -250,6 +250,16 @@ public class WiremockFixtures {
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
+    public static void stubSubmitEventForCase(String caseID,
+                                              CaseResource caseResource) {
+        stubFor(WireMock.post(urlEqualTo("/cases/" + caseID + "/events"))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK).withBody(getJsonString(caseResource))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
     @SuppressWarnings({"PMD.AvoidThrowingRawExceptionTypes", "squid:S112"})
     // Required as wiremock's Json.getObjectMapper().registerModule(..); not working
     // see https://github.com/tomakehurst/wiremock/issues/1127

@@ -65,14 +65,6 @@ public class CaseViewField implements CommonField {
         this.label = label;
     }
 
-    public String getHintText() {
-        return hintText;
-    }
-
-    public void setHintText(String hintText) {
-        this.hintText = hintText;
-    }
-
     @Override
     public FieldTypeDefinition getFieldTypeDefinition() {
         return fieldTypeDefinition;
@@ -80,6 +72,14 @@ public class CaseViewField implements CommonField {
 
     public void setFieldTypeDefinition(FieldTypeDefinition fieldTypeDefinition) {
         this.fieldTypeDefinition = fieldTypeDefinition;
+    }
+
+    public String getHintText() {
+        return hintText;
+    }
+
+    public void setHintText(String hintText) {
+        this.hintText = hintText;
     }
 
     public Boolean isHidden() {

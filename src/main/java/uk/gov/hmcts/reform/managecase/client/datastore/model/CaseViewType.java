@@ -31,14 +31,6 @@ public class CaseViewType {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -53,6 +45,14 @@ public class CaseViewType {
 
     public void setJurisdiction(CaseViewJurisdiction jurisdiction) {
         this.jurisdiction = jurisdiction;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public boolean isPrintEnabled() {

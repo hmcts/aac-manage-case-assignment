@@ -1,0 +1,52 @@
+{
+  "_guid_": "F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies_And_Matching_Litigant_Names",
+  "_extends_": "F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies",
+
+  "specs": [
+    "by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles, with litgants that have matching names"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "applicant": {
+          "individual": {
+            "LastName": "MATCHING-NAME"
+          }
+        },
+        "respondent": {
+          "company": {
+            "Name": "MATCHING-NAME"
+          }
+        },
+        "otherParty": {
+          "soletrader": {
+            "Name": "MATCHING-NAME"
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "applicant": {
+          "individual": {
+            "LastName": "MATCHING-NAME"
+          }
+        },
+        "respondent": {
+          "company": {
+            "Name": "MATCHING-NAME"
+          }
+        },
+        "otherParty": {
+          "soletrader": {
+            "Name": "MATCHING-NAME"
+          }
+        }
+      }
+    }
+  }
+}

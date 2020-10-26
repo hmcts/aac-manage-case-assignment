@@ -320,11 +320,6 @@ public class NoticeOfChangeControllerIT {
         private CheckNoticeOfChangeApprovalRequest checkNoticeOfChangeApprovalRequest;
         private CaseDetails caseDetails;
         private ChangeOrganisationRequest changeOrganisationRequest;
-        private CaseViewEvent caseViewEvent;
-        private CaseViewResource caseViewResource;
-        private CaseUpdateViewEvent caseUpdateViewEvent;
-        private CaseViewField caseViewField;
-        private FieldTypeDefinition fieldTypeDefinition;
 
         private static final String ENDPOINT_URL = "/noc" + CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
 
@@ -347,20 +342,20 @@ public class NoticeOfChangeControllerIT {
 
             checkNoticeOfChangeApprovalRequest = new CheckNoticeOfChangeApprovalRequest(NOC, null, caseDetails);
 
-            caseViewField = new CaseViewField();
-            fieldTypeDefinition = new FieldTypeDefinition();
+            CaseViewField caseViewField = new CaseViewField();
+            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
             fieldTypeDefinition.setId("OrganisationPolicy");
             caseViewField.setId("applicantOrganisationPolicy");
             caseViewField.setFieldTypeDefinition(fieldTypeDefinition);
 
-            caseUpdateViewEvent = CaseUpdateViewEvent.builder()
+            CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
                 .caseFields(new ArrayList<>(Arrays.asList(caseViewField)))
                 .eventToken("eventToken")
                 .build();
 
-            caseViewEvent = new CaseViewEvent();
+            CaseViewEvent caseViewEvent = new CaseViewEvent();
             caseViewEvent.setEventId("NOC");
-            caseViewResource = new CaseViewResource();
+            CaseViewResource caseViewResource = new CaseViewResource();
             caseViewResource.setCaseViewEvents(new CaseViewEvent[]{caseViewEvent});
 
             Event event = Event.builder()

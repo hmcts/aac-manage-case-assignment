@@ -295,33 +295,19 @@ public class NoticeOfChangeController {
                                                               checkNoticeOfChangeApprovalRequest) {
         CaseDetails caseDetails = checkNoticeOfChangeApprovalRequest.getCaseDetails();
         Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
-
         if (changeOrganisationRequestFieldJson.isEmpty()) {
             throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
         }
 
         ChangeOrganisationRequest changeOrganisationRequest =
             jacksonUtils.convertValue(changeOrganisationRequestFieldJson.get(), ChangeOrganisationRequest.class);
-
-        validateNoCApproval(changeOrganisationRequest);
-
+        changeOrganisationRequest.validateChangeOrganisationRequest();
         if (!changeOrganisationRequest.getApprovalStatus().equals(APPROVED_NUMERIC)
             && !changeOrganisationRequest.getApprovalStatus().equals(APPROVED)) {
             return ResponseEntity.ok().build();
         }
 
         noticeOfChangeApprovalService.checkNoticeOfChangeApproval(caseDetails.getReference());
-
         return ResponseEntity.ok().build();
-    }
-
-    private void validateNoCApproval(ChangeOrganisationRequest changeOrganisationRequest) {
-        if (StringUtils.isBlank(changeOrganisationRequest.getCaseRoleId())
-            || StringUtils.isBlank(changeOrganisationRequest.getApprovalStatus())
-            || changeOrganisationRequest.getRequestTimestamp() == null
-            || changeOrganisationRequest.getOrganisationToAdd() == null
-            || changeOrganisationRequest.getOrganisationToRemove() == null) {
-            throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
-        }
     }
 }

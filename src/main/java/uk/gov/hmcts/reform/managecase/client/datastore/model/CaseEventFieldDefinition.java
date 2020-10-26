@@ -68,6 +68,19 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
         this.showCondition = showCondition;
     }
 
+    /**
+     * event case field hint text.
+     **/
+    @ApiModelProperty("")
+    @JsonProperty("hint_text")
+    public String getHintText() {
+        return hintText;
+    }
+
+    public void setHintText(String hintText) {
+        this.hintText = hintText;
+    }
+
     @ApiModelProperty("Show Summary Change Option")
     @JsonProperty("show_summary_change_option")
     public Boolean getShowSummaryChangeOption() {
@@ -99,19 +112,6 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
 
     public void setLabel(String label) {
         this.label = label;
-    }
-
-    /**
-     * event case field hint text.
-     **/
-    @ApiModelProperty("")
-    @JsonProperty("hint_text")
-    public String getHintText() {
-        return hintText;
-    }
-
-    public void setHintText(String hintText) {
-        this.hintText = hintText;
     }
 
     @ApiModelProperty("")

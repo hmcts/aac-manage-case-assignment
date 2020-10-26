@@ -46,6 +46,16 @@ public class JurisdictionDefinition implements Serializable {
     }
 
     @ApiModelProperty("")
+    @JsonProperty("live_until")
+    public Date getLiveUntil() {
+        return liveUntil;
+    }
+
+    public void setLiveUntil(Date liveUntil) {
+        this.liveUntil = liveUntil;
+    }
+
+    @ApiModelProperty("")
     @JsonProperty("description")
     public String getDescription() {
         return description;
@@ -63,16 +73,6 @@ public class JurisdictionDefinition implements Serializable {
 
     public void setLiveFrom(Date liveFrom) {
         this.liveFrom = liveFrom;
-    }
-
-    @ApiModelProperty("")
-    @JsonProperty("live_until")
-    public Date getLiveUntil() {
-        return liveUntil;
-    }
-
-    public void setLiveUntil(Date liveUntil) {
-        this.liveUntil = liveUntil;
     }
 
     @ApiModelProperty("")

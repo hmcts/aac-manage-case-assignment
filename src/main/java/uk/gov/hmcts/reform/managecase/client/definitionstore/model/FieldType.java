@@ -3,11 +3,13 @@ package uk.gov.hmcts.reform.managecase.client.definitionstore.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ApiModel(description = "")
+@Builder
 public class FieldType {
 
     private String id;

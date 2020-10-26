@@ -33,6 +33,16 @@ public class CaseStateDefinition implements Serializable {
         this.id = id;
     }
 
+    @ApiModelProperty("")
+    @JsonProperty("description")
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     /**
      * Short name to display.
      **/
@@ -44,16 +54,6 @@ public class CaseStateDefinition implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @ApiModelProperty("")
-    @JsonProperty("description")
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     @JsonProperty("order")

@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.Searc
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
@@ -30,8 +31,9 @@ import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
@@ -43,7 +45,11 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
 
 @Service
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.GodClass", "PMD.ExcessiveImports", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis",
+    "PMD.GodClass",
+    "PMD.ExcessiveImports",
+    "PMD.TooManyMethods",
+    "PMD.AvoidDeeplyNestedIfStmts"})
 public class NoticeOfChangeService {
 
     public static final String PUI_ROLE = "pui-caa";
@@ -75,13 +81,34 @@ public class NoticeOfChangeService {
     public ChallengeQuestionsResult getChallengeQuestions(String caseId) {
         ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId).getChallengeQuestionsResult();
         //Step 12 Remove the answer section from the JSON returned byGetTabContents and return success with the
-        // remaining JSON
-        for (ChallengeQuestion challengeQuestion : challengeQuestionsResult.getQuestions()) {
-            if (!challengeQuestion.getAnswerField().isEmpty()) {
-                challengeQuestion.setAnswers(null);
-            }
-        }
-        return challengeQuestionsResult;
+        // remaining JSOn
+
+        List<ChallengeQuestion> challengeQuestionsResponse = challengeQuestionsResult.getQuestions().stream()
+            .map(challengeQuestion -> ChallengeQuestion.builder()
+                               .questionText(challengeQuestion.getQuestionText())
+                               .caseTypeId(challengeQuestion.getCaseTypeId())
+                               .order(challengeQuestion.getOrder())
+                               .answerFieldType(FieldType.builder()
+                                                    .collectionFieldType(challengeQuestion.getAnswerFieldType()
+                                                                             .getCollectionFieldType())
+                                                    .complexFields(challengeQuestion.getAnswerFieldType()
+                                                                       .getComplexFields())
+                                                    .fixedListItems(challengeQuestion.getAnswerFieldType()
+                                                                        .getFixedListItems())
+                                                    .regularExpression(challengeQuestion.getAnswerFieldType()
+                                                                           .getRegularExpression())
+                                                    .max(challengeQuestion.getAnswerFieldType().getMax())
+                                                    .min(challengeQuestion.getAnswerFieldType().getMin())
+                                                    .id(challengeQuestion.getAnswerFieldType().getId())
+                                                    .type(challengeQuestion.getAnswerFieldType().getType())
+                                                    .build())
+                               .displayContextParameter(challengeQuestion.getDisplayContextParameter())
+                               .challengeQuestionId(challengeQuestion.getChallengeQuestionId())
+                .build())
+            .collect(Collectors.toList());
+
+
+        return ChallengeQuestionsResult.builder().questions(challengeQuestionsResponse).build();
     }
 
     public NoCRequestDetails challengeQuestions(String caseId) {
@@ -146,7 +173,6 @@ public class NoticeOfChangeService {
                 roleFound = true;
             }
         }
-
         return roleFound;
     }
 
@@ -163,6 +189,10 @@ public class NoticeOfChangeService {
             && !isActingAsSolicitor(roles, caseViewResource.getCaseType().getJurisdiction().getId())) {
             throw new ValidationException(INSUFFICIENT_PRIVILEGE);
         }
+    }
+
+    private boolean isActingAsSolicitor(List<String> roles, String jurisdiction) {
+        return securityUtils.hasSolicitorRole(roles, jurisdiction);
     }
 
     private UserInfo getUserInfo() {
@@ -263,10 +293,6 @@ public class NoticeOfChangeService {
         // will have validated that events exist.
         // Assuming a single event, so always take first array element
         return noCRequestDetails.getCaseViewResource().getCaseViewActionableEvents()[0].getId();
-    }
-
-    private boolean isActingAsSolicitor(List<String> roles, String jurisdiction) {
-        return securityUtils.hasSolicitorRole(roles, jurisdiction);
     }
 
     private CaseResource generateNoCRequestEvent(String caseId,

@@ -97,15 +97,17 @@ class NoticeOfChangeServiceTest {
         private NoticeOfChangeService noticeOfChangeService;
 
         @BeforeEach
-        void setUp()throws JsonProcessingException {
-            noticeOfChangeService = new NoticeOfChangeService(dataStoreRepository,
-                                                              definitionStoreRepository,
-                                                              securityUtils);
+        void setUp() throws JsonProcessingException {
+            noticeOfChangeService = new NoticeOfChangeService(
+                dataStoreRepository,
+                definitionStoreRepository,
+                securityUtils
+            );
 
             //internal/cases/caseId
             CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
             CaseViewResource caseViewResource = new CaseViewResource();
-            caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[] {caseViewActionableEvent});
+            caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[]{caseViewActionableEvent});
             CaseViewType caseViewType = new CaseViewType();
             caseViewType.setName(CASE_TYPE_ID);
             caseViewType.setId(CASE_TYPE_ID);
@@ -167,22 +169,25 @@ class NoticeOfChangeServiceTest {
                                                                         CHALLENGE_QUESTION,
                                                                         ANSWER_FIELD,
                                                                         "QuestionId1",
-                                                                        Arrays.asList(challengeAnswer));
+                                                                        Arrays.asList(challengeAnswer)
+            );
             ChallengeQuestionsResult challengeQuestionsResult =
                 new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
             given(definitionStoreRepository.challengeQuestions(CASE_TYPE_ID, "NoCChallenge"))
                 .willReturn(challengeQuestionsResult);
 
-            UserInfo userInfo = new UserInfo("","","", "", "",
-                                             Arrays.asList("pui-caa"));
+            UserInfo userInfo = new UserInfo("", "", "", "", "",
+                                             Arrays.asList("pui-caa")
+            );
             given(securityUtils.getUserInfo()).willReturn(userInfo);
         }
 
         @Test
         @DisplayName("NoC questions successfully returned for a Solicitor user")
         void shouldReturnQuestionsForSolicitor() {
-            UserInfo userInfo = new UserInfo("","","", "", "",
-                                             Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicitor"));
+            UserInfo userInfo = new UserInfo("", "", "", "", "",
+                                             Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicitor")
+            );
             given(securityUtils.getUserInfo()).willReturn(userInfo);
             given(securityUtils.hasSolicitorRole(anyList(), any())).willReturn(true);
             ChallengeQuestionsResult challengeQuestionsResult = service.getChallengeQuestions(CASE_ID);
@@ -201,8 +206,9 @@ class NoticeOfChangeServiceTest {
         @Test
         @DisplayName("NoC questions successfully returned for a Solicitor user")
         void shouldReturnQuestionsForNocDetails() {
-            UserInfo userInfo = new UserInfo("","","", "", "",
-                                             Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicitor"));
+            UserInfo userInfo = new UserInfo("", "", "", "", "",
+                                             Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicitor")
+            );
             given(securityUtils.getUserInfo()).willReturn(userInfo);
             given(securityUtils.hasSolicitorRole(anyList(), any())).willReturn(true);
             NoCRequestDetails noCRequestDetails = service.challengeQuestions(CASE_ID);
@@ -217,9 +223,9 @@ class NoticeOfChangeServiceTest {
             assertThat(noCRequestDetails.getChallengeQuestionsResult().getQuestions()
                            .get(0).getChallengeQuestionId())
                 .isEqualTo(CHALLENGE_QUESTION);
-             assertThat(noCRequestDetails.getCaseViewResource()).isNotNull();
-             assertThat(noCRequestDetails.getOrganisationPolicy()).isNull();
-             assertThat(noCRequestDetails.getSearchResultViewItem().getCaseId()).isEqualTo("CaseId");
+            assertThat(noCRequestDetails.getCaseViewResource()).isNotNull();
+            assertThat(noCRequestDetails.getOrganisationPolicy()).isNull();
+            assertThat(noCRequestDetails.getSearchResultViewItem().getCaseId()).isEqualTo("CaseId");
         }
 
         @Test
@@ -329,7 +335,8 @@ class NoticeOfChangeServiceTest {
                                                                         CHALLENGE_QUESTION,
                                                                         ANSWER_FIELD,
                                                                         "QuestionId1",
-                                                                        Arrays.asList(challengeAnswer));
+                                                                        Arrays.asList(challengeAnswer)
+            );
             ChallengeQuestionsResult challengeQuestionsResult =
                 new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
             given(definitionStoreRepository.challengeQuestions(CASE_TYPE_ID, "NoCChallenge"))
@@ -357,7 +364,8 @@ class NoticeOfChangeServiceTest {
                                                                         CHALLENGE_QUESTION,
                                                                         ANSWER_FIELD,
                                                                         "QuestionId1",
-                                                                        Arrays.asList(challengeAnswer));
+                                                                        Arrays.asList(challengeAnswer)
+            );
             ChallengeQuestionsResult challengeQuestionsResult =
                 new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
             given(definitionStoreRepository
@@ -385,8 +393,9 @@ class NoticeOfChangeServiceTest {
         @DisplayName(" must return an error response when the solicitor does not have access to the "
             + "jurisdiction of the case")
         void shouldThrowErrorInsufficientPrivilegesForSolicitor() {
-            UserInfo userInfo = new UserInfo("","","", "", "",
-                                             Arrays.asList("caseworker-JurisdictionA-solicitor"));
+            UserInfo userInfo = new UserInfo("", "", "", "", "",
+                                             Arrays.asList("caseworker-JurisdictionA-solicitor")
+            );
             given(securityUtils.getUserInfo()).willReturn(userInfo);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))

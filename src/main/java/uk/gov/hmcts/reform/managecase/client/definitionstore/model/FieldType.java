@@ -82,7 +82,9 @@ public class FieldType {
     }
 
     public void setComplexFields(List<CaseField> complexFields) {
-        complexFields.stream().forEach(cf -> cf.setAcls(null));
+        if (complexFields != null) {
+            complexFields.stream().forEach(cf -> cf.setAcls(null));
+        }
         this.complexFields = complexFields;
     }
 

@@ -348,11 +348,6 @@ public class NoticeOfChangeControllerIT {
             caseViewField.setId("applicantOrganisationPolicy");
             caseViewField.setFieldTypeDefinition(fieldTypeDefinition);
 
-            CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
-                .caseFields(new ArrayList<>(Arrays.asList(caseViewField)))
-                .eventToken("eventToken")
-                .build();
-
             CaseViewEvent caseViewEvent = new CaseViewEvent();
             caseViewEvent.setEventId("NOC");
             CaseViewResource caseViewResource = new CaseViewResource();
@@ -361,6 +356,11 @@ public class NoticeOfChangeControllerIT {
             Event event = Event.builder()
                 .eventId(caseViewResource.getCaseViewEvents()[0].getEventId())
                 .description("Check Notice of Change Approval Event")
+                .build();
+
+            CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
+                .caseFields(new ArrayList<>(Arrays.asList(caseViewField)))
+                .eventToken("eventToken")
                 .build();
 
             HashMap<String, JsonNode> data = new HashMap<>();

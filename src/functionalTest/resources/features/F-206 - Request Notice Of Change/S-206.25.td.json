@@ -1,0 +1,48 @@
+{
+  "_guid_": "S-206.25",
+  "_extends_": "Request_NoC__Base",
+
+  "title": "Must return an error when the set of answers match more than one corresponding case roles for representation",
+
+  "specs": [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's",
+    "a citizen Mario, on behalf of whome Richard will create a case",
+
+    "contains a valid case ID for C1",
+    "contains a set of answers that match more than one corresponding case roles for representation",
+
+    "is made by Dil to place a NOC Request for C1"
+  ],
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "request": {
+    "body": {
+      "case_id": "${[scenarioContext][childContexts][F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies_And_Matching_Litigant_Names][testData][actualResponse][body][id]}",
+
+      "answers": [ 
+        {
+          "question_id": "NoC_Challenge_Name",
+          "value": "MATCHING-NAME"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "status" : "BAD_REQUEST",
+      "message": "The answers did not uniquely identify a litigant",
+      "errors" : [ ]
+    }
+  }
+}

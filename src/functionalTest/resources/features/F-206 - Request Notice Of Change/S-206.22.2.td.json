@@ -1,0 +1,50 @@
+{
+  "_guid_": "S-206.22.2",
+  "_extends_": "Request_NoC__Base",
+
+  "title": "Must return an error response for an invalid/incorrect answer (wrong number of questions)",
+
+  "specs": [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's",
+    "a citizen Mario, on behalf of whome Richard will create a case",
+
+    "contains a valid case ID for C1",
+    "contains any invalid/incorrect answer(s) to any of the question(s) - (wrong number of questions)",
+
+    "is made by Dil to place a NOC Request for C1"
+  ],
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "request": {
+    "body": {
+      "_extends_": "NoC_Auto_Approval_Valid_Answers_For_Case_Role_R2",
+
+      "case_id": "${[scenarioContext][childContexts][F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}",
+
+      "answers": [ 
+        {
+          "question_id": "Additional-Question",
+          "value": "Test Company"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "status" : "BAD_REQUEST",
+      "message": "The number of provided answers must match the number of questions - expected 1 answers, received 2",
+      "errors" : [ ]
+    }
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "_guid_": "F-206_NoC_Case_Creation_By_Richard_With_Only_2_Out_Of_3_Org_Policies",
+  "_extends_": "NoC_Case_Creation__Base",
+
+  "specs": [
+    "by Richard to create a case C1 on behalf of Mario, which only contains 2 out 3 Org Policies for 3 case roles"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Richard"
+    }
+  },
+
+  "prerequisites": [
+    {
+      "Token_Creation": "F-206_NoC_Case_Creation_By_Richard_Token_Creation",
+      "Get_Organisation_Identifier": "Get_Organisation_Identifier_For_Any_Org1_User__Prerequisite"
+    }
+  ],
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+
+      "data": {
+        "applicantOrganisationPolicy": {
+          "OrgPolicyReference": "ApplicantPolicy",
+          "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
+          "Organisation": {
+            "OrganisationID": "",
+            "OrganisationName": ""
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "OrgPolicyReference": "RespondentPolicy",
+          "OrgPolicyCaseAssignedRole": "[RespondentSolicitor]",
+          "Organisation": {
+            "OrganisationID": "",
+            "OrganisationName": ""
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "applicantOrganisationPolicy": {
+          "OrgPolicyReference": "ApplicantPolicy",
+          "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
+          "Organisation": {
+            "OrganisationID": "",
+            "OrganisationName": ""
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "OrgPolicyReference": "RespondentPolicy",
+          "OrgPolicyCaseAssignedRole": "[RespondentSolicitor]",
+          "Organisation": {
+            "OrganisationID": "",
+            "OrganisationName": ""
+          }
+        }
+      },
+
+      "data_classification": {
+        "applicantOrganisationPolicy": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrgPolicyReference": "PUBLIC",
+            "OrgPolicyCaseAssignedRole": "PUBLIC",
+            "Organisation": "[[ANY_NULLABLE]]"
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrgPolicyReference": "PUBLIC",
+            "OrgPolicyCaseAssignedRole": "PUBLIC",
+            "Organisation": "[[ANY_NULLABLE]]"
+          }
+        }
+      },
+
+      "security_classifications": {
+        "applicantOrganisationPolicy": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrgPolicyReference": "PUBLIC",
+            "OrgPolicyCaseAssignedRole": "PUBLIC",
+            "Organisation": "[[ANY_NULLABLE]]"
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrgPolicyReference": "PUBLIC",
+            "OrgPolicyCaseAssignedRole": "PUBLIC",
+            "Organisation": "[[ANY_NULLABLE]]"
+          }
+        }
+      }
+    }
+  }
+}

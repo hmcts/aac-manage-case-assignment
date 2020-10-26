@@ -1,12 +1,9 @@
 {
-  "_guid_": "F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies",
+  "_guid_": "F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies_All_To_Org1",
   "_extends_": "NoC_Case_Creation_With_Org_Policies__Base",
 
   "specs": [
-    "by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Dil's organisation, R2 & R3 which are both assigned to Richard's organisation",
-    "by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Matt's organisation, R2 & R3 which are both assigned to Richard's organisation",
-    "by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Alice's organisation, R2 & R3 which are both assigned to Richard's organisation",
-    "by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Ashley's organisation, R2 & R3 which are both assigned to Richard's organisation"
+    "by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: which are all assigned to Dil's organisation"
   ],
 
   "users": {
@@ -35,14 +32,14 @@
         },
         "respondentOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "Org-Two",
-            "OrganisationName": "Richard's Org"
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}",
+            "OrganisationName": "CCD Solicitors Limited"
           }
         },
         "otherPartyOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "Org-Two",
-            "OrganisationName": "Richard's Org"
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}",
+            "OrganisationName": "CCD Solicitors Limited"
           }
         }
       }
@@ -60,14 +57,14 @@
         },
         "respondentOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "Org-Two",
-            "OrganisationName": "Richard's Org"
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}",
+            "OrganisationName": "CCD Solicitors Limited"
           }
         },
         "otherPartyOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "Org-Two",
-            "OrganisationName": "Richard's Org"
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}",
+            "OrganisationName": "CCD Solicitors Limited"
           }
         }
       }

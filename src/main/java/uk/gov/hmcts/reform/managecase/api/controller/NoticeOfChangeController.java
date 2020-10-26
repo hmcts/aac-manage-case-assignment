@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
+import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeApprovalService;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
@@ -64,13 +65,16 @@ public class NoticeOfChangeController {
     private static final String APPROVED_NUMERIC = "1";
 
     private final NoticeOfChangeService noticeOfChangeService;
+    private final NoticeOfChangeApprovalService noticeOfChangeApprovalService;
     private final VerifyNoCAnswersService verifyNoCAnswersService;
     private final JacksonUtils jacksonUtils;
 
     public NoticeOfChangeController(NoticeOfChangeService noticeOfChangeService,
+                                    NoticeOfChangeApprovalService noticeOfChangeApprovalService,
                                     VerifyNoCAnswersService verifyNoCAnswersService,
                                     JacksonUtils jacksonUtils) {
         this.noticeOfChangeService = noticeOfChangeService;
+        this.noticeOfChangeApprovalService = noticeOfChangeApprovalService;
         this.verifyNoCAnswersService = verifyNoCAnswersService;
         this.jacksonUtils = jacksonUtils;
     }
@@ -291,33 +295,19 @@ public class NoticeOfChangeController {
                                                               checkNoticeOfChangeApprovalRequest) {
         CaseDetails caseDetails = checkNoticeOfChangeApprovalRequest.getCaseDetails();
         Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
-
         if (changeOrganisationRequestFieldJson.isEmpty()) {
             throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
         }
 
         ChangeOrganisationRequest changeOrganisationRequest =
             jacksonUtils.convertValue(changeOrganisationRequestFieldJson.get(), ChangeOrganisationRequest.class);
-
-        validateNoCApproval(changeOrganisationRequest);
-
+        changeOrganisationRequest.validateChangeOrganisationRequest();
         if (!changeOrganisationRequest.getApprovalStatus().equals(APPROVED_NUMERIC)
             && !changeOrganisationRequest.getApprovalStatus().equals(APPROVED)) {
             return ResponseEntity.ok().build();
         }
 
-        noticeOfChangeService.checkNoticeOfChangeApproval(caseDetails.getReference());
-
+        noticeOfChangeApprovalService.checkNoticeOfChangeApproval(caseDetails.getReference());
         return ResponseEntity.ok().build();
-    }
-
-    private void validateNoCApproval(ChangeOrganisationRequest changeOrganisationRequest) {
-        if (StringUtils.isBlank(changeOrganisationRequest.getCaseRoleId())
-            || StringUtils.isBlank(changeOrganisationRequest.getApprovalStatus())
-            || changeOrganisationRequest.getRequestTimestamp() == null
-            || changeOrganisationRequest.getOrganisationToAdd() == null
-            || changeOrganisationRequest.getOrganisationToRemove() == null) {
-            throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
-        }
     }
 }

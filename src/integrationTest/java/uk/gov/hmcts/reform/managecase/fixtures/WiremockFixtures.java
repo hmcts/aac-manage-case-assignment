@@ -202,21 +202,6 @@ public class WiremockFixtures {
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
-    public static void stubSubmitEventForCase(String caseId,
-                                              CaseDataContent caseDataContent,
-                                              CaseResource caseResource) throws JsonProcessingException {
-        stubFor(WireMock.post(urlPathEqualTo("/cases/" + caseId + "/events"))
-                    .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
-                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-                    .withRequestBody(equalToJson(
-                        OBJECT_MAPPER.writeValueAsString(caseDataContent)
-                    ))
-                    .willReturn(aResponse()
-                                    .withStatus(HTTP_CREATED)
-                                    .withBody(getJsonString(caseResource))
-                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
-    }
-
     public static void stubGetCaseViaExternalApi(String caseId, CaseResource caseResource) {
         stubFor(WireMock.get(urlPathEqualTo("/cases/" + caseId))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
@@ -247,6 +232,21 @@ public class WiremockFixtures {
                     .willReturn(aResponse()
                                     .withStatus(HTTP_OK)
                                     .withBody(getJsonString(caseUpdateViewEvent))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubSubmitEventForCase(String caseId,
+                                              CaseDataContent caseDataContent,
+                                              CaseResource caseResource) throws JsonProcessingException {
+        stubFor(WireMock.post(urlPathEqualTo("/cases/" + caseId + "/events"))
+                    .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .withRequestBody(equalToJson(
+                        OBJECT_MAPPER.writeValueAsString(caseDataContent)
+                    ))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_CREATED)
+                                    .withBody(getJsonString(caseResource))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 

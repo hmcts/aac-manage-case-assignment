@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnsw
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
+import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
@@ -195,6 +196,30 @@ class NoticeOfChangeServiceTest {
             assertThat(challengeQuestionsResult.getQuestions().get(0).getAnswers()).isEqualTo(null);
             assertThat(challengeQuestionsResult.getQuestions().get(0).getAnswerField()).isEqualTo(null);
 
+        }
+
+        @Test
+        @DisplayName("NoC questions successfully returned for a Solicitor user")
+        void shouldReturnQuestionsForNocDetails() {
+            UserInfo userInfo = new UserInfo("","","", "", "",
+                                             Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicitor"));
+            given(securityUtils.getUserInfo()).willReturn(userInfo);
+            given(securityUtils.hasSolicitorRole(anyList(), any())).willReturn(true);
+            NoCRequestDetails noCRequestDetails = service.challengeQuestions(CASE_ID);
+
+            assertThat(noCRequestDetails).isNotNull();
+            assertThat(noCRequestDetails.getChallengeQuestionsResult().getQuestions()
+                           .get(0).getCaseTypeId()).isEqualTo(CASE_TYPE_ID);
+            assertThat(noCRequestDetails.getChallengeQuestionsResult().getQuestions()
+                           .get(0).getOrder()).isEqualTo(1);
+            assertThat(noCRequestDetails.getChallengeQuestionsResult().getQuestions()
+                           .get(0).getQuestionText()).isEqualTo(QUESTION_TEXT);
+            assertThat(noCRequestDetails.getChallengeQuestionsResult().getQuestions()
+                           .get(0).getChallengeQuestionId())
+                .isEqualTo(CHALLENGE_QUESTION);
+             assertThat(noCRequestDetails.getCaseViewResource()).isNotNull();
+             assertThat(noCRequestDetails.getOrganisationPolicy()).isNull();
+             assertThat(noCRequestDetails.getSearchResultViewItem().getCaseId()).isEqualTo("CaseId");
         }
 
         @Test

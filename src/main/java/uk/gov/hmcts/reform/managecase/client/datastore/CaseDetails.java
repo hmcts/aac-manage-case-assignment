@@ -10,7 +10,6 @@ import lombok.Getter;
 import javax.validation.ValidationException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
@@ -44,12 +43,14 @@ public class CaseDetails {
             .collect(Collectors.toList());
     }
 
-    public Optional<JsonNode> findOrganisationPolicyNodeForCaseRole(String caseRoleId) {
+    public JsonNode findOrganisationPolicyNodeForCaseRole(String caseRoleId) {
         return findOrganisationPolicyNodes().stream()
-                .filter(node -> node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText().equals(caseRoleId))
-                .reduce((a, b) -> {
-                    throw new ValidationException(String.format("More than one Organisation Policy with "
-                            + "case role ID '%s' exists on case", caseRoleId));
-                });
+            .filter(node -> node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText().equals(caseRoleId))
+            .reduce((a, b) -> {
+                throw new ValidationException(String.format("More than one Organisation Policy with "
+                    + "case role ID '%s' exists on case", caseRoleId));
+            })
+            .orElseThrow(() -> new ValidationException(String.format("No Organisation Policy found with "
+                + "case role ID '%s'", caseRoleId)));
     }
 }

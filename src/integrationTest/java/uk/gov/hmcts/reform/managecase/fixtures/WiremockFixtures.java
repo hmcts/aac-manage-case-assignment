@@ -145,6 +145,17 @@ public final class WiremockFixtures {
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
+    public static void stubGetCaseAssignments(List<String> caseIds, List<CaseUserRole> caseUserRoles) {
+        stubFor(WireMock.get(urlPathEqualTo(CASE_USERS))
+            .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+            .withQueryParam("case_ids", equalTo(caseIds.get(0)))
+            .willReturn(aResponse()
+                .withStatus(HTTP_OK)
+                .withBody(getJsonString(new CaseUserRoleResource(caseUserRoles)))
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
     public static void stubGetCaseInternalES(String caseTypeId,
                                              String searchQuery,
                                              CaseSearchResultViewResource resource) {

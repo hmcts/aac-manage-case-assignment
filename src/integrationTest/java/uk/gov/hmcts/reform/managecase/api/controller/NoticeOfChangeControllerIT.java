@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.BaseTest;
+import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -30,12 +35,12 @@ import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -44,14 +49,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.usersByOrganisation;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_DETAILS_REQUIRED;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_DATA_PROVIDED;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseAssignments;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternal;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternalES;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetChallengeQuestions;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisationInternal;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubUnassignCase;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.UseConcurrentHashMap",
@@ -186,7 +199,7 @@ public class NoticeOfChangeControllerIT {
         void shouldVerifyNoCAnswersSuccessfully() throws Exception {
             SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer(QUESTION_ID_1,
                 ORGANISATION_ID.toLowerCase(Locale.getDefault()));
-            VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, Collections.singletonList(answer));
+            VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, singletonList(answer));
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -201,7 +214,7 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldReturnErrorForIncorrectAnswer() throws Exception {
             SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer(QUESTION_ID_1, "Incorrect Answer");
-            VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, Collections.singletonList(answer));
+            VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, singletonList(answer));
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -214,7 +227,7 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldReturnErrorWhenExpectedQuestionIdIsNotPassed() throws Exception {
             SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer("UnknownID", ORGANISATION_ID);
-            VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, Collections.singletonList(answer));
+            VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, singletonList(answer));
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -225,4 +238,159 @@ public class NoticeOfChangeControllerIT {
         }
     }
 
+    @Nested
+    @DisplayName("POST /noc/apply-decision")
+    class ApplyNoticeOfChangeDecision extends BaseTest {
+
+        private static final String ENDPOINT_URL = "/noc" + APPLY_NOC_DECISION;
+
+        private static final String ORG_1_ID = "Org1Id";
+        private static final String ORG_2_ID = "Org2Id";
+        private static final String ORG_1_NAME = "Org1Name";
+        private static final String ORG_2_NAME = "Org2Name";
+        private static final String ORG_POLICY_1_REF = "DefendantPolicy";
+        private static final String ORG_POLICY_2_REF = "ClaimantPolicy";
+        private static final String ORG_POLICY_1_ROLE = "[Defendant]";
+        private static final String ORG_POLICY_2_ROLE = "[Claimant]";
+        private static final String USER_ID_1 = "UserId1";
+        private static final String USER_ID_2 = "UserId2";
+
+        @Autowired
+        private MockMvc mockMvc;
+
+        @BeforeEach
+        void setUp() throws JsonProcessingException {
+            CaseUserRole caseUserRole = CaseUserRole.builder()
+                .caseId(CASE_ID)
+                .userId(USER_ID_2)
+                .caseRole(ORG_POLICY_2_ROLE)
+                .build();
+            stubGetCaseAssignments(singletonList(CASE_ID), singletonList(caseUserRole));
+            stubGetUsersByOrganisationInternal(usersByOrganisation(user(USER_ID_1), user(USER_ID_2)), ORG_2_ID);
+            stubUnassignCase(singletonList(
+                new CaseUserRoleWithOrganisation(CASE_ID, USER_ID_2, ORG_POLICY_2_ROLE, ORG_2_ID)));
+        }
+
+        @Test
+        void shouldApplyNoCDecisionSuccessfully() throws Exception {
+            ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(CaseDetails.builder()
+                .reference(CASE_ID)
+                .caseTypeId(CASE_TYPE_ID)
+                .data(createData())
+                .build());
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.Reason").isEmpty())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId").isEmpty())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.NotesReason").isEmpty())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.ApprovalStatus").isEmpty())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.RequestTimestamp").isEmpty())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.ApprovalStatus").isEmpty())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.ApprovalRejectionTimestamp").isEmpty())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToAdd.OrganisationID")
+                    .isEmpty())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToAdd.OrganisationName")
+                    .isEmpty())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToRemove.OrganisationID")
+                    .isEmpty())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToRemove.OrganisationName")
+                    .isEmpty())
+                .andExpect(jsonPath("$.data.OrganisationPolicyField1.Organisation.OrganisationID", is(ORG_1_ID)))
+                .andExpect(jsonPath("$.data.OrganisationPolicyField1.Organisation.OrganisationName", is(ORG_1_NAME)))
+                .andExpect(jsonPath("$.data.OrganisationPolicyField1.OrgPolicyReference", is(ORG_POLICY_1_REF)))
+                .andExpect(jsonPath("$.data.OrganisationPolicyField1.OrgPolicyCaseAssignedRole", is(ORG_POLICY_1_ROLE)))
+                .andExpect(jsonPath("$.data.OrganisationPolicyField2.Organisation.OrganisationID").isEmpty())
+                .andExpect(jsonPath("$.data.OrganisationPolicyField2.Organisation.OrganisationName").isEmpty())
+                .andExpect(jsonPath("$.data.OrganisationPolicyField2.OrgPolicyReference", is(ORG_POLICY_2_REF)))
+                .andExpect(jsonPath("$.data.OrganisationPolicyField2.OrgPolicyCaseAssignedRole", is(ORG_POLICY_2_ROLE)))
+                .andExpect(jsonPath("$.data.TextField", is("TextFieldValue")))
+                .andExpect(jsonPath("$.errors").doesNotExist());
+        }
+
+        @Test
+        void shouldReturnSuccessResponseWithErrorsArrayForHandledExceptions() throws Exception {
+            ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(CaseDetails.builder()
+                .reference(CASE_ID)
+                .caseTypeId(CASE_TYPE_ID)
+                .build());
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.errors.length()", is(1)))
+                .andExpect(jsonPath("$.errors[0]", is(NO_DATA_PROVIDED)));
+        }
+
+        @Test
+        void shouldReturnErrorWhenRequestDoesNotContainCaseDetails() throws Exception {
+            ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(null);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.errors.length()", is(1)))
+                .andExpect(jsonPath("$.errors[0]", is(CASE_DETAILS_REQUIRED)));
+        }
+
+        private String orgPolicyAsString(String organisationId,
+                                         String organisationName,
+                                         String orgPolicyReference,
+                                         String orgPolicyCaseAssignedRole) {
+            return String.format("{\"Organisation\":%s,\"OrgPolicyReference\":%s,\"OrgPolicyCaseAssignedRole\":%s}",
+                organisationAsString(organisationId, organisationName),
+                stringValueAsJson(orgPolicyReference), stringValueAsJson(orgPolicyCaseAssignedRole));
+        }
+
+        private String organisationAsString(String organisationId,
+                                            String organisationName) {
+            return String.format("{\"OrganisationID\":%s,\"OrganisationName\":%s}",
+                stringValueAsJson(organisationId), stringValueAsJson(organisationName));
+        }
+
+        private String stringValueAsJson(String string) {
+            return string == null ? "null" : String.format("\"%s\"", string);
+        }
+
+        private Map<String, JsonNode> createData(String organisationPolicy1,
+                                                 String organisationPolicy2,
+                                                 String organisationToAdd,
+                                                 String organisationToRemove) throws JsonProcessingException {
+            return mapper.convertValue(mapper.readTree(String.format("{\n"
+                    + "    \"TextField\": \"TextFieldValue\",\n"
+                    + "    \"OrganisationPolicyField1\": %s,\n"
+                    + "    \"OrganisationPolicyField2\": %s,\n"
+                    + "    \"ChangeOrganisationRequestField\": {\n"
+                    + "        \"Reason\": null,\n"
+                    + "        \"CaseRoleId\": \"[Claimant]\",\n"
+                    + "        \"NotesReason\": \"a\",\n"
+                    + "        \"ApprovalStatus\": 1,\n"
+                    + "        \"RequestTimestamp\": null,\n"
+                    + "        \"OrganisationToAdd\": %s,\n"
+                    + "        \"OrganisationToRemove\": %s,\n"
+                    + "        \"ApprovalRejectionTimestamp\": null\n"
+                    + "    }\n"
+                    + "}", organisationPolicy1, organisationPolicy2, organisationToAdd, organisationToRemove)),
+                getHashMapTypeReference());
+        }
+
+        private Map<String, JsonNode> createData() throws JsonProcessingException {
+            return createData(orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
+                orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
+                organisationAsString(null, null),
+                organisationAsString(ORG_2_ID, ORG_2_NAME));
+        }
+
+        private TypeReference<HashMap<String, JsonNode>> getHashMapTypeReference() {
+            return new TypeReference<HashMap<String, JsonNode>>() {
+            };
+        }
+    }
 }

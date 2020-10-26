@@ -27,6 +27,14 @@ public final class ValidationError {
     public static final String ORGANISATION_POLICY_ERROR = "Case ID has to be one for which a case role is"
         + " represented by the invoker's organisation.";
 
+    public static final String CASE_DETAILS_REQUIRED = "'case_details' are required.";
+    public static final String NOC_REQUEST_NOT_CONSIDERED = "A decision has not yet been made on the "
+        + "pending Notice of Change request.";
+    public static final String UNKNOWN_NOC_APPROVAL_STATUS = "Unrecognised value for ApprovalStatus.";
+    public static final String NO_DATA_PROVIDED = "No case data has been provided.";
+    public static final String COR_MISSING_ORGANISATIONS = "Fields of type ChangeOrganisationRequest must include "
+        + "both an OrganisationToAdd and OrganisationToRemove field.";
+
     // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     private ValidationError() {
     }

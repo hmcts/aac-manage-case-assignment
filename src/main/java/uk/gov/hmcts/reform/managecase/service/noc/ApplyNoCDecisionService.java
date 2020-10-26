@@ -29,6 +29,13 @@ import java.util.Optional;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.COR_MISSING_ORGANISATIONS;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_NOT_CONSIDERED;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_DATA_PROVIDED;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.UNKNOWN_NOC_APPROVAL_STATUS;
+import static uk.gov.hmcts.reform.managecase.client.datastore.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.client.datastore.ApprovalStatus.NOT_CONSIDERED;
+import static uk.gov.hmcts.reform.managecase.client.datastore.ApprovalStatus.REJECTED;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.APPROVAL_STATUS;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CASE_ROLE_ID;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION;
@@ -36,7 +43,7 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANI
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_REMOVE;
 
 @Service
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.PrematureDeclaration"})
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.PrematureDeclaration", "PMD.ExcessiveImports"})
 public class ApplyNoCDecisionService {
 
     private final PrdRepository prdRepository;
@@ -62,24 +69,34 @@ public class ApplyNoCDecisionService {
         CaseDetails caseDetails = applyNoCDecisionRequest.getCaseDetails();
         Map<String, JsonNode> data = caseDetails.getData();
 
-        // TODO: Use ACA-71 method when available on branch (and double-check it errors when required)
+        if (data == null) {
+            throw new ValidationException(NO_DATA_PROVIDED);
+        }
+
+        // TODO: Use ACA-71 method when available on branch
         JsonNode changeOrganisationRequestField = data.get("ChangeOrganisationRequestField");
 
         String approvalStatus = getNonNullStringValue(changeOrganisationRequestField, APPROVAL_STATUS);
         String caseRoleId = getNonNullStringValue(changeOrganisationRequestField, CASE_ROLE_ID);
         validateCorFieldOrganisations(changeOrganisationRequestField);
 
-        if ("Not considered".equals(approvalStatus)) {
-            throw new ValidationException("Pending request!");
-        } else if ("Rejected".equals(approvalStatus)) {
+        if (NOT_CONSIDERED.getCode().equals(approvalStatus)) {
+            throw new ValidationException(NOC_REQUEST_NOT_CONSIDERED);
+        } else if (REJECTED.getCode().equals(approvalStatus)) {
             nullifyNode(changeOrganisationRequestField);
             return data;
-        } else if (!"Approved".equals(approvalStatus)) {
-            throw new ValidationException("Unknown approval status!");
+        } else if (!APPROVED.getCode().equals(approvalStatus)) {
+            throw new ValidationException(UNKNOWN_NOC_APPROVAL_STATUS);
         }
 
-        JsonNode orgPolicyNode = caseDetails.findOrganisationPolicyNodeForCaseRole(caseRoleId)
-                .orElseThrow(() -> new ValidationException("None found"));
+        applyDecision(caseDetails, changeOrganisationRequestField, caseRoleId);
+
+        nullifyNode(changeOrganisationRequestField);
+        return data;
+    }
+
+    private void applyDecision(CaseDetails caseDetails, JsonNode changeOrganisationRequestField, String caseRoleId) {
+        JsonNode orgPolicyNode = caseDetails.findOrganisationPolicyNodeForCaseRole(caseRoleId);
 
         JsonNode organisationToAddNode = changeOrganisationRequestField.get(ORGANISATION_TO_ADD);
         JsonNode organisationToRemoveNode = changeOrganisationRequestField.get(ORGANISATION_TO_REMOVE);
@@ -92,16 +109,12 @@ public class ApplyNoCDecisionService {
             applyAddOrReplaceRepresentationDecision(caseDetails.getReference(), caseRoleId, orgPolicyNode,
                     organisationToAddNode, organisationToAdd, organisationToRemove);
         }
-
-        nullifyNode(changeOrganisationRequestField);
-        return data;
     }
 
     private void validateCorFieldOrganisations(JsonNode changeOrganisationRequestField) {
         if (!changeOrganisationRequestField.has(ORGANISATION_TO_ADD)
                 || !changeOrganisationRequestField.has(ORGANISATION_TO_REMOVE)) {
-            throw new ValidationException("Fields of type ChangeOrganisationRequest must include both an "
-                    + "OrganisationToAdd and OrganisationToRemove field.");
+            throw new ValidationException(COR_MISSING_ORGANISATIONS);
         }
     }
 
@@ -115,7 +128,7 @@ public class ApplyNoCDecisionService {
         assignAccessToOrganisationUsers(caseReference, organisationToAdd, caseRoleId);
 
         if (organisationToRemove != null && !isNullOrEmpty(organisationToRemove.getOrganisationID())) {
-            removeOrganisationUsersAccess(caseReference, organisationToRemove);
+            removeOrganisationUsersAccess(caseReference, organisationToRemove, caseRoleId);
         }
     }
 
@@ -123,20 +136,21 @@ public class ApplyNoCDecisionService {
                                                    JsonNode orgPolicyNode,
                                                    Organisation organisationToRemove) {
         nullifyNode(orgPolicyNode.get(ORGANISATION));
-        removeOrganisationUsersAccess(caseReference, organisationToRemove);
+        removeOrganisationUsersAccess(caseReference, organisationToRemove, null);
     }
 
     private void assignAccessToOrganisationUsers(String caseReference,
-                                                 Organisation organisation,
+                                                 Organisation organisationToAdd,
                                                  String caseRoleToBeAssigned) {
-        FindUsersByOrganisationResponse response = prdRepository
-            .findUsersByOrganisation(organisation.getOrganisationID());
-        response.getUsers().forEach(user ->
-                dataStoreRepository.assignCase(
-                        singletonList(caseRoleToBeAssigned),
-                        caseReference,
-                        user.getUserIdentifier(),
-                        response.getOrganisationIdentifier())
+        String organisationId = organisationToAdd.getOrganisationID();
+        Pair<List<CaseUserRole>, List<ProfessionalUser>> users =
+            getUsersWithCaseAccess(caseReference, organisationId, null);
+
+        users.getRight().forEach(user -> dataStoreRepository.assignCase(
+            singletonList(caseRoleToBeAssigned),
+            caseReference,
+            user.getUserIdentifier(),
+            organisationId)
         );
     }
 
@@ -144,13 +158,16 @@ public class ApplyNoCDecisionService {
         ((ObjectNode) orgPolicyNode).set(ORGANISATION, organisationToAddNode.deepCopy());
     }
 
-    private void removeOrganisationUsersAccess(String caseReference, Organisation organisationToRemove) {
+    private void removeOrganisationUsersAccess(String caseReference,
+                                               Organisation organisationToRemove,
+                                               String ignoredRole) {
         Pair<List<CaseUserRole>, List<ProfessionalUser>> users =
-            getUsersWithCaseAccess(caseReference, organisationToRemove.getOrganisationID());
+            getUsersWithCaseAccess(caseReference, organisationToRemove.getOrganisationID(), ignoredRole);
 
-        dataStoreRepository.removeCaseUserRoles(users.getLeft(), organisationToRemove.getOrganisationID());
-
-        sendRemovalNotification(caseReference, users.getRight());
+        if (!users.getLeft().isEmpty()) {
+            dataStoreRepository.removeCaseUserRoles(users.getLeft(), organisationToRemove.getOrganisationID());
+            sendRemovalNotification(caseReference, users.getRight());
+        }
     }
 
     private String getNonNullStringValue(JsonNode node, String key) {
@@ -175,9 +192,13 @@ public class ApplyNoCDecisionService {
     }
 
     private Pair<List<CaseUserRole>, List<ProfessionalUser>> getUsersWithCaseAccess(String caseReference,
-                                                                                    String organisationId) {
+                                                                                    String organisationId,
+                                                                                    String ignoredRole) {
         List<CaseUserRole> existingCaseAssignments = dataStoreRepository
-            .getCaseAssignments(singletonList(caseReference), null);
+            .getCaseAssignments(singletonList(caseReference), null)
+            .stream()
+            .filter(caseUserRole -> !caseUserRole.getCaseRole().equals(ignoredRole))
+            .collect(toList());
 
         FindUsersByOrganisationResponse usersByOrganisation = prdRepository.findUsersByOrganisation(organisationId);
 
@@ -190,7 +211,7 @@ public class ApplyNoCDecisionService {
      * @param caseUserRoles case use role assignments
      * @param professionalUsers professional users
      * @return the intersection - the list of filtered case user role assignments and
-     *         professional users are both provided
+     *         professional users for the intersection are both provided
      */
     private Pair<List<CaseUserRole>, List<ProfessionalUser>> getIntersection(List<CaseUserRole> caseUserRoles,
                                                                              List<ProfessionalUser> professionalUsers) {
@@ -199,7 +220,7 @@ public class ApplyNoCDecisionService {
 
         professionalUsers.forEach(professionalUser -> {
             Optional<CaseUserRole> caseUserRoleOptional = caseUserRoles.stream()
-                .filter(cur -> cur.getUserId().equals(professionalUser.getUserIdentifier()))
+                .filter(caseUserRole -> caseUserRole.getUserId().equals(professionalUser.getUserIdentifier()))
                 .findFirst();
 
             caseUserRoleOptional.ifPresent(caseUserRole -> {

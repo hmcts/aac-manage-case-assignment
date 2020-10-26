@@ -23,7 +23,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   cache:
-    cache-names: userInfoCache,usersByOrganisation,usersByOrganisationId,systemUserAccessTokenCache
+    cache-names: userInfoCache,usersByOrganisationExternal,usersByOrganisationInternal,systemUserAccessTokenCache
     caffeine:
       spec: expireAfterAccess=1800s
   security:
@@ -66,10 +66,6 @@ ccd:
     host: ${CCD_DEFINITION_STORE_API_BASE_URL:http://localhost:4451}
     allowed-urls: ${MCA_DEF_STORE_PROXY_URLS_ALLOWED_LIST:/api/display/challenge-questions.*}
     allowed-service: xui_webapp
-prd:
-  host: ${PRD_HOST:http://localhost:4455}
-  allowed-urls: ${MCA_PRD_PROXY_URLS_ALLOWED_LIST:/refdata/internal/v1/.*}
-  allowed-service: xui_webapp
 
 zuul:
   routes:
@@ -77,10 +73,8 @@ zuul:
       path: /ccd/**
       sensitiveHeaders: Cookie,Set-Cookie
       url: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
-    prd:
-      path: /prd/**
-      sensitiveHeaders: Cookie,Set-Cookie
-      url: ${PRD_HOST:http://localhost:4455}
+prd:
+  host: ${PRD_HOST:http://localhost:4455}
 mca:
   conditional-apis:
     case-assignments:

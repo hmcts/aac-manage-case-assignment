@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class JacksonUtilsTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -19,26 +21,29 @@ class JacksonUtilsTest {
     }
 
     @Test
-    void testNullifyObjectNode() throws JsonProcessingException {
+    void shouldNullifyObjectNode() throws JsonProcessingException {
         JsonNode node = objectMapper.readTree("{\n"
             + "        \"Reason\": \"reason\",\n"
-            + "        \"CaseRoleId\": null,\n"
-            + "        \"NotesReason\": \"a\",\n"
-            + "        \"ApprovalStatus\": null,\n"
-            + "        \"RequestTimestamp\": null,\n"
+            + "        \"CaseRoleId\": \"case role\",\n"
+            + "        \"NotesReason\": \"reason\",\n"
+            + "        \"ApprovalStatus\": \"status\",\n"
+            + "        \"RequestTimestamp\": \"date1\",\n"
             + "        \"OrganisationToAdd\": {\n"
-            + "            \"OrganisationID\": \"\",\n"
-            + "            \"OrganisationName\": null\n"
+            + "            \"OrganisationID\": \"OrgId1\",\n"
+            + "            \"OrganisationName\": \"OrgName1\"\n"
             + "        },\n"
             + "        \"OrganisationToRemove\": {\n"
-            + "            \"OrganisationID\": \"OrgID\",\n"
-            + "            \"OrganisationName\": \"OrgName\"\n"
+            + "            \"OrganisationID\": \"OrgId2\",\n"
+            + "            \"OrganisationName\": \"OrgName2\"\n"
             + "        },\n"
-            + "        \"ApprovalRejectionTimestamp\": null\n"
+            + "        \"ApprovalRejectionTimestamp\": \"date2\"\n"
             + "    }");
 
         jacksonUtils.nullifyObjectNode((ObjectNode) node);
 
-        // Add assertions
+        assertThat(node).hasToString("{\"Reason\":null,\"CaseRoleId\":null,\"NotesReason\":null,"
+            + "\"ApprovalStatus\":null,\"RequestTimestamp\":null,\"OrganisationToAdd\":{\"OrganisationID\":null,"
+            + "\"OrganisationName\":null},\"OrganisationToRemove\":{\"OrganisationID\":null,"
+            + "\"OrganisationName\":null},\"ApprovalRejectionTimestamp\":null}");
     }
 }

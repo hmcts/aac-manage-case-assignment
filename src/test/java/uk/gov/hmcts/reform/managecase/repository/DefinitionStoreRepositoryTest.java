@@ -59,7 +59,8 @@ class DefinitionStoreRepositoryTest {
                                                                     null);
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
             Arrays.asList(challengeQuestion));
-        given(definitionStoreApiClient.challengeQuestions(anyString(), anyString())).willReturn(challengeQuestionsResult);
+        given(definitionStoreApiClient.challengeQuestions(anyString(), anyString()))
+            .willReturn(challengeQuestionsResult);
 
         // ACT
         ChallengeQuestionsResult result = repository.challengeQuestions(CASE_TYPE_ID, CASE_ID);

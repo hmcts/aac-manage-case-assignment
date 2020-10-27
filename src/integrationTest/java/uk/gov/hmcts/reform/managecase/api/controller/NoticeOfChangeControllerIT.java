@@ -86,6 +86,7 @@ public class NoticeOfChangeControllerIT {
             SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
             FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
             fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
+            fieldTypeDefinition.setId(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
             searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
             searchResultViewHeader.setCaseFieldId("changeOrg");
             SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(

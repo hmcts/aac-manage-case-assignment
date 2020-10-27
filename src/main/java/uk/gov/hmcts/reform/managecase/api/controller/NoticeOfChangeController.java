@@ -36,6 +36,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @Validated
 @RequestMapping(path = "/noc")
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class NoticeOfChangeController {
 
     @SuppressWarnings({"squid:S1075"})

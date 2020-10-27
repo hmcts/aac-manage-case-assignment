@@ -175,15 +175,7 @@ public class NoticeOfChangeService {
     }
 
     private CaseViewResource getCase(String caseId) {
-        CaseViewResource caseViewResource = new CaseViewResource();
-        try {
-            caseViewResource = dataStoreRepository.findCaseByCaseId(caseId);
-        } catch (RestClientResponseException e) {
-            if (HttpStatus.NOT_FOUND.value() == e.getRawStatusCode()) {
-                throw new CaseCouldNotBeFetchedException("Case could not be found");
-            }
-        }
-        return caseViewResource;
+        return dataStoreRepository.findCaseByCaseId(caseId);
     }
 
     private CaseSearchResultViewResource findCaseBy(String caseTypeId, String caseId) {

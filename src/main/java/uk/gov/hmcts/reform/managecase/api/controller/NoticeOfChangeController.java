@@ -189,10 +189,10 @@ public class NoticeOfChangeController {
     @ApiOperation(
         value = "Apply Notice of Change decision",
         notes = "Use to apply a Notice of Change decision on a case.\n\n"
-            + "Note that this operation acts as a callback and therefore it accepts a standard callback request "
-            + "(although only `case_details` is required), and similarly returns a standard callback response. "
-            + "As with normal callbacks, the response returns a 200 (success) status when valid parameters "
-            + "have been passed to the operation but processing errors have occurred."
+            + "Note that this operation acts as a callback and therefore it accepts a standard callback request, "
+            + "and similarly returns a standard callback response. As with normal callbacks, the response "
+            + "returns a 200 (success) status when valid parameters have been passed to the operation but "
+            + "processing errors have occurred."
     )
     @ApiResponses({
         @ApiResponse(
@@ -201,7 +201,8 @@ public class NoticeOfChangeController {
                 + "- A decision has not yet been made on the pending Notice of Change request\n"
                 + "- Approval status is not recognised\n"
                 + "- Case must contain exactly one OrganisationPolicy with the case role\n"
-                + "- ChangeOrganisationRequest complex type is missing an expected field or value",
+                + "- ChangeOrganisationRequest complex type is missing an expected field or value\n\n"
+                + "Note that the response will contain *either* `data` (for a success) or `errors` (for an error).",
             response = ApplyNoCDecisionResponse.class,
             examples = @Example({
                 @ExampleProperty(

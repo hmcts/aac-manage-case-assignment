@@ -119,11 +119,12 @@ public class NoticeOfChangeControllerTest {
             void directCallHappyPath() {
                 // created to avoid IDE warnings in controller class that function is never used
                 // ARRANGE
-                FieldType fieldType = new FieldType();
-                fieldType.setId("Number");
-                fieldType.setType("Number");
-                fieldType.setMin(null);
-                fieldType.setMax(null);
+                FieldType fieldType = FieldType.builder()
+                    .max(null)
+                    .min(null)
+                    .id("Number")
+                    .type("Number")
+                    .build();
                 ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
                                                                             "QuestionText1",
                                                                             fieldType,
@@ -150,11 +151,12 @@ public class NoticeOfChangeControllerTest {
             @DisplayName("should successfully get NoC questions")
             @Test
             void shouldGetCaseAssignmentsForAValidRequest() throws Exception {
-                FieldType fieldType = new FieldType();
-                fieldType.setId("Number");
-                fieldType.setType("Number");
-                fieldType.setMin(null);
-                fieldType.setMax(null);
+                FieldType fieldType = FieldType.builder()
+                    .max(null)
+                    .min(null)
+                    .id("Number")
+                    .type("Number")
+                    .build();
                 ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
                                                                             "QuestionText1",
                                                                             fieldType,

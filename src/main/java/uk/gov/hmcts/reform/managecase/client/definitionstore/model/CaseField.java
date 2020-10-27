@@ -57,19 +57,6 @@ public class CaseField implements HasAcls, Orderable {
     }
 
     /**
-     * label associated with the field.
-     **/
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("label")
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    /**
      * hint text associated with the field.
      **/
     @ApiModelProperty("")
@@ -80,6 +67,19 @@ public class CaseField implements HasAcls, Orderable {
 
     public void setHintText(String hintText) {
         this.hintText = hintText;
+    }
+
+    /**
+     * label associated with the field.
+     **/
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("label")
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     /**

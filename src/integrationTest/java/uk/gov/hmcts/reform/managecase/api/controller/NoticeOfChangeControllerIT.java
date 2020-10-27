@@ -134,11 +134,13 @@ public class NoticeOfChangeControllerIT {
         CaseSearchResultViewResource resource = new CaseSearchResultViewResource(caseSearchResultView);
         stubGetCaseInternalES(CASE_TYPE_ID, ES_QUERY, resource);
 
-        FieldType fieldType = new FieldType();
-        fieldType.setId("Number");
-        fieldType.setType("Number");
-        fieldType.setMin(null);
-        fieldType.setMax(null);
+        FieldType fieldType = FieldType.builder()
+            .regularExpression("regular expression")
+            .max(null)
+            .min(null)
+            .id("Number")
+            .type("Number")
+            .build();
         ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
                 "questionText",
                 fieldType,

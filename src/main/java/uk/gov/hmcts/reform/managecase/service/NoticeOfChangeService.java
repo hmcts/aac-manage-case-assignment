@@ -220,8 +220,7 @@ public class NoticeOfChangeService {
     }
 
     private void checkForCaseEvents(CaseViewResource caseViewResource) {
-        if (caseViewResource.getCaseViewActionableEvents() == null
-            || ArrayUtils.isEmpty(caseViewResource.getCaseViewActionableEvents())) {
+        if (!ArrayUtils.isNotEmpty(caseViewResource.getCaseViewActionableEvents())) {
             throw new ValidationException(NOC_EVENT_NOT_AVAILABLE);
         }
     }

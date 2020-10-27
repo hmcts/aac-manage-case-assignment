@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.managecase.service;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

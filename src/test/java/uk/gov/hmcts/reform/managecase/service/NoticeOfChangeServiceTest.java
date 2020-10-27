@@ -122,6 +122,7 @@ class NoticeOfChangeServiceTest {
             SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
             FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
             fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
+            fieldTypeDefinition.setId(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
             searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
             searchResultViewHeader.setCaseFieldId(CHANGE_ORG);
             caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
@@ -248,6 +249,7 @@ class NoticeOfChangeServiceTest {
             SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
             FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
             fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
+            fieldTypeDefinition.setId(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
             searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
             searchResultViewHeader.setCaseFieldId(CHANGE_ORG);
 
@@ -290,6 +292,7 @@ class NoticeOfChangeServiceTest {
             SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
             FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
             fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
+            fieldTypeDefinition.setId(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
             searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
             searchResultViewHeader.setCaseFieldId(CHANGE_ORG);
             caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));

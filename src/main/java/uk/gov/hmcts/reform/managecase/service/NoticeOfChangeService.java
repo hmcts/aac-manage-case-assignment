@@ -2,8 +2,11 @@ package uk.gov.hmcts.reform.managecase.service;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -34,7 +37,8 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
 
 @Service
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ExcessiveImports", "PMD.AvoidDeeplyNestedIfStmts"})
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ExcessiveImports",
+    "PMD.AvoidDeeplyNestedIfStmts", "PMD.PreserveStackTrace", "PMD.LawOfDemeter"})
 public class NoticeOfChangeService {
 
     public static final String PUI_ROLE = "pui-caa";
@@ -63,25 +67,25 @@ public class NoticeOfChangeService {
 
         List<ChallengeQuestion> challengeQuestionsResponse = challengeQuestionsResult.getQuestions().stream()
             .map(challengeQuestion -> ChallengeQuestion.builder()
-                               .questionText(challengeQuestion.getQuestionText())
-                               .caseTypeId(challengeQuestion.getCaseTypeId())
-                               .order(challengeQuestion.getOrder())
-                               .answerFieldType(FieldType.builder()
-                                                    .collectionFieldType(challengeQuestion.getAnswerFieldType()
-                                                                             .getCollectionFieldType())
-                                                    .complexFields(challengeQuestion.getAnswerFieldType()
-                                                                       .getComplexFields())
-                                                    .fixedListItems(challengeQuestion.getAnswerFieldType()
-                                                                        .getFixedListItems())
-                                                    .regularExpression(challengeQuestion.getAnswerFieldType()
-                                                                           .getRegularExpression())
-                                                    .max(challengeQuestion.getAnswerFieldType().getMax())
-                                                    .min(challengeQuestion.getAnswerFieldType().getMin())
-                                                    .id(challengeQuestion.getAnswerFieldType().getId())
-                                                    .type(challengeQuestion.getAnswerFieldType().getType())
-                                                    .build())
-                               .displayContextParameter(challengeQuestion.getDisplayContextParameter())
-                               .challengeQuestionId(challengeQuestion.getChallengeQuestionId())
+                .questionText(challengeQuestion.getQuestionText())
+                .caseTypeId(challengeQuestion.getCaseTypeId())
+                .order(challengeQuestion.getOrder())
+                .answerFieldType(FieldType.builder()
+                                     .collectionFieldType(challengeQuestion.getAnswerFieldType()
+                                                              .getCollectionFieldType())
+                                     .complexFields(challengeQuestion.getAnswerFieldType()
+                                                        .getComplexFields())
+                                     .fixedListItems(challengeQuestion.getAnswerFieldType()
+                                                         .getFixedListItems())
+                                     .regularExpression(challengeQuestion.getAnswerFieldType()
+                                                            .getRegularExpression())
+                                     .max(challengeQuestion.getAnswerFieldType().getMax())
+                                     .min(challengeQuestion.getAnswerFieldType().getMin())
+                                     .id(challengeQuestion.getAnswerFieldType().getId())
+                                     .type(challengeQuestion.getAnswerFieldType().getType())
+                                     .build())
+                .displayContextParameter(challengeQuestion.getDisplayContextParameter())
+                .challengeQuestionId(challengeQuestion.getChallengeQuestionId())
                 .build())
             .collect(Collectors.toList());
 
@@ -171,7 +175,15 @@ public class NoticeOfChangeService {
     }
 
     private CaseViewResource getCase(String caseId) {
-        return dataStoreRepository.findCaseByCaseId(caseId);
+        CaseViewResource caseViewResource = null;
+        try {
+            caseViewResource = dataStoreRepository.findCaseByCaseId(caseId);
+        } catch (RestClientResponseException e) {
+            if (HttpStatus.NOT_FOUND.value() == e.getRawStatusCode()) {
+                throw new CaseCouldNotBeFetchedException("Case could not be found");
+            }
+        }
+        return caseViewResource;
     }
 
     private CaseSearchResultViewResource findCaseBy(String caseTypeId, String caseId) {
@@ -194,8 +206,8 @@ public class NoticeOfChangeService {
             List<SearchResultViewHeader> filteredSearch =
                 searchResultViewHeaderList.stream()
                     .filter(searchResultViewHeader ->
-                                searchResultViewHeader.getCaseFieldTypeDefinition()
-                                    .getType().equals(CHANGE_ORG_REQUEST)).collect(Collectors.toList());
+                                searchResultViewHeader.getCaseFieldTypeDefinition().getId()
+                                    .equals(CHANGE_ORG_REQUEST)).collect(Collectors.toList());
             for (SearchResultViewHeader searchResultViewHeader : filteredSearch) {
                 if (caseFields.containsKey(searchResultViewHeader.getCaseFieldId())) {
                     JsonNode node = caseFields.get(searchResultViewHeader.getCaseFieldId());
@@ -208,7 +220,8 @@ public class NoticeOfChangeService {
     }
 
     private void checkForCaseEvents(CaseViewResource caseViewResource) {
-        if (caseViewResource.getCaseViewActionableEvents() == null) {
+        if (caseViewResource.getCaseViewActionableEvents() == null
+            || ArrayUtils.isEmpty(caseViewResource.getCaseViewActionableEvents())) {
             throw new ValidationException(NOC_EVENT_NOT_AVAILABLE);
         }
     }

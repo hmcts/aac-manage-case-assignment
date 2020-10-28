@@ -114,7 +114,8 @@ class NoticeOfChangeServiceTest {
     class AssignCaseAccess {
 
         @BeforeEach
-        void setUp()throws JsonProcessingException {
+        void setUp() throws JsonProcessingException {
+            //internal/cases/caseId
             CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
             caseViewActionableEvent.setId("NOC");
             CaseViewResource caseViewResource = new CaseViewResource();
@@ -133,6 +134,7 @@ class NoticeOfChangeServiceTest {
             SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
             FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
             fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
+            fieldTypeDefinition.setId(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
             searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
             searchResultViewHeader.setCaseFieldId(CHANGE_ORG);
             caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
@@ -259,6 +261,7 @@ class NoticeOfChangeServiceTest {
             SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
             FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
             fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
+            fieldTypeDefinition.setId(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
             searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
             searchResultViewHeader.setCaseFieldId(CHANGE_ORG);
 
@@ -292,7 +295,7 @@ class NoticeOfChangeServiceTest {
             given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, null, CASE_ID)).willReturn(resource);
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("On going NoC request in progress");
+                .hasMessageContaining("Ongoing NoC request in progress");
         }
 
         @Test
@@ -301,6 +304,7 @@ class NoticeOfChangeServiceTest {
             SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
             FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
             fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
+            fieldTypeDefinition.setId(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
             searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
             searchResultViewHeader.setCaseFieldId(CHANGE_ORG);
             caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
@@ -321,12 +325,12 @@ class NoticeOfChangeServiceTest {
             caseFields.put(PREDEFINED_COMPLEX_ORGANISATION_POLICY, actualObj);
             SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
             viewItems.add(item);
-            SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
+            SearchResultViewHeaderGroup searchResultViewHeaderGroup = new SearchResultViewHeaderGroup(
                 new HeaderGroupMetadata(JURISDICTION, CASE_TYPE),
                 Arrays.asList(searchResultViewHeader), Arrays.asList("111", "222")
             );
             List<SearchResultViewHeaderGroup> headers = new ArrayList<>();
-            headers.add(correctHeader);
+            headers.add(searchResultViewHeaderGroup);
             List<SearchResultViewItem> cases = new ArrayList<>();
             Long total = 3L;
             CaseSearchResultView caseSearchResultView = new CaseSearchResultView(headers, cases, total);
@@ -385,7 +389,7 @@ class NoticeOfChangeServiceTest {
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("No Org Policy with that role");
+                .hasMessageContaining("No Organisation Policy with that role");
         }
 
         @Test

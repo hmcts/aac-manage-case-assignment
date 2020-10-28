@@ -92,12 +92,12 @@ public class NoticeOfChangeController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:\n"
-                + "1. " + "case_id must be not be empty" + ", \n"
-                + "2. " + "on going NoC request in progress, \n"
+                + "1. " + "case_id must not be empty" + ", \n"
+                + "2. " + "ongoing NoC request in progress, \n"
                 + "3. " + "no NoC events available for this case id, \n",
             examples = @Example({
                 @ExampleProperty(
-                    value = "{\"message\": \"case_id must be not be empty\","
+                    value = "{\"message\": \"case_id must not be empty\","
                         + " \"status\": \"BAD_REQUEST\" }",
                     mediaType = APPLICATION_JSON_VALUE)
             })
@@ -123,7 +123,7 @@ public class NoticeOfChangeController {
     })
     public ChallengeQuestionsResult getNoticeOfChangeQuestions(@RequestParam("case_id")
                                                                @Valid @NotEmpty(message = "case_id must "
-        + "be not be empty") String caseId) {
+        + "not be empty") String caseId) {
         validateCaseIds(caseId);
         return noticeOfChangeService.getChallengeQuestions(caseId);
     }

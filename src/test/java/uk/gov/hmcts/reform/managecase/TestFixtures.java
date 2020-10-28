@@ -86,7 +86,7 @@ public class TestFixtures {
             return OrganisationPolicy.builder()
                     .orgPolicyCaseAssignedRole(orgPolicyRole)
                     .orgPolicyReference(null)
-                    .organisation(new Organisation(organizationId, organizationId))
+                    .organisation(new Organisation(organizationId))
                     .build();
         }
 

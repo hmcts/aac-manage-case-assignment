@@ -10,6 +10,4 @@ public class Organisation {
 
     @JsonProperty("OrganisationID")
     private String organisationID;
-    @JsonProperty("OrganisationName")
-    private String organisationName;
 }

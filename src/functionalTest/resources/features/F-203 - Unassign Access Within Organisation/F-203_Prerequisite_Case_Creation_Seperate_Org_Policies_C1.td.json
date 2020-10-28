@@ -19,15 +19,13 @@
         "OrganisationPolicyField1": {
           "OrgPolicyReference": "ClaimantPolicy",
           "Organisation": {
-            "OrganisationID": "QUK822N",
-            "OrganisationName": "CCD Solicitors Limited"
+            "OrganisationID": "QUK822N"
           }
         },
         "OrganisationPolicyField2": {
           "OrgPolicyReference": "DefendantPolicy",
           "Organisation": {
-            "OrganisationID": "Org-Two",
-            "OrganisationName": "CCD Solicitors Limited"
+            "OrganisationID": "Org-Two"
           }
         }
       }
@@ -40,15 +38,13 @@
         "OrganisationPolicyField1": {
           "OrgPolicyReference": "ClaimantPolicy",
           "Organisation": {
-            "OrganisationID": "QUK822N",
-            "OrganisationName": "CCD Solicitors Limited"
+            "OrganisationID": "QUK822N"
           }
         },
         "OrganisationPolicyField2": {
           "OrgPolicyReference": "DefendantPolicy",
           "Organisation": {
-            "OrganisationID": "Org-Two",
-            "OrganisationName": "CCD Solicitors Limited"
+            "OrganisationID": "Org-Two"
           }
         }
       }

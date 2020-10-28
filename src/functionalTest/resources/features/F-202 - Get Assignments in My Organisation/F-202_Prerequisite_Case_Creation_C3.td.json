@@ -13,15 +13,13 @@
 				"OrganisationPolicyField1": {
 					"OrgPolicyReference": "ClaimantPolicy",
 					"Organisation": {
-						"OrganisationID": "QUK822N",
-						"OrganisationName": "CCD Solicitors Limited"
+						"OrganisationID": "QUK822N"
 					}
 				},
 				"OrganisationPolicyField2": {
 					"OrgPolicyReference": "DefendantPolicy",
 					"Organisation": {
-						"OrganisationID": "QUK822N",
-						"OrganisationName": "CCD Solicitors Limited"
+						"OrganisationID": "QUK822N"
 					}
 				}
 			}
@@ -34,15 +32,13 @@
 				"OrganisationPolicyField1": {
 					"OrgPolicyReference": "ClaimantPolicy",
 					"Organisation": {
-						"OrganisationID": "QUK822N",
-						"OrganisationName": "CCD Solicitors Limited"
+						"OrganisationID": "QUK822N"
 					}
 				},
 				"OrganisationPolicyField2": {
 					"OrgPolicyReference": "DefendantPolicy",
 					"Organisation": {
-						"OrganisationID": "QUK822N",
-						"OrganisationName": "CCD Solicitors Limited"
+						"OrganisationID": "QUK822N"
 					}
 				}
 			},
@@ -53,8 +49,7 @@
 						"Organisation": {
 							"classification": "PUBLIC",
 							"value": {
-								"OrganisationID": "PUBLIC",
-								"OrganisationName": "PUBLIC"
+								"OrganisationID": "PUBLIC"
 							}
 						}
 					}
@@ -65,8 +60,7 @@
 						"Organisation": {
 							"classification": "PUBLIC",
 							"value": {
-								"OrganisationID": "PUBLIC",
-								"OrganisationName": "PUBLIC"
+								"OrganisationID": "PUBLIC"
 							}
 						}
 					}
@@ -79,8 +73,7 @@
 						"Organisation": {
 							"classification": "PUBLIC",
 							"value": {
-								"OrganisationID": "PUBLIC",
-								"OrganisationName": "PUBLIC"
+								"OrganisationID": "PUBLIC"
 							}
 						}
 					}
@@ -91,8 +84,7 @@
 						"Organisation": {
 							"classification": "PUBLIC",
 							"value": {
-								"OrganisationID": "PUBLIC",
-								"OrganisationName": "PUBLIC"
+								"OrganisationID": "PUBLIC"
 							}
 						}
 					}

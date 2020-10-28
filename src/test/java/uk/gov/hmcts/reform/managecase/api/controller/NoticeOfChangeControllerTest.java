@@ -139,7 +139,6 @@ public class NoticeOfChangeControllerTest {
             @DisplayName("should fail with 400 bad request when caseIds query param is not passed")
             @Test
             void shouldFailWithBadRequestWhenCaseIdsInGetAssignmentsIsNull() throws Exception {
-
                 this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS))
                     .andExpect(status().isBadRequest());
             }
@@ -153,7 +152,7 @@ public class NoticeOfChangeControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath(
                         "$.message",
-                        containsString("getNoticeOfChangeQuestions.caseId: case_id must be not be empty")
+                        containsString("getNoticeOfChangeQuestions.caseId: case_id must not be empty")
                     ));
             }
 

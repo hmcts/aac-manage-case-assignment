@@ -158,7 +158,6 @@ public class NoticeOfChangeQuestions {
         if (caseDetails.getCases().isEmpty()) {
             throw new CaseCouldNotBeFetchedException("Case could not be found");
         }
-        SearchResultViewItem searchResultViewItem = caseDetails.getCases().get(0);
         List<SearchResultViewHeader> searchResultViewHeaderList = new ArrayList<>();
         Optional<SearchResultViewHeaderGroup> searchResultViewHeaderGroup =
             caseDetails.getHeaders().stream().findFirst();
@@ -173,6 +172,7 @@ public class NoticeOfChangeQuestions {
         if (filteredSearch.size() > 1) {
             throw new ValidationException(CHANGE_REQUEST);
         }
+        SearchResultViewItem searchResultViewItem = caseDetails.getCases().get(0);
         Map<String, JsonNode> caseFields = searchResultViewItem.getFields();
         for (SearchResultViewHeader searchResultViewHeader : filteredSearch) {
             if (caseFields.containsKey(searchResultViewHeader.getCaseFieldId())) {

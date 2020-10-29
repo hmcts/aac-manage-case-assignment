@@ -34,7 +34,6 @@ import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
-import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 
 import java.util.ArrayList;
 import java.util.Arrays;

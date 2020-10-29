@@ -40,6 +40,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.ES_QUERY;
 
+@SuppressWarnings({"PMD.ExcessiveImports"})
 class DataStoreRepositoryTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";

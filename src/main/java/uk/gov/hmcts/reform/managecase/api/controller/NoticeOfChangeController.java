@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
-import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeQuestions;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;

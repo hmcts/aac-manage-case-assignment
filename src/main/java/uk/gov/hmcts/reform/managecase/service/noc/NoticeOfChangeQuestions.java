@@ -3,10 +3,10 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.ArrayUtils;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -25,8 +25,8 @@ import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
@@ -140,10 +140,10 @@ public class NoticeOfChangeQuestions {
         CaseViewResource caseViewResource = new CaseViewResource();
         try {
             caseViewResource = dataStoreRepository.findCaseByCaseId(caseId);
-        } catch (RestClientResponseException e) {
-            if (HttpStatus.NOT_FOUND.value() == e.getRawStatusCode()) {
+        } catch (FeignException e) {
+            if (HttpStatus.NOT_FOUND.value() == e.status()) {
                 throw new CaseCouldNotBeFetchedException("Case could not be found");
-            } else if (HttpStatus.BAD_REQUEST.value() == e.getRawStatusCode()) {
+            } else if (HttpStatus.BAD_REQUEST.value() == e.status()) {
                 throw new CaseCouldNotBeFetchedException("Case ID is not valid");
             }
         }

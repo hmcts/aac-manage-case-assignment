@@ -78,6 +78,7 @@
 			"created_date": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
 			"last_modified": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
 			"last_state_modified_date": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "supplementary_data" : null,
 			"security_classification": "PUBLIC",
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,

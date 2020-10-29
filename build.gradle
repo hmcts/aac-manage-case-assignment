@@ -104,7 +104,7 @@ task functional(type: Test) {
     javaexec {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-      args = ['--threads', '10',
+      args = ['--threads', '5',
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
               '--tags', 'not @Ignore',
               '--glue', 'uk.gov.hmcts.befta.player', 

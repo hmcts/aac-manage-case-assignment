@@ -39,7 +39,7 @@
     "_extends_": "ACA_400_Response",
     "body": {
       "status" : "BAD_REQUEST",
-      "message": "No Org Policy with that role",
+      "message": "No Organisation Policy with that role",
       "errors" : [ ]
     }
   }

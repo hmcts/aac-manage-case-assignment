@@ -282,7 +282,7 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.19.0-RDM-9893-RDM-9587'
+  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.19.0-RDM-9893-RDM-9587.1'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath

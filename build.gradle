@@ -277,7 +277,7 @@ dependencies {
 
   // groovy v3.* added to avoid 'WARNING: Illegal reflective access by org.codehaus.groovy.reflection.CachedClass'
   // in groovy:2.5.* when running functional/befta tests
-  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.3'
+  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.6'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath

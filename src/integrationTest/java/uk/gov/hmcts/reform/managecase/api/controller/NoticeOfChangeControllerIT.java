@@ -131,7 +131,8 @@ public class NoticeOfChangeControllerIT {
                 .questionText("questionText")
                 .answerFieldType(fieldType)
                 .answerField(ANSWER_FIELD_APPLICANT)
-                .questionId("QuestionId1").build();
+                .questionId("QuestionId1")
+                .order(1).build();
             ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
                 Arrays.asList(challengeQuestion));
             stubGetChallengeQuestions(CASE_TYPE_ID, "NoCChallenge", challengeQuestionsResult);

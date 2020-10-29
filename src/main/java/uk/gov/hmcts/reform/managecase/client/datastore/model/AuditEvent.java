@@ -54,12 +54,12 @@ public class AuditEvent extends Event {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getUserFirstName() {
+        return userFirstName;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUserFirstName(String userFirstName) {
+        this.userFirstName = userFirstName;
     }
 
     public String getUserLastName() {
@@ -70,12 +70,12 @@ public class AuditEvent extends Event {
         this.userLastName = userLastName;
     }
 
-    public String getUserFirstName() {
-        return userFirstName;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUserFirstName(String userFirstName) {
-        this.userFirstName = userFirstName;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getEventName() {

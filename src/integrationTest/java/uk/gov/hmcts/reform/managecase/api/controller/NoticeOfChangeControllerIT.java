@@ -88,26 +88,29 @@ public class NoticeOfChangeControllerIT {
         caseViewResource.setCaseType(caseViewType);
         stubGetCaseInternal(CASE_ID, caseViewResource);
 
+
         SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
         FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
         fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
+        fieldTypeDefinition.setId(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
         searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
         searchResultViewHeader.setCaseFieldId("changeOrg");
         SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
-                new HeaderGroupMetadata(JURISDICTION, CASE_TYPE_ID),
-                Arrays.asList(searchResultViewHeader),
-                Arrays.asList("111", "222")
+            new HeaderGroupMetadata(JURISDICTION, CASE_TYPE_ID),
+            Arrays.asList(searchResultViewHeader),
+            Arrays.asList("111", "222")
         );
+        ObjectMapper mapper = new ObjectMapper();
         JsonNode actualObj = mapper.readValue("{\n"
-                + "  \"OrganisationPolicy1\": {\n"
-                + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
-                + "    \"OrgPolicyReference\": \"Reference\",\n"
-                + "    \"Organisation\": {\n"
-                + "      \"OrganisationID\": \"QUK822N\",\n"
-                + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
-                + "    }\n"
-                + "  }\n"
-                + "}", JsonNode.class);
+            + "  \"OrganisationPolicy1\": {\n"
+            + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
+            + "    \"OrgPolicyReference\": \"Reference\",\n"
+            + "    \"Organisation\": {\n"
+            + "      \"OrganisationID\": \"QUK822N\",\n"
+            + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
+            + "    }\n"
+            + "  }\n"
+            + "}", JsonNode.class);
 
         caseFields.put(PREDEFINED_COMPLEX_ORGANISATION_POLICY, actualObj);
         SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
@@ -121,21 +124,23 @@ public class NoticeOfChangeControllerIT {
         CaseSearchResultViewResource resource = new CaseSearchResultViewResource(caseSearchResultView);
         stubGetCaseInternalES(CASE_TYPE_ID, ES_QUERY, resource);
 
-        FieldType fieldType = new FieldType();
-        fieldType.setId("Number");
-        fieldType.setType("Number");
-        fieldType.setMin(null);
-        fieldType.setMax(null);
+        FieldType fieldType = FieldType.builder()
+            .regularExpression("regular expression")
+            .max(null)
+            .min(null)
+            .id("Number")
+            .type("Number")
+            .build();
         ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
-                "questionText",
-                fieldType,
-                null,
-                "NoC",
-                ANSWER_FIELD_APPLICANT,
-                "QuestionId1",
-                null);
+                                                                    "questionText",
+                                                                    fieldType,
+                                                                    null,
+                                                                    "NoC",
+                                                                    ANSWER_FIELD_APPLICANT,
+                                                                    "QuestionId1",
+                                                                    null);
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
-                Arrays.asList(challengeQuestion));
+            Arrays.asList(challengeQuestion));
         stubGetChallengeQuestions(CASE_TYPE_ID, "NoCChallenge", challengeQuestionsResult);
     }
 

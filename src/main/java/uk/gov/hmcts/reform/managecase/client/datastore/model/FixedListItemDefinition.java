@@ -15,16 +15,6 @@ public class FixedListItemDefinition implements Serializable {
     private String label;
     private String order;
 
-    @ApiModelProperty("")
-    @JsonProperty("code")
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     @JsonProperty("label")
     public String getLabel() {
         return label;
@@ -42,5 +32,15 @@ public class FixedListItemDefinition implements Serializable {
 
     public void setOrder(final String order) {
         this.order = order;
+    }
+
+    @ApiModelProperty("")
+    @JsonProperty("code")
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

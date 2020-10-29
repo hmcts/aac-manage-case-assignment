@@ -105,11 +105,12 @@ public class NoticeOfChangeControllerTest {
             void directCallHappyPath() {
                 // created to avoid IDE warnings in controller class that function is never used
                 // ARRANGE
-                FieldType fieldType = new FieldType();
-                fieldType.setId("Number");
-                fieldType.setType("Number");
-                fieldType.setMin(null);
-                fieldType.setMax(null);
+                FieldType fieldType = FieldType.builder()
+                    .max(null)
+                    .min(null)
+                    .id("Number")
+                    .type("Number")
+                    .build();
                 ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
                                                                             "QuestionText1",
                                                                             fieldType,
@@ -135,11 +136,12 @@ public class NoticeOfChangeControllerTest {
             @DisplayName("should successfully get NoC questions")
             @Test
             void shouldGetCaseAssignmentsForAValidRequest() throws Exception {
-                FieldType fieldType = new FieldType();
-                fieldType.setId("Number");
-                fieldType.setType("Number");
-                fieldType.setMin(null);
-                fieldType.setMax(null);
+                FieldType fieldType = FieldType.builder()
+                    .max(null)
+                    .min(null)
+                    .id("Number")
+                    .type("Number")
+                    .build();
                 ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
                                                                             "QuestionText1",
                                                                             fieldType,
@@ -162,7 +164,6 @@ public class NoticeOfChangeControllerTest {
             @DisplayName("should fail with 400 bad request when caseIds query param is not passed")
             @Test
             void shouldFailWithBadRequestWhenCaseIdsInGetAssignmentsIsNull() throws Exception {
-
                 this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS))
                     .andExpect(status().isBadRequest());
             }
@@ -176,7 +177,7 @@ public class NoticeOfChangeControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath(
                         "$.message",
-                        containsString("getNoticeOfChangeQuestions.caseId: case_id must be not be empty")
+                        containsString("getNoticeOfChangeQuestions.caseId: case_id must not be empty")
                     ));
             }
 

@@ -443,7 +443,7 @@ class NoticeOfChangeQuestionsTest {
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("Insufficient privileges for notice of change reques");
+                .hasMessageContaining("Insufficient privileges for notice of change request");
         }
 
     }

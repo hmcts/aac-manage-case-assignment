@@ -127,7 +127,7 @@ public class NoticeOfChangeControllerIT {
                 .build();
             ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
                 .caseTypeId(CASE_TYPE_ID)
-                .challengeQuestionId("QuestionId1")
+                .challengeQuestionId("NoC")
                 .questionText("questionText")
                 .answerFieldType(fieldType)
                 .answerField(ANSWER_FIELD_APPLICANT)

@@ -187,6 +187,12 @@ dependencyManagement {
     dependencySet(group: 'com.netflix.servo', version: '0.12.4') {
       entry 'servo-core'
     }
+    dependencySet(group: 'org.codehaus.groovy', version: '3.0.3') {
+      entry 'groovy'
+      entry 'groovy-xml'
+      entry 'groovy-json'
+      entry 'groovy-nio'
+    }
   }
 }
 

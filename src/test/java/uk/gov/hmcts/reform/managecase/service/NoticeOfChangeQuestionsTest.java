@@ -51,7 +51,7 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDef
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports"})
-class NoticeOfChangeServiceTest {
+class NoticeOfChangeQuestionsTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
     private static final String CASE_ID = "1567934206391385";
@@ -76,7 +76,7 @@ class NoticeOfChangeServiceTest {
     private static final String TEXT_FIELD = "TextField";
 
     @InjectMocks
-    private NoticeOfChangeService service;
+    private NoticeOfChangeQuestions service;
 
     @Mock
     private DataStoreRepository dataStoreRepository;
@@ -157,14 +157,15 @@ class NoticeOfChangeServiceTest {
                 .type(FIELD_ID)
                 .build();
             ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_APPLICANT);
-            ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
-                                                                        fieldType,
-                                                                        null,
-                                                                        CHALLENGE_QUESTION,
-                                                                        ANSWER_FIELD,
-                                                                        "QuestionId1",
-                                                                        Arrays.asList(challengeAnswer)
-            );
+            ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+                .caseTypeId(CASE_TYPE_ID)
+                .challengeQuestionId("NoC")
+                .questionText("QuestionText1")
+                .answerFieldType(fieldType)
+                .answerField(ANSWER_FIELD)
+                .answers(Arrays.asList(challengeAnswer))
+                .questionId("NoC")
+                .order(1).build();
             ChallengeQuestionsResult challengeQuestionsResult =
                 new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
             given(definitionStoreRepository.challengeQuestions(CASE_TYPE_ID, "NoCChallenge"))
@@ -192,8 +193,7 @@ class NoticeOfChangeServiceTest {
             assertThat(challengeQuestionsResult.getQuestions().get(0).getQuestionText()).isEqualTo(QUESTION_TEXT);
             assertThat(challengeQuestionsResult.getQuestions().get(0).getChallengeQuestionId())
                 .isEqualTo(CHALLENGE_QUESTION);
-            assertThat(challengeQuestionsResult.getQuestions().get(0).getAnswers()).isEqualTo(null);
-            assertThat(challengeQuestionsResult.getQuestions().get(0).getAnswerField()).isEqualTo(null);
+            assertThat(challengeQuestionsResult.getQuestions().get(0).getAnswers().size()).isEqualTo(0);
 
         }
 
@@ -325,14 +325,14 @@ class NoticeOfChangeServiceTest {
                 .type(FIELD_ID)
                 .build();
             ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_APPLICANT);
-            ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
-                                                                        fieldType,
-                                                                        null,
-                                                                        CHALLENGE_QUESTION,
-                                                                        ANSWER_FIELD,
-                                                                        "QuestionId1",
-                                                                        Arrays.asList(challengeAnswer)
-            );
+            ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+                .caseTypeId(CASE_TYPE_ID)
+                .challengeQuestionId("QuestionId1")
+                .questionText(QUESTION_TEXT)
+                .answerFieldType(fieldType)
+                .answerField(ANSWER_FIELD)
+                .answers(Arrays.asList(challengeAnswer))
+                .questionId("NoC").build();
             ChallengeQuestionsResult challengeQuestionsResult =
                 new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
             given(definitionStoreRepository.challengeQuestions(CASE_TYPE_ID, "NoCChallenge"))
@@ -354,14 +354,15 @@ class NoticeOfChangeServiceTest {
                 .type(FIELD_ID)
                 .build();
             ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_RESPONDENT);
-            ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1, QUESTION_TEXT,
-                                                                        fieldType,
-                                                                        null,
-                                                                        CHALLENGE_QUESTION,
-                                                                        ANSWER_FIELD,
-                                                                        "QuestionId1",
-                                                                        Arrays.asList(challengeAnswer)
-            );
+
+            ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+                .caseTypeId(CASE_TYPE_ID)
+                .challengeQuestionId("QuestionId1")
+                .questionText(QUESTION_TEXT)
+                .answerFieldType(fieldType)
+                .answerField(ANSWER_FIELD)
+                .answers(Arrays.asList(challengeAnswer))
+                .questionId("NoC").build();
             ChallengeQuestionsResult challengeQuestionsResult =
                 new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
             given(definitionStoreRepository
@@ -370,7 +371,7 @@ class NoticeOfChangeServiceTest {
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("No Organisation Policy with that role");
+                .hasMessageContaining("No Organisation Policy with that role for notice of change request");
         }
 
         @Test
@@ -396,7 +397,7 @@ class NoticeOfChangeServiceTest {
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("Insufficient privileges");
+                .hasMessageContaining("Insufficient privileges for notice of change reques");
         }
 
     }

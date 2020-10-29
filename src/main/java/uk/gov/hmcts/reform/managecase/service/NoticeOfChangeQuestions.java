@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.Searc
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
-import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
@@ -39,7 +38,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 @Service
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ExcessiveImports",
     "PMD.AvoidDeeplyNestedIfStmts", "PMD.PreserveStackTrace", "PMD.LawOfDemeter"})
-public class NoticeOfChangeService {
+public class NoticeOfChangeQuestions {
 
     public static final String PUI_ROLE = "pui-caa";
     public static final String CHANGE_ORG_REQUEST = "ChangeOrganisationRequest";
@@ -51,9 +50,9 @@ public class NoticeOfChangeService {
     private final SecurityUtils securityUtils;
 
     @Autowired
-    public NoticeOfChangeService(DataStoreRepository dataStoreRepository,
-                                 DefinitionStoreRepository definitionStoreRepository,
-                                 SecurityUtils securityUtils) {
+    public NoticeOfChangeQuestions(DataStoreRepository dataStoreRepository,
+                                   DefinitionStoreRepository definitionStoreRepository,
+                                   SecurityUtils securityUtils) {
 
         this.dataStoreRepository = dataStoreRepository;
         this.definitionStoreRepository = definitionStoreRepository;
@@ -64,27 +63,10 @@ public class NoticeOfChangeService {
         ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId).getChallengeQuestionsResult();
 
         List<ChallengeQuestion> challengeQuestionsResponse = challengeQuestionsResult.getQuestions().stream()
-            .map(challengeQuestion -> ChallengeQuestion.builder()
-                .questionText(challengeQuestion.getQuestionText())
-                .caseTypeId(challengeQuestion.getCaseTypeId())
-                .order(challengeQuestion.getOrder())
-                .answerFieldType(FieldType.builder()
-                                     .collectionFieldType(challengeQuestion.getAnswerFieldType()
-                                                              .getCollectionFieldType())
-                                     .complexFields(challengeQuestion.getAnswerFieldType()
-                                                        .getComplexFields())
-                                     .fixedListItems(challengeQuestion.getAnswerFieldType()
-                                                         .getFixedListItems())
-                                     .regularExpression(challengeQuestion.getAnswerFieldType()
-                                                            .getRegularExpression())
-                                     .max(challengeQuestion.getAnswerFieldType().getMax())
-                                     .min(challengeQuestion.getAnswerFieldType().getMin())
-                                     .id(challengeQuestion.getAnswerFieldType().getId())
-                                     .type(challengeQuestion.getAnswerFieldType().getType())
-                                     .build())
-                .displayContextParameter(challengeQuestion.getDisplayContextParameter())
-                .challengeQuestionId(challengeQuestion.getChallengeQuestionId())
-                .build())
+            .map(challengeQuestion -> {
+                challengeQuestion.setAnswerField(null);
+                return challengeQuestion;
+            })
             .collect(Collectors.toList());
 
 
@@ -161,6 +143,8 @@ public class NoticeOfChangeService {
         } catch (RestClientResponseException e) {
             if (HttpStatus.NOT_FOUND.value() == e.getRawStatusCode()) {
                 throw new CaseCouldNotBeFetchedException("Case could not be found");
+            } else if (HttpStatus.BAD_REQUEST.value() == e.getRawStatusCode()) {
+                throw new CaseCouldNotBeFetchedException("Case ID is not valid");
             }
         }
         return caseViewResource;
@@ -190,7 +174,7 @@ public class NoticeOfChangeService {
         for (SearchResultViewHeader searchResultViewHeader : filteredSearch) {
             if (caseFields.containsKey(searchResultViewHeader.getCaseFieldId())) {
                 JsonNode node = caseFields.get(searchResultViewHeader.getCaseFieldId());
-                if (node.findValues(CASE_ROLE_ID) != null) {
+                if (!node.hasNonNull(CASE_ROLE_ID) || node.findPath(CASE_ROLE_ID) != null) {
                     throw new ValidationException(NOC_REQUEST_ONGOING);
                 }
             }

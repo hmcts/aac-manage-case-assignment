@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,7 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
+import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeQuestions;
 
 import java.util.Arrays;
 
@@ -58,18 +57,13 @@ public class NoticeOfChangeControllerTest {
         protected MockMvc mockMvc;
 
         @MockBean
-        protected NoticeOfChangeService service;
+        protected NoticeOfChangeQuestions service;
     }
 
     @Nested
     @DisplayName("GET /noc/noc-questions")
     @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
     class GetNoticeOfChangeQuestions extends BaseMvcTest {
-
-        @BeforeEach
-        void setUp() {
-
-        }
 
         @Nested
         @DisplayName("GET /noc/noc-questions")
@@ -86,14 +80,13 @@ public class NoticeOfChangeControllerTest {
                     .id("Number")
                     .type("Number")
                     .build();
-                ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
-                                                                            "QuestionText1",
-                                                                            fieldType,
-                                                                            null,
-                                                                            "NoC",
-                                                                            ANSWER_FIELD,
-                                                                            "QuestionId1",
-                                                                            null);
+                ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+                    .caseTypeId(CASE_TYPE_ID)
+                    .challengeQuestionId("QuestionId1")
+                    .questionText("QuestionText1")
+                    .answerFieldType(fieldType)
+                    .answerField(ANSWER_FIELD)
+                    .questionId("NoC").build();
                 ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
                     Arrays.asList(challengeQuestion));
 
@@ -117,13 +110,13 @@ public class NoticeOfChangeControllerTest {
                     .id("Number")
                     .type("Number")
                     .build();
-                ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
-                                                                            "QuestionText1",
-                                                                            fieldType,
-                                                                            null,
-                                                                            "NoC",
-                                                                            ANSWER_FIELD,
-                                                                            "QuestionId1", null);
+                ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+                    .caseTypeId(CASE_TYPE_ID)
+                    .challengeQuestionId("QuestionId1")
+                    .questionText("QuestionText1")
+                    .answerFieldType(fieldType)
+                    .answerField(ANSWER_FIELD)
+                    .questionId("NoC").build();
                 ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
                     Arrays.asList(challengeQuestion));
 

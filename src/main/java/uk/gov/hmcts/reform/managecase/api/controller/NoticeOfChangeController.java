@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
-import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
+import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeQuestions;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
@@ -31,10 +31,10 @@ public class NoticeOfChangeController {
     @SuppressWarnings({"squid:S1075"})
     public static final String GET_NOC_QUESTIONS = "/noc-questions";
 
-    private final NoticeOfChangeService noticeOfChangeService;
+    private final NoticeOfChangeQuestions noticeOfChangeQuestions;
 
-    public NoticeOfChangeController(NoticeOfChangeService noticeOfChangeService) {
-        this.noticeOfChangeService = noticeOfChangeService;
+    public NoticeOfChangeController(NoticeOfChangeQuestions noticeOfChangeQuestions) {
+        this.noticeOfChangeQuestions = noticeOfChangeQuestions;
     }
 
     @GetMapping(path = GET_NOC_QUESTIONS, produces = APPLICATION_JSON_VALUE)
@@ -104,7 +104,7 @@ public class NoticeOfChangeController {
                                                                @Valid @NotEmpty(message = "case_id must "
         + "not be empty") String caseId) {
         validateCaseIds(caseId);
-        return noticeOfChangeService.getChallengeQuestions(caseId);
+        return noticeOfChangeQuestions.getChallengeQuestions(caseId);
     }
 
     private void validateCaseIds(String caseId) {

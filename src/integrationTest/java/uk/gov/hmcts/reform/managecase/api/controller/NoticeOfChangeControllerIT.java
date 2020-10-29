@@ -125,14 +125,13 @@ public class NoticeOfChangeControllerIT {
                 .id("Number")
                 .type("Number")
                 .build();
-            ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
-                                                                        "questionText",
-                                                                        fieldType,
-                                                                        null,
-                                                                        "NoC",
-                                                                        ANSWER_FIELD_APPLICANT,
-                                                                        "QuestionId1",
-                                                                        null);
+            ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+                .caseTypeId(CASE_TYPE_ID)
+                .challengeQuestionId("QuestionId1")
+                .questionText("questionText")
+                .answerFieldType(fieldType)
+                .answerField(ANSWER_FIELD_APPLICANT)
+                .questionId("QuestionId1").build();
             ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
                 Arrays.asList(challengeQuestion));
             stubGetChallengeQuestions(CASE_TYPE_ID, "NoCChallenge", challengeQuestionsResult);

@@ -179,12 +179,11 @@ public class WiremockFixtures {
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
-    public static void stubIdamSearch(String userId, UserDetails user) {
-        stubFor(WireMock.get(urlPathEqualTo("/api/v1/users"))
-                    .withQueryParam("query", equalTo("id:\"" + userId + "\""))
+    public static void stubIdamGetUserById(String userId, UserDetails user) {
+        stubFor(WireMock.get(urlPathEqualTo("/api/v1/users/" + userId))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .willReturn(aResponse()
-                                    .withStatus(HTTP_OK).withBody(getJsonString(List.of(user)))
+                                    .withStatus(HTTP_OK).withBody(getJsonString(user))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 

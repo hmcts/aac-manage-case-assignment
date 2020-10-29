@@ -99,10 +99,4 @@
    ]]></notes>
     <cve>CVE-2020-13943</cve>
   </suppress>
-  <suppress>
-    <notes><![CDATA[
-			tomcat 9.0.38 - temp
-		]]></notes>
-    <cve>CVE-2020-13943</cve>
-  </suppress>
 </suppressions>

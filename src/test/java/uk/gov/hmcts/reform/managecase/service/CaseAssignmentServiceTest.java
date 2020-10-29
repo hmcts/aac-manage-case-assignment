@@ -100,7 +100,7 @@ class CaseAssignmentServiceTest {
             UserDetails userDetails = UserDetails.builder()
                 .id(ASSIGNEE_ID).roles(List.of("caseworker-AUTOTEST1-solicitor")).build();
             given(idamRepository.getSystemUserAccessToken()).willReturn(BEAR_TOKEN);
-            given(idamRepository.searchUserById(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
+            given(idamRepository.getUserByUserId(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
         }
 
         @Test
@@ -154,7 +154,7 @@ class CaseAssignmentServiceTest {
             UserDetails userDetails = UserDetails.builder()
                 .id(ASSIGNEE_ID).roles(List.of("caseworker-AUTOTEST2-solicitor")).build();
 
-            given(idamRepository.searchUserById(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
+            given(idamRepository.getUserByUserId(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
 
             assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
                 .isInstanceOf(ValidationException.class)

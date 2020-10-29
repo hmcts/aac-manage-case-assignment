@@ -280,6 +280,51 @@ class NoticeOfChangeQuestionsTest {
         }
 
         @Test
+        @DisplayName("must return an error response when there is more than one chnage request")
+        void shouldThrowErrorMoreThanOneChangeRequest() throws JsonProcessingException {
+
+            SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
+            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+            fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
+            fieldTypeDefinition.setId(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
+            searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
+            searchResultViewHeader.setCaseFieldId(CHANGE_ORG);
+
+            caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
+            caseFields.put(DATETIME_FIELD, new TextNode("1985-12-30"));
+            caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode actualObj = mapper.readValue("   {\n"
+                                                      + "                \"changeOrg\":\n"
+                                                      + "                {\n"
+                                                      + "                    \"CaseRoleId\": \"role\"\n"
+                                                      + "                }\n"
+                                                      + "            }", JsonNode.class);
+            caseFields.put(CHANGE_ORG, actualObj);
+            caseFields.put(CHANGE_ORG, actualObj);
+            SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
+            viewItems.add(item);
+            SearchResultViewHeaderGroup searchResultViewHeaderGroup = new SearchResultViewHeaderGroup(
+                new HeaderGroupMetadata(JURISDICTION, CASE_TYPE),
+                Arrays.asList(searchResultViewHeader, searchResultViewHeader), Arrays.asList("111", "222")
+            );
+            List<SearchResultViewHeaderGroup> headers = new ArrayList<>();
+            headers.add(searchResultViewHeaderGroup);
+            List<SearchResultViewItem> cases = new ArrayList<>();
+            cases.add(item);
+            Long total = 3L;
+
+            CaseSearchResultView caseSearchResultView = new CaseSearchResultView(headers, cases, total);
+
+            CaseSearchResultViewResource resource = new CaseSearchResultViewResource(caseSearchResultView);
+
+            given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, null, CASE_ID)).willReturn(resource);
+            assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("More than one change request found on the case");
+        }
+
+        @Test
         @DisplayName("Must return an error if there is no cases returned")
         void shouldThrowErrorMissingCasesFromInternalSearch() throws JsonProcessingException {
             SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();

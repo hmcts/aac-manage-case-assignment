@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseS
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
-import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
@@ -30,6 +29,7 @@ import java.util.Optional;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
@@ -37,7 +37,8 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 
 @Service
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ExcessiveImports",
-    "PMD.AvoidDeeplyNestedIfStmts", "PMD.PreserveStackTrace", "PMD.LawOfDemeter"})
+    "PMD.AvoidDeeplyNestedIfStmts", "PMD.PreserveStackTrace", "PMD.LawOfDemeter",
+    "PMD.AvoidLiteralsInIfCondition", "PMD.CyclomaticComplexity"})
 public class NoticeOfChangeQuestions {
 
     public static final String PUI_ROLE = "pui-caa";
@@ -106,11 +107,10 @@ public class NoticeOfChangeQuestions {
             throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
         }
         challengeQuestionsResult.getQuestions().forEach(challengeQuestion -> {
-            for (ChallengeAnswer answer : challengeQuestion.getAnswers()) {
-                String role = answer.getCaseRoleId();
-                if (!isRoleInOrganisationPolicies(organisationPolicies, role)) {
-                    throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
-                }
+            boolean missingRole = challengeQuestion.getAnswers().stream()
+                .anyMatch(answer -> !isRoleInOrganisationPolicies(organisationPolicies, answer.getCaseRoleId()));
+            if (missingRole) {
+                throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
             }
         });
     }
@@ -159,7 +159,6 @@ public class NoticeOfChangeQuestions {
             throw new CaseCouldNotBeFetchedException("Case could not be found");
         }
         SearchResultViewItem searchResultViewItem = caseDetails.getCases().get(0);
-        Map<String, JsonNode> caseFields = searchResultViewItem.getFields();
         List<SearchResultViewHeader> searchResultViewHeaderList = new ArrayList<>();
         Optional<SearchResultViewHeaderGroup> searchResultViewHeaderGroup =
             caseDetails.getHeaders().stream().findFirst();
@@ -171,6 +170,10 @@ public class NoticeOfChangeQuestions {
                 .filter(searchResultViewHeader ->
                             searchResultViewHeader.getCaseFieldTypeDefinition().getId()
                                 .equals(CHANGE_ORG_REQUEST)).collect(Collectors.toList());
+        if (filteredSearch.size() > 1) {
+            throw new ValidationException(CHANGE_REQUEST);
+        }
+        Map<String, JsonNode> caseFields = searchResultViewItem.getFields();
         for (SearchResultViewHeader searchResultViewHeader : filteredSearch) {
             if (caseFields.containsKey(searchResultViewHeader.getCaseFieldId())) {
                 JsonNode node = caseFields.get(searchResultViewHeader.getCaseFieldId());

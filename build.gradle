@@ -174,7 +174,7 @@ dependencyManagement {
       entry 'guava'
     }
     // CVE-2020-9488
-    dependencySet(group: 'org.apache.logging.log4j', version: '2.13.2') {
+    dependencySet(group: 'org.apache.logging.log4j', version: '2.13.3') {
       entry 'log4j-api'
     }
     // CVE-2020-11996, CVE-2020-13934

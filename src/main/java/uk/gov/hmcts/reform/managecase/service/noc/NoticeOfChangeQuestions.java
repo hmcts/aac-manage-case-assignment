@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
@@ -91,7 +93,7 @@ public class NoticeOfChangeQuestions {
             List<OrganisationPolicy> organisationPolicies = searchResultViewItem.get().findPolicies();
             checkOrgPoliciesForRoles(challengeQuestionsResult, organisationPolicies);
         } else {
-            throw new CaseCouldNotBeFetchedException("Case could not be found");
+            throw new CaseCouldNotBeFetchedException(CASE_NOT_FOUND);
         }
 
         return NoCRequestDetails.builder()
@@ -142,9 +144,9 @@ public class NoticeOfChangeQuestions {
             caseViewResource = dataStoreRepository.findCaseByCaseId(caseId);
         } catch (FeignException e) {
             if (HttpStatus.NOT_FOUND.value() == e.status()) {
-                throw new CaseCouldNotBeFetchedException("Case could not be found");
+                throw new CaseCouldNotBeFetchedException(CASE_NOT_FOUND);
             } else if (HttpStatus.BAD_REQUEST.value() == e.status()) {
-                throw new CaseCouldNotBeFetchedException("Case ID is not valid");
+                throw new CaseCouldNotBeFetchedException(CASE_ID_INVALID);
             }
         }
         return caseViewResource;
@@ -156,7 +158,7 @@ public class NoticeOfChangeQuestions {
 
     private void checkCaseFields(CaseSearchResultViewResource caseDetails) {
         if (caseDetails.getCases().isEmpty()) {
-            throw new CaseCouldNotBeFetchedException("Case could not be found");
+            throw new CaseCouldNotBeFetchedException(CASE_NOT_FOUND);
         }
         List<SearchResultViewHeader> searchResultViewHeaderList = new ArrayList<>();
         Optional<SearchResultViewHeaderGroup> searchResultViewHeaderGroup =

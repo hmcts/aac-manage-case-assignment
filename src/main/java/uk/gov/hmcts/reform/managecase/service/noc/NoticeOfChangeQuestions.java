@@ -177,8 +177,10 @@ public class NoticeOfChangeQuestions {
         for (SearchResultViewHeader searchResultViewHeader : filteredSearch) {
             if (caseFields.containsKey(searchResultViewHeader.getCaseFieldId())) {
                 JsonNode node = caseFields.get(searchResultViewHeader.getCaseFieldId());
-                if (!node.hasNonNull(CASE_ROLE_ID) || node.findPath(CASE_ROLE_ID) != null) {
-                    throw new ValidationException(NOC_REQUEST_ONGOING);
+                if (!node.isNull() || node != null) {
+                    if (!node.hasNonNull(CASE_ROLE_ID) || node.findPath(CASE_ROLE_ID) != null) {
+                        throw new ValidationException(NOC_REQUEST_ONGOING);
+                    }
                 }
             }
         }

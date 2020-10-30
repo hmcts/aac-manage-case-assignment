@@ -34,7 +34,7 @@ public class CCDConsumerTest {
         SERVICE_AUTHORIZATION, SERVICE_AUTHORIZATION_TOKEN
     );
 
-    private static final String CASE_ASSIGNMENT_REQUEST = "{"
+    private static final String ADD_CASE_ASSIGNMENT_REQUEST_BODY = "{"
         + "\"case_users\": ["
                 + " {\"organisation_id\": \"Test_Org\", \"case_id\": \"1588234985453946\", \"user_id\": \"abc123\","
                 + " \"case_role\": \"[Collaborator]\" }"
@@ -65,7 +65,7 @@ public class CCDConsumerTest {
     }
 
     @Pact(provider = "ccd", consumer = "mca_consumer")
-    public RequestResponsePact getCaseAssignmentsWhenCaseIdsPassed(PactDslWithProvider builder) throws Exception {
+    public RequestResponsePact getCaseAssignmentsWhenCaseIdsMissing(PactDslWithProvider builder) throws Exception {
         return builder
             .given("CCD successfully return case assignments")
             .uponReceiving("Request to get case assignments")
@@ -88,7 +88,7 @@ public class CCDConsumerTest {
             .uponReceiving("Request to add case assignments")
             .path("/case-users")
             .method(HttpMethod.POST.toString())
-            .body(CASE_ASSIGNMENT_REQUEST, ContentType.APPLICATION_JSON)
+            .body(ADD_CASE_ASSIGNMENT_REQUEST_BODY, ContentType.APPLICATION_JSON)
             .headers(headers)
             .willRespondWith()
             .status(HttpStatus.CREATED.value())
@@ -106,7 +106,7 @@ public class CCDConsumerTest {
             .uponReceiving("Request to remove case assignments")
             .path("/case-users")
             .method(HttpMethod.DELETE.toString())
-            .body(CASE_ASSIGNMENT_REQUEST, ContentType.APPLICATION_JSON)
+            .body(ADD_CASE_ASSIGNMENT_REQUEST_BODY, ContentType.APPLICATION_JSON)
             .headers(headers)
             .willRespondWith()
             .status(HttpStatus.OK.value())
@@ -140,7 +140,7 @@ public class CCDConsumerTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "getCaseAssignmentsWhenCaseIdsPassed")
+    @PactTestFor(pactMethod = "getCaseAssignmentsWhenCaseIdsMissing")
     public void shouldReturnBadRequestForGetAssignmentsWhenInputIsMissing(MockServer mockServer) throws Exception {
         JsonPath response = RestAssured
             .given()
@@ -164,7 +164,7 @@ public class CCDConsumerTest {
         JsonPath response = RestAssured
             .given()
             .headers(headers)
-            .body(CASE_ASSIGNMENT_REQUEST)
+            .body(ADD_CASE_ASSIGNMENT_REQUEST_BODY)
             .contentType(io.restassured.http.ContentType.JSON)
             .when()
             .post(mockServer.getUrl() + "/case-users")
@@ -184,7 +184,7 @@ public class CCDConsumerTest {
         JsonPath response = RestAssured
             .given()
             .headers(headers)
-            .body(CASE_ASSIGNMENT_REQUEST)
+            .body(ADD_CASE_ASSIGNMENT_REQUEST_BODY)
             .contentType(io.restassured.http.ContentType.JSON)
             .when()
             .delete(mockServer.getUrl() + "/case-users")

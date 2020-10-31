@@ -81,7 +81,7 @@ withPipeline("java", product, component) {
   onMaster {
     enableSlackNotifications('#ccd-master-builds')
     env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
-    env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-staging.service.core-compute-aat.internal"
+    env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
   }
   onDemo {
     enableSlackNotifications('#ccd-demo-builds')

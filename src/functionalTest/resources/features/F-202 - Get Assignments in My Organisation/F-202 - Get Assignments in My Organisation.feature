@@ -16,7 +16,7 @@ Scenario: Must return case assignments in my organisation for the provided Case 
       And a user [Bill – another solicitor within the same organisation as Becky],
       And a case [C1, Becky has just] created as in [F-202_Prerequisite_Case_Creation_C1],
       And a case [C2, Becky has just] created as in [F-202_Prerequisite_Case_Creation_C2],
-      And a wait time of [5] seconds [to allow for the cases just created to appear in search results],
+      And a wait time of [10] seconds [to allow for the cases just created to appear in search results],
       And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Benjamin access to C1] as in [F-202_Prerequisite_Case_Assignment_C1_Benjamin],
       And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Bill access to C2] as in [F-202_Prerequisite_Case_Assignment_C2_Bill],
 
@@ -39,7 +39,7 @@ Scenario: Must return an error response when a malformed case ID is provided
       And a user [Bill – another solicitor within the same organisation as Becky],
       And a case [C1, Becky has just] created as in [F-202_Prerequisite_Case_Creation_C1],
       And a case [C2, Becky has just] created as in [F-202_Prerequisite_Case_Creation_C2],
-      And a wait time of [5] seconds [to allow for the case just created to appear in search results],
+      And a wait time of [10] seconds [to allow for the case just created to appear in search results],
       And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Benjamin access to C1] as in [F-202_Prerequisite_Case_Assignment_C1_Benjamin],
       And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Bill access to C2] as in [F-202_Prerequisite_Case_Assignment_C2_Bill],
 
@@ -78,7 +78,7 @@ Scenario: Must return an error response for a malformed Case ID List
       And a case [C1, Becky has just] created as in [F-202_Prerequisite_Case_Creation_C1],
       And a case [C2, Becky has just] created as in [F-202_Prerequisite_Case_Creation_C2],
       And a case [C3, Becky has just] created as in [F-202_Prerequisite_Case_Creation_C3],
-      And a wait time of [5] seconds [to allow for the case just created to appear in search results],
+      And a wait time of [10] seconds [to allow for the case just created to appear in search results],
       And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Benjamin access to C1] as in [F-202_Prerequisite_Case_Assignment_C1_Benjamin],
       And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Bill access to C2] as in [F-202_Prerequisite_Case_Assignment_C2_Bill],
       And a successful call [to the ‘Assign Access within Organisation’ operation of Case Assignment Microservice assigning Emma access to C3] as in [F-202_Prerequisite_Case_Assignment_C3_Emma],

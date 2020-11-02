@@ -231,7 +231,7 @@ public class NoticeOfChangeController {
             = new VerifyNoCAnswersRequest(requestNoticeOfChangeRequest.getCaseId(),
                                           requestNoticeOfChangeRequest.getAnswers());
         NoCRequestDetails noCRequestDetails = verifyNoCAnswersService.verifyNoCAnswers(verifyNoCAnswersRequest);
-        return noticeOfChangeService.requestNoticeOfChange(noCRequestDetails);
+        return noticeOfChangeQuestions.requestNoticeOfChange(noCRequestDetails);
     }
 
 }

@@ -94,7 +94,7 @@ public class WiremockFixtures {
                                     .withBody(getJsonString(
                                         caseDetails == null ? new CaseSearchResponse() : new CaseSearchResponse(list(
                                             caseDetails))))
-                                    .withHeader("Content-Type", "application/json")));
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     public static void stubSearchCase(String caseTypeId, String searchQuery, CaseDetails caseDetails) {

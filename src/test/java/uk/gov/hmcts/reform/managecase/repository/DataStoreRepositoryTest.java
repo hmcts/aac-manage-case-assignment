@@ -210,7 +210,7 @@ class DataStoreRepositoryTest {
 
     @Test
     @DisplayName("Find case by caseTypeId and caseId")
-    void shouldFindCaseByEternalES() {
+    void shouldFindCaseByExternalES() {
         // ARRANGE
         SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
         FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();

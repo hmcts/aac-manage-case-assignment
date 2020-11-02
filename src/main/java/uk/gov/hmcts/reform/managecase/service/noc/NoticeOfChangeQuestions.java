@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.managecase.service;
+package uk.gov.hmcts.reform.managecase.service.noc;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,10 +17,8 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseS
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
-import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
-import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
@@ -40,6 +38,9 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
@@ -51,8 +52,9 @@ import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreReposito
     "PMD.GodClass",
     "PMD.ExcessiveImports",
     "PMD.TooManyMethods",
-    "PMD.AvoidDeeplyNestedIfStmts", "PMD.PreserveStackTrace", "PMD.LawOfDemeter"})
-public class NoticeOfChangeService {
+    "PMD.AvoidDeeplyNestedIfStmts", "PMD.PreserveStackTrace", "PMD.LawOfDemeter",
+    "PMD.AvoidLiteralsInIfCondition", "PMD.CyclomaticComplexity"})
+public class NoticeOfChangeQuestions {
 
     public static final String PUI_ROLE = "pui-caa";
 
@@ -68,9 +70,9 @@ public class NoticeOfChangeService {
     private final SecurityUtils securityUtils;
 
     @Autowired
-    public NoticeOfChangeService(DataStoreRepository dataStoreRepository,
-                                 DefinitionStoreRepository definitionStoreRepository,
-                                 PrdRepository prdRepository,
+    public NoticeOfChangeQuestions(DataStoreRepository dataStoreRepository,
+                                   DefinitionStoreRepository definitionStoreRepository,
+                                   PrdRepository prdRepository,
                                  JacksonUtils jacksonUtils,
                                  SecurityUtils securityUtils) {
         this.dataStoreRepository = dataStoreRepository;
@@ -84,27 +86,10 @@ public class NoticeOfChangeService {
         ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId).getChallengeQuestionsResult();
 
         List<ChallengeQuestion> challengeQuestionsResponse = challengeQuestionsResult.getQuestions().stream()
-            .map(challengeQuestion -> ChallengeQuestion.builder()
-                .questionText(challengeQuestion.getQuestionText())
-                .caseTypeId(challengeQuestion.getCaseTypeId())
-                .order(challengeQuestion.getOrder())
-                .answerFieldType(FieldType.builder()
-                                     .collectionFieldType(challengeQuestion.getAnswerFieldType()
-                                                              .getCollectionFieldType())
-                                     .complexFields(challengeQuestion.getAnswerFieldType()
-                                                        .getComplexFields())
-                                     .fixedListItems(challengeQuestion.getAnswerFieldType()
-                                                         .getFixedListItems())
-                                     .regularExpression(challengeQuestion.getAnswerFieldType()
-                                                            .getRegularExpression())
-                                     .max(challengeQuestion.getAnswerFieldType().getMax())
-                                     .min(challengeQuestion.getAnswerFieldType().getMin())
-                                     .id(challengeQuestion.getAnswerFieldType().getId())
-                                     .type(challengeQuestion.getAnswerFieldType().getType())
-                                     .build())
-                .displayContextParameter(challengeQuestion.getDisplayContextParameter())
-                .challengeQuestionId(challengeQuestion.getChallengeQuestionId())
-                .build())
+            .map(challengeQuestion -> {
+                challengeQuestion.setAnswerField(null);
+                return challengeQuestion;
+            })
             .collect(Collectors.toList());
 
 
@@ -128,7 +113,7 @@ public class NoticeOfChangeService {
             List<OrganisationPolicy> organisationPolicies = searchResultViewItem.get().findPolicies();
             checkOrgPoliciesForRoles(challengeQuestionsResult, organisationPolicies);
         } else {
-            throw new CaseCouldNotBeFetchedException("Case could not be found");
+            throw new CaseCouldNotBeFetchedException(CASE_NOT_FOUND);
         }
 
         return NoCRequestDetails.builder()
@@ -144,11 +129,10 @@ public class NoticeOfChangeService {
             throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
         }
         challengeQuestionsResult.getQuestions().forEach(challengeQuestion -> {
-            for (ChallengeAnswer answer : challengeQuestion.getAnswers()) {
-                String role = answer.getCaseRoleId();
-                if (!isRoleInOrganisationPolicies(organisationPolicies, role)) {
-                    throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
-                }
+            boolean missingRole = challengeQuestion.getAnswers().stream()
+                .anyMatch(answer -> !isRoleInOrganisationPolicies(organisationPolicies, answer.getCaseRoleId()));
+            if (missingRole) {
+                throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
             }
         });
     }
@@ -187,7 +171,9 @@ public class NoticeOfChangeService {
             caseViewResource = dataStoreRepository.findCaseByCaseId(caseId);
         } catch (FeignException e) {
             if (HttpStatus.NOT_FOUND.value() == e.status()) {
-                throw new CaseCouldNotBeFetchedException("Case could not be found");
+                throw new CaseCouldNotBeFetchedException(CASE_NOT_FOUND);
+            } else if (HttpStatus.BAD_REQUEST.value() == e.status()) {
+                throw new CaseCouldNotBeFetchedException(CASE_ID_INVALID);
             } else if (HttpStatus.BAD_REQUEST.value() == e.status()) {
                 throw new CaseCouldNotBeFetchedException("Case ID is not valid");
             }
@@ -205,10 +191,8 @@ public class NoticeOfChangeService {
 
     private void checkCaseFields(CaseSearchResultViewResource caseDetails) {
         if (caseDetails.getCases().isEmpty()) {
-            throw new CaseCouldNotBeFetchedException("Case could not be found");
+            throw new CaseCouldNotBeFetchedException(CASE_NOT_FOUND);
         }
-        SearchResultViewItem searchResultViewItem = caseDetails.getCases().get(0);
-        Map<String, JsonNode> caseFields = searchResultViewItem.getFields();
         List<SearchResultViewHeader> searchResultViewHeaderList = new ArrayList<>();
         Optional<SearchResultViewHeaderGroup> searchResultViewHeaderGroup =
             caseDetails.getHeaders().stream().findFirst();
@@ -220,11 +204,19 @@ public class NoticeOfChangeService {
                 .filter(searchResultViewHeader ->
                             searchResultViewHeader.getCaseFieldTypeDefinition().getId()
                                 .equals(CHANGE_ORGANISATION_REQUEST)).collect(toList());
+        if (filteredSearch.size() > 1) {
+            throw new ValidationException(CHANGE_REQUEST);
+        }
+        SearchResultViewItem searchResultViewItem = caseDetails.getCases().get(0);
+        Map<String, JsonNode> caseFields = searchResultViewItem.getFields();
         for (SearchResultViewHeader searchResultViewHeader : filteredSearch) {
             if (caseFields.containsKey(searchResultViewHeader.getCaseFieldId())) {
                 JsonNode node = caseFields.get(searchResultViewHeader.getCaseFieldId());
-                if (node.findValues(CASE_ROLE_ID) != null) {
-                    throw new ValidationException(NOC_REQUEST_ONGOING);
+                if (node != null) {
+                    JsonNode caseRoleId = node.findPath(CASE_ROLE_ID);
+                    if (!caseRoleId.isNull()) {
+                        throw new ValidationException(NOC_REQUEST_ONGOING);
+                    }
                 }
             }
         }

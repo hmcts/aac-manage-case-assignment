@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.ToString;
 
@@ -10,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ToString
-@ApiModel(description = "")
 public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
 
     private static final long serialVersionUID = -4257574164546267919L;

@@ -174,8 +174,6 @@ public class NoticeOfChangeQuestions {
                 throw new CaseCouldNotBeFetchedException(CASE_NOT_FOUND);
             } else if (HttpStatus.BAD_REQUEST.value() == e.status()) {
                 throw new CaseCouldNotBeFetchedException(CASE_ID_INVALID);
-            } else if (HttpStatus.BAD_REQUEST.value() == e.status()) {
-                throw new CaseCouldNotBeFetchedException("Case ID is not valid");
             }
         }
         return caseViewResource;

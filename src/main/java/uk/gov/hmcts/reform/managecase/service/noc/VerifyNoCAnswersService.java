@@ -8,29 +8,28 @@ import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
-import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 
 import javax.validation.ValidationException;
 
 @Service
 public class VerifyNoCAnswersService {
 
-    private final NoticeOfChangeService noticeOfChangeService;
+    private final NoticeOfChangeQuestions noticeOfChangeQuestions;
     private final ChallengeAnswerValidator challengeAnswerValidator;
     private final PrdRepository prdRepository;
 
     @Autowired
-    public VerifyNoCAnswersService(NoticeOfChangeService noticeOfChangeService,
+    public VerifyNoCAnswersService(NoticeOfChangeQuestions noticeOfChangeQuestions,
                                    ChallengeAnswerValidator challengeAnswerValidator,
                                    PrdRepository prdRepository) {
-        this.noticeOfChangeService = noticeOfChangeService;
+        this.noticeOfChangeQuestions = noticeOfChangeQuestions;
         this.challengeAnswerValidator = challengeAnswerValidator;
         this.prdRepository = prdRepository;
     }
 
     public NoCRequestDetails verifyNoCAnswers(VerifyNoCAnswersRequest verifyNoCAnswersRequest) {
         String caseId = verifyNoCAnswersRequest.getCaseId();
-        NoCRequestDetails noCRequestDetails = noticeOfChangeService.challengeQuestions(caseId);
+        NoCRequestDetails noCRequestDetails = noticeOfChangeQuestions.challengeQuestions(caseId);
         SearchResultViewItem caseResult = noCRequestDetails.getSearchResultViewItem();
 
         String caseRoleId = challengeAnswerValidator

@@ -20,8 +20,8 @@ import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
-import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
@@ -40,12 +40,12 @@ public class NoticeOfChangeController {
 
     public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
 
-    private final NoticeOfChangeService noticeOfChangeService;
+    private final NoticeOfChangeQuestions noticeOfChangeQuestions;
     private final VerifyNoCAnswersService verifyNoCAnswersService;
 
-    public NoticeOfChangeController(NoticeOfChangeService noticeOfChangeService,
+    public NoticeOfChangeController(NoticeOfChangeQuestions noticeOfChangeQuestions,
                                     VerifyNoCAnswersService verifyNoCAnswersService) {
-        this.noticeOfChangeService = noticeOfChangeService;
+        this.noticeOfChangeQuestions = noticeOfChangeQuestions;
         this.verifyNoCAnswersService = verifyNoCAnswersService;
     }
 
@@ -116,7 +116,7 @@ public class NoticeOfChangeController {
                                                                @Valid @NotEmpty(message = "case_id must "
         + "not be empty") String caseId) {
         validateCaseIds(caseId);
-        return noticeOfChangeService.getChallengeQuestions(caseId);
+        return noticeOfChangeQuestions.getChallengeQuestions(caseId);
     }
 
     @PostMapping(path = VERIFY_NOC_ANSWERS, produces = APPLICATION_JSON_VALUE)

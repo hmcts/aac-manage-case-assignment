@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeApprovalService;
+import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
@@ -106,6 +107,9 @@ public class NoticeOfChangeControllerTest {
         protected VerifyNoCAnswersService verifyNoCAnswersService;
 
         @MockBean
+        protected RequestNoticeOfChangeService requestNoticeOfChangeService;
+
+        @MockBean
         protected JacksonUtils jacksonUtils;
 
         @Autowired
@@ -144,8 +148,12 @@ public class NoticeOfChangeControllerTest {
 
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 
-                NoticeOfChangeController controller =
-                    new NoticeOfChangeController(service, approvalService, verifyNoCAnswersService, jacksonUtils);
+                NoticeOfChangeController controller
+                    = new NoticeOfChangeController(service,
+                                                   approvalService,
+                                                   verifyNoCAnswersService,
+                                                   requestNoticeOfChangeService,
+                                                   jacksonUtils);
 
                 // ACT
                 ChallengeQuestionsResult response = controller.getNoticeOfChangeQuestions(CASE_ID);
@@ -331,15 +339,19 @@ public class NoticeOfChangeControllerTest {
 
             given(verifyNoCAnswersService.verifyNoCAnswers(any(VerifyNoCAnswersRequest.class)))
                 .willReturn(noCRequestDetails);
-            given(service.requestNoticeOfChange(noCRequestDetails)).willReturn(requestNoticeOfChangeResponse);
+            given(requestNoticeOfChangeService.requestNoticeOfChange(noCRequestDetails))
+                .willReturn(requestNoticeOfChangeResponse);
         }
 
         @DisplayName("happy path test without mockMvc")
         @Test
         void directCallHappyPath() {
             // ARRANGE
-            NoticeOfChangeController controller =
-                new NoticeOfChangeController(service, approvalService, verifyNoCAnswersService, jacksonUtils);
+            NoticeOfChangeController controller = new NoticeOfChangeController(service,
+                                                                               approvalService,
+                                                                               verifyNoCAnswersService,
+                                                                               requestNoticeOfChangeService,
+                                                                               jacksonUtils);
 
             // ACT
             RequestNoticeOfChangeResponse response = controller.requestNoticeOfChange(requestNoticeOfChangeRequest);
@@ -442,7 +454,11 @@ public class NoticeOfChangeControllerTest {
                                                  objectMapper.convertValue(changeOrganisationRequest, JsonNode.class)));
             request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
             NoticeOfChangeController controller =
-                new NoticeOfChangeController(service, approvalService, verifyNoCAnswersService, jacksonUtils);
+                new NoticeOfChangeController(service,
+                                             approvalService,
+                                             verifyNoCAnswersService,
+                                             requestNoticeOfChangeService,
+                                             jacksonUtils);
 
             ResponseEntity response = controller.checkNoticeOfChangeApproval(request);
 

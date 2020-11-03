@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeApprovalService;
+import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
@@ -67,15 +68,18 @@ public class NoticeOfChangeController {
 
     private final NoticeOfChangeApprovalService noticeOfChangeApprovalService;
     private final VerifyNoCAnswersService verifyNoCAnswersService;
+    private final RequestNoticeOfChangeService requestNoticeOfChangeService;
     private final JacksonUtils jacksonUtils;
 
     public NoticeOfChangeController(NoticeOfChangeQuestions noticeOfChangeQuestions,
                                     NoticeOfChangeApprovalService noticeOfChangeApprovalService,
                                     VerifyNoCAnswersService verifyNoCAnswersService,
+                                    RequestNoticeOfChangeService requestNoticeOfChangeService,
                                     JacksonUtils jacksonUtils) {
         this.noticeOfChangeQuestions = noticeOfChangeQuestions;
-        this.noticeOfChangeApprovalService = noticeOfChangeApprovalService;
         this.verifyNoCAnswersService = verifyNoCAnswersService;
+        this.requestNoticeOfChangeService = requestNoticeOfChangeService;
+        this.noticeOfChangeApprovalService = noticeOfChangeApprovalService;
         this.jacksonUtils = jacksonUtils;
     }
 
@@ -253,7 +257,7 @@ public class NoticeOfChangeController {
             = new VerifyNoCAnswersRequest(requestNoticeOfChangeRequest.getCaseId(),
                                           requestNoticeOfChangeRequest.getAnswers());
         NoCRequestDetails noCRequestDetails = verifyNoCAnswersService.verifyNoCAnswers(verifyNoCAnswersRequest);
-        return noticeOfChangeQuestions.requestNoticeOfChange(noCRequestDetails);
+        return requestNoticeOfChangeService.requestNoticeOfChange(noCRequestDetails);
     }
 
     @PostMapping(path = CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH, produces = APPLICATION_JSON_VALUE)

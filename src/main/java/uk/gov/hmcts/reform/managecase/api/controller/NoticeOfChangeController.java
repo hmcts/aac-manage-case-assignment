@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
+import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 
@@ -50,11 +51,14 @@ public class NoticeOfChangeController {
 
     private final NoticeOfChangeQuestions noticeOfChangeQuestions;
     private final VerifyNoCAnswersService verifyNoCAnswersService;
+    private final RequestNoticeOfChangeService requestNoticeOfChangeService;
 
     public NoticeOfChangeController(NoticeOfChangeQuestions noticeOfChangeQuestions,
-                                    VerifyNoCAnswersService verifyNoCAnswersService) {
+                                    VerifyNoCAnswersService verifyNoCAnswersService,
+                                    RequestNoticeOfChangeService requestNoticeOfChangeService) {
         this.noticeOfChangeQuestions = noticeOfChangeQuestions;
         this.verifyNoCAnswersService = verifyNoCAnswersService;
+        this.requestNoticeOfChangeService = requestNoticeOfChangeService;
     }
 
     @GetMapping(path = GET_NOC_QUESTIONS, produces = APPLICATION_JSON_VALUE)
@@ -231,7 +235,7 @@ public class NoticeOfChangeController {
             = new VerifyNoCAnswersRequest(requestNoticeOfChangeRequest.getCaseId(),
                                           requestNoticeOfChangeRequest.getAnswers());
         NoCRequestDetails noCRequestDetails = verifyNoCAnswersService.verifyNoCAnswers(verifyNoCAnswersRequest);
-        return noticeOfChangeQuestions.requestNoticeOfChange(noCRequestDetails);
+        return requestNoticeOfChangeService.requestNoticeOfChange(noCRequestDetails);
     }
 
 }

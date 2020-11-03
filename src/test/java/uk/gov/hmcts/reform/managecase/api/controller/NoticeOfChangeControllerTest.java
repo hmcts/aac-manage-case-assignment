@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
+import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 
 import java.util.Arrays;
@@ -90,6 +91,9 @@ public class NoticeOfChangeControllerTest {
         @MockBean
         protected VerifyNoCAnswersService verifyNoCAnswersService;
 
+        @MockBean
+        protected RequestNoticeOfChangeService requestNoticeOfChangeService;
+
         @Autowired
         protected ObjectMapper objectMapper;
     }
@@ -126,7 +130,8 @@ public class NoticeOfChangeControllerTest {
 
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 
-                NoticeOfChangeController controller = new NoticeOfChangeController(service, verifyNoCAnswersService);
+                NoticeOfChangeController controller
+                    = new NoticeOfChangeController(service, verifyNoCAnswersService, requestNoticeOfChangeService);
 
                 // ACT
                 ChallengeQuestionsResult response = controller.getNoticeOfChangeQuestions(CASE_ID);
@@ -312,14 +317,17 @@ public class NoticeOfChangeControllerTest {
 
             given(verifyNoCAnswersService.verifyNoCAnswers(any(VerifyNoCAnswersRequest.class)))
                 .willReturn(noCRequestDetails);
-            given(service.requestNoticeOfChange(noCRequestDetails)).willReturn(requestNoticeOfChangeResponse);
+            given(requestNoticeOfChangeService.requestNoticeOfChange(noCRequestDetails))
+                .willReturn(requestNoticeOfChangeResponse);
         }
 
         @DisplayName("happy path test without mockMvc")
         @Test
         void directCallHappyPath() {
             // ARRANGE
-            NoticeOfChangeController controller = new NoticeOfChangeController(service, verifyNoCAnswersService);
+            NoticeOfChangeController controller = new NoticeOfChangeController(service,
+                                                                               verifyNoCAnswersService,
+                                                                               requestNoticeOfChangeService);
 
             // ACT
             RequestNoticeOfChangeResponse response = controller.requestNoticeOfChange(requestNoticeOfChangeRequest);

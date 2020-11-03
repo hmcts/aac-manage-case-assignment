@@ -8,14 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
-import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -31,32 +27,23 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnsw
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
-import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
-import uk.gov.hmcts.reform.managecase.domain.Organisation;
-import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
-import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
-import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
@@ -98,11 +85,7 @@ class NoticeOfChangeQuestionsTest {
     @Mock
     private DefinitionStoreRepository definitionStoreRepository;
     @Mock
-    private PrdRepository prdRepository;
-    @Mock
     private SecurityUtils securityUtils;
-    @Mock
-    private JacksonUtils jacksonUtils;
 
     @BeforeEach
     void setUp() {
@@ -464,276 +447,4 @@ class NoticeOfChangeQuestionsTest {
                 .hasMessageContaining("Insufficient privileges for notice of change request");
         }
     }
-
-    @Nested
-    @DisplayName("Request Notice of Change")
-    class RequestNoticeOfChange {
-
-        private static final String PENDING = "PENDING";
-        private static final String APPROVED = "APPROVED";
-        private static final String INCUMBENT_ORGANISATION_ID = "INCUMBENT_ORG_ID_1";
-        private static final String INCUMBENT_ORGANISATION_NAME = "INCUMBENT_ORG_NAME_1";
-        private static final String CASE_ASSIGNED_ROLE = "CASE_ASSIGNED_ROLE";
-        private static final String NOC_REQUEST_EVENT = "NocRequest";
-        private static final String INVOKERS_ORGANISATION_IDENTIFIER = "PRD_ORG_IDENTIFIER";
-        private static final String ORG_POLICY_REFERENCE = "orgPolicyReference";
-        private static final String CHANGE_ORGANISATION_REQUEST_KEY = "ChangeOrganisationRequest";
-        private static final String ORGANISATION_POLICY_KEY = "OrganisationPolicy";
-        private static final String JURISDICTION_ONE = "JURISDICTION_1";
-        private static final String SOLICITOR_ROLE = "caseworker-" + JURISDICTION_ONE + "-solicitor";
-        private static final String NON_SOLICITOR_ROLE = "caseworker-" + JURISDICTION_ONE + "-citizen";
-        private static final String USER_INFO_UID = "userInfoUid";
-
-        private NoCRequestDetails noCRequestDetails;
-        private Organisation incumbentOrganisation;
-        private CaseResource caseResource;
-
-        private final ObjectMapper objectMapper = new ObjectMapper();
-
-        @BeforeEach
-        void setUp() {
-
-            FindUsersByOrganisationResponse findUsersByOrganisationResponse = new FindUsersByOrganisationResponse(
-                Collections.emptyList(), INVOKERS_ORGANISATION_IDENTIFIER);
-            given(prdRepository.findUsersByOrganisation()).willReturn(findUsersByOrganisationResponse);
-
-            CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
-            caseViewActionableEvent.setId(NOC_REQUEST_EVENT);
-            CaseViewActionableEvent[] caseViewActionableEvents = {caseViewActionableEvent};
-            CaseViewResource caseViewResource = new CaseViewResource();
-            caseViewResource.setReference(CASE_ID);
-            caseViewResource.setCaseViewActionableEvents(caseViewActionableEvents);
-
-            incumbentOrganisation = new Organisation(INCUMBENT_ORGANISATION_ID, INCUMBENT_ORGANISATION_NAME);
-            OrganisationPolicy organisationPolicy = new OrganisationPolicy(incumbentOrganisation,
-                                                                           ORG_POLICY_REFERENCE, CASE_ASSIGNED_ROLE);
-
-            noCRequestDetails = NoCRequestDetails.builder()
-                .caseViewResource(caseViewResource)
-                .organisationPolicy(organisationPolicy)
-                .build();
-
-            caseResource = CaseResource.builder().reference(CASE_ID).data(new HashMap<>()).build();
-
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseResource);
-        }
-
-        @Test
-        @DisplayName("Generate a Notice Of Change Request with an Incumbent Organisation")
-        void testGenerateNocRequestWithIncumbentOrganisation() {
-            service.requestNoticeOfChange(noCRequestDetails);
-
-            assertSubmitEventForCaseParameters(incumbentOrganisation);
-        }
-
-        @Test
-        @DisplayName("Generate a Notice Of Change Request with no Incumbent Organisation")
-        void testGenerateNocRequestWithOutIncumbentOrganisation() {
-            noCRequestDetails.setOrganisationPolicy(new OrganisationPolicy(null,
-                                                                           ORG_POLICY_REFERENCE,
-                                                                           CASE_ASSIGNED_ROLE));
-            final Organisation nullIncumbentOrganisation = null;
-            service.requestNoticeOfChange(noCRequestDetails);
-
-            assertSubmitEventForCaseParameters(nullIncumbentOrganisation);
-        }
-
-        private void assertSubmitEventForCaseParameters(Organisation organisationToRemove) {
-            ArgumentCaptor<String> caseIdCaptor = ArgumentCaptor.forClass(String.class);
-            ArgumentCaptor<String> eventIdCaptor = ArgumentCaptor.forClass(String.class);
-            ArgumentCaptor<ChangeOrganisationRequest> corArgumentCaptor
-                = ArgumentCaptor.forClass(ChangeOrganisationRequest.class);
-
-            verify(dataStoreRepository).submitEventForCase(caseIdCaptor.capture(),
-                                                           eventIdCaptor.capture(),
-                                                           corArgumentCaptor.capture());
-
-            assertThat(caseIdCaptor.getValue()).isEqualTo(CASE_ID);
-            assertThat(eventIdCaptor.getValue()).isEqualTo(NOC_REQUEST_EVENT);
-
-            ChangeOrganisationRequest capturedCor = corArgumentCaptor.getValue();
-            assertAll(
-                () -> assertThat(capturedCor.getCaseRoleId()).isEqualTo(CASE_ASSIGNED_ROLE),
-                () -> assertThat(capturedCor.getOrganisationToAdd().getOrganisationID()).isEqualTo(
-                    INVOKERS_ORGANISATION_IDENTIFIER),
-                () -> assertThat(capturedCor.getOrganisationToRemove()).isEqualTo(organisationToRemove),
-                () -> assertThat(capturedCor.getRequestTimestamp()).isNotNull()
-            );
-        }
-
-        @Test
-        @DisplayName("NoC auto approval with no Change Organisation Request returns PENDING state")
-        void testAutoApprovalWithCorNotPresent() {
-            RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
-                = service.requestNoticeOfChange(noCRequestDetails);
-
-
-            assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(PENDING);
-        }
-
-        @Test
-        @DisplayName("NoC auto approval with Change Organisation Request and Case Role present returns PENDING state")
-        void testAutoApprovalCorPresentCaseRolePresent() {
-            ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
-                                                                    .caseRoleId(CASE_ASSIGNED_ROLE)
-                                                                    .build();
-            updateCaseResourceData(caseResource, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
-
-            given(jacksonUtils.convertValue(any(), any())).willReturn(changeOrganisationRequest);
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseResource);
-
-            RequestNoticeOfChangeResponse requestNoticeOfChangeResponse =
-                service.requestNoticeOfChange(noCRequestDetails);
-
-            verify(dataStoreRepository, never())
-                .assignCase(any(), any(String.class), any(String.class), any(String.class));
-            assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(PENDING);
-        }
-
-        @Test
-        @DisplayName("NoC auto approval with Change Organisation Request and no Case Role present and no assigned "
-                    + "Organisation Policies returns PENDING state")
-        void testAutoApprovalCorPresentBlankCaseRoleOrgPoliciesNotAssigned() {
-            ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder().build();
-            updateCaseResourceData(caseResource, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
-
-            List<OrganisationPolicy> organisationPolicies = updateCaseResourceWithOrganisationPolicies(caseResource);
-
-            given(jacksonUtils.convertValue(any(JsonNode.class), any()))
-                .willReturn(changeOrganisationRequest)
-                .willReturn(organisationPolicies.get(0))
-                .willReturn(organisationPolicies.get(1))
-                .willReturn(organisationPolicies.get(2));
-
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseResource);
-
-            RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
-                = service.requestNoticeOfChange(noCRequestDetails);
-
-            assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(PENDING);
-        }
-
-        @Test
-        @DisplayName("NoC auto approval with Change Organisation Request and no Case Role present and assigned "
-            + "Organisation Policies returns APPROVED state")
-        void testAutoApprovalCorPresentBlankCaseRoleOrgPoliciesAssigned() {
-            nocAutoApprovedByAdminOrSolicitor(false);
-
-            RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
-                = service.requestNoticeOfChange(noCRequestDetails);
-
-            verify(dataStoreRepository, never())
-                .assignCase(any(), any(String.class), any(String.class), any(String.class));
-            assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(APPROVED);
-        }
-
-        private void nocAutoApprovedByAdminOrSolicitor(boolean isAdminOrSolicitor) {
-            ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder().build();
-            updateCaseResourceData(caseResource, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
-
-            List<OrganisationPolicy> organisationPolicies = updateCaseResourceWithOrganisationPolicies(caseResource);
-
-            Organisation invokersOrganisation =
-                new Organisation(INVOKERS_ORGANISATION_IDENTIFIER, "InvokersOrganisationName");
-            OrganisationPolicy invokersOrganisationPolicy = new OrganisationPolicy(invokersOrganisation,
-                                                                                   ORG_POLICY_REFERENCE,
-                                                                                   CASE_ASSIGNED_ROLE);
-
-            updateCaseResourceData(caseResource, ORGANISATION_POLICY_KEY, invokersOrganisationPolicy);
-
-            setInvokerToActAsAnAdminOrSolicitor(isAdminOrSolicitor);
-
-            given(jacksonUtils.convertValue(any(JsonNode.class), any()))
-                .willReturn(changeOrganisationRequest)
-                .willReturn(organisationPolicies.get(0))
-                .willReturn(organisationPolicies.get(1))
-                .willReturn(organisationPolicies.get(2))
-                .willReturn(invokersOrganisationPolicy);
-
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseResource);
-
-        }
-
-        @Test
-        @DisplayName("Generate a Notice Of Change Request with approval and Auto assignment of case roles")
-        void testApprovalComplete() {
-
-            caseResource.setJurisdiction(JURISDICTION_ONE);
-            nocAutoApprovedByAdminOrSolicitor(true);
-
-            RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
-                = service.requestNoticeOfChange(noCRequestDetails);
-
-            @SuppressWarnings("unchecked")
-            ArgumentCaptor<List<String>> caseRolesCaptor = ArgumentCaptor.forClass(List.class);
-            ArgumentCaptor<String> caseIdCaptor = ArgumentCaptor.forClass(String.class);
-            ArgumentCaptor<String> userIdCaptor = ArgumentCaptor.forClass(String.class);
-            ArgumentCaptor<String> organisationIdCaptor = ArgumentCaptor.forClass(String.class);
-
-            verify(dataStoreRepository).assignCase(caseRolesCaptor.capture(),
-                                                   caseIdCaptor.capture(),
-                                                   userIdCaptor.capture(),
-                                                   organisationIdCaptor.capture());
-
-            assertThat(caseRolesCaptor.getValue()).isNotEmpty();
-            assertThat(caseIdCaptor.getValue()).isEqualTo(CASE_ID);
-            assertThat(userIdCaptor.getValue()).isEqualTo(USER_INFO_UID);
-            assertThat(organisationIdCaptor.getValue()).isEqualTo(INVOKERS_ORGANISATION_IDENTIFIER);
-            assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(APPROVED);
-        }
-
-        @Test
-        @DisplayName("Generate a Notice Of Change Request with approval and Auto assignment of case roles")
-        void testNotActingAsSolicitor() {
-
-            caseResource.setJurisdiction(JURISDICTION_ONE);
-            nocAutoApprovedByAdminOrSolicitor(false);
-
-            RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
-                = service.requestNoticeOfChange(noCRequestDetails);
-
-            verify(dataStoreRepository, never())
-                .assignCase(any(), any(String.class), any(String.class), any(String.class));
-            assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(APPROVED);
-        }
-
-        private void setInvokerToActAsAnAdminOrSolicitor(boolean actAsAnAdminOrSolicitor) {
-            List<String> roles = actAsAnAdminOrSolicitor ? List.of(SOLICITOR_ROLE) : List.of(NON_SOLICITOR_ROLE);
-            UserInfo userInfo = new UserInfo("sub",
-                                             USER_INFO_UID,
-                                             "name",
-                                             "givenName",
-                                             "familyName",
-                                             roles);
-            given(securityUtils.getUserInfo()).willReturn(userInfo);
-            given(securityUtils.hasSolicitorRole(any(), any())).willReturn(actAsAnAdminOrSolicitor);
-        }
-
-        @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-        private List<OrganisationPolicy> updateCaseResourceWithOrganisationPolicies(CaseResource caseResource) {
-            List<OrganisationPolicy> organisationPolicies = new ArrayList<>();
-            for (int loopCounter = 0; loopCounter < 3; loopCounter++) {
-                Organisation organisation =
-                    new Organisation("OrganisationId" + loopCounter,
-                                     "OrganisationName" + loopCounter);
-                OrganisationPolicy organisationPolicy =
-                    new OrganisationPolicy(organisation, ORG_POLICY_REFERENCE,
-                                           "CaseRole" + loopCounter);
-                organisationPolicies.add(organisationPolicy);
-                updateCaseResourceData(caseResource, "OrganisationPolicy" + loopCounter, organisationPolicy);
-            }
-
-            return organisationPolicies;
-        }
-
-        private void updateCaseResourceData(CaseResource caseResource,
-                                            String dataKey,
-                                            Object changeOrganisationRequest) {
-            Map<String, JsonNode> data = caseResource.getData();
-            data.put(dataKey, objectMapper.convertValue(changeOrganisationRequest, JsonNode.class));
-
-            caseResource.setData(data);
-        }
-    }
-
 }

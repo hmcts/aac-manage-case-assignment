@@ -198,10 +198,11 @@ class ChallengeAnswerValidatorTest {
     }
 
     private ChallengeQuestion challengeQuestion(String questionId, String answerField, FieldType answerFieldType) {
-        ChallengeQuestion challengeQuestion = new ChallengeQuestion();
-        challengeQuestion.setQuestionId(questionId);
+        ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+            .questionId(questionId)
+            .answerFieldType(answerFieldType)
+            .build();
         challengeQuestion.setAnswerField(answerField);
-        challengeQuestion.setAnswerFieldType(answerFieldType);
         return challengeQuestion;
     }
 

@@ -78,7 +78,6 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     @Override
     public CaseSearchResultViewResource findCaseBy(String caseTypeId, Optional<String> useCase, String caseId) {
         return dataStoreApi.internalSearchCases(caseTypeId,null, String.format(ES_QUERY, caseId));
-
     }
 
     @Override

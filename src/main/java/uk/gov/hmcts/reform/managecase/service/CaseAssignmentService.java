@@ -48,7 +48,8 @@ public class CaseAssignmentService {
     @Autowired
     public CaseAssignmentService(PrdRepository prdRepository,
                                  @Qualifier("defaultDataStoreRepository") DataStoreRepository dataStoreRepository,
-                                 IdamRepository idamRepository, JacksonUtils jacksonUtils,
+                                 IdamRepository idamRepository,
+                                 JacksonUtils jacksonUtils,
                                  SecurityUtils securityUtils) {
         this.dataStoreRepository = dataStoreRepository;
         this.prdRepository = prdRepository;
@@ -225,6 +226,6 @@ public class CaseAssignmentService {
 
     private List<String> getAssigneeRoles(String assigneeId) {
         String systemUserToken = idamRepository.getCaaSystemUserAccessToken();
-        return idamRepository.searchUserById(assigneeId, systemUserToken).getRoles();
+        return idamRepository.getUserByUserId(assigneeId, systemUserToken).getRoles();
     }
 }

@@ -104,7 +104,7 @@ task functional(type: Test) {
     javaexec {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-      args = ['--threads', '10',
+      args = ['--threads', '5',
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
               '--tags', 'not @Ignore',
               '--glue', 'uk.gov.hmcts.befta.player', 
@@ -178,6 +178,12 @@ dependencyManagement {
     dependencySet(group: 'com.netflix.servo', version: '0.12.4') {
       entry 'servo-core'
     }
+    dependencySet(group: 'org.codehaus.groovy', version: '3.0.3') {
+      entry 'groovy'
+      entry 'groovy-xml'
+      entry 'groovy-json'
+      entry 'groovy-nio'
+    }
   }
 }
 
@@ -217,7 +223,7 @@ ext.libraries = [
 ]
 
 dependencies {
-  compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+  implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
@@ -276,7 +282,7 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.18.0-ACA-68'
+  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.18.0-ACA-68.1'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath

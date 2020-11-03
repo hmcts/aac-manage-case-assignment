@@ -13,14 +13,15 @@ public final class ValidationError {
     public static final String CASE_TYPE_ID_EMPTY = "Case type ID can not be empty";
     public static final String EMPTY_REQUESTED_UNASSIGNMENTS_LIST = "Requested Unassignments can not be empty";
     public static final String CHALLENGE_QUESTION_ANSWERS_EMPTY = "Challenge question answers can not be empty";
-    public static final String NOC_REQUEST_ONGOING = "On going NoC request in progress";
+    public static final String NOC_REQUEST_ONGOING = "Ongoing NoC request in progress";
+    public static final String CHANGE_REQUEST = "More than one change request found on the case";
+    public static final String CASE_NOT_FOUND = "Case could not be found";
     public static final String NOC_EVENT_NOT_AVAILABLE = "No NoC events available for this case type";
-    public static final String INSUFFICIENT_PRIVILEGE = "Insufficient privileges";
-    public static final String NO_ORG_POLICY_WITH_ROLE = "No Org Policy with that role";
+    public static final String INSUFFICIENT_PRIVILEGE = "Insufficient privileges for notice of change request";
+    public static final String NO_ORG_POLICY_WITH_ROLE = "No Organisation Policy with that role for "
+        + "notice of change request";
     public static final String NOC_DECISION_EVENT_UNIDENTIFIABLE = "NoC Decision event could not be identified";
-
     public static final String EVENT_TOKEN_NOT_PRESENT = "Event token not present";
-
     public static final String CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID =
         "ChangeOrganisationRequest field could not be found or appears invalid";
 

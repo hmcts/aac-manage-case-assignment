@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQues
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
-import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 
 import javax.validation.ValidationException;
 import java.util.Map;
@@ -37,7 +36,7 @@ class VerifyNoCAnswersServiceTest {
     private VerifyNoCAnswersService verifyNoCAnswersService;
 
     @Mock
-    private NoticeOfChangeService noticeOfChangeService;
+    private NoticeOfChangeQuestions noticeOfChangeQuestions;
 
     @Mock
     private ChallengeAnswerValidator challengeAnswerValidator;
@@ -64,7 +63,7 @@ class VerifyNoCAnswersServiceTest {
             .caseViewResource(caseViewResource)
             .build();
 
-        when(noticeOfChangeService.challengeQuestions("1")).thenReturn(details);
+        when(noticeOfChangeQuestions.challengeQuestions("1")).thenReturn(details);
     }
 
     @Test

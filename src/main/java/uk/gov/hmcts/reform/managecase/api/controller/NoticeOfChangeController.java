@@ -29,8 +29,8 @@ import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeApprovalService;
-import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.Valid;
@@ -61,19 +61,19 @@ public class NoticeOfChangeController {
     public static final String REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE =
         "The Notice of Change request has been successfully submitted.";
 
+    private final NoticeOfChangeQuestions noticeOfChangeQuestions;
     private static final String APPROVED = "APPROVED";
     private static final String APPROVED_NUMERIC = "1";
 
-    private final NoticeOfChangeService noticeOfChangeService;
     private final NoticeOfChangeApprovalService noticeOfChangeApprovalService;
     private final VerifyNoCAnswersService verifyNoCAnswersService;
     private final JacksonUtils jacksonUtils;
 
-    public NoticeOfChangeController(NoticeOfChangeService noticeOfChangeService,
+    public NoticeOfChangeController(NoticeOfChangeQuestions noticeOfChangeQuestions,
                                     NoticeOfChangeApprovalService noticeOfChangeApprovalService,
                                     VerifyNoCAnswersService verifyNoCAnswersService,
                                     JacksonUtils jacksonUtils) {
-        this.noticeOfChangeService = noticeOfChangeService;
+        this.noticeOfChangeQuestions = noticeOfChangeQuestions;
         this.noticeOfChangeApprovalService = noticeOfChangeApprovalService;
         this.verifyNoCAnswersService = verifyNoCAnswersService;
         this.jacksonUtils = jacksonUtils;
@@ -113,12 +113,12 @@ public class NoticeOfChangeController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:\n"
-                + "1. " + "case_id must be not be empty" + ", \n"
-                + "2. " + "on going NoC request in progress, \n"
+                + "1. " + "case_id must not be empty" + ", \n"
+                + "2. " + "ongoing NoC request in progress, \n"
                 + "3. " + "no NoC events available for this case id, \n",
             examples = @Example({
                 @ExampleProperty(
-                    value = "{\"message\": \"case_id must be not be empty\","
+                    value = "{\"message\": \"case_id must not be empty\","
                         + " \"status\": \"BAD_REQUEST\" }",
                     mediaType = APPLICATION_JSON_VALUE)
             })
@@ -144,9 +144,9 @@ public class NoticeOfChangeController {
     })
     public ChallengeQuestionsResult getNoticeOfChangeQuestions(@RequestParam("case_id")
                                                                @Valid @NotEmpty(message = "case_id must "
-        + "be not be empty") String caseId) {
+        + "not be empty") String caseId) {
         validateCaseIds(caseId);
-        return noticeOfChangeService.getChallengeQuestions(caseId);
+        return noticeOfChangeQuestions.getChallengeQuestions(caseId);
     }
 
     @PostMapping(path = VERIFY_NOC_ANSWERS, produces = APPLICATION_JSON_VALUE)
@@ -253,7 +253,7 @@ public class NoticeOfChangeController {
             = new VerifyNoCAnswersRequest(requestNoticeOfChangeRequest.getCaseId(),
                                           requestNoticeOfChangeRequest.getAnswers());
         NoCRequestDetails noCRequestDetails = verifyNoCAnswersService.verifyNoCAnswers(verifyNoCAnswersRequest);
-        return noticeOfChangeService.requestNoticeOfChange(noCRequestDetails);
+        return noticeOfChangeQuestions.requestNoticeOfChange(noCRequestDetails);
     }
 
     @PostMapping(path = CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH, produces = APPLICATION_JSON_VALUE)

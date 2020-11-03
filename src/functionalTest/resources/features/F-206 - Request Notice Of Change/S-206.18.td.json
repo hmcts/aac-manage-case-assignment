@@ -43,7 +43,7 @@
     "_extends_": "ACA_400_Response",
     "body": {
       "status" : "BAD_REQUEST",
-      "message": "On going NoC request in progress",
+      "message": "Ongoing NoC request in progress",
       "errors": []
     }
   }

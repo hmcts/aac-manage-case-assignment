@@ -33,8 +33,8 @@ import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeApprovalService;
-import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
@@ -97,7 +97,7 @@ public class NoticeOfChangeControllerTest {
         protected MockMvc mockMvc;
 
         @MockBean
-        protected NoticeOfChangeService service;
+        protected NoticeOfChangeQuestions service;
 
         @MockBean
         protected NoticeOfChangeApprovalService approvalService;
@@ -117,11 +117,6 @@ public class NoticeOfChangeControllerTest {
     @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
     class GetNoticeOfChangeQuestions extends BaseMvcTest {
 
-        @BeforeEach
-        void setUp() {
-
-        }
-
         @Nested
         @DisplayName("GET /noc/noc-questions")
         class GetCaseAssignments extends BaseMvcTest {
@@ -137,14 +132,13 @@ public class NoticeOfChangeControllerTest {
                     .id("Number")
                     .type("Number")
                     .build();
-                ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
-                                                                            "QuestionText1",
-                                                                            fieldType,
-                                                                            null,
-                                                                            "NoC",
-                                                                            ANSWER_FIELD,
-                                                                            "QuestionId1",
-                                                                            null);
+                ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+                    .caseTypeId(CASE_TYPE_ID)
+                    .challengeQuestionId("QuestionId1")
+                    .questionText("QuestionText1")
+                    .answerFieldType(fieldType)
+                    .answerField(ANSWER_FIELD)
+                    .questionId("NoC").build();
                 ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
                     Arrays.asList(challengeQuestion));
 
@@ -169,13 +163,13 @@ public class NoticeOfChangeControllerTest {
                     .id("Number")
                     .type("Number")
                     .build();
-                ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
-                                                                            "QuestionText1",
-                                                                            fieldType,
-                                                                            null,
-                                                                            "NoC",
-                                                                            ANSWER_FIELD,
-                                                                            "QuestionId1", null);
+                ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+                    .caseTypeId(CASE_TYPE_ID)
+                    .challengeQuestionId("QuestionId1")
+                    .questionText("QuestionText1")
+                    .answerFieldType(fieldType)
+                    .answerField(ANSWER_FIELD)
+                    .questionId("NoC").build();
                 ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
                     Arrays.asList(challengeQuestion));
 
@@ -191,7 +185,6 @@ public class NoticeOfChangeControllerTest {
             @DisplayName("should fail with 400 bad request when caseIds query param is not passed")
             @Test
             void shouldFailWithBadRequestWhenCaseIdsInGetAssignmentsIsNull() throws Exception {
-
                 this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS))
                     .andExpect(status().isBadRequest());
             }
@@ -205,7 +198,7 @@ public class NoticeOfChangeControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath(
                         "$.message",
-                        containsString("getNoticeOfChangeQuestions.caseId: case_id must be not be empty")
+                        containsString("getNoticeOfChangeQuestions.caseId: case_id must not be empty")
                     ));
             }
 

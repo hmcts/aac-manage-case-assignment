@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -384,7 +384,7 @@ class NoticeOfChangeQuestionsTest {
                 .willReturn(challengeQuestionsResult);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
-                .isInstanceOf(CaseCouldNotBeFetchedException.class)
+                .isInstanceOf(CaseCouldNotBeFoundException.class)
                 .hasMessageContaining("Case could not be found");
         }
 

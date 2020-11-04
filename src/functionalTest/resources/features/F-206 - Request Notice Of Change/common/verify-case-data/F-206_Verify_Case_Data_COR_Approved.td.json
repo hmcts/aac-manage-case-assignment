@@ -22,8 +22,7 @@
       "data": {
         "respondentOrganisationPolicy" : {
           "Organisation" : {
-            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}",
-            "OrganisationName" : "BEFTA Organisation"
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
           }
         },
 
@@ -34,12 +33,10 @@
           "ApprovalStatus": null,
           "RequestTimestamp": null,
           "OrganisationToAdd": {
-            "OrganisationID": null,
-            "OrganisationName": null
+            "OrganisationID": null
           },
           "OrganisationToRemove": {
-            "OrganisationID": null,
-            "OrganisationName": null
+            "OrganisationID": null
           },
           "ApprovalRejectionTimestamp": null
         }
@@ -55,15 +52,13 @@
             "RequestTimestamp" : "PUBLIC",
             "OrganisationToAdd" : {
               "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+                "OrganisationID" : "PUBLIC"
               },
               "classification" : "PUBLIC"
             },
             "OrganisationToRemove" : {
               "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+                "OrganisationID" : "PUBLIC"
               },
               "classification" : "PUBLIC"
             },

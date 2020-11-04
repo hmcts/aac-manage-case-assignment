@@ -28,16 +28,14 @@
           "OrgPolicyReference": "ApplicantPolicy",
           "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
           "Organisation": {
-            "OrganisationID": "",
-            "OrganisationName": ""
+            "OrganisationID": ""
           }
         },
         "respondentOrganisationPolicy": {
           "OrgPolicyReference": "RespondentPolicy",
           "OrgPolicyCaseAssignedRole": "[RespondentSolicitor]",
           "Organisation": {
-            "OrganisationID": "",
-            "OrganisationName": ""
+            "OrganisationID": ""
           }
         }
       }
@@ -51,16 +49,14 @@
           "OrgPolicyReference": "ApplicantPolicy",
           "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
           "Organisation": {
-            "OrganisationID": "",
-            "OrganisationName": ""
+            "OrganisationID": ""
           }
         },
         "respondentOrganisationPolicy": {
           "OrgPolicyReference": "RespondentPolicy",
           "OrgPolicyCaseAssignedRole": "[RespondentSolicitor]",
           "Organisation": {
-            "OrganisationID": "",
-            "OrganisationName": ""
+            "OrganisationID": ""
           }
         }
       },

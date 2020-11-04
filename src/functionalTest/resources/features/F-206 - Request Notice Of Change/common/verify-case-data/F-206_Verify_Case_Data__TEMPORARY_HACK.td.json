@@ -40,7 +40,19 @@
         },
         "respondentOrganisationPolicy" : {
           "OrgPolicyReference" : "RespondentPolicy",
-          "OrgPolicyCaseAssignedRole" : "[RespondentSolicitor]"
+          "OrgPolicyCaseAssignedRole" : "[RespondentSolicitor]",
+          "Organisation" : {
+            "OrganisationName" : "BEFTA Organisation"
+          }
+        },
+
+        "changeOrganisationRequestField" : {
+          "OrganisationToAdd": {
+            "OrganisationName": null
+          },
+          "OrganisationToRemove": {
+            "OrganisationName": null
+          }
         }
       },
 
@@ -72,6 +84,21 @@
             "OrgPolicyCaseAssignedRole" : "PUBLIC"
           },
           "classification" : "PUBLIC"
+        },
+
+        "changeOrganisationRequestField" : {
+          "value" : {
+            "OrganisationToAdd" : {
+              "value" : {
+                "OrganisationName" : "PUBLIC"
+              }
+            },
+            "OrganisationToRemove" : {
+              "value" : {
+                "OrganisationName" : "PUBLIC"
+              }
+            }
+          }
         }
       }
 

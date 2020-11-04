@@ -306,7 +306,7 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldSuccessfullyVerifyNoCRequestWithAutoApproval() throws Exception {
 
-            Organisation org = new Organisation("InvokingUsersOrg", "");
+            Organisation org = Organisation.builder().organisationID("InvokingUsersOrg").build();
             OrganisationPolicy orgPolicy = new OrganisationPolicy(org, null, "Applicant");
 
             caseFields.put("OrganisationPolicy", mapper.convertValue(orgPolicy,  JsonNode.class));

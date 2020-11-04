@@ -24,20 +24,17 @@
 
         "applicantOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "[[ANY_NULLABLE]]",
-            "OrganisationName": "[[ANY_NULLABLE]]"
+            "OrganisationID": "[[ANY_NULLABLE]]"
           }
         },
         "respondentOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "[[ANY_NULLABLE]]",
-            "OrganisationName": "[[ANY_NULLABLE]]"
+            "OrganisationID": "[[ANY_NULLABLE]]"
           }
         },
         "otherPartyOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "[[ANY_NULLABLE]]",
-            "OrganisationName": "[[ANY_NULLABLE]]"
+            "OrganisationID": "[[ANY_NULLABLE]]"
           }
         }
       },

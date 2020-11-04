@@ -11,7 +11,7 @@ class ChallengeQuestionTest {
 
     @Test
     void shouldSetAnswersList() {
-        ChallengeQuestion challengeQuestion = new ChallengeQuestion();
+        ChallengeQuestion challengeQuestion = ChallengeQuestion.builder().build();
         challengeQuestion.setAnswerField("${OrganisationField.OrganisationName}|${OrganisationField.OrganisationID}:"
             + "[Claimant],${Litigant2Field}:[Defendant]");
 

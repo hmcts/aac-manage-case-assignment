@@ -17,5 +17,4 @@ public class ChallengeQuestionsResult {
 
     @JsonProperty("questions")
     private List<ChallengeQuestion> questions;
-
 }

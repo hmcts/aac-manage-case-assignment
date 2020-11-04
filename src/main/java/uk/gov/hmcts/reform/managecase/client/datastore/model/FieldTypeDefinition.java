@@ -33,6 +33,7 @@ public class FieldTypeDefinition implements Serializable {
     public static final String PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST = "ChangeOrganisationRequest";
     public static final String DATETIME = "DateTime";
     public static final String DATE = "Date";
+    public static final String TEXT = "Text";
 
     private String id;
     private String type;

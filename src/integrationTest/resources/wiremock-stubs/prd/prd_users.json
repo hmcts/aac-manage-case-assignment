@@ -1,0 +1,24 @@
+{
+    "request": {
+        "method": "GET",
+        "url": "/refdata/external/v1/organisations/users?status=Active&returnRoles=false"
+    },
+    "response": {
+        "status": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "jsonBody": {
+            "users": [
+                {
+                    "userIdentifier": "cfab4771-0c8a-4a96-a1e9-3ae3f171fbd8",
+                    "firstName": "Becky",
+                    "lastName": "Solicington",
+                    "email": "befta.master.solicitor.becky@gmail.com",
+                    "idamStatus": "ACTIVE"
+                }
+            ],
+            "organisationIdentifier": "InvokingUsersOrg"
+        }
+    }
+}

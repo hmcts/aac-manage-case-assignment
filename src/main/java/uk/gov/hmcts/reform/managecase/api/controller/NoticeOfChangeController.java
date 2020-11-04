@@ -9,12 +9,18 @@ import io.swagger.annotations.ExampleProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
+import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
+import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
+import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 
 import javax.validation.Valid;
@@ -30,11 +36,17 @@ public class NoticeOfChangeController {
 
     @SuppressWarnings({"squid:S1075"})
     public static final String GET_NOC_QUESTIONS = "/noc-questions";
+    public static final String VERIFY_NOC_ANSWERS = "/verify-noc-answers";
+
+    public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
 
     private final NoticeOfChangeQuestions noticeOfChangeQuestions;
+    private final VerifyNoCAnswersService verifyNoCAnswersService;
 
-    public NoticeOfChangeController(NoticeOfChangeQuestions noticeOfChangeQuestions) {
+    public NoticeOfChangeController(NoticeOfChangeQuestions noticeOfChangeQuestions,
+                                    VerifyNoCAnswersService verifyNoCAnswersService) {
         this.noticeOfChangeQuestions = noticeOfChangeQuestions;
+        this.verifyNoCAnswersService = verifyNoCAnswersService;
     }
 
     @GetMapping(path = GET_NOC_QUESTIONS, produces = APPLICATION_JSON_VALUE)
@@ -105,6 +117,64 @@ public class NoticeOfChangeController {
         + "not be empty") String caseId) {
         validateCaseIds(caseId);
         return noticeOfChangeQuestions.getChallengeQuestions(caseId);
+    }
+
+    @PostMapping(path = VERIFY_NOC_ANSWERS, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(
+        value = "Verify Notice of Change answers",
+        notes = "Use to validate the answers provided by a user wishing to raise a "
+            + "Notice of Change Request to gain access to a case"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "Notice of Change answers verified successfully.",
+            response = VerifyNoCAnswersResponse.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "    \"organisation\": {\n"
+                        + "        \"OrganisationID\": \"QUK822NA\",\n"
+                        + "        \"OrganisationName\": \"Some Org\"\n"
+                        + "    },\n"
+                        + "    \"status_message\": \"Notice of Change answers verified successfully\"\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:\n"
+                + "- Any of the `400` errors returned by the `Get Notice of Change questions` operation\n"
+                + "- The number of submitted answers does not match the number of questions\n"
+                + "- No answer has been provided for an expected question ID\n"
+                + "- The submitted answers do not match any litigant\n"
+                + "- The submitted answers do not uniquely identify a litigant\n"
+                + "- No organisation policy exists on the case for the identified case role\n"
+                + "- The submitted answers identify a litigant that the requestor is already representing\n",
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "    \"status\": \"BAD_REQUEST\",\n"
+                        + "    \"message\": \"The answers did not match those for any litigant\",\n"
+                        + "    \"errors\": []\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
+        )
+    })
+    public VerifyNoCAnswersResponse verifyNoticeOfChangeAnswers(
+        @Valid @RequestBody VerifyNoCAnswersRequest verifyNoCAnswersRequest) {
+        NoCRequestDetails result = verifyNoCAnswersService.verifyNoCAnswers(verifyNoCAnswersRequest);
+        return result.toVerifyNoCAnswersResponse(VERIFY_NOC_ANSWERS_MESSAGE);
     }
 
     private void validateCaseIds(String caseId) {

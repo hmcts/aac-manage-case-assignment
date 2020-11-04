@@ -11,12 +11,14 @@ import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_ID;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_NAME;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_POLICY_CASE_ASSIGNED_ROLE;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_POLICY_REFERENCE;
+import static uk.gov.hmcts.reform.managecase.client.datastore.model.CaseFieldPathUtils.getNestedCaseFieldByPath;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,6 +38,11 @@ public class SearchResultViewItem implements CommonViewItem {
             .collect(Collectors.toList());
     }
 
+    public String getFieldValue(String fieldId) {
+        JsonNode fieldNode = getNestedCaseFieldByPath(fields, fieldId);
+        return fieldNode == null || fieldNode.isNull() ? null : fieldNode.asText();
+    }
+
     public List<OrganisationPolicy> findPolicies() {
         List<JsonNode> policyNodes = findOrganisationPolicyNodes();
         return policyNodes.stream()
@@ -49,5 +56,11 @@ public class SearchResultViewItem implements CommonViewItem {
                     .orgPolicyCaseAssignedRole(node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).textValue())
                     .orgPolicyReference(node.get(ORG_POLICY_REFERENCE).textValue()).build();
             }).collect(Collectors.toList());
+    }
+
+    public Optional<OrganisationPolicy> findOrganisationPolicyForRole(String caseRoleId) {
+        return findPolicies().stream()
+            .filter(policy -> policy.getOrgPolicyCaseAssignedRole().equals(caseRoleId))
+            .findFirst();
     }
 }

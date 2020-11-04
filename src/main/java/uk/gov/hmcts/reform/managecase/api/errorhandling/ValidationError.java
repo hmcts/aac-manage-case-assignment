@@ -12,6 +12,7 @@ public final class ValidationError {
     public static final String CASE_ROLE_FORMAT_INVALID = "Case role name format is invalid";
     public static final String CASE_TYPE_ID_EMPTY = "Case type ID can not be empty";
     public static final String EMPTY_REQUESTED_UNASSIGNMENTS_LIST = "Requested Unassignments can not be empty";
+    public static final String CHALLENGE_QUESTION_ANSWERS_EMPTY = "Challenge question answers can not be empty";
     public static final String NOC_REQUEST_ONGOING = "Ongoing NoC request in progress";
     public static final String CHANGE_REQUEST = "More than one change request found on the case";
     public static final String CASE_NOT_FOUND = "Case could not be found";

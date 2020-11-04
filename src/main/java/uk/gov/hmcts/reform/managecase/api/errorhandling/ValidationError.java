@@ -18,8 +18,8 @@ public final class ValidationError {
     public static final String CASE_NOT_FOUND = "Case could not be found";
     public static final String NOC_EVENT_NOT_AVAILABLE = "No NoC events available for this case type";
     public static final String INSUFFICIENT_PRIVILEGE = "Insufficient privileges for notice of change request";
-    public static final String NO_ORG_POLICY_WITH_ROLE = "No Organisation Policy with that role for "
-        + "notice of change request";
+    public static final String NO_ORG_POLICY_WITH_ROLE = "No Organisation Policy for one or more of the roles "
+        + "available for the notice of change request";
 
     public static final String ASSIGNEE_ROLE_ERROR = "Intended assignee has to be a solicitor"
         + " enabled in the jurisdiction of the case.";

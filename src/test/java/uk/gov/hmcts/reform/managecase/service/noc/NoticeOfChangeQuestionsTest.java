@@ -416,7 +416,8 @@ class NoticeOfChangeQuestionsTest {
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("No Organisation Policy with that role for notice of change request");
+                .hasMessageContaining("No Organisation Policy for one or more of the roles available for the "
+                                          + "notice of change request");
         }
 
         @Test

@@ -14,7 +14,18 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.HeaderGroupMetadata;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeaderGroup;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,8 +37,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.ES_QUERY;
 
+@SuppressWarnings({"PMD.ExcessiveImports"})
 class DataStoreRepositoryTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
@@ -36,12 +49,14 @@ class DataStoreRepositoryTest {
     private static final String CASE_ID = "12345678";
     private static final String CASE_ID2 = "87654321";
     private static final String ORG_ID = "organisation1";
+    private static final String JURISDICTION = "Jurisdiction";
 
     @Mock
     private DataStoreApiClient dataStoreApi;
 
     @InjectMocks
     private DefaultDataStoreRepository repository;
+
 
     @BeforeEach
     void setUp() {
@@ -159,4 +174,56 @@ class DataStoreRepositoryTest {
                 new CaseUserRoleWithOrganisation(CASE_ID2, ASSIGNEE_ID, ROLE, ORG_ID)
             ));
     }
+
+
+    @Test
+    @DisplayName("Find case by caseTypeId and caseId")
+    void shouldFindCaseByExternalES() {
+        // ARRANGE
+        SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
+        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+        fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
+        searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
+        SearchResultViewHeaderGroup searchResultViewHeaderGroup = new SearchResultViewHeaderGroup(
+            new HeaderGroupMetadata(JURISDICTION, CASE_TYPE_ID),
+            Arrays.asList(searchResultViewHeader), Arrays.asList("111", "222")
+        );
+        SearchResultViewItem searchResultViewItem = new SearchResultViewItem();
+        CaseSearchResultViewResource caseSearchResultViewResource = new CaseSearchResultViewResource();
+        caseSearchResultViewResource.setCases(Arrays.asList(searchResultViewItem));
+        caseSearchResultViewResource.setHeaders(Arrays.asList(searchResultViewHeaderGroup));
+        given(dataStoreApi.internalSearchCases(anyString(), any(), anyString()))
+            .willReturn(caseSearchResultViewResource);
+
+        // ACT
+        CaseSearchResultViewResource result = repository.findCaseBy(CASE_TYPE_ID, null, CASE_ID);
+
+        // ASSERT
+        assertThat(result).isEqualTo(caseSearchResultViewResource);
+    }
+
+    @Test
+    @DisplayName("Find case by case and caseId")
+    void shouldFindCaseByCaseId() {
+        // ARRANGE
+
+        CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
+        CaseViewResource caseViewResource = new CaseViewResource();
+        caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[] {caseViewActionableEvent});
+        CaseViewType caseViewType = new CaseViewType();
+        caseViewType.setName(CASE_TYPE_ID);
+        caseViewType.setId(CASE_TYPE_ID);
+        CaseViewJurisdiction caseViewJurisdiction = new CaseViewJurisdiction();
+        caseViewJurisdiction.setId(JURISDICTION);
+        caseViewType.setJurisdiction(caseViewJurisdiction);
+        caseViewResource.setCaseType(caseViewType);
+        given(dataStoreApi.getCaseDetailsByCaseId(anyString())).willReturn(caseViewResource);
+
+        // ACT
+        CaseViewResource result = repository.findCaseByCaseId(CASE_ID);
+
+        // ASSERT
+        assertThat(result).isEqualTo(caseViewResource);
+    }
+
 }

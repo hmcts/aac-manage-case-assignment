@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 public class CaseDetails {
 
     public static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
+    public static final String ORG_POLICY_REFERENCE = "OrgPolicyReference";
+    public static final String ORG_ID = "OrganisationID";
+    public static final String ORG_NAME = "OrganisationName";
 
     private String reference;
     private String jurisdiction;
@@ -33,4 +36,5 @@ public class CaseDetails {
             .flatMap(List::stream)
             .collect(Collectors.toList());
     }
+
 }

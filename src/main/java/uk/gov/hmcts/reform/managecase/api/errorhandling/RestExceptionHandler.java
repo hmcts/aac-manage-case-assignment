@@ -21,10 +21,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         String[] errors = ex.getBindingResult().getFieldErrors().stream()
-                .map(e -> e.getDefaultMessage())
-                .toArray(String[]::new);
+            .map(e -> e.getDefaultMessage())
+            .toArray(String[]::new);
         log.debug("MethodArgumentNotValidException:{}", ex.getLocalizedMessage());
         return toResponseEntity(status, null, errors);
     }
@@ -45,6 +45,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleCaseCouldNotBeFetchedException(CaseCouldNotBeFetchedException ex) {
         log.error("Data Store errors: {}", ex.getMessage(), ex);
         return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
+    }
+
+    @ExceptionHandler(CaseIdLuhnException.class)
+    public ResponseEntity<Object> handleCaseIdLuhnException(CaseIdLuhnException ex) {
+        log.error("Data Store errors: {}", ex.getMessage(), ex);
+        return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(FeignException.class)

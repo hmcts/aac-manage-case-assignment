@@ -1,0 +1,11 @@
+{
+  "_guid_": "205.14_get_org_policy_update_event_trigger",
+  "_extends_": "204_get_update_org_policies_event_trigger",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][205.14_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}"
+    }
+  }
+}

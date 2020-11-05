@@ -1,0 +1,44 @@
+{
+  "_guid_": "S-205.7",
+  "_extends_": "S-205_Test_Data_Base",
+  "specs" : [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Dil - with a solicitor role",
+    "Dil - with a solicitor role for the jurisdiction of C1 below",
+    "the configuration of the NoC request event has no auto-approval",
+    "Mutlu - with a solicitor role for the same jurisdiction within a different organisation from Richard",
+    "is made by Dil to return the questions that need answering in order to become Mario's representative on C1",
+    "contains a valid case ID",
+    "No user has approved or rejected the NoC request from Mutlu",
+    "is made by Dil to validate the answers in order to become Mario's representative on C1",
+    "contains a valid case ID",
+    "contains a structurally valid set of answers",
+    "contains a valid IDAM token for Dil",
+    "contains a valid IDAM token for Dil"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "_extends_": "Applicant_correct_answers_snippet"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 400,
+    "responseMessage": "Bad Request",
+    "body" : {
+      "status" : "BAD_REQUEST",
+      "message" : "Ongoing NoC request in progress",
+      "errors" : [ ]
+    }
+
+  }
+
+
+}

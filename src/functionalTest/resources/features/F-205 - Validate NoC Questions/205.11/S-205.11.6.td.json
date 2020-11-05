@@ -1,0 +1,36 @@
+{
+  "_guid_": "S-205.11.6",
+  "_extends_": "S-205.11",
+  "specs": [
+    "has a null answer where a non-null answer is expected"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "answers": [
+        {
+          "question_id": "NoC_Challenge_Name",
+          "value": "Noronha"
+        },
+        {
+          "question_id": "NoC_Challenge_Name2",
+          "value": null
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode" : 400,
+    "responseMessage" : "Bad Request",
+    "body" : {
+      "status" : "BAD_REQUEST",
+      "message" : "The answers did not match those for any litigant",
+      "errors" : [ ]
+    }
+
+  }
+
+
+}

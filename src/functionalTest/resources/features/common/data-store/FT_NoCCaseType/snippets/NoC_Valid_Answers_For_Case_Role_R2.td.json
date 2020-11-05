@@ -1,10 +1,13 @@
 {
 	"_guid_": "NoC_Valid_Answers_For_Case_Role_R2",
-
 	"answers": [
 		{
 			"question_id": "NoC_Challenge_Name",
 			"value": "Test Company"
-		}
+		},
+    {
+      "question_id": "NoC_Challenge_Name2",
+      "value": ""
+    }
 	]
 }

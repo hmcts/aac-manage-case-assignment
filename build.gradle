@@ -98,7 +98,7 @@ task functional(type: Test) {
 
   generateCucumberReports.enabled = false
 
-  doLast {
+  doFirst {
     generateCucumberReports.enabled = true
     cucumberReports.outputDir = file("${project.buildDir}/reports/tests/befta/functional")
     cucumberReports.reports = files("${cucumberReports.outputDir}/cucumber.json")
@@ -286,7 +286,7 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.9.0'
+  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.19.0-ACA-72'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath

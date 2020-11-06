@@ -48,7 +48,6 @@ class RequestNoticeOfChangeServiceTest {
     private static final String PENDING = "PENDING";
     private static final String APPROVED = "APPROVED";
     private static final String INCUMBENT_ORGANISATION_ID = "INCUMBENT_ORG_ID_1";
-    private static final String INCUMBENT_ORGANISATION_NAME = "INCUMBENT_ORG_NAME_1";
     private static final String CASE_ASSIGNED_ROLE = "CASE_ASSIGNED_ROLE";
     private static final String NOC_REQUEST_EVENT = "NocRequest";
     private static final String INVOKERS_ORGANISATION_IDENTIFIER = "PRD_ORG_IDENTIFIER";
@@ -92,7 +91,7 @@ class RequestNoticeOfChangeServiceTest {
         caseViewResource.setReference(CASE_ID);
         caseViewResource.setCaseViewActionableEvents(caseViewActionableEvents);
 
-        incumbentOrganisation = new Organisation(INCUMBENT_ORGANISATION_ID, INCUMBENT_ORGANISATION_NAME);
+        incumbentOrganisation = Organisation.builder().organisationID(INCUMBENT_ORGANISATION_ID).build();
         OrganisationPolicy organisationPolicy = new OrganisationPolicy(incumbentOrganisation,
                                                                        ORG_POLICY_REFERENCE, CASE_ASSIGNED_ROLE);
 
@@ -222,7 +221,7 @@ class RequestNoticeOfChangeServiceTest {
         List<OrganisationPolicy> organisationPolicies = updateCaseResourceWithOrganisationPolicies(caseResource);
 
         Organisation invokersOrganisation =
-            new Organisation(INVOKERS_ORGANISATION_IDENTIFIER, "InvokersOrganisationName");
+            Organisation.builder().organisationID(INVOKERS_ORGANISATION_IDENTIFIER).build();
         OrganisationPolicy invokersOrganisationPolicy = new OrganisationPolicy(invokersOrganisation,
                                                                                ORG_POLICY_REFERENCE,
                                                                                CASE_ASSIGNED_ROLE);
@@ -298,9 +297,7 @@ class RequestNoticeOfChangeServiceTest {
     private List<OrganisationPolicy> updateCaseResourceWithOrganisationPolicies(CaseResource caseResource) {
         List<OrganisationPolicy> organisationPolicies = new ArrayList<>();
         for (int loopCounter = 0; loopCounter < 3; loopCounter++) {
-            Organisation organisation =
-                new Organisation("OrganisationId" + loopCounter,
-                                 "OrganisationName" + loopCounter);
+            Organisation organisation = Organisation.builder().organisationID("OrganisationId").build();
             OrganisationPolicy organisationPolicy =
                 new OrganisationPolicy(organisation, ORG_POLICY_REFERENCE,
                                        "CaseRole" + loopCounter);

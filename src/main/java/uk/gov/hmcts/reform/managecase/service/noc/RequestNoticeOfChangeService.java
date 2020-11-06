@@ -60,7 +60,7 @@ public class RequestNoticeOfChangeService {
 
         String organisationIdentifier = prdRepository.findUsersByOrganisation().getOrganisationIdentifier();
 
-        Organisation invokersOrganisation = new Organisation(organisationIdentifier, "");
+        Organisation invokersOrganisation = Organisation.builder().organisationID(organisationIdentifier).build();
 
         String eventId = getEventId(noCRequestDetails);
 

@@ -29,20 +29,17 @@
       "data": {
         "applicantOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}",
-            "OrganisationName": "CCD Solicitors Limited"
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
           }
         },
         "respondentOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "Org-Two",
-            "OrganisationName": "Richard's Org"
+            "OrganisationID": "Org-Two"
           }
         },
         "otherPartyOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "Org-Two",
-            "OrganisationName": "Richard's Org"
+            "OrganisationID": "Org-Two"
           }
         }
       }
@@ -54,20 +51,17 @@
       "case_data": {
         "applicantOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}",
-            "OrganisationName": "CCD Solicitors Limited"
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
           }
         },
         "respondentOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "Org-Two",
-            "OrganisationName": "Richard's Org"
+            "OrganisationID": "Org-Two"
           }
         },
         "otherPartyOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "Org-Two",
-            "OrganisationName": "Richard's Org"
+            "OrganisationID": "Org-Two"
           }
         }
       }

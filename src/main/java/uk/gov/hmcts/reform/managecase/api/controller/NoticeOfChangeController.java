@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
+import uk.gov.hmcts.reform.managecase.api.payload.CallbackCaseDetails;
 import uk.gov.hmcts.reform.managecase.api.payload.CheckNoticeOfChangeApprovalRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
@@ -297,7 +297,7 @@ public class NoticeOfChangeController {
     })
     public ResponseEntity checkNoticeOfChangeApproval(@Valid @RequestBody CheckNoticeOfChangeApprovalRequest
                                                               checkNoticeOfChangeApprovalRequest) {
-        CaseDetails caseDetails = checkNoticeOfChangeApprovalRequest.getCaseDetails();
+        CallbackCaseDetails caseDetails = checkNoticeOfChangeApprovalRequest.getCaseDetails();
         Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
         if (changeOrganisationRequestFieldJson.isEmpty()) {
             throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
@@ -311,7 +311,7 @@ public class NoticeOfChangeController {
             return ResponseEntity.ok().build();
         }
 
-        noticeOfChangeApprovalService.checkNoticeOfChangeApproval(caseDetails.getReference());
+        noticeOfChangeApprovalService.checkNoticeOfChangeApproval(caseDetails.getId());
         return ResponseEntity.ok().build();
     }
 }

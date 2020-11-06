@@ -17,11 +17,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
+import uk.gov.hmcts.reform.managecase.api.payload.CallbackCaseDetails;
 import uk.gov.hmcts.reform.managecase.api.payload.CheckNoticeOfChangeApprovalRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
@@ -426,7 +426,7 @@ public class NoticeOfChangeControllerTest {
     class PostCheckNoticeOfChangeApproval extends BaseMvcTest {
 
         private CheckNoticeOfChangeApprovalRequest request;
-        private CaseDetails caseDetails;
+        private CallbackCaseDetails caseDetails;
         private ChangeOrganisationRequest changeOrganisationRequest;
 
         private static final String ENDPOINT_URL = "/noc" + CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
@@ -449,7 +449,7 @@ public class NoticeOfChangeControllerTest {
         @Test
         void directCallHappyPath() {
             changeOrganisationRequest.setApprovalStatus("1");
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
+            caseDetails = new CallbackCaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
                                           Map.of("changeOrganisationRequestField",
                                                  objectMapper.convertValue(changeOrganisationRequest, JsonNode.class)));
             request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
@@ -471,7 +471,7 @@ public class NoticeOfChangeControllerTest {
         @Test
         void shouldCheckForNoCApprovalWithNumberForApprovalStatus() throws Exception {
             changeOrganisationRequest.setApprovalStatus("1");
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
+            caseDetails = new CallbackCaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
                                           Map.of("changeOrganisationRequestField",
                                                  objectMapper.convertValue(changeOrganisationRequest, JsonNode.class)));
             request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
@@ -486,7 +486,7 @@ public class NoticeOfChangeControllerTest {
         @Test
         void shouldCheckForNoCApprovalWithStringForApprovalStatus() throws Exception {
             changeOrganisationRequest.setApprovalStatus("APPROVED");
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
+            caseDetails = new CallbackCaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
                                           Map.of("changeOrganisationRequestField",
                                                  objectMapper.convertValue(changeOrganisationRequest, JsonNode.class)));
             request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
@@ -501,7 +501,7 @@ public class NoticeOfChangeControllerTest {
         @Test
         void shouldReturnSuccessfullyIfApprovalStatusIsNotApprovedCode() throws Exception {
             changeOrganisationRequest.setApprovalStatus("0");
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
+            caseDetails = new CallbackCaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
                                           Map.of("changeOrganisationRequestField",
                                                  objectMapper.convertValue(changeOrganisationRequest, JsonNode.class)));
             request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
@@ -516,7 +516,7 @@ public class NoticeOfChangeControllerTest {
         @Test
         void shouldReturnSuccessfullyIfApprovalStatusIsNotApproved() throws Exception {
             changeOrganisationRequest.setApprovalStatus("REJECTED");
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
+            caseDetails = new CallbackCaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
                                           Map.of("changeOrganisationRequestField",
                                                  objectMapper.convertValue(changeOrganisationRequest, JsonNode.class)));
             request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
@@ -530,7 +530,7 @@ public class NoticeOfChangeControllerTest {
         @DisplayName("should error if case reference in Case Details is empty")
         @Test
         void shouldFailIfCaseReferenceIsEmpty() throws Exception {
-            caseDetails = new CaseDetails(null, "Jurisdiction", "State", "CaseTypeId", new HashMap<>());
+            caseDetails = new CallbackCaseDetails(null, "Jurisdiction", "State", "CaseTypeId", new HashMap<>());
             request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
@@ -544,7 +544,8 @@ public class NoticeOfChangeControllerTest {
         @DisplayName("should error if case reference in Case Details is an invalid length")
         @Test
         void shouldFailIfCaseReferenceIsInvalidLength() throws Exception {
-            caseDetails = new CaseDetails("16032064624", "Jurisdiction", "State", "CaseTypeId", new HashMap<>());
+            caseDetails = new CallbackCaseDetails("16032064624", "Jurisdiction", "State",
+                "CaseTypeId", new HashMap<>());
             request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
@@ -558,7 +559,8 @@ public class NoticeOfChangeControllerTest {
         @DisplayName("should error if case reference in Case Details is an invalid Luhn Number")
         @Test
         void shouldFailIfCaseReferenceIsInvalidLuhnNumber() throws Exception {
-            caseDetails = new CaseDetails("1588234985453947", "Jurisdiction", "State", "CaseTypeId", new HashMap<>());
+            caseDetails = new CallbackCaseDetails("1588234985453947", "Jurisdiction", "State",
+                "CaseTypeId", new HashMap<>());
             request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
@@ -572,7 +574,7 @@ public class NoticeOfChangeControllerTest {
         @DisplayName("should error if changeOrganisationRequestField not found in Case Details")
         @Test
         void shouldFailIfChangeOrganisationRequestFieldNotFound() throws Exception {
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId", new HashMap<>());
+            caseDetails = new CallbackCaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId", new HashMap<>());
             request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
@@ -585,7 +587,7 @@ public class NoticeOfChangeControllerTest {
         @DisplayName("should error if changeOrganisationRequestField is invalid")
         @Test
         void shouldFailIfChangeOrganisationRequestIsInvalid() throws Exception {
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
+            caseDetails = new CallbackCaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
                                           Map.of("changeOrganisationRequestField",
                                                  objectMapper.convertValue(changeOrganisationRequest, JsonNode.class)));
             request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);

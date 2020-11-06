@@ -12,11 +12,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import uk.gov.hmcts.reform.managecase.BaseTest;
+import uk.gov.hmcts.reform.managecase.api.payload.CallbackCaseDetails;
 import uk.gov.hmcts.reform.managecase.api.payload.CheckNoticeOfChangeApprovalRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
@@ -339,7 +339,7 @@ public class NoticeOfChangeControllerIT {
     class CheckNoticeOfChangeApproval extends BaseTest {
 
         private CheckNoticeOfChangeApprovalRequest checkNoticeOfChangeApprovalRequest;
-        private CaseDetails caseDetails;
+        private CallbackCaseDetails caseDetails;
         private ChangeOrganisationRequest changeOrganisationRequest;
 
         private static final String ENDPOINT_URL = "/noc" + CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
@@ -357,7 +357,7 @@ public class NoticeOfChangeControllerIT {
                 .approvalStatus("APPROVED")
                 .build();
 
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
+            caseDetails = new CallbackCaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
                                           Map.of("changeOrganisationRequestField",
                                                  mapper.convertValue(changeOrganisationRequest, JsonNode.class)));
 
@@ -418,7 +418,7 @@ public class NoticeOfChangeControllerIT {
                 .approvalStatus("REJECTED")
                 .build();
 
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
+            caseDetails = new CallbackCaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
                                           Map.of("changeOrganisationRequestField",
                                                  mapper.convertValue(changeOrganisationRequest, JsonNode.class)));
 
@@ -432,7 +432,7 @@ public class NoticeOfChangeControllerIT {
 
         @Test
         void shouldReturnAnErrorIfRequestDoesNotContainChangeOrgRequest() throws Exception {
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State",
+            caseDetails = new CallbackCaseDetails(CASE_ID, "Jurisdiction", "State",
                                           "CaseTypeId", new HashMap<>());
 
             checkNoticeOfChangeApprovalRequest = new CheckNoticeOfChangeApprovalRequest(NOC, null, caseDetails);
@@ -448,7 +448,7 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldReturnAnErrorIfChangeOrganisationRequestIsInvalid() throws Exception {
             changeOrganisationRequest.setApprovalStatus(null);
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
+            caseDetails = new CallbackCaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
                                           Map.of("changeOrganisationRequestField",
                                                  mapper.convertValue(changeOrganisationRequest, JsonNode.class)));
 

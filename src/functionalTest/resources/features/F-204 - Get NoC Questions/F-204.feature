@@ -11,7 +11,7 @@ Feature: F-204 Get Notice of Change Questions
     And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [Prerequisite_Case_Creation_Call_for_Case_Assignment],
     And a successful call [to get the update org policy event trigger] as in [204_get_update_org_policies_event_trigger],
     And a successful call [to update the applicant org policy] as in [204_update_org_policies],
-    And a wait time of [5] seconds [to allow for Logstash to index the case just created]
+    And a wait time of [20] seconds [to allow for Logstash to index the case just created]
     When a request is prepared with appropriate values,
     And the request [is made by Dil to return the questions that need answering in order to become Mario's representative on C1],
     And the request [contains a valid case ID for C1],
@@ -27,7 +27,7 @@ Feature: F-204 Get Notice of Change Questions
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [Prerequisite_Case_Creation_Call_for_Case_Assignment],
       And a successful call [to get the update org policy event trigger] as in [204_get_update_org_policies_event_trigger],
       And a successful call [to update the applicant org policy] as in [204_update_org_policies],
-      And a wait time of [5] seconds [to allow for Logstash to index the case just created]
+      And a wait time of [40] seconds [to allow for Logstash to index the case just created]
       When a request is prepared with appropriate values,
       And the request [is made by Dil to return the questions that need answering in order to become Mario's representative on C1],
       And the request [contains a valid case ID for C1],

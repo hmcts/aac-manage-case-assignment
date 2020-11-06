@@ -1,42 +1,13 @@
 {
-	"_guid_": "NoC_Case_Data",
+  "_guid_": "NoC_Case_Data",
+  "_extends_": "NoC_Case_Data__expectedResponse",
 
-	"applicant": {
-		"litigantType": "INDIVIDUAL",
-		"individual": {
-			"Title": "Mr",
-			"LastName": "Applicant"
-		}
-	},
-	"respondent": {
-		"litigantType": "COMPANY",
-		"company": {
-			"Name": "Test Company",
-			"BusinessAddress": {
-				"Country": null,
-				"AddressLine1": "TC Address Line 1",
-				"AddressLine2": "TC Address Line 2",
-				"AddressLine3": "TC Address Line 3"
-			}
-		}
-	},
-	"otherParty": {
-		"litigantType": "SOLETRADER",
-		"soletrader": {
-			"Name": "Sole Trader",
-			"PostalAddress": {
-				"Country": null,
-				"AddressLine1": "Postal Address Line 1",
-				"AddressLine2": "Postal Address Line 2",
-				"AddressLine3": "Postal Address Line 3"
-			},
-			"BusinessAddress": {
-				"Country": null,
-				"AddressLine1": "Business Address Line 1",
-				"AddressLine2": "Business Address Line 2",
-				"AddressLine3": "Business Address Line 3"
-			}
-		}
-	}
-
+  "applicant": {
+    "individual": {
+      "FirstName": "ashley",
+      "MiddleName": "dean",
+      "DateOfBirth": "1989-09-19",
+      "NationalInsuranceNumber": null
+    }
+  }
 }

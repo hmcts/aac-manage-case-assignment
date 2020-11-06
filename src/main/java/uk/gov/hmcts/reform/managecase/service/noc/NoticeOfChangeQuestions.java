@@ -8,7 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseIdLuhnException;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
@@ -99,7 +100,7 @@ public class NoticeOfChangeQuestions {
             List<OrganisationPolicy> organisationPolicies = searchResultViewItem.get().findPolicies();
             checkOrgPoliciesForRoles(challengeQuestionsResult, organisationPolicies);
         } else {
-            throw new CaseCouldNotBeFetchedException(CASE_NOT_FOUND);
+            throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
         }
 
         return NoCRequestDetails.builder()
@@ -150,9 +151,9 @@ public class NoticeOfChangeQuestions {
             caseViewResource = dataStoreRepository.findCaseByCaseId(caseId);
         } catch (FeignException e) {
             if (HttpStatus.NOT_FOUND.value() == e.status()) {
-                throw new CaseCouldNotBeFetchedException(CASE_NOT_FOUND);
+                throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
             } else if (HttpStatus.BAD_REQUEST.value() == e.status()) {
-                throw new CaseCouldNotBeFetchedException(CASE_ID_INVALID);
+                throw new CaseIdLuhnException(CASE_ID_INVALID);
             }
         }
         return caseViewResource;
@@ -164,7 +165,7 @@ public class NoticeOfChangeQuestions {
 
     private void checkCaseFields(CaseSearchResultViewResource caseDetails) {
         if (caseDetails.getCases().isEmpty()) {
-            throw new CaseCouldNotBeFetchedException(CASE_NOT_FOUND);
+            throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
         }
         List<SearchResultViewHeader> searchResultViewHeaderList = new ArrayList<>();
         Optional<SearchResultViewHeaderGroup> searchResultViewHeaderGroup =

@@ -1,0 +1,44 @@
+{
+  "_guid_": "S-205.14",
+  "_extends_": "S-205_Test_Data_Base",
+  "specs" : [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Dil - with a solicitor role for the same jurisdiction within a different organisation from Richard",
+    "is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1",
+    "contains a set of answers that match more than one corresponding case roles for representation"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "answers": [
+        {
+          "question_id": "NoC_Challenge_Name",
+          "value": "MATCHING-NAME"
+        },
+        {
+          "question_id": "NoC_Challenge_Name2",
+          "value":  "2010-10-10"
+        }
+      ],
+      "case_id": "${[scenarioContext][childContexts][205.14_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 400,
+    "responseMessage": "Bad Request",
+    "body" : {
+      "status" : "BAD_REQUEST",
+      "message" : "The answers did not uniquely identify a litigant",
+      "errors" : [ ]
+    }
+  }
+
+
+}

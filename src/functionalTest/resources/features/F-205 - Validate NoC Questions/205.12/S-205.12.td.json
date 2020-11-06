@@ -1,0 +1,38 @@
+{
+  "_guid_": "S-205.12",
+  "_extends_": "S-205_Test_Data_Base",
+  "specs" : [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Tony - with a solicitor role for the same jurisdiction within the same organisation from Richard",
+    "contains all correct answers",
+    "is made by Tony to validate the answers provided to the NoC questions in order to become the representative for Mario on C1"
+
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Bill"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "_extends_": "Applicant_correct_answers_snippet",
+      "case_id": "${[scenarioContext][childContexts][205.12_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}"
+
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 400,
+    "responseMessage": "Bad Request",
+    "body" : {
+      "status" : "BAD_REQUEST",
+      "message" : "The requestor has answered questions uniquely identifying a litigant that they are already representing",
+      "errors" : [ ]
+    }
+
+  }
+
+
+}

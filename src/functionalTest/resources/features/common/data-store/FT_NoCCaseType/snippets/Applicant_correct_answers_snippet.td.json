@@ -1,14 +1,13 @@
 {
-  "_guid_": "NoC_Valid_Answers_For_Case_Role_R2",
-
+  "_guid_" : "Applicant_correct_answers_snippet",
   "answers": [
     {
       "question_id": "NoC_Challenge_Name",
-    "value": "Test Company"
+      "value": "Noronha"
     },
     {
       "question_id": "NoC_Challenge_Name2",
-      "value": ""
+      "value": "1989-09-19"
     }
   ]
 }

@@ -19,16 +19,18 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
-import uk.gov.hmcts.reform.managecase.api.payload.CheckNoticeOfChangeApprovalRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.NoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.SetOrganisationToRemoveResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
-import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeApprovalService;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
@@ -38,13 +40,18 @@ import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.constraints.NotEmpty;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
+import static java.util.stream.Collectors.toList;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_DECISION_EVENT_UNIDENTIFIABLE;
 
 @RestController
@@ -57,6 +64,7 @@ public class NoticeOfChangeController {
     public static final String VERIFY_NOC_ANSWERS = "/verify-noc-answers";
     public static final String REQUEST_NOTICE_OF_CHANGE_PATH = "/noc-requests";
     public static final String CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH = "/check-noc-approval";
+    public static final String SET_ORGANISATION_TO_REMOVE_PATH = "/set-organisation-to-remove";
 
     public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
     public static final String REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE =
@@ -295,9 +303,9 @@ public class NoticeOfChangeController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
-    public ResponseEntity checkNoticeOfChangeApproval(@Valid @RequestBody CheckNoticeOfChangeApprovalRequest
-                                                              checkNoticeOfChangeApprovalRequest) {
-        CaseDetails caseDetails = checkNoticeOfChangeApprovalRequest.getCaseDetails();
+    public ResponseEntity checkNoticeOfChangeApproval(@Valid @RequestBody NoticeOfChangeRequest
+                                                          noticeOfChangeRequest) {
+        CaseDetails caseDetails = noticeOfChangeRequest.getCaseDetails();
         Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
         if (changeOrganisationRequestFieldJson.isEmpty()) {
             throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
@@ -313,5 +321,63 @@ public class NoticeOfChangeController {
 
         noticeOfChangeApprovalService.checkNoticeOfChangeApproval(caseDetails.getReference());
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(path = SET_ORGANISATION_TO_REMOVE_PATH, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Set Organisation To Remove", notes = "Set Organisation To Remove")
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = StringUtils.EMPTY
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:"
+                + "\n1) " + CASE_ID_INVALID
+                + "\n2) " + CASE_ID_INVALID_LENGTH
+                + "\n3) " + CASE_ID_EMPTY
+                + "\n4) " + CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID
+                + "\n5) " + INVALID_CASE_ROLE_FIELD,
+            response = ApiError.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"message\": \"" + CASE_ID_EMPTY + "\",\n"
+                        + "   \"errors\": [ ]\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
+        )
+    })
+    public ResponseEntity<SetOrganisationToRemoveResponse> setOrganisationToRemove(@Valid @RequestBody
+                                                                   NoticeOfChangeRequest noticeOfChangeRequest) {
+        CaseDetails caseDetails = noticeOfChangeRequest.getCaseDetails();
+        Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
+
+        if (changeOrganisationRequestFieldJson.isEmpty()) {
+            throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
+        }
+
+        ChangeOrganisationRequest changeOrganisationRequest =
+            jacksonUtils.convertValue(changeOrganisationRequestFieldJson.get(), ChangeOrganisationRequest.class);
+
+        changeOrganisationRequest.validateChangeOrganisationRequest();
+
+        if (changeOrganisationRequest.getOrganisationToRemove().getOrganisationID() != null
+            || changeOrganisationRequest.getOrganisationToRemove().getOrganisationName() != null) {
+            throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
+        }
+
+        return ResponseEntity.ok(
+            requestNoticeOfChangeService.setOrganisationToRemove(caseDetails, changeOrganisationRequest));
     }
 }

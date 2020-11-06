@@ -10,8 +10,8 @@ import javax.validation.Valid;
 
 @Getter
 @AllArgsConstructor
-@ApiModel("Check Notice of Change Approval Request")
-public class CheckNoticeOfChangeApprovalRequest {
+@ApiModel("Notice of Change Request")
+public class NoticeOfChangeRequest {
 
     @JsonProperty("event_id")
     private String eventId;

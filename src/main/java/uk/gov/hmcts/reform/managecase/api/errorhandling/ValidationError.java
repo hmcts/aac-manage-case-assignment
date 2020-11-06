@@ -25,6 +25,9 @@ public final class ValidationError {
     public static final String CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID =
         "ChangeOrganisationRequest field could not be found or appears invalid";
 
+    public static final String INVALID_CASE_ROLE_FIELD = "CaseRole field within ChangeOrganisationRequest "
+        + "matched none or more than one OrganisationPolicy on the case";
+
     public static final String ASSIGNEE_ROLE_ERROR = "Intended assignee has to be a solicitor"
         + " enabled in the jurisdiction of the case.";
     public static final String ASSIGNEE_ORGANISATION_ERROR = "Intended assignee has to be in the same"

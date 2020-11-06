@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.SetOrganisationToRemoveResponse;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
@@ -14,12 +16,16 @@ import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
+import javax.validation.ValidationException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 
 @Service
 public class RequestNoticeOfChangeService {
@@ -83,6 +89,36 @@ public class RequestNoticeOfChangeService {
             .caseRole(caseRoleId)
             .approvalStatus(isApprovalComplete ? APPROVED : PENDING)
             .status(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)
+            .build();
+    }
+
+    public SetOrganisationToRemoveResponse setOrganisationToRemove(
+        CaseDetails caseDetails, ChangeOrganisationRequest changeOrganisationRequest) {
+
+        List<JsonNode> organisationPolicyNodes = caseDetails.findOrganisationPolicyNodes();
+        List<OrganisationPolicy> matchingOrganisationPolicyNodes =
+            organisationPolicyNodes.stream()
+                .map(node -> jacksonUtils.convertValue(node, OrganisationPolicy.class))
+                .filter(orgPolicy ->
+                            orgPolicy.getOrgPolicyCaseAssignedRole()
+                                .equalsIgnoreCase(changeOrganisationRequest.getCaseRoleId()))
+                .collect(toList());
+
+        if (matchingOrganisationPolicyNodes.size() != 1) {
+            throw new ValidationException(INVALID_CASE_ROLE_FIELD);
+        }
+
+        changeOrganisationRequest
+            .getOrganisationToRemove()
+            .setOrganisationID(matchingOrganisationPolicyNodes.get(0).getOrganisation().getOrganisationID());
+
+        HashMap<String, JsonNode> data = new HashMap<>();
+        IntStream.range(0, organisationPolicyNodes.size())
+            .forEach(index -> data.put("OrganisationPolicyField" + index + 1, organisationPolicyNodes.get(index)));
+        data.put("ChangeOrganisationRequestField", jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
+
+        return SetOrganisationToRemoveResponse.builder()
+            .data(data)
             .build();
     }
 

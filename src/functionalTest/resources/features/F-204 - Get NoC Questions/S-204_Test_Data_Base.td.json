@@ -1,0 +1,19 @@
+{
+  "_guid_" : "S-204_Test_Data_Base",
+
+  "productName": "Case Assignment Microservice",
+  "operationName": "NoCQuestions",
+
+  "method": "GET",
+  "uri": "/noc/noc-questions",
+
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
+
+  "request": {
+    "queryParams": {
+      "case_id": "${[scenarioContext][childContexts][Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}"
+    },
+    "_extends_": "Common_Request"
+  }
+}

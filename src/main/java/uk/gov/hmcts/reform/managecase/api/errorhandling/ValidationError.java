@@ -18,12 +18,13 @@ public final class ValidationError {
     public static final String CASE_NOT_FOUND = "Case could not be found";
     public static final String NOC_EVENT_NOT_AVAILABLE = "No NoC events available for this case type";
     public static final String INSUFFICIENT_PRIVILEGE = "Insufficient privileges for notice of change request";
-    public static final String NO_ORG_POLICY_WITH_ROLE = "No Organisation Policy with that role for "
-        + "notice of change request";
+
     public static final String NOC_DECISION_EVENT_UNIDENTIFIABLE = "NoC Decision event could not be identified";
     public static final String EVENT_TOKEN_NOT_PRESENT = "Event token not present";
     public static final String CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID =
         "ChangeOrganisationRequest field could not be found or appears invalid";
+    public static final String NO_ORG_POLICY_WITH_ROLE = "No Organisation Policy for one or more of the roles "
+        + "available for the notice of change request";  
 
     public static final String INVALID_CASE_ROLE_FIELD = "CaseRole field within ChangeOrganisationRequest "
         + "matched none or more than one OrganisationPolicy on the case";

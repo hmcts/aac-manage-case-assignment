@@ -1,0 +1,39 @@
+{
+  "_guid_" : "S-204.9",
+  "_extends_" : "S-204_Test_Data_Base",
+
+  "users": {
+    "Benjamin": {
+      "username": "befta.master.solicitor.benjamin@gmail.com",
+      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_2_PWD]]"
+    }
+  },
+
+  "request": {
+    "queryParams": {
+      "case_id": "${[scenarioContext][childContexts][204_NoC_WithoutEvents_Case_Creation_With_Org_Policies][testData][actualResponse][body][id]}"
+    },
+    "_extends_": "Common_Request"
+  },
+
+  "specs" : [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Dil - with a solicitor role for the same jurisdiction within a different organisation from Richard",
+    "is made by Dil to return the questions in order to become Mario's representative on C1",
+    "contains a valid case ID for C1",
+    "contains a structurally valid set of answers",
+    "contains a valid IDAM token for Dil",
+    "identifies that no NOC request event is available on the case"
+
+  ],
+
+  "expectedResponse": {
+    "responseCode": 400,
+    "responseMessage": "Bad Request",
+    "body": {
+      "status" : "BAD_REQUEST",
+      "message" : "No NoC events available for this case type",
+      "errors" : [ ]
+    }
+  }
+}

@@ -31,8 +31,7 @@
       "data": {
         "applicantOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}",
-            "OrganisationName": "CCD Solicitors Limited"
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
           }
         }
       }
@@ -44,8 +43,7 @@
       "case_data": {
         "applicantOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}",
-            "OrganisationName": "CCD Solicitors Limited"
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
           }
         }
       }

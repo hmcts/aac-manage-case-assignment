@@ -10,9 +10,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.managecase.api.payload.CallbackCaseDetails;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.SetOrganisationToRemoveResponse;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
@@ -56,7 +56,6 @@ class RequestNoticeOfChangeServiceTest {
     private static final String PENDING = "PENDING";
     private static final String APPROVED = "APPROVED";
     private static final String INCUMBENT_ORGANISATION_ID = "INCUMBENT_ORG_ID_1";
-    private static final String INCUMBENT_ORGANISATION_NAME = "INCUMBENT_ORG_NAME_1";
     private static final String CASE_ASSIGNED_ROLE = "CASE_ASSIGNED_ROLE";
     private static final String NOC_REQUEST_EVENT = "NocRequest";
     private static final String INVOKERS_ORGANISATION_IDENTIFIER = "PRD_ORG_IDENTIFIER";
@@ -100,7 +99,7 @@ class RequestNoticeOfChangeServiceTest {
         caseViewResource.setReference(CASE_ID);
         caseViewResource.setCaseViewActionableEvents(caseViewActionableEvents);
 
-        incumbentOrganisation = new Organisation(INCUMBENT_ORGANISATION_ID, INCUMBENT_ORGANISATION_NAME);
+        incumbentOrganisation = Organisation.builder().organisationID(INCUMBENT_ORGANISATION_ID).build();
         OrganisationPolicy organisationPolicy = new OrganisationPolicy(incumbentOrganisation,
                                                                        ORG_POLICY_REFERENCE, CASE_ASSIGNED_ROLE);
 
@@ -230,7 +229,7 @@ class RequestNoticeOfChangeServiceTest {
         List<OrganisationPolicy> organisationPolicies = updateCaseResourceWithOrganisationPolicies(caseResource);
 
         Organisation invokersOrganisation =
-            new Organisation(INVOKERS_ORGANISATION_IDENTIFIER, "InvokersOrganisationName");
+            Organisation.builder().organisationID(INVOKERS_ORGANISATION_IDENTIFIER).build();
         OrganisationPolicy invokersOrganisationPolicy = new OrganisationPolicy(invokersOrganisation,
                                                                                ORG_POLICY_REFERENCE,
                                                                                CASE_ASSIGNED_ROLE);
@@ -306,9 +305,7 @@ class RequestNoticeOfChangeServiceTest {
     private List<OrganisationPolicy> updateCaseResourceWithOrganisationPolicies(CaseResource caseResource) {
         List<OrganisationPolicy> organisationPolicies = new ArrayList<>();
         for (int loopCounter = 0; loopCounter < 3; loopCounter++) {
-            Organisation organisation =
-                new Organisation("OrganisationId" + loopCounter,
-                                 "OrganisationName" + loopCounter);
+            Organisation organisation = Organisation.builder().organisationID("OrganisationId").build();
             OrganisationPolicy organisationPolicy =
                 new OrganisationPolicy(organisation, ORG_POLICY_REFERENCE,
                                        "CaseRole" + loopCounter);
@@ -337,7 +334,7 @@ class RequestNoticeOfChangeServiceTest {
         private OrganisationPolicy organisationPolicy;
         private ChangeOrganisationRequest changeOrganisationRequestBefore;
         private ChangeOrganisationRequest changeOrganisationRequestAfter;
-        private CaseDetails caseDetails;
+        private CallbackCaseDetails callbackCaseDetails;
 
         @BeforeEach
         void setUp() {
@@ -375,7 +372,7 @@ class RequestNoticeOfChangeServiceTest {
         @Test
         @DisplayName("Set Organisation To Remove should return successfully")
         void setOrganisationToRemoveSuccess() {
-            caseDetails = CaseDetails.builder()
+            callbackCaseDetails = CallbackCaseDetails.builder()
                 .data(Map.of(
                     "OrganisationPolicyField1",
                     objectMapper.convertValue(organisationPolicy, JsonNode.class),
@@ -388,7 +385,7 @@ class RequestNoticeOfChangeServiceTest {
                 .willReturn(organisationPolicy);
 
             SetOrganisationToRemoveResponse response =
-                service.setOrganisationToRemove(caseDetails, changeOrganisationRequestBefore);
+                service.setOrganisationToRemove(callbackCaseDetails, changeOrganisationRequestBefore);
 
             assertThat(response.getData().get("ChangeOrganisationRequestField"))
                 .isEqualTo(objectMapper.convertValue(changeOrganisationRequestAfter, JsonNode.class));
@@ -403,7 +400,7 @@ class RequestNoticeOfChangeServiceTest {
                 .organisation(organisation)
                 .build();
 
-            caseDetails = CaseDetails.builder()
+            callbackCaseDetails = CallbackCaseDetails.builder()
                 .data(Map.of(
                     "OrganisationPolicyField1",
                     objectMapper.convertValue(organisationPolicy, JsonNode.class),
@@ -417,7 +414,7 @@ class RequestNoticeOfChangeServiceTest {
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> service.setOrganisationToRemove(caseDetails, changeOrganisationRequestBefore)
+                () -> service.setOrganisationToRemove(callbackCaseDetails, changeOrganisationRequestBefore)
             );
 
             assertThat(exception.getMessage())
@@ -427,7 +424,7 @@ class RequestNoticeOfChangeServiceTest {
         @Test
         @DisplayName("Set Organisation To Remove Should fail when more than one organisation policy matches case role")
         void setOrganisationToRemoveShouldFailWhenThereAreMoreThanOneMatchingOrgPolicies() {
-            caseDetails = CaseDetails.builder()
+            callbackCaseDetails = CallbackCaseDetails.builder()
                 .data(Map.of(
                     "OrganisationPolicyField1",
                     objectMapper.convertValue(organisationPolicy, JsonNode.class),
@@ -443,7 +440,7 @@ class RequestNoticeOfChangeServiceTest {
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> service.setOrganisationToRemove(caseDetails, changeOrganisationRequestBefore)
+                () -> service.setOrganisationToRemove(callbackCaseDetails, changeOrganisationRequestBefore)
             );
 
             assertThat(exception.getMessage())

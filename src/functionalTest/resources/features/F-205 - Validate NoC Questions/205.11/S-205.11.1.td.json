@@ -1,0 +1,27 @@
+{
+  "_guid_": "S-205.11.1",
+  "_extends_": "S-205.11",
+  "specs": [
+    "has no answers"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "answers": [
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode" : 400,
+    "responseMessage" : "Bad Request",
+    "body" : {
+      "status" : "BAD_REQUEST",
+      "errors" : [ "Challenge question answers can not be empty" ]
+    }
+
+  }
+
+
+}

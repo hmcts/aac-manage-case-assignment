@@ -50,11 +50,12 @@ public class SearchResultViewItem implements CommonViewItem {
                 JsonNode org = node.get("Organisation");
                 return OrganisationPolicy.builder()
                     .organisation(Organisation.builder()
-                        .organisationID(org.get(ORG_ID).asText())
-                        .organisationName(org.get(ORG_NAME).asText())
+                    .organisationID(org == null || org.get(ORG_ID) == null ? null : org.get(ORG_ID).textValue())
+                    .organisationName(org == null || org.get(ORG_NAME) == null
+                                      ? null : org.get(ORG_NAME).textValue())
                         .build())
-                    .orgPolicyCaseAssignedRole(node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText())
-                    .orgPolicyReference(node.get(ORG_POLICY_REFERENCE).asText()).build();
+                    .orgPolicyCaseAssignedRole(node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).textValue())
+                    .orgPolicyReference(node.get(ORG_POLICY_REFERENCE).textValue()).build();
             }).collect(Collectors.toList());
     }
 

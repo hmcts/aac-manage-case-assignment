@@ -1,0 +1,33 @@
+{
+  "_guid_": "Event_Creation_Token_Creation",
+
+  "productName": "CCD Data Store",
+  "operationName": "Fetch event trigger",
+
+  "method": "GET",
+  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "id": "manageAllOrgPolicies",
+      "name": "Manage Organisation Policies",
+      "description": "Manage Organisation Policies",
+      "case_id": "[[ANYTHING_PRESENT]]",
+      "case_fields": "[[ANYTHING_PRESENT]]",
+      "event_token": "[[ANYTHING_PRESENT]]",
+      "wizard_pages": "[[ANYTHING_PRESENT]]",
+      "show_summary": true,
+      "show_event_notes": true,
+      "end_button_label": null,
+      "can_save_draft": null
+    }
+  }
+}

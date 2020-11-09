@@ -1,0 +1,57 @@
+{
+  "_guid_" : "update_org_policies",
+  "_extends_": "Event_Creation",
+
+  "request": {
+    "pathVariables": {
+      "cid": "OVERWRITE"
+    },
+    "body":{
+      "data": {
+        "respondentOrganisationPolicy": {
+          "OrgPolicyCaseAssignedRole": "[RespondentSolicitor]",
+          "OrgPolicyReference": "respondent",
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "applicantOrganisationPolicy": {
+          "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
+          "OrgPolicyReference": "applicant",
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "otherPartyOrganisationPolicy": {
+          "OrgPolicyCaseAssignedRole": "[OtherPartySolicitor]",
+          "OrgPolicyReference": "other",
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        }
+      },
+      "event": {
+        "id": "manageAllOrgPolicies",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "OVERWRITE"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body":  {
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type" : "FT_NoCCaseType"
+    }
+  }
+}

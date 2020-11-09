@@ -28,8 +28,8 @@ class CaseResourceTest {
         // ARRANGE
         LocalDateTime now = LocalDateTime.of(2020, Month.MAY, 16, 11, 48, 32);
 
-        Organisation organisationToAdd = new Organisation("id1", "name1");
-        Organisation organisationToRemove = new Organisation("id2", "name2");
+        Organisation organisationToAdd = Organisation.builder().organisationID("id1").build();
+        Organisation organisationToRemove = Organisation.builder().organisationID("id2").build();
 
         ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
             .caseRoleId("[Claimant]")
@@ -42,12 +42,10 @@ class CaseResourceTest {
         final String expectedChangeOrganisationRequestJson =
             "{"
             + "\"OrganisationToAdd\":{"
-            +   "\"OrganisationID\":\"" + organisationToAdd.getOrganisationID() + "\","
-            +   "\"OrganisationName\":\"" + organisationToAdd.getOrganisationName() + "\""
+            +   "\"OrganisationID\":\"" + organisationToAdd.getOrganisationID() + "\""
             + "},"
             + "\"OrganisationToRemove\":{"
-            +   "\"OrganisationID\":\"" + organisationToRemove.getOrganisationID() + "\","
-            +   "\"OrganisationName\":\"" + organisationToRemove.getOrganisationName() + "\""
+            +   "\"OrganisationID\":\"" + organisationToRemove.getOrganisationID() + "\""
             + "},"
             + "\"CaseRoleId\":\"" + cor.getCaseRoleId() + "\","
             + "\"RequestTimestamp\":\"" + now + "\","

@@ -26,11 +26,11 @@
 
   "request": {
     "body": {
-      "_extends_": "NoC_Auto_Approval_Valid_Answers_For_Case_Role_R2",
+      "_extends_": "NoC_Valid_Answers_For_Case_Role_R2",
 
       "case_id": "${[scenarioContext][childContexts][F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}",
 
-      "answers": [ 
+      "answers": [
         {
           "question_id": "Additional-Question",
           "value": "Test Company"
@@ -43,7 +43,7 @@
     "_extends_": "ACA_400_Response",
     "body": {
       "status" : "BAD_REQUEST",
-      "message": "The number of provided answers must match the number of questions - expected 1 answers, received 2",
+      "message": "The number of provided answers must match the number of questions - expected 2 answers, received 3",
       "errors" : [ ]
     }
   }

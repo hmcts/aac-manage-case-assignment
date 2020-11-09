@@ -1,0 +1,22 @@
+{
+  "_guid_": "204_get_org_policy_update_event_trigger",
+  "_extends_": "Manage_org_policies_Event_Trigger_Base",
+
+  "specs" : [
+    "to get the update org policy event trigger"
+  ],
+
+  "user": {
+    "username": "master.caseworker@gmail.com",
+    "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}"
+    }
+  }
+
+
+}

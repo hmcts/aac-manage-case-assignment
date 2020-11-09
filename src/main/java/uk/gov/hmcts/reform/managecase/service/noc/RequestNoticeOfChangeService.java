@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.managecase.api.payload.CallbackCaseDetails;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.SetOrganisationToRemoveResponse;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
@@ -41,7 +41,7 @@ public class RequestNoticeOfChangeService {
 
     @Autowired
     public RequestNoticeOfChangeService(NoticeOfChangeQuestions noticeOfChangeQuestions,
-                                        @Qualifier("nocApprovalDataStoreRepository")
+                                        @Qualifier("defaultDataStoreRepository")
                                             DataStoreRepository dataStoreRepository,
                                         PrdRepository prdRepository,
                                         JacksonUtils jacksonUtils,
@@ -66,7 +66,7 @@ public class RequestNoticeOfChangeService {
 
         String organisationIdentifier = prdRepository.findUsersByOrganisation().getOrganisationIdentifier();
 
-        Organisation invokersOrganisation = new Organisation(organisationIdentifier, "");
+        Organisation invokersOrganisation = Organisation.builder().organisationID(organisationIdentifier).build();
 
         String eventId = getEventId(noCRequestDetails);
 
@@ -95,7 +95,7 @@ public class RequestNoticeOfChangeService {
     }
 
     public SetOrganisationToRemoveResponse setOrganisationToRemove(
-        CaseDetails caseDetails, ChangeOrganisationRequest changeOrganisationRequest) {
+        CallbackCaseDetails caseDetails, ChangeOrganisationRequest changeOrganisationRequest) {
 
         List<JsonNode> organisationPolicyNodes = caseDetails.findOrganisationPolicyNodes();
         List<OrganisationPolicy> matchingOrganisationPolicyNodes =

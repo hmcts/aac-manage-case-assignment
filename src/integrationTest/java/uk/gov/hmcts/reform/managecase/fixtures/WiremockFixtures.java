@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
@@ -232,6 +233,18 @@ public class WiremockFixtures {
                                     .withStatus(HTTP_OK)
                                     .withBody(getJsonString(caseUpdateViewEvent))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubGetExternalStartEventTriggerAsApprover(String caseId,
+                                                          String eventId,
+                                                          StartEventResource startEventResource) {
+        stubFor(WireMock.get(urlPathEqualTo("/cases/" + caseId + "/event-triggers/" + eventId))
+            .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
+            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+            .willReturn(aResponse()
+                .withStatus(HTTP_OK)
+                .withBody(getJsonString(startEventResource))
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     public static void stubSubmitEventForCase(String caseId,

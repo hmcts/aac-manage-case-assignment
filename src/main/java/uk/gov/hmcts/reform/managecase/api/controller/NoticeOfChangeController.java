@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +18,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
-import uk.gov.hmcts.reform.managecase.api.payload.CallbackCaseDetails;
+import uk.gov.hmcts.reform.managecase.api.payload.SubmitCallbackResponse;
+import uk.gov.hmcts.reform.managecase.client.datastore.CallbackCaseDetails;
 import uk.gov.hmcts.reform.managecase.api.payload.CheckNoticeOfChangeApprovalRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
@@ -61,6 +61,8 @@ public class NoticeOfChangeController {
     public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
     public static final String REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE =
         "The Notice of Change request has been successfully submitted.";
+    public static final String APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE = "auto approval is not configured for the case";
+    public static final String CHECK_NOC_APPROVAL_DONE = "check noc approval has done";
 
     private final NoticeOfChangeQuestions noticeOfChangeQuestions;
     private static final String APPROVED = "APPROVED";
@@ -265,7 +267,8 @@ public class NoticeOfChangeController {
     @ApiResponses({
         @ApiResponse(
             code = 200,
-            message = StringUtils.EMPTY
+            message = StringUtils.EMPTY,
+            response = SubmitCallbackResponse.class
         ),
         @ApiResponse(
             code = 400,
@@ -295,7 +298,7 @@ public class NoticeOfChangeController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
-    public ResponseEntity checkNoticeOfChangeApproval(@Valid @RequestBody CheckNoticeOfChangeApprovalRequest
+    public SubmitCallbackResponse checkNoticeOfChangeApproval(@Valid @RequestBody CheckNoticeOfChangeApprovalRequest
                                                               checkNoticeOfChangeApprovalRequest) {
         CallbackCaseDetails caseDetails = checkNoticeOfChangeApprovalRequest.getCaseDetails();
         Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
@@ -308,10 +311,12 @@ public class NoticeOfChangeController {
         changeOrganisationRequest.validateChangeOrganisationRequest();
         if (!changeOrganisationRequest.getApprovalStatus().equals(APPROVED_NUMERIC)
             && !changeOrganisationRequest.getApprovalStatus().equals(APPROVED)) {
-            return ResponseEntity.ok().build();
+            return new SubmitCallbackResponse(APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE,
+                APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE);
         }
 
         noticeOfChangeApprovalService.checkNoticeOfChangeApproval(caseDetails.getId());
-        return ResponseEntity.ok().build();
+        return new SubmitCallbackResponse(CHECK_NOC_APPROVAL_DONE,
+            CHECK_NOC_APPROVAL_DONE);
     }
 }

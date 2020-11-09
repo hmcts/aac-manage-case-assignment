@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.managecase.api.payload;
+package uk.gov.hmcts.reform.managecase.client.datastore;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -39,7 +39,7 @@ public class CallbackCaseDetails {
 
     public Optional<JsonNode> findChangeOrganisationRequestNode() {
         return getData().values().stream()
-            .map(node -> node.findParent(CASE_ROLE_ID))
+            .filter(node -> node.findParent(CASE_ROLE_ID) != null)
             .findFirst();
     }
 }

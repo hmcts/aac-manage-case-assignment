@@ -14,15 +14,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
-import uk.gov.hmcts.reform.managecase.api.payload.CallbackCaseDetails;
 import uk.gov.hmcts.reform.managecase.api.payload.CheckNoticeOfChangeApprovalRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.SubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.CallbackCaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
@@ -33,8 +33,8 @@ import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeApprovalService;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
@@ -47,7 +47,6 @@ import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -63,6 +62,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DONE;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_PATH;
@@ -460,11 +461,11 @@ public class NoticeOfChangeControllerTest {
                                              requestNoticeOfChangeService,
                                              jacksonUtils);
 
-            ResponseEntity response = controller.checkNoticeOfChangeApproval(request);
+            SubmitCallbackResponse response = controller.checkNoticeOfChangeApproval(request);
 
-            assertThat(response)
-                .isNotNull()
-                .isEqualTo(ResponseEntity.ok().build());
+            assertThat(response).isNotNull();
+            assertThat(response.getConfirmationBody()).isEqualTo(CHECK_NOC_APPROVAL_DONE);
+            assertThat(response.getConfirmationHeader()).isEqualTo(CHECK_NOC_APPROVAL_DONE);
         }
 
         @DisplayName("should return 200 status code if all data is valid (ApprovalStatus as a Number)")
@@ -479,7 +480,10 @@ public class NoticeOfChangeControllerTest {
             this.mockMvc.perform(post(ENDPOINT_URL)
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DONE)))
+                .andExpect(jsonPath("$.confirmation_body", is(CHECK_NOC_APPROVAL_DONE)));
+
         }
 
         @DisplayName("should return 200 status code if all data is valid (ApprovalStatus as a String)")
@@ -509,7 +513,9 @@ public class NoticeOfChangeControllerTest {
             this.mockMvc.perform(post(ENDPOINT_URL)
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_header", is(APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE)))
+                .andExpect(jsonPath("$.confirmation_body", is(APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE)));
         }
 
         @DisplayName("should return 200 status code if ApprovalStatus is not equal to APPROVED")

@@ -36,6 +36,7 @@ public interface DataStoreApiClient {
     String INTERNAL_CASES = "/internal/cases/{caseId}";
     String START_EVENT_TRIGGER = "internal/" + CASES_WITH_ID + "/event-triggers/{eventId}";
     String SUBMIT_EVENT_FOR_CASE = CASES_WITH_ID + "/events";
+    String EXTERNAL_START_EVENT_TRIGGER = "/cases/{caseId}/event-triggers/{eventId}";
 
     @PostMapping(value = SEARCH_CASES, consumes = APPLICATION_JSON_VALUE)
     CaseSearchResponse searchCases(@RequestParam(CASE_TYPE_ID) String caseTypeId,
@@ -62,6 +63,11 @@ public interface DataStoreApiClient {
 
     @GetMapping(START_EVENT_TRIGGER)
     CaseUpdateViewEvent getStartEventTrigger(@RequestHeader(AUTHORIZATION) String userAuthorizationHeader,
+                                             @PathVariable(CASE_ID) String caseId,
+                                             @PathVariable("eventId") String eventId);
+
+    @GetMapping(EXTERNAL_START_EVENT_TRIGGER)
+    StartEventResource getExternalStartEventTrigger(@RequestHeader(AUTHORIZATION) String userAuthorizationHeader,
                                              @PathVariable(CASE_ID) String caseId,
                                              @PathVariable("eventId") String eventId);
 

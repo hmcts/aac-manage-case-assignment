@@ -23,7 +23,7 @@ class NotifyServiceIT extends BaseTest {
         EmailNotificationRequest request =
             new EmailNotificationRequest("22331112222", "simulate-delivered@notifications.service.gov.uk");
         List<EmailNotificationRequestStatus> notificationRequestStatuses =
-            this.notifyService.senEmail(Lists.newArrayList(request));
+            this.notifyService.sendEmail(Lists.newArrayList(request));
 
         assertNotNull(notificationRequestStatuses, "response object should not be null");
         assertEquals(1, notificationRequestStatuses.size(), "size should equals 1");

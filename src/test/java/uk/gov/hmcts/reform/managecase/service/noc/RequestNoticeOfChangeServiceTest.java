@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.SetOrganisationToRemoveResponse;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
@@ -23,6 +26,8 @@ import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
+import javax.validation.ValidationException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,11 +36,14 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap",
     "PMD.AvoidDuplicateLiterals",
@@ -318,5 +326,128 @@ class RequestNoticeOfChangeServiceTest {
         data.put(dataKey, objectMapper.convertValue(changeOrganisationRequest, JsonNode.class));
 
         caseResource.setData(data);
+    }
+
+    @Nested
+    @DisplayName("Set Organisation To Remove")
+    @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
+    class SetOrganisationToRemove {
+
+        private Organisation organisation;
+        private OrganisationPolicy organisationPolicy;
+        private ChangeOrganisationRequest changeOrganisationRequestBefore;
+        private ChangeOrganisationRequest changeOrganisationRequestAfter;
+        private CaseDetails caseDetails;
+
+        @BeforeEach
+        void setUp() {
+            organisation = Organisation.builder()
+                .organisationID("Org1")
+                .organisationName("Organisation 1")
+                .build();
+
+            organisationPolicy = OrganisationPolicy.builder()
+                .organisation(organisation)
+                .orgPolicyReference("PolicyRef")
+                .orgPolicyCaseAssignedRole("Role1")
+                .build();
+
+            changeOrganisationRequestBefore = ChangeOrganisationRequest.builder()
+                .organisationToAdd(new Organisation("123", "Org1"))
+                .organisationToRemove(new Organisation(null, null))
+                .caseRoleId("Role1")
+                .requestTimestamp(LocalDateTime.now())
+                .approvalStatus("1")
+                .build();
+
+            changeOrganisationRequestAfter = ChangeOrganisationRequest.builder()
+                .organisationToAdd(new Organisation("123", "Org1"))
+                .organisationToRemove(new Organisation("Org1", "Organisation 1"))
+                .caseRoleId("Role1")
+                .requestTimestamp(LocalDateTime.now())
+                .approvalStatus("1")
+                .build();
+
+            given(jacksonUtils.convertValue(any(), eq(JsonNode.class)))
+                .willReturn(objectMapper.convertValue(changeOrganisationRequestAfter, JsonNode.class));
+        }
+
+        @Test
+        @DisplayName("Set Organisation To Remove should return successfully")
+        void setOrganisationToRemoveSuccess() {
+            caseDetails = CaseDetails.builder()
+                .data(Map.of(
+                    "OrganisationPolicyField1",
+                    objectMapper.convertValue(organisationPolicy, JsonNode.class),
+                    "ChangeOrganisationRequestField",
+                    objectMapper.convertValue(changeOrganisationRequestBefore, JsonNode.class)
+                ))
+                .build();
+
+            given(jacksonUtils.convertValue(any(), eq(OrganisationPolicy.class)))
+                .willReturn(organisationPolicy);
+
+            SetOrganisationToRemoveResponse response =
+                service.setOrganisationToRemove(caseDetails, changeOrganisationRequestBefore);
+
+            assertThat(response.getData().get("ChangeOrganisationRequestField"))
+                .isEqualTo(objectMapper.convertValue(changeOrganisationRequestAfter, JsonNode.class));
+        }
+
+        @Test
+        @DisplayName("Set Organisation To Remove Should fail when zero organisation policies match case role")
+        void setOrganisationToRemoveShouldFailWhenThereAreNoMatchingOrgPolicies() {
+            organisationPolicy  = OrganisationPolicy.builder()
+                .orgPolicyCaseAssignedRole("role")
+                .orgPolicyReference("ref")
+                .organisation(organisation)
+                .build();
+
+            caseDetails = CaseDetails.builder()
+                .data(Map.of(
+                    "OrganisationPolicyField1",
+                    objectMapper.convertValue(organisationPolicy, JsonNode.class),
+                    "ChangeOrganisationRequestField",
+                    objectMapper.convertValue(changeOrganisationRequestBefore, JsonNode.class)
+                ))
+                .build();
+
+            given(jacksonUtils.convertValue(any(), eq(OrganisationPolicy.class)))
+                .willReturn(organisationPolicy);
+
+            ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> service.setOrganisationToRemove(caseDetails, changeOrganisationRequestBefore)
+            );
+
+            assertThat(exception.getMessage())
+                .isEqualTo(INVALID_CASE_ROLE_FIELD);
+        }
+
+        @Test
+        @DisplayName("Set Organisation To Remove Should fail when more than one organisation policy matches case role")
+        void setOrganisationToRemoveShouldFailWhenThereAreMoreThanOneMatchingOrgPolicies() {
+            caseDetails = CaseDetails.builder()
+                .data(Map.of(
+                    "OrganisationPolicyField1",
+                    objectMapper.convertValue(organisationPolicy, JsonNode.class),
+                    "OrganisationPolicyField2",
+                    objectMapper.convertValue(organisationPolicy, JsonNode.class),
+                    "ChangeOrganisationRequestField",
+                    objectMapper.convertValue(changeOrganisationRequestBefore, JsonNode.class)
+                ))
+                .build();
+
+            given(jacksonUtils.convertValue(any(), eq(OrganisationPolicy.class)))
+                .willReturn(organisationPolicy);
+
+            ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> service.setOrganisationToRemove(caseDetails, changeOrganisationRequestBefore)
+            );
+
+            assertThat(exception.getMessage())
+                .isEqualTo(INVALID_CASE_ROLE_FIELD);
+        }
     }
 }

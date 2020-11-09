@@ -54,7 +54,7 @@ public class CaseDetails {
 
     public Optional<JsonNode> findChangeOrganisationRequestNode() {
         return getData().values().stream()
-            .map(node -> node.findParent(CASE_ROLE_ID))
+            .filter(node -> node.findParent(CASE_ROLE_ID) != null)
             .findFirst();
     }
 }

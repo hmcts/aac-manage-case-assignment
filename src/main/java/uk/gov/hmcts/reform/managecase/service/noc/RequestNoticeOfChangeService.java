@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.SetOrganisationToRemoveResponse;
@@ -40,10 +41,11 @@ public class RequestNoticeOfChangeService {
 
     @Autowired
     public RequestNoticeOfChangeService(NoticeOfChangeQuestions noticeOfChangeQuestions,
-                                        DataStoreRepository dataStoreRepository,
+                                        @Qualifier("nocApprovalDataStoreRepository")
+                                            DataStoreRepository dataStoreRepository,
                                         PrdRepository prdRepository,
                                         JacksonUtils jacksonUtils,
-                                   SecurityUtils securityUtils) {
+                                        SecurityUtils securityUtils) {
         this.dataStoreRepository = dataStoreRepository;
         this.prdRepository = prdRepository;
         this.jacksonUtils = jacksonUtils;
@@ -109,13 +111,13 @@ public class RequestNoticeOfChangeService {
         }
 
         changeOrganisationRequest
-            .getOrganisationToRemove()
-            .setOrganisationID(matchingOrganisationPolicyNodes.get(0).getOrganisation().getOrganisationID());
+            .setOrganisationToRemove(matchingOrganisationPolicyNodes.get(0).getOrganisation());
 
         HashMap<String, JsonNode> data = new HashMap<>();
         IntStream.range(0, organisationPolicyNodes.size())
-            .forEach(index -> data.put("OrganisationPolicyField" + index + 1, organisationPolicyNodes.get(index)));
-        data.put("ChangeOrganisationRequestField", jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
+            .forEach(index -> data.put("OrganisationPolicyField" + (index + 1), organisationPolicyNodes.get(index)));
+        data.put("ChangeOrganisationRequestField",
+                 jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
 
         return SetOrganisationToRemoveResponse.builder()
             .data(data)

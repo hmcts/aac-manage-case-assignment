@@ -17,7 +17,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
-import uk.gov.hmcts.reform.managecase.api.payload.*;
+import uk.gov.hmcts.reform.managecase.api.payload.NoticeOfChangeRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.SetOrganisationToRemoveResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
@@ -638,13 +642,27 @@ public class NoticeOfChangeControllerTest {
         @DisplayName("happy path test without mockMvc")
         @Test
         void directCallHappyPath() {
+            setOrganisationToRemoveResponse = SetOrganisationToRemoveResponse.builder()
+                .data(Map.of(
+                    "OrganisationPolicyField1",
+                    objectMapper.convertValue(organisationPolicy, JsonNode.class),
+                    "ChangeOrganisationRequestField",
+                    objectMapper.convertValue(changeOrganisationRequest, JsonNode.class))
+                )
+                .build();
+
             caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
                   Map.of(
                       "changeOrganisationRequestField",
                       objectMapper.convertValue(changeOrganisationRequest, JsonNode.class),
                       "organisationPolicyField",
                       objectMapper.convertValue(organisationPolicy, JsonNode.class)));
+
+            given(requestNoticeOfChangeService.setOrganisationToRemove(any(), any()))
+                .willReturn(setOrganisationToRemoveResponse);
+
             request = new NoticeOfChangeRequest(null, null, caseDetails);
+
             NoticeOfChangeController controller =
                 new NoticeOfChangeController(service,
                                              approvalService,
@@ -652,14 +670,143 @@ public class NoticeOfChangeControllerTest {
                                              requestNoticeOfChangeService,
                                              jacksonUtils);
 
-            given(requestNoticeOfChangeService.setOrganisationToRemove(caseDetails, changeOrganisationRequest))
-                .willReturn(setOrganisationToRemoveResponse);
-
             ResponseEntity<SetOrganisationToRemoveResponse> response = controller.setOrganisationToRemove(request);
 
             assertThat(response)
                 .isNotNull()
                 .isEqualTo(ResponseEntity.ok(setOrganisationToRemoveResponse));
+        }
+
+        @DisplayName("should return 200 status code if all constraints met")
+        @Test
+        void shouldSetOrganisationToRemove() throws Exception {
+            ChangeOrganisationRequest updatedCOR = ChangeOrganisationRequest.builder()
+                .organisationToAdd(new Organisation("123", "Org1"))
+                .organisationToRemove(new Organisation("234", "Org2"))
+                .caseRoleId("Role1")
+                .requestTimestamp(LocalDateTime.now())
+                .approvalStatus("1")
+                .build();
+
+            setOrganisationToRemoveResponse = SetOrganisationToRemoveResponse.builder()
+                .data(Map.of(
+                    "OrganisationPolicyField1",
+                    objectMapper.convertValue(organisationPolicy, JsonNode.class),
+                    "ChangeOrganisationRequestField",
+                    objectMapper.convertValue(updatedCOR, JsonNode.class))
+                )
+                .build();
+
+            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
+                                          Map.of(
+                                              "changeOrganisationRequestField",
+                                              objectMapper.convertValue(changeOrganisationRequest, JsonNode.class),
+                                              "organisationPolicyField",
+                                              objectMapper.convertValue(organisationPolicy, JsonNode.class)));
+
+            given(requestNoticeOfChangeService.setOrganisationToRemove(any(), any()))
+                .willReturn(setOrganisationToRemoveResponse);
+
+            request = new NoticeOfChangeRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToRemove.OrganisationID",
+                                    is("234")))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToRemove.OrganisationName",
+                                    is("Org2")));
+        }
+
+        @DisplayName("should error if case reference in Case Details is empty")
+        @Test
+        void shouldFailIfCaseReferenceIsEmpty() throws Exception {
+            caseDetails = new CaseDetails(null, "Jurisdiction", "State", "CaseTypeId", new HashMap<>());
+            request = new NoticeOfChangeRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors", hasItem(CASE_ID_EMPTY)));
+        }
+
+        @DisplayName("should error if case reference in Case Details is an invalid length")
+        @Test
+        void shouldFailIfCaseReferenceIsInvalidLength() throws Exception {
+            caseDetails = new CaseDetails("16032064624", "Jurisdiction", "State", "CaseTypeId", new HashMap<>());
+            request = new NoticeOfChangeRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID_LENGTH)));
+        }
+
+        @DisplayName("should error if case reference in Case Details is an invalid Luhn Number")
+        @Test
+        void shouldFailIfCaseReferenceIsInvalidLuhnNumber() throws Exception {
+            caseDetails = new CaseDetails("1588234985453947", "Jurisdiction", "State", "CaseTypeId", new HashMap<>());
+            request = new NoticeOfChangeRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID)));
+        }
+
+        @DisplayName("should error if changeOrganisationRequestField not found in Case Details")
+        @Test
+        void shouldFailIfChangeOrganisationRequestFieldNotFound() throws Exception {
+            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId", new HashMap<>());
+            request = new NoticeOfChangeRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
+        }
+
+        @DisplayName("should error if organisationToRemove fields invalid")
+        @Test
+        void shouldFailIfOrganisationToRemoveFieldsInvalid() throws Exception {
+            changeOrganisationRequest.setOrganisationToRemove(organisation);
+            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
+                              Map.of(
+                                  "changeOrganisationRequestField",
+                                  objectMapper.convertValue(changeOrganisationRequest, JsonNode.class),
+                                  "organisationPolicyField",
+                                  objectMapper.convertValue(organisationPolicy, JsonNode.class)));
+            request = new NoticeOfChangeRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
+        }
+
+        @DisplayName("should error if changeOrganisationRequestField is invalid")
+        @Test
+        void shouldFailIfChangeOrganisationRequestIsInvalid() throws Exception {
+            changeOrganisationRequest.setApprovalStatus(null);
+            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
+                                          Map.of("changeOrganisationRequestField",
+                                                 objectMapper.convertValue(changeOrganisationRequest, JsonNode.class)));
+            request = new NoticeOfChangeRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
         }
     }
 }

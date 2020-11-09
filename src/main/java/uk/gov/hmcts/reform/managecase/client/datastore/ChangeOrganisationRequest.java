@@ -23,8 +23,9 @@ public class ChangeOrganisationRequest {
     @JsonProperty("OrganisationToAdd")
     private final Organisation organisationToAdd;
 
+    @Setter
     @JsonProperty("OrganisationToRemove")
-    private final Organisation organisationToRemove;
+    private Organisation organisationToRemove;
 
     @JsonProperty("CaseRoleId")
     private final String caseRoleId;

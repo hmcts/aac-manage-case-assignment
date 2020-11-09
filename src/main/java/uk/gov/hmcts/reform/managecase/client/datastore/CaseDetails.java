@@ -13,7 +13,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
@@ -50,11 +49,5 @@ public class CaseDetails {
             .map(node -> node.findParents(ORG_POLICY_CASE_ASSIGNED_ROLE))
             .flatMap(List::stream)
             .collect(Collectors.toList());
-    }
-
-    public Optional<JsonNode> findChangeOrganisationRequestNode() {
-        return getData().values().stream()
-            .map(node -> node.findParent(CASE_ROLE_ID))
-            .findFirst();
     }
 }

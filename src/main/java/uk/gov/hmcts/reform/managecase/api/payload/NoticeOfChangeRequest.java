@@ -10,9 +10,9 @@ import javax.validation.Valid;
 
 @Getter
 @AllArgsConstructor
-@ApiModel("Check Notice of Change Approval Request")
+@ApiModel("Notice of Change Request")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CheckNoticeOfChangeApprovalRequest {
+public class NoticeOfChangeRequest {
 
     @JsonProperty("event_id")
     private String eventId;

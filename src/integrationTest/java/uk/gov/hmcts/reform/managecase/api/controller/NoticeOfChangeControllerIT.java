@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import uk.gov.hmcts.reform.managecase.BaseTest;
 import uk.gov.hmcts.reform.managecase.api.payload.CallbackCaseDetails;
-import uk.gov.hmcts.reform.managecase.api.payload.CheckNoticeOfChangeApprovalRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.NoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
@@ -340,7 +340,7 @@ public class NoticeOfChangeControllerIT {
     @DisplayName("POST /noc/check-noc-approval")
     class CheckNoticeOfChangeApproval extends BaseTest {
 
-        private CheckNoticeOfChangeApprovalRequest checkNoticeOfChangeApprovalRequest;
+        private NoticeOfChangeRequest noticeOfChangeRequest;
         private CallbackCaseDetails caseDetails;
         private ChangeOrganisationRequest changeOrganisationRequest;
 
@@ -363,7 +363,7 @@ public class NoticeOfChangeControllerIT {
                                           Map.of("changeOrganisationRequestField",
                                                  mapper.convertValue(changeOrganisationRequest, JsonNode.class)));
 
-            checkNoticeOfChangeApprovalRequest = new CheckNoticeOfChangeApprovalRequest(NOC, null, caseDetails);
+            noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
 
             CaseViewField caseViewField = new CaseViewField();
             FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
@@ -405,7 +405,7 @@ public class NoticeOfChangeControllerIT {
         void shouldSuccessfullyCheckNoCApprovalWithAutoApproval() throws Exception {
             this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
+                .content(mapper.writeValueAsString(noticeOfChangeRequest)))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk());
         }
@@ -424,11 +424,11 @@ public class NoticeOfChangeControllerIT {
                                           Map.of("changeOrganisationRequestField",
                                                  mapper.convertValue(changeOrganisationRequest, JsonNode.class)));
 
-            checkNoticeOfChangeApprovalRequest = new CheckNoticeOfChangeApprovalRequest(NOC, null, caseDetails);
+            noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
+                .content(mapper.writeValueAsString(noticeOfChangeRequest)))
                 .andExpect(status().isOk());
         }
 
@@ -437,11 +437,11 @@ public class NoticeOfChangeControllerIT {
             caseDetails = new CallbackCaseDetails(CASE_ID, "Jurisdiction", "State",
                                           "CaseTypeId", new HashMap<>());
 
-            checkNoticeOfChangeApprovalRequest = new CheckNoticeOfChangeApprovalRequest(NOC, null, caseDetails);
+            noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
+                .content(mapper.writeValueAsString(noticeOfChangeRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
@@ -454,11 +454,11 @@ public class NoticeOfChangeControllerIT {
                                           Map.of("changeOrganisationRequestField",
                                                  mapper.convertValue(changeOrganisationRequest, JsonNode.class)));
 
-            checkNoticeOfChangeApprovalRequest = new CheckNoticeOfChangeApprovalRequest(NOC, null, caseDetails);
+            noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
+                .content(mapper.writeValueAsString(noticeOfChangeRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));

@@ -11,8 +11,10 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -21,6 +23,7 @@ import java.util.Optional;
 public class CallbackCaseDetails {
 
     public static final String CASE_ROLE_ID  = "CaseRoleId";
+    public static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
 
     @NotEmpty(message = ValidationError.CASE_ID_EMPTY)
     @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID_LENGTH)
@@ -37,9 +40,16 @@ public class CallbackCaseDetails {
     @JsonProperty("case_data")
     private Map<String, JsonNode> data;
 
+    public List<JsonNode> findOrganisationPolicyNodes() {
+        return getData().values().stream()
+            .map(node -> node.findParents(ORG_POLICY_CASE_ASSIGNED_ROLE))
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
+    }
+
     public Optional<JsonNode> findChangeOrganisationRequestNode() {
         return getData().values().stream()
-            .map(node -> node.findParent(CASE_ROLE_ID))
+            .filter(node -> node.findParent(CASE_ROLE_ID) != null)
             .findFirst();
     }
 }

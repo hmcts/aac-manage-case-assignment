@@ -26,6 +26,9 @@ public final class ValidationError {
     public static final String NO_ORG_POLICY_WITH_ROLE = "No Organisation Policy for one or more of the roles "
         + "available for the notice of change request";  
 
+    public static final String INVALID_CASE_ROLE_FIELD = "CaseRole field within ChangeOrganisationRequest "
+        + "matched none or more than one OrganisationPolicy on the case";
+
     public static final String ASSIGNEE_ROLE_ERROR = "Intended assignee has to be a solicitor"
         + " enabled in the jurisdiction of the case.";
     public static final String ASSIGNEE_ORGANISATION_ERROR = "Intended assignee has to be in the same"

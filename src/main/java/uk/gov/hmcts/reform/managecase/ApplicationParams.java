@@ -18,6 +18,10 @@ public class ApplicationParams {
     private List<String> ccdDataStoreAllowedUrls;
     @Value("${ccd.data-store.allowed-service}")
     private String ccdDataStoreAllowedService;
+    @Value("${ccd.definition-store.allowed-urls}")
+    private List<String> ccdDefinitionStoreAllowedUrls;
+    @Value("${ccd.definition-store.allowed-service}")
+    private String ccdDefinitionStoreAllowedService;
 
     @Value("${notify.email-template-id}")
     private String emailTemplateId;
@@ -41,6 +45,14 @@ public class ApplicationParams {
         return ccdDataStoreAllowedService;
     }
 
+    public List<String> getCcdDefinitionStoreAllowedUrls() {
+        return ccdDefinitionStoreAllowedUrls;
+    }
+
+    public String getCcdDefinitionStoreAllowedService() {
+        return ccdDefinitionStoreAllowedService;
+    }
+    
     public String getEmailTemplateId() {
         return emailTemplateId;
     }

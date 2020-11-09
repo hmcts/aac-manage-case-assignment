@@ -1,0 +1,69 @@
+{
+	"_guid_": "NoC_Case_Data_Classification",
+
+	"otherParty": {
+		"classification": "PUBLIC",
+		"value": {
+			"litigantType": "PUBLIC",
+			"soletrader": {
+				"classification": "PUBLIC",
+				"value": {
+					"Name": "PUBLIC",
+					"PostalAddress": {
+						"classification": "PRIVATE",
+						"value": {
+							"Country": "PUBLIC",
+							"AddressLine1": "PUBLIC",
+							"AddressLine2": "PUBLIC",
+							"AddressLine3": "PUBLIC"
+						}
+					},
+					"BusinessAddress": {
+						"classification": "RESTRICTED",
+						"value": {
+							"Country": "PUBLIC",
+							"AddressLine1": "PUBLIC",
+							"AddressLine2": "PUBLIC",
+							"AddressLine3": "PUBLIC"
+						}
+					}
+				}
+			}
+		}
+	},
+	"respondent": {
+		"classification": "PUBLIC",
+		"value": {
+			"litigantType": "PUBLIC",
+			"company": {
+				"classification": "PUBLIC",
+				"value": {
+					"Name": "PUBLIC",
+					"BusinessAddress": {
+						"classification": "PUBLIC",
+						"value": {
+							"Country": "PUBLIC",
+							"AddressLine1": "PUBLIC",
+							"AddressLine2": "PUBLIC",
+							"AddressLine3": "PUBLIC"
+						}
+					}
+				}
+			}
+		}
+	},
+	"applicant": {
+		"classification": "PUBLIC",
+		"value": {
+			"litigantType": "PUBLIC",
+			"individual": {
+				"classification": "PUBLIC",
+				"value": {
+					"Title": "PUBLIC",
+					"LastName": "PUBLIC"
+				}
+			}
+		}
+	}
+
+}

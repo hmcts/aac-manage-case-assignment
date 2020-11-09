@@ -8,7 +8,7 @@
 
   "user": {
     "username": "master.caa@gmail.com",
-    "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    "password": "[[$IDAM_SYSTEM_USER_PASSWORD]]"
   },
 
   "request": {

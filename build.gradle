@@ -98,7 +98,7 @@ task functional(type: Test) {
 
   generateCucumberReports.enabled = false
 
-  doFirst {
+  doLast {
     generateCucumberReports.enabled = true
     cucumberReports.outputDir = file("${project.buildDir}/reports/tests/befta/functional")
     cucumberReports.reports = files("${cucumberReports.outputDir}/cucumber.json")
@@ -106,7 +106,7 @@ task functional(type: Test) {
     javaexec {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-      args = ['--plugin', "json:${cucumberReports.outputDir}/cucumber.json", '--tags', '@F-204', '--glue',
+      args = ['--plugin', "json:${cucumberReports.outputDir}/cucumber.json", '--tags', 'not @Ignore', '--glue',
               'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features']
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
@@ -187,6 +187,12 @@ dependencyManagement {
     // multiple CVEs
     dependencySet(group: 'com.netflix.servo', version: '0.12.4') {
       entry 'servo-core'
+    }
+    dependencySet(group: 'org.codehaus.groovy', version: '3.0.3') {
+      entry 'groovy'
+      entry 'groovy-xml'
+      entry 'groovy-json'
+      entry 'groovy-nio'
     }
   }
 }

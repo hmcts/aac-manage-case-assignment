@@ -1,0 +1,26 @@
+{
+  "_guid_": "S-208.7",
+
+  "title": "Must return an error for a malformed Case ID",
+
+  "specs": [
+    "intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user",
+    "contains a malformed 16 digit case ID number"
+  ],
+
+  "request": {
+    "body": {
+      "_extends_": "",
+
+      "case_id": "Non-Luhn-Number-"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "status" : "BAD_REQUEST",
+      "errors": [ "Case ID has to be a valid 16-digit Luhn number" ]
+    }
+  }
+}

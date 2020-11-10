@@ -1,5 +1,5 @@
 #=============================================
-@F-207
+@F-208
 Feature: F-207: Set Organisation To Remove
 #=============================================
 
@@ -8,7 +8,7 @@ Feature: F-207: Set Organisation To Remove
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-87 / AC-1
-@S-207.1
+@S-208.1
 Scenario: (Happy Path) Successfully set up the OrganisationToRemove in the ChangeOrganisationRequest and return the updated case record for a Remove event
 
     Given a request is prepared with appropriate values,
@@ -23,7 +23,7 @@ Scenario: (Happy Path) Successfully set up the OrganisationToRemove in the Chang
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-87 / AC-2
-@S-207.2
+@S-208.2
 Scenario: Must return an error for a non extant case record
 
     Given a successful call [by Dil - a solicitor who has triggered a NoC Request which contains answers identifying a case role on a case - C1],
@@ -40,7 +40,7 @@ Scenario: Must return an error for a non extant case record
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-87 / AC-3
-@S-207.3
+@S-208.3
 Scenario: Must return error if the ChangeOrganisationRequest.CaseRole is missing
 
     Given a request is prepared with appropriate values,
@@ -54,10 +54,8 @@ Scenario: Must return error if the ChangeOrganisationRequest.CaseRole is missing
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-87 / AC-4
-@S-207.4
+@S-208.4
 Scenario: Must return error if the ChangeOrganisationRequest.CaseRole is null
-
-    Given an appropriate test context as detailed in the test data source,
 
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
@@ -70,10 +68,8 @@ Scenario: Must return error if the ChangeOrganisationRequest.CaseRole is null
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-87 / AC-5
-@S-207.5
-Scenario: Must return error if there is more then one OrganisationPolicy CaseRole on the case which matches the ChangeOrganisationRequest.CaseRole
-
-    Given an appropriate test context as detailed in the test data source,
+@S-208.5
+Scenario: Must return error if there is more than one OrganisationPolicy CaseRole on the case which matches the ChangeOrganisationRequest.CaseRole
 
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
@@ -86,10 +82,8 @@ Scenario: Must return error if there is more then one OrganisationPolicy CaseRol
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-87 / AC-6
-@S-207.6
+@S-208.6
 Scenario: Must return error if no OrganisationPolicy CaseRole on the case matches the ChangeOrganisationRequest.CaseRole
-
-    Given an appropriate test context as detailed in the test data source,
 
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
@@ -102,7 +96,7 @@ Scenario: Must return error if no OrganisationPolicy CaseRole on the case matche
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-87 / AC-7
-@S-207.7
+@S-208.7
 Scenario: Must return an error for a malformed Case ID
 
     Given a successful call [by Dil - a solicitor who has triggered a NoC Request which contains answers identifying a case role on a case - C1],

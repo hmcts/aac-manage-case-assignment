@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
+import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -121,6 +122,12 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     public CaseUpdateViewEvent getStartEventTrigger(String caseId, String eventId) {
         String userAuthToken = getUserAuthToken();
         return dataStoreApi.getStartEventTrigger(userAuthToken, caseId, eventId);
+    }
+
+    @Override
+    public StartEventResource getExternalStartEventTrigger(String caseId, String eventId) {
+        String userAuthToken = getUserAuthToken();
+        return dataStoreApi.getExternalStartEventTrigger(userAuthToken, caseId, eventId);
     }
 
     @Override

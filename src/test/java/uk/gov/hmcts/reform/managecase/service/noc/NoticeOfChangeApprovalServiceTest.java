@@ -5,28 +5,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import uk.gov.hmcts.reform.managecase.client.datastore.CallbackCaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
+import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
 import uk.gov.hmcts.reform.managecase.repository.NocApprovalDataStoreRepository;
-import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
-import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_DECISION_EVENT_UNIDENTIFIABLE;
@@ -41,8 +38,6 @@ public class NoticeOfChangeApprovalServiceTest {
 
     @Mock
     private NocApprovalDataStoreRepository repository;
-    @Mock
-    private JacksonUtils jacksonUtils;
 
     @BeforeEach
     void setUp() {
@@ -53,50 +48,57 @@ public class NoticeOfChangeApprovalServiceTest {
     @DisplayName("Check Notice of Change Approval")
     class CheckNoticeOfChangeApproval {
 
-        private CaseViewEvent caseViewEvent;
+        public static final String EVENT_ID = "NOC";
+        public static final String EVENT_TOKEN = "eventToken";
+
+        private CaseViewActionableEvent caseViewEvent;
         private CaseViewResource caseViewResource;
-        private CaseUpdateViewEvent caseUpdateViewEvent;
-        private CaseViewField caseViewField;
-        private FieldTypeDefinition fieldTypeDefinition;
-        private JsonNode node;
+        private StartEventResource startEventResource;
+        private Map<String, JsonNode> data;
 
         @BeforeEach
         void setUp() {
-            node = mock(JsonNode.class);
-            caseViewField = new CaseViewField();
-            fieldTypeDefinition = new FieldTypeDefinition();
-            fieldTypeDefinition.setId("OrganisationPolicy");
-            caseViewField.setFieldTypeDefinition(fieldTypeDefinition);
+            data = new HashMap<>();
 
-            caseUpdateViewEvent = CaseUpdateViewEvent.builder()
-                .caseFields(new ArrayList<>(Arrays.asList(caseViewField)))
-                .eventToken("eventToken")
+            startEventResource = StartEventResource.builder()
+                .eventId(EVENT_ID)
+                .token(EVENT_TOKEN)
+                .caseDetails(CallbackCaseDetails.builder().id(CASE_ID).data(data).build())
                 .build();
 
-            caseViewEvent = new CaseViewEvent();
-            caseViewEvent.setEventId("NOC");
+            caseViewEvent = new CaseViewActionableEvent();
+            caseViewEvent.setId(EVENT_ID);
             caseViewResource = new CaseViewResource();
-            caseViewResource.setCaseViewEvents(new CaseViewEvent[]{caseViewEvent});
+            caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[]{caseViewEvent});
 
             given(repository.findCaseByCaseId(CASE_ID))
                 .willReturn(caseViewResource);
-            given(repository.getStartEventTrigger(anyString(), anyString()))
-                .willReturn(caseUpdateViewEvent);
-            given(jacksonUtils.convertValue(any(CaseViewField.class), any()))
-                .willReturn(node);
+            given(repository.getExternalStartEventTrigger(anyString(), anyString()))
+                .willReturn(startEventResource);
         }
 
         @Test
         @DisplayName("Submit Event for Check NoC Approval")
         void checkNoticeOfChangeApproval() {
             service.checkNoticeOfChangeApproval(CASE_ID);
-            verify(repository).submitEventForCaseOnly(eq(CASE_ID), any(CaseDataContent.class));
+
+            ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
+            verify(repository).submitEventForCaseOnly(eq(CASE_ID), captor.capture());
+
+            assertThat(captor.getValue().getEvent().getEventId()).isEqualTo(EVENT_ID);
+            assertThat(captor.getValue().getToken()).isEqualTo(EVENT_TOKEN);
+            assertThat(captor.getValue().getData()).isEqualTo(data);
         }
 
         @Test
-        @DisplayName("must return an error when the CaseUpdateViewEvent token is null")
+        @DisplayName("must return an error when the startEventResource token is null")
         void shouldThrowErrorWhenCaseUpdateViewEventTokenIsNull() {
-            caseUpdateViewEvent.setEventToken(null);
+            startEventResource = StartEventResource.builder()
+                .eventId("NOC")
+                .build();
+
+            given(repository.getExternalStartEventTrigger(anyString(), anyString()))
+                .willReturn(startEventResource);
 
             assertThatThrownBy(() -> service.checkNoticeOfChangeApproval(CASE_ID))
                 .isInstanceOf(ValidationException.class)
@@ -104,9 +106,9 @@ public class NoticeOfChangeApprovalServiceTest {
         }
 
         @Test
-        @DisplayName("must return an error when the CaseViewEvent list is empty")
+        @DisplayName("must return an error when the CaseViewActionableEvent list is empty")
         void shouldThrowErrorWhenCaseViewEventListIsEmpty() {
-            caseViewResource.setCaseViewEvents(new CaseViewEvent[]{});
+            caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[]{});
 
             assertThatThrownBy(() -> service.checkNoticeOfChangeApproval(CASE_ID))
                 .isInstanceOf(ValidationException.class)
@@ -114,9 +116,9 @@ public class NoticeOfChangeApprovalServiceTest {
         }
 
         @Test
-        @DisplayName("must return an error when the CaseViewEvent list length is greater than one")
+        @DisplayName("must return an error when the CaseViewActionableEvent list length is greater than one")
         void shouldThrowErrorWhenCaseViewEventListLengthGreaterThanOne() {
-            caseViewResource.setCaseViewEvents(new CaseViewEvent[]{caseViewEvent, caseViewEvent});
+            caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[]{caseViewEvent, caseViewEvent});
 
             assertThatThrownBy(() -> service.checkNoticeOfChangeApproval(CASE_ID))
                 .isInstanceOf(ValidationException.class)

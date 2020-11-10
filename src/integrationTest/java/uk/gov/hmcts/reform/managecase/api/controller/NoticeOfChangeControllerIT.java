@@ -12,18 +12,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import uk.gov.hmcts.reform.managecase.BaseTest;
-import uk.gov.hmcts.reform.managecase.api.payload.CallbackCaseDetails;
 import uk.gov.hmcts.reform.managecase.api.payload.NoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.CallbackCaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
+import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewEvent;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
@@ -58,9 +57,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getCaseViewFields;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getWizardPages;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
@@ -71,14 +70,14 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseViaExternalApi;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternal;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternalAsApprover;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternalES;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseViaExternalApi;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetChallengeQuestions;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetExternalStartEventTriggerAsApprover;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetStartEventTrigger;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSubmitEventForCase;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternalAsApprover;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetStartEventTriggerAsApprover;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.UseConcurrentHashMap",
@@ -367,39 +366,33 @@ public class NoticeOfChangeControllerIT {
 
             noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
 
-            CaseViewField caseViewField = new CaseViewField();
-            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-            fieldTypeDefinition.setId("OrganisationPolicy");
-            caseViewField.setId("applicantOrganisationPolicy");
-            caseViewField.setFieldTypeDefinition(fieldTypeDefinition);
-
-            CaseViewEvent caseViewEvent = new CaseViewEvent();
-            caseViewEvent.setEventId("NOC");
+            CaseViewActionableEvent caseViewEvent = new CaseViewActionableEvent();
+            caseViewEvent.setId(NOC);
             CaseViewResource caseViewResource = new CaseViewResource();
-            caseViewResource.setCaseViewEvents(new CaseViewEvent[]{caseViewEvent});
+            caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[]{caseViewEvent});
 
             Event event = Event.builder()
-                .eventId(caseViewResource.getCaseViewEvents()[0].getEventId())
+                .eventId(NOC)
                 .description("Check Notice of Change Approval Event")
                 .build();
 
-            CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
-                .caseFields(new ArrayList<>(Arrays.asList(caseViewField)))
-                .eventToken("eventToken")
+            StartEventResource startEventResource = StartEventResource.builder()
+                .eventId(NOC)
+                .token("eventToken")
+                .caseDetails(caseDetails)
                 .build();
 
             HashMap<String, JsonNode> data = new HashMap<>();
-            data.put(caseViewField.getId(), mapper.convertValue(caseViewField, JsonNode.class));
             CaseDataContent caseDataContent = CaseDataContent.builder()
-                .token(caseUpdateViewEvent.getEventToken())
+                .token(startEventResource.getToken())
                 .event(event)
-                .data(data)
+                .data(caseDetails.getData())
                 .build();
 
             CaseResource caseResource = CaseResource.builder().build();
 
             stubGetCaseInternalAsApprover(CASE_ID, caseViewResource);
-            stubGetStartEventTriggerAsApprover(CASE_ID, NOC, caseUpdateViewEvent);
+            stubGetExternalStartEventTriggerAsApprover(CASE_ID, NOC, startEventResource);
             stubSubmitEventForCase(CASE_ID, caseDataContent, caseResource);
         }
 

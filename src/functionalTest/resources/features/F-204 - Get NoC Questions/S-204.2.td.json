@@ -4,7 +4,7 @@
 
   "user": {
     "username" : "befta.pui.caa.1@gmail.com",
-    "password" : "[[$CCD_BEFTA_MASTER_SOLICITOR_2_PWD]]"
+    "password" : "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
   },
 
   "specs" : [

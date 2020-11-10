@@ -52,4 +52,13 @@ public class CallbackCaseDetails {
             .filter(node -> node.findParent(CASE_ROLE_ID) != null)
             .findFirst();
     }
+
+    public String getKeyFromDataWithValue(JsonNode value) {
+        for (String key : data.keySet()) {
+            if (data.get(key).equals(value)) {
+                return key;
+            }
+        }
+        return null;
+    }
 }

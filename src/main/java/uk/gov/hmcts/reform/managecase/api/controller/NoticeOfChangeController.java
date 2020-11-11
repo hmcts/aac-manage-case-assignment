@@ -377,7 +377,10 @@ public class NoticeOfChangeController {
             || changeOrganisationRequest.getOrganisationToRemove().getOrganisationName() != null) {
             throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
         }
+        String changeOrganisationKey = caseDetails.getKeyFromDataWithValue(changeOrganisationRequestFieldJson.get());
 
-        return requestNoticeOfChangeService.setOrganisationToRemove(caseDetails, changeOrganisationRequest);
+        return requestNoticeOfChangeService.setOrganisationToRemove(caseDetails,
+                                                                    changeOrganisationRequest,
+                                                                    changeOrganisationKey);
     }
 }

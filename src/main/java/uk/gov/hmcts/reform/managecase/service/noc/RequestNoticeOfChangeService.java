@@ -94,8 +94,9 @@ public class RequestNoticeOfChangeService {
             .build();
     }
 
-    public SetOrganisationToRemoveResponse setOrganisationToRemove(
-        CallbackCaseDetails caseDetails, ChangeOrganisationRequest changeOrganisationRequest) {
+    public SetOrganisationToRemoveResponse setOrganisationToRemove(CallbackCaseDetails caseDetails,
+                                                                   ChangeOrganisationRequest changeOrganisationRequest,
+                                                                   String changeOrganisationKey) {
 
         List<JsonNode> organisationPolicyNodes = caseDetails.findOrganisationPolicyNodes();
         List<OrganisationPolicy> matchingOrganisationPolicyNodes =
@@ -114,8 +115,7 @@ public class RequestNoticeOfChangeService {
             .setOrganisationToRemove(matchingOrganisationPolicyNodes.get(0).getOrganisation());
 
         Map<String, JsonNode> data = new HashMap<>(caseDetails.getData());
-        data.put(caseDetails.getKeyFromDataWithValue(caseDetails.findChangeOrganisationRequestNode().get()),
-                 jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
+        data.put(changeOrganisationKey, jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
 
         return SetOrganisationToRemoveResponse.builder()
             .data(data)

@@ -385,7 +385,9 @@ class RequestNoticeOfChangeServiceTest {
                 .willReturn(organisationPolicy);
 
             SetOrganisationToRemoveResponse response =
-                service.setOrganisationToRemove(callbackCaseDetails, changeOrganisationRequestBefore);
+                service.setOrganisationToRemove(callbackCaseDetails,
+                                                changeOrganisationRequestBefore,
+                                                "ChangeOrganisationRequestField");
 
             assertThat(response.getData().get("ChangeOrganisationRequestField"))
                 .isEqualTo(objectMapper.convertValue(changeOrganisationRequestAfter, JsonNode.class));
@@ -414,8 +416,9 @@ class RequestNoticeOfChangeServiceTest {
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> service.setOrganisationToRemove(callbackCaseDetails, changeOrganisationRequestBefore)
-            );
+                () -> service.setOrganisationToRemove(callbackCaseDetails,
+                                                      changeOrganisationRequestBefore,
+                                                      "ChangeOrganisationRequestField"));
 
             assertThat(exception.getMessage())
                 .isEqualTo(INVALID_CASE_ROLE_FIELD);
@@ -440,8 +443,9 @@ class RequestNoticeOfChangeServiceTest {
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> service.setOrganisationToRemove(callbackCaseDetails, changeOrganisationRequestBefore)
-            );
+                () -> service.setOrganisationToRemove(callbackCaseDetails,
+                                                      changeOrganisationRequestBefore,
+                                                      "ChangeOrganisationRequestField"));
 
             assertThat(exception.getMessage())
                 .isEqualTo(INVALID_CASE_ROLE_FIELD);

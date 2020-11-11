@@ -666,7 +666,7 @@ public class NoticeOfChangeControllerTest {
                       "organisationPolicyField",
                       objectMapper.convertValue(organisationPolicy, JsonNode.class)));
 
-            given(requestNoticeOfChangeService.setOrganisationToRemove(any(), any()))
+            given(requestNoticeOfChangeService.setOrganisationToRemove(any(), any(), any()))
                 .willReturn(setOrganisationToRemoveResponse);
 
             request = new NoticeOfChangeRequest(null, null, caseDetails);
@@ -712,7 +712,7 @@ public class NoticeOfChangeControllerTest {
                                               "organisationPolicyField",
                                               objectMapper.convertValue(organisationPolicy, JsonNode.class)));
 
-            given(requestNoticeOfChangeService.setOrganisationToRemove(any(), any()))
+            given(requestNoticeOfChangeService.setOrganisationToRemove(any(), any(), any()))
                 .willReturn(setOrganisationToRemoveResponse);
 
             request = new NoticeOfChangeRequest(null, null, caseDetails);

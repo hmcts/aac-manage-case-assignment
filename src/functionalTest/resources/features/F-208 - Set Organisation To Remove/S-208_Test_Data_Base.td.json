@@ -1,8 +1,8 @@
 {
   "_guid_" : "S-208_Test_Data_Base",
 
-  "productName": "Case Assignment Microservice",
-  "operationName": "Set Organisation To Remove",
+  "productName": "Manage Case Assignment Microservice",
+  "operationName": "SetOrganisationToRemove",
 
   "method": "POST",
   "uri": "noc/set-organisation-to-remove",
@@ -10,10 +10,8 @@
   "s2sClientId": "xui_webapp",
   "userTokenClientId": "xuiwebapp",
 
-  "users": {
-    "invokingUser": {
+  "user": {
       "_extends_": "Common_User_For_Request"
-    }
   },
 
   "request": {

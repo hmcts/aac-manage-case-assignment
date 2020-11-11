@@ -1,6 +1,6 @@
 #=============================================
 @F-208
-Feature: F-207: Set Organisation To Remove
+Feature: F-208: Set Organisation To Remove
 #=============================================
 
   Background:
@@ -8,26 +8,23 @@ Feature: F-207: Set Organisation To Remove
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-87 / AC-1
-@S-208.1
-Scenario: (Happy Path) Successfully set up the OrganisationToRemove in the ChangeOrganisationRequest and return the updated case record for a Remove event
-
-    Given a request is prepared with appropriate values,
-      And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
-      And the request [contains a case record containing exactly one OrganisationPolicy.OrgPolicyCaseAssignedRole matching the ChangeOrganisationRequest.CaseRole],
-      And it is submitted to call the [SetOrganisationToRemove] operation of [Manage Case Assignment Microservice],
-
-    Then a positive response is received,
-      And the response has all the details as expected,
-      And the response [includes ChangeOrganisationRequest.OrganisationToRemove is equal to the organisation ID in the Organisation policy that has a OrgPolicyCaseAssignedRole matching the COR.CaseRole] will get the expected response as in [YYY].
+#@S-208.1
+#Scenario: (Happy Path) Successfully set up the OrganisationToRemove in the ChangeOrganisationRequest and return the updated case record for a Remove event
+#
+#    Given a request is prepared with appropriate values,
+#      And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
+#      And the request [contains a case record containing exactly one OrganisationPolicy.OrgPolicyCaseAssignedRole matching the ChangeOrganisationRequest.CaseRole],
+#      And it is submitted to call the [SetOrganisationToRemove] operation of [Manage Case Assignment Microservice],
+#
+#    Then a positive response is received,
+#      And the response has all the details as expected,
+#      And the response [includes ChangeOrganisationRequest.OrganisationToRemove is equal to the organisation ID in the Organisation policy that has a OrgPolicyCaseAssignedRole matching the COR.CaseRole] will get the expected response as in [YYY].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-87 / AC-2
 @S-208.2
 Scenario: Must return an error for a non extant case record
-
-    Given a successful call [by Dil - a solicitor who has triggered a NoC Request which contains answers identifying a case role on a case - C1],
-      And a successful call [is made to verify that the NoCRequest has been approved],
 
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
@@ -98,9 +95,6 @@ Scenario: Must return error if no OrganisationPolicy CaseRole on the case matche
 # ACA-87 / AC-7
 @S-208.7
 Scenario: Must return an error for a malformed Case ID
-
-    Given a successful call [by Dil - a solicitor who has triggered a NoC Request which contains answers identifying a case role on a case - C1],
-      And a successful call [is made to verify that the NoCRequest has been approved],
 
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],

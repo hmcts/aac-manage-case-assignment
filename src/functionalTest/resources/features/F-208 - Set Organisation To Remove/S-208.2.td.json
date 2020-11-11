@@ -1,0 +1,28 @@
+{
+  "_guid_": "S-208.2",
+  "_extends_": "S-208_Test_Data_Base",
+
+  "title": "Must return an error for a non extant case record",
+
+  "specs": [
+    "intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user",
+    "does not contain a case record"
+  ],
+
+  "request": {
+    "body": {
+      "event_id": "[[ANYTHING_PRESENT]]",
+      "case_details_before": "[[ANYTHING_PRESENT]]",
+      "case_details": {}
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "status" : "BAD_REQUEST",
+      "message": "?",
+      "errors" : [ ]
+    }
+  }
+}

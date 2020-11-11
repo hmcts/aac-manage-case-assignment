@@ -16,7 +16,7 @@
       "case_details": {
         "id": "[[ANYTHING_PRESENT]]",
         "jurisdiction": "BEFTA_MASTER",
-        "state": "",
+        "state": "open",
         "case_type_id": "FT_MasterCaseType",
         "data": {
           "changeOrganisationRequestField": {

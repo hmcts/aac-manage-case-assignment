@@ -1,8 +1,12 @@
 package uk.gov.hmcts.reform.managecase.service;
 
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseIdLuhnException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
@@ -12,6 +16,8 @@ import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 
 import javax.validation.ValidationException;
 
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.EVENT_TOKEN_NOT_PRESENT;
 
 @Service
@@ -31,7 +37,7 @@ public class NoticeOfChangeApprovalService {
     }
 
     public void checkNoticeOfChangeApproval(String caseId) {
-        CaseViewResource caseViewResource = dataStoreRepository.findCaseByCaseId(caseId);
+        CaseViewResource caseViewResource = findCaseByCaseId(caseId);
         CaseViewActionableEvent[] events = caseViewResource.getCaseViewActionableEvents();
 
 
@@ -52,6 +58,7 @@ public class NoticeOfChangeApprovalService {
                 .token(startEvent.getToken())
                 .event(Event.builder()
                     .eventId(eventId)
+                    .summary(CHECK_NOC_APPROVAL_DESCRIPTION)
                     .description(CHECK_NOC_APPROVAL_DESCRIPTION)
                     .build())
                 .data(startEvent.getCaseDetails().getData())
@@ -59,5 +66,18 @@ public class NoticeOfChangeApprovalService {
 
             dataStoreRepository.submitEventForCaseOnly(caseId, caseDataContent);
         }
+    }
+
+    private CaseViewResource findCaseByCaseId(String caseId) {
+        CaseViewResource caseViewResource;
+        try {
+            caseViewResource = dataStoreRepository.findCaseByCaseId(caseId);
+        } catch (FeignException e) {
+            if (HttpStatus.NOT_FOUND.value() == e.status()) {
+                throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
+            }
+            throw e;
+        }
+        return caseViewResource;
     }
 }

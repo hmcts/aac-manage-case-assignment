@@ -1,0 +1,50 @@
+{
+  "_guid_": "S-207.5",
+  "_extends_": "Check_NoC_Approval__Base",
+
+  "title": "Must return an error response for a non-extant Case ID",
+
+  "specs": [
+    "Dil - with a solicitor role",
+
+    "contains a non extant case record",
+    "is made by the system user (caseworker-caa IdAM role) to check if the NOC Request made by Dil has been auto-approved"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "request": {
+    "body": {
+      "event_id": "nocRequest_autoApproval",
+      "case_details": {
+        "id": "4444333322221111",
+        "jurisdiction": "BEFTA_MASTER",
+        "data": {
+          "changeOrganisationRequestField" : {
+            "CaseRoleId" : "[RespondentSolicitor]",
+            "ApprovalStatus" : "1",
+            "RequestTimestamp": "2020-02-20T06:30:00",
+            "OrganisationToAdd" : {
+              "OrganisationID": "Org-Two"
+            },
+            "OrganisationToRemove": {
+              "OrganisationID": null
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_404_Response",
+    "body": {
+      "message": "Case could not be found",
+      "errors": []
+    }
+  }
+}

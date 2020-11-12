@@ -7,14 +7,12 @@
   "specs": [
     "system_user - with caseworker-caa IdAM role",
     "intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user",
-    "does not contain a case record",
-    "is made by the system_user - with caseworker-caa IdAM role"
+    "does not contain a case record"
   ],
 
   "request": {
     "body": {
-      "event_id": "[[ANYTHING_PRESENT]]",
-      "case_details_before": "[[ANYTHING_PRESENT]]",
+      "event_id": "nocRequest_setOrgToRemove",
       "case_details": {}
     }
   },

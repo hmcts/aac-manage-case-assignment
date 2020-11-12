@@ -7,23 +7,21 @@
   "specs": [
     "system_user - with caseworker-caa IdAM role",
     "intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user",
-    "contains a case record for which the ChangeOrganisationRequest.CaseRole is null",
-    "is made by the system_user - with caseworker-caa IdAM role"
+    "contains a case record for which the ChangeOrganisationRequest.CaseRole is null"
   ],
 
   "request": {
     "body": {
-      "event_id": "[[ANYTHING_PRESENT]]",
-      "case_details_before": "[[ANYTHING_PRESENT]]",
+      "event_id": "nocRequest_setOrgToRemove",
       "case_details": {
-        "id": "[[ANYTHING_PRESENT]]",
+        "id": "4444333322221111",
         "jurisdiction": "BEFTA_MASTER",
         "state": "open",
         "case_type_id": "FT_MasterCaseType",
         "data": {
           "changeOrganisationRequestField": {
             "CaseRoleId": null,
-            "RequestTimestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+            "RequestTimestamp" : "2020-02-20T06:30:00",
             "OrganisationToAdd": {
               "OrganisationID": "PUBLIC",
               "OrganisationName": "PUBLIC"

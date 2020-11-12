@@ -21,8 +21,8 @@ import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
@@ -94,8 +94,9 @@ public class RequestNoticeOfChangeService {
             .build();
     }
 
-    public SetOrganisationToRemoveResponse setOrganisationToRemove(
-        CallbackCaseDetails caseDetails, ChangeOrganisationRequest changeOrganisationRequest) {
+    public SetOrganisationToRemoveResponse setOrganisationToRemove(CallbackCaseDetails caseDetails,
+                                                                   ChangeOrganisationRequest changeOrganisationRequest,
+                                                                   String changeOrganisationKey) {
 
         List<JsonNode> organisationPolicyNodes = caseDetails.findOrganisationPolicyNodes();
         List<OrganisationPolicy> matchingOrganisationPolicyNodes =
@@ -113,11 +114,8 @@ public class RequestNoticeOfChangeService {
         changeOrganisationRequest
             .setOrganisationToRemove(matchingOrganisationPolicyNodes.get(0).getOrganisation());
 
-        HashMap<String, JsonNode> data = new HashMap<>();
-        IntStream.range(0, organisationPolicyNodes.size())
-            .forEach(index -> data.put("OrganisationPolicyField" + (index + 1), organisationPolicyNodes.get(index)));
-        data.put("ChangeOrganisationRequestField",
-                 jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
+        Map<String, JsonNode> data = new HashMap<>(caseDetails.getData());
+        data.put(changeOrganisationKey, jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
 
         return SetOrganisationToRemoveResponse.builder()
             .data(data)

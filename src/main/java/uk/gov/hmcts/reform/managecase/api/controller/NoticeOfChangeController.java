@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -329,7 +328,8 @@ public class NoticeOfChangeController {
     @ApiResponses({
         @ApiResponse(
             code = 200,
-            message = StringUtils.EMPTY
+            message = StringUtils.EMPTY,
+            response = SetOrganisationToRemoveResponse.class
         ),
         @ApiResponse(
             code = 400,
@@ -359,7 +359,7 @@ public class NoticeOfChangeController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
-    public ResponseEntity<SetOrganisationToRemoveResponse> setOrganisationToRemove(@Valid @RequestBody
+    public SetOrganisationToRemoveResponse setOrganisationToRemove(@Valid @RequestBody
                                                                        NoticeOfChangeRequest noticeOfChangeRequest) {
         CallbackCaseDetails caseDetails = noticeOfChangeRequest.getCaseDetails();
         Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
@@ -377,8 +377,10 @@ public class NoticeOfChangeController {
             || changeOrganisationRequest.getOrganisationToRemove().getOrganisationName() != null) {
             throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
         }
+        String changeOrganisationKey = caseDetails.getKeyFromDataWithValue(changeOrganisationRequestFieldJson.get());
 
-        return ResponseEntity.ok(
-            requestNoticeOfChangeService.setOrganisationToRemove(caseDetails, changeOrganisationRequest));
+        return requestNoticeOfChangeService.setOrganisationToRemove(caseDetails,
+                                                                    changeOrganisationRequest,
+                                                                    changeOrganisationKey);
     }
 }

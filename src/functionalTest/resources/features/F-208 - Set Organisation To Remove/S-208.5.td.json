@@ -1,0 +1,64 @@
+{
+  "_guid_": "S-208.5",
+  "_extends_": "S-208_Test_Data_Base",
+
+  "title": "Must return error if there is more than one OrganisationPolicy CaseRole on the case which matches the ChangeOrganisationRequest.CaseRole",
+
+  "specs": [
+    "system_user - with caseworker-caa IdAM role",
+    "intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user",
+    "contains a case record containing more than one OrganisationPolicy.OrgPolicyCaseAssignedRole matching the ChangeOrganisationRequest.CaseRole"
+  ],
+
+  "request": {
+    "body": {
+      "event_id": "nocRequest_setOrgToRemove",
+      "case_details": {
+        "id": "4444333322221111",
+        "jurisdiction": "BEFTA_MASTER",
+        "state": "open",
+        "case_type_id": "FT_MasterCaseType",
+        "data": {
+          "changeOrganisationRequestField": {
+            "CaseRoleId": "[ApplicantSolicitor]",
+            "RequestTimestamp" : "2020-02-20T06:30:00",
+            "OrganisationToAdd": {
+              "OrganisationID": "PUBLIC",
+              "OrganisationName": "PUBLIC"
+            },
+            "OrganisationToRemove": {
+              "OrganisationID": null,
+              "OrganisationName": null
+            },
+            "ApprovalStatus": "0"
+          },
+          "applicantOrganisationPolicy": {
+            "OrgPolicyReference": "ApplicantPolicy",
+            "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
+            "Organisation": {
+              "OrganisationID": "Org1",
+              "OrganisationName": "Organisation 1"
+            }
+          },
+          "respondentOrganisationPolicy": {
+            "OrgPolicyReference": "ApplicantPolicy",
+            "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
+            "Organisation": {
+              "OrganisationID": "Org2",
+              "OrganisationName": "Organisation 2"
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "status" : "BAD_REQUEST",
+      "message": "CaseRole field within ChangeOrganisationRequest matched none or more than one OrganisationPolicy on the case",
+      "errors" : [ ]
+    }
+  }
+}

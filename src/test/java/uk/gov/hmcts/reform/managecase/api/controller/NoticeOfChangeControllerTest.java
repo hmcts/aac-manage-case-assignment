@@ -14,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
 import uk.gov.hmcts.reform.managecase.api.payload.NoticeOfChangeRequest;
@@ -667,7 +666,7 @@ public class NoticeOfChangeControllerTest {
                       "organisationPolicyField",
                       objectMapper.convertValue(organisationPolicy, JsonNode.class)));
 
-            given(requestNoticeOfChangeService.setOrganisationToRemove(any(), any()))
+            given(requestNoticeOfChangeService.setOrganisationToRemove(any(), any(), any()))
                 .willReturn(setOrganisationToRemoveResponse);
 
             request = new NoticeOfChangeRequest(null, null, caseDetails);
@@ -679,11 +678,11 @@ public class NoticeOfChangeControllerTest {
                                              requestNoticeOfChangeService,
                                              jacksonUtils);
 
-            ResponseEntity<SetOrganisationToRemoveResponse> response = controller.setOrganisationToRemove(request);
+            SetOrganisationToRemoveResponse response = controller.setOrganisationToRemove(request);
 
             assertThat(response)
                 .isNotNull()
-                .isEqualTo(ResponseEntity.ok(setOrganisationToRemoveResponse));
+                .isEqualTo(setOrganisationToRemoveResponse);
         }
 
         @DisplayName("should return 200 status code if all constraints met")
@@ -713,7 +712,7 @@ public class NoticeOfChangeControllerTest {
                                               "organisationPolicyField",
                                               objectMapper.convertValue(organisationPolicy, JsonNode.class)));
 
-            given(requestNoticeOfChangeService.setOrganisationToRemove(any(), any()))
+            given(requestNoticeOfChangeService.setOrganisationToRemove(any(), any(), any()))
                 .willReturn(setOrganisationToRemoveResponse);
 
             request = new NoticeOfChangeRequest(null, null, caseDetails);

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.assertj.core.util.Maps;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPage;
@@ -83,7 +84,7 @@ public class TestFixtures {
         public static CaseDetails.CaseDetailsBuilder defaultCaseDetails() {
             return CaseDetails.builder()
                     .caseTypeId(CASE_TYPE_ID)
-                    .reference(CASE_ID)
+                    .id(CASE_ID)
                     .jurisdiction(JURISDICTION)
                     .state(null)
                     .data(Maps.newHashMap("OrganisationPolicy1", jsonNode(ORGANIZATION_ID, CASE_ROLE)));
@@ -95,6 +96,12 @@ public class TestFixtures {
                     .orgPolicyReference(null)
                     .organisation(new Organisation(organizationId, organizationId))
                     .build();
+        }
+        public static CaseDetails caseDetails(ChangeOrganisationRequest changeOrganisationRequest) {
+            return defaultCaseDetails()
+                .data(Map.of("changeOrganisationRequestField",
+                    OBJECT_MAPPER.convertValue(changeOrganisationRequest, JsonNode.class)))
+                .build();
         }
 
         private static JsonNode jsonNode(String organizationId, String orgPolicyRole) {

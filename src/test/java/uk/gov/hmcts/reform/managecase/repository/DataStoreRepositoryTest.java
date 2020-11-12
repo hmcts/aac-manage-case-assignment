@@ -107,7 +107,7 @@ class DataStoreRepositoryTest {
         // ARRANGE
         CaseDetails caseDetails = CaseDetails.builder()
                 .caseTypeId(CASE_TYPE_ID)
-                .reference(CASE_ID)
+                .id(CASE_ID)
                 .build();
         CaseSearchResponse response = new CaseSearchResponse(Lists.newArrayList(caseDetails));
         given(dataStoreApi.searchCases(anyString(), anyString())).willReturn(response);

@@ -12,7 +12,7 @@ import lombok.Getter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StartEventResource {
     @JsonProperty("case_details")
-    private CallbackCaseDetails caseDetails;
+    private CaseDetails caseDetails;
 
     @JsonProperty("event_id")
     private String eventId;

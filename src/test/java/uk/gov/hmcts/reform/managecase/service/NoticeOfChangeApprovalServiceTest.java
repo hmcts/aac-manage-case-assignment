@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import uk.gov.hmcts.reform.managecase.client.datastore.CallbackCaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
@@ -64,7 +64,7 @@ public class NoticeOfChangeApprovalServiceTest {
             startEventResource = StartEventResource.builder()
                 .eventId(EVENT_ID)
                 .token(EVENT_TOKEN)
-                .caseDetails(CallbackCaseDetails.builder().id(CASE_ID).data(data).build())
+                .caseDetails(CaseDetails.builder().id(CASE_ID).data(data).build())
                 .build();
 
             caseViewEvent = new CaseViewActionableEvent();

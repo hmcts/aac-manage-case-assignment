@@ -17,6 +17,7 @@ import java.util.Optional;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.CASES_WITH_ID;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.CASE_USERS;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.EXTERNAL_START_EVENT_TRIGGER;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.INTERNAL_CASES;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.INTERNAL_SEARCH_CASES;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.SEARCH_CASES;
@@ -59,11 +60,16 @@ public interface DataStoreApiClient {
     CaseUpdateViewEvent getStartEventTrigger(@PathVariable(CASE_ID) String caseId,
                                                    @PathVariable("eventId") String eventId);
 
+    @GetMapping(EXTERNAL_START_EVENT_TRIGGER)
+    StartEventResource getExternalStartEventTrigger(@PathVariable(CASE_ID)String caseId,
+                                                    @PathVariable("eventId")String eventId);
+
     @PostMapping(SUBMIT_EVENT_FOR_CASE)
     CaseResource submitEventForCase(@PathVariable("caseId") String caseId,
                                     @RequestBody CaseDataContent caseDataContent);
 
     @GetMapping(CASES_WITH_ID)
     CaseResource getCaseDetailsByCaseIdViaExternalApi(@PathVariable(CASE_ID) String caseId);
+
 
 }

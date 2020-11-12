@@ -188,7 +188,7 @@ public class NoticeOfChangeQuestions {
                 JsonNode node = caseFields.get(searchResultViewHeader.getCaseFieldId());
                 if (node != null) {
                     JsonNode caseRoleId = node.findPath(CASE_ROLE_ID);
-                    if (!caseRoleId.isNull()) {
+                    if (!caseRoleId.isMissingNode() && !caseRoleId.isNull()) {
                         throw new ValidationException(NOC_REQUEST_ONGOING);
                     }
                 }

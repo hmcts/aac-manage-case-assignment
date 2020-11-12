@@ -13,8 +13,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.BaseTest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
@@ -33,6 +35,7 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
+import uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -289,6 +292,13 @@ public class NoticeOfChangeControllerIT {
             stubGetCaseViaExternalApi(CASE_ID, caseResource);
 
             stubSubmitEventForCase(CASE_ID, caseResource);
+
+            StartEventResource startEventResource = new StartEventResource();
+            startEventResource.setToken("token");
+            Map<String, JsonNode> data = new HashMap<>();
+            CaseDetails caseDetails = CaseDetails.builder().data(data).build();
+            startEventResource.setCaseDetails(caseDetails);
+            WiremockFixtures.stubGetExternalStartEventTrigger(CASE_ID, NOC, startEventResource);
         }
 
 

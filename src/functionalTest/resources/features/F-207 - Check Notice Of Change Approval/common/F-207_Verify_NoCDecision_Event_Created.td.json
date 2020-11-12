@@ -1,0 +1,67 @@
+{
+  "_guid_": "F-207_Verify_NoCDecision_Event_Created",
+  "_extends_": "Retrieve_Case_Events__Base",
+
+  "specs": [
+    "to verify that the NoCDecision event has been successfully created"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][parentContext][testData][request][body][case_details][id]}"
+    }
+  },
+
+
+  "expectedResponse": {
+    "body": {
+      "auditEvents": [
+        {
+          "id": "ApplyNoCDecision",
+          "event_name": "Apply NoC Decision",
+          "summary": "Check Notice of Change Approval Event",
+          "description": "Check Notice of Change Approval Event",
+          "created_date": "[[ANYTHING_PRESENT]]",
+          "user_id": "[[ANYTHING_PRESENT]]",
+          "user_last_name": "[[ANYTHING_PRESENT]]",
+          "user_first_name": "[[ANYTHING_PRESENT]]",
+          "case_type_id": "[[ANYTHING_PRESENT]]",
+          "case_type_version": "[[ANYTHING_PRESENT]]",
+          "state_id": "[[ANYTHING_PRESENT]]",
+          "state_name": "[[ANYTHING_PRESENT]]",
+          "data": "[[ANYTHING_PRESENT]]",
+          "data_classification": "[[ANYTHING_PRESENT]]",
+          "security_classification": "[[ANYTHING_PRESENT]]",
+          "security_classifications": "[[ANYTHING_PRESENT]]",
+          "significant_item": null
+        },
+        {
+          "id": "createCase",
+          "event_name": "Create Case",
+          "summary": "",
+          "description": "",
+          "created_date": "[[ANYTHING_PRESENT]]",
+          "user_id": "[[ANYTHING_PRESENT]]",
+          "user_last_name": "[[ANYTHING_PRESENT]]",
+          "user_first_name": "[[ANYTHING_PRESENT]]",
+          "case_type_id": "[[ANYTHING_PRESENT]]",
+          "case_type_version": "[[ANYTHING_PRESENT]]",
+          "state_id": "[[ANYTHING_PRESENT]]",
+          "state_name": "[[ANYTHING_PRESENT]]",
+          "data": "[[ANYTHING_PRESENT]]",
+          "data_classification": "[[ANYTHING_PRESENT]]",
+          "security_classification": "[[ANYTHING_PRESENT]]",
+          "security_classifications": "[[ANYTHING_PRESENT]]",
+          "significant_item": null
+        }
+      ]
+    }
+  }
+}
+

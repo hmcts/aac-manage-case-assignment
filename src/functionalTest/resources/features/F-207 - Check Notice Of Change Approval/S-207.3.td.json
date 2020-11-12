@@ -1,0 +1,51 @@
+{
+  "_guid_": "S-207.3",
+  "_extends_": "Check_NoC_Approval__Base",
+
+  "title": "Must return an error response for a malformed Case ID",
+
+  "specs": [
+    "Dil - with a solicitor role",
+
+    "contains a malformed case record",
+    "is made by the system user (caseworker-caa IdAM role) to check if the NOC Request made by Dil has NOT been configured approvalStatus"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "request": {
+    "body": {
+      "event_id": "nocRequest_autoApproval",
+      "case_details": {
+        "id": "1605102929808799",
+        "jurisdiction": "BEFTA_MASTER",
+        "data": {
+          "changeOrganisationRequestField" : {
+            "CaseRoleId" : "[RespondentSolicitor]",
+            "ApprovalStatus" : null,
+            "RequestTimestamp": "2020-02-20T06:30:00",
+            "OrganisationToAdd" : {
+              "OrganisationID": "Org-Two"
+            },
+            "OrganisationToRemove": {
+              "OrganisationID": null
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "status" : "BAD_REQUEST",
+      "message" : "ChangeOrganisationRequest field could not be found or appears invalid",
+      "errors" : "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

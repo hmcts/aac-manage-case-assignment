@@ -182,32 +182,32 @@ public class WiremockFixtures {
 
     public static void stubIdamGetUserById(String userId, UserDetails user) {
         stubFor(WireMock.get(urlPathEqualTo("/api/v1/users/" + userId))
-                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-                    .willReturn(aResponse()
-                                    .withStatus(HTTP_OK).withBody(getJsonString(user))
-                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+                .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                .willReturn(aResponse()
+                        .withStatus(HTTP_OK).withBody(getJsonString(user))
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     public static void stubGetStartEventTrigger(String caseId,
                                                 String eventId,
                                                 CaseUpdateViewEvent caseUpdateViewEvent) {
         stubFor(WireMock.get(urlPathEqualTo("/internal/cases/" + caseId + "/event-triggers/" + eventId))
-            .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-            .willReturn(aResponse()
-                            .withStatus(HTTP_OK)
-                            .withBody(getJsonString(caseUpdateViewEvent))
-                            .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK)
+                                    .withBody(getJsonString(caseUpdateViewEvent))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     public static void stubGetCaseViaExternalApi(String caseId, CaseResource caseResource) {
         stubFor(WireMock.get(urlPathEqualTo("/cases/" + caseId))
-            .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-            .willReturn(aResponse()
-                            .withStatus(HTTP_CREATED)
-                            .withBody(getJsonString(caseResource))
-                            .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_CREATED)
+                                    .withBody(getJsonString(caseResource))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     public static void stubSubmitEventForCase(String caseID,
@@ -221,8 +221,8 @@ public class WiremockFixtures {
     }
 
     public static void stubGetExternalStartEventTrigger(String caseId,
-                                                                  String eventId,
-                                                                  StartEventResource startEventResource) {
+                                                        String eventId,
+                                                        StartEventResource startEventResource) {
         stubFor(WireMock.get(urlPathEqualTo("/cases/" + caseId + "/event-triggers/" + eventId))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))

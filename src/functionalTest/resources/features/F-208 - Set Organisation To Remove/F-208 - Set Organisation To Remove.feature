@@ -8,19 +8,19 @@ Feature: F-208: Set Organisation To Remove
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-87 / AC-1
-#@S-208.1
-#Scenario: (Happy Path) Successfully set up the OrganisationToRemove in the ChangeOrganisationRequest and return the updated case record for a Remove event
-#
-#    Given a user [system_user - with caseworker-caa IdAM role],
-#
-#    When a request is prepared with appropriate values,
-#      And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
-#      And the request [contains a case record containing exactly one OrganisationPolicy.OrgPolicyCaseAssignedRole matching the ChangeOrganisationRequest.CaseRole],
-#      And it is submitted to call the [SetOrganisationToRemove] operation of [Manage Case Assignment Microservice],
-#
-#    Then a positive response is received,
-#      And the response has all the details as expected,
-#      And the response [includes ChangeOrganisationRequest.OrganisationToRemove is equal to the organisation ID in the Organisation policy that has a OrgPolicyCaseAssignedRole matching the COR.CaseRole] will get the expected response as in [YYY].
+@S-208.1
+Scenario: (Happy Path) Successfully set up the OrganisationToRemove in the ChangeOrganisationRequest and return the updated case record for a Remove event
+
+    Given a user [system_user - with caseworker-caa IdAM role],
+
+    When a request is prepared with appropriate values,
+      And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
+      And the request [contains a case record containing exactly one OrganisationPolicy.OrgPolicyCaseAssignedRole matching the ChangeOrganisationRequest.CaseRole],
+      And it is submitted to call the [SetOrganisationToRemove] operation of [Manage Case Assignment Microservice],
+
+    Then a positive response is received,
+      And the response has all the details as expected,
+      And the response [includes ChangeOrganisationRequest.OrganisationToRemove is equal to the organisation ID in the Organisation policy that has a OrgPolicyCaseAssignedRole matching the COR.CaseRole].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

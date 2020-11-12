@@ -6,14 +6,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.validator.constraints.LuhnCheck;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
@@ -26,13 +21,7 @@ public class CaseDetails {
     public static final String ORG_POLICY_REFERENCE = "OrgPolicyReference";
     public static final String ORG_ID = "OrganisationID";
     public static final String ORG_NAME = "OrganisationName";
-    public static final String CASE_ROLE_ID  = "CaseRoleId";
-    public static final String APPROVAL_STATUS = "ApprovalStatus";
-    public static final String ORGANISATION_TO_ADD = "OrganisationToAdd";
 
-    @NotEmpty(message = ValidationError.CASE_ID_EMPTY)
-    @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID_LENGTH)
-    @LuhnCheck(message = ValidationError.CASE_ID_INVALID, ignoreNonDigitCharacters = false)
     private String reference;
 
     private String jurisdiction;
@@ -50,11 +39,5 @@ public class CaseDetails {
             .map(node -> node.findParents(ORG_POLICY_CASE_ASSIGNED_ROLE))
             .flatMap(List::stream)
             .collect(Collectors.toList());
-    }
-
-    public Optional<JsonNode> findChangeOrganisationRequestNode() {
-        return getData().values().stream()
-            .map(node -> node.findParent(CASE_ROLE_ID))
-            .findFirst();
     }
 }

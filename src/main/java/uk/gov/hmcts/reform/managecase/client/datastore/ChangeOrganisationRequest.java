@@ -41,8 +41,7 @@ public class ChangeOrganisationRequest {
         if (StringUtils.isBlank(this.getCaseRoleId())
             || StringUtils.isBlank(this.getApprovalStatus())
             || this.getRequestTimestamp() == null
-            || this.getOrganisationToAdd() == null
-            || this.getOrganisationToRemove() == null) {
+            || (this.getOrganisationToAdd() == null && this.getOrganisationToRemove() == null)) {
             throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
         }
     }

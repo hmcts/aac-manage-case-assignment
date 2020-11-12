@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -59,6 +60,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getCaseViewFields;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getWizardPages;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_PATH;
@@ -355,7 +358,7 @@ public class NoticeOfChangeControllerIT {
                 .organisationToRemove(new Organisation("789", "Org2"))
                 .caseRoleId("CaseRoleId")
                 .requestTimestamp(LocalDateTime.now())
-                .approvalStatus("APPROVED")
+                .approvalStatus(NoticeOfChangeController.APPROVED)
                 .build();
 
             caseDetails = new CallbackCaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
@@ -371,7 +374,8 @@ public class NoticeOfChangeControllerIT {
 
             Event event = Event.builder()
                 .eventId(NOC)
-                .description("Check Notice of Change Approval Event")
+                .summary(NoticeOfChangeApprovalService.APPLY_NOC_DECISION_EVENT)
+                .description(NoticeOfChangeApprovalService.APPLY_NOC_DECISION_EVENT)
                 .build();
 
             StartEventResource startEventResource = StartEventResource.builder()
@@ -400,7 +404,9 @@ public class NoticeOfChangeControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)))
+                .andExpect(jsonPath("$.confirmation_body", is(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)));
         }
 
         @Test
@@ -422,7 +428,9 @@ public class NoticeOfChangeControllerIT {
             this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE)))
+                .andExpect(jsonPath("$.confirmation_body", is(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE)));
         }
 
         @Test

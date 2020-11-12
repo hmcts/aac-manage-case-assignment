@@ -151,7 +151,7 @@ public class RequestNoticeOfChangeService {
     }
 
     private Optional<ChangeOrganisationRequest> getChangeOrganisationRequest(CaseResource caseResource) {
-        Optional changeOrganisationRequest = Optional.empty();
+        Optional<ChangeOrganisationRequest> changeOrganisationRequest = Optional.empty();
         final Optional<JsonNode> changeOrganisationRequestNode = caseResource.findChangeOrganisationRequestNode();
 
         if (changeOrganisationRequestNode.isPresent()) {

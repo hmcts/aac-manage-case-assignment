@@ -9,8 +9,8 @@ public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutoma
 
     @Override
     public void doLoadTestData() {
-        loader.addCcdRoles();
-        loader.importDefinitions();
+        //loader.addCcdRoles();
+       // loader.importDefinitions();
     }
 
 }

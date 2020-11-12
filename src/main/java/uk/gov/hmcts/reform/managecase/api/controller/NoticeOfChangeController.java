@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
-import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeApprovalService;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
@@ -61,12 +61,12 @@ public class NoticeOfChangeController {
     public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
     public static final String REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE =
         "The Notice of Change request has been successfully submitted.";
-    public static final String APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE = "auto approval is not configured for the case";
-    public static final String CHECK_NOC_APPROVAL_DONE = "check noc approval has done";
+    public static final String CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE = "Not yet approved";
+    public static final String CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE = "Approval Applied";
+    public static final String APPROVED = "APPROVED";
+    public static final String APPROVED_NUMERIC = "1";
 
     private final NoticeOfChangeQuestions noticeOfChangeQuestions;
-    private static final String APPROVED = "APPROVED";
-    private static final String APPROVED_NUMERIC = "1";
 
     private final NoticeOfChangeApprovalService noticeOfChangeApprovalService;
     private final VerifyNoCAnswersService verifyNoCAnswersService;
@@ -311,12 +311,12 @@ public class NoticeOfChangeController {
         changeOrganisationRequest.validateChangeOrganisationRequest();
         if (!changeOrganisationRequest.getApprovalStatus().equals(APPROVED_NUMERIC)
             && !changeOrganisationRequest.getApprovalStatus().equals(APPROVED)) {
-            return new SubmitCallbackResponse(APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE,
-                APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE);
+            return new SubmitCallbackResponse(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE,
+                CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE);
         }
 
-        noticeOfChangeApprovalService.checkNoticeOfChangeApproval(caseDetails.getId());
-        return new SubmitCallbackResponse(CHECK_NOC_APPROVAL_DONE,
-            CHECK_NOC_APPROVAL_DONE);
+        noticeOfChangeApprovalService.findAndTriggerNocDecisionEvent(caseDetails.getId());
+        return new SubmitCallbackResponse(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE,
+            CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE);
     }
 }

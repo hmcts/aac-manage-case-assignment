@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.repository.NocApprovalDataStoreRepository;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 
 import javax.validation.ValidationException;
 import java.util.HashMap;
@@ -80,7 +81,7 @@ public class NoticeOfChangeApprovalServiceTest {
         @Test
         @DisplayName("Submit Event for Check NoC Approval")
         void checkNoticeOfChangeApproval() {
-            service.checkNoticeOfChangeApproval(CASE_ID);
+            service.findAndTriggerNocDecisionEvent(CASE_ID);
 
             ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
             verify(repository).submitEventForCaseOnly(eq(CASE_ID), captor.capture());
@@ -100,7 +101,7 @@ public class NoticeOfChangeApprovalServiceTest {
             given(repository.getExternalStartEventTrigger(anyString(), anyString()))
                 .willReturn(startEventResource);
 
-            assertThatThrownBy(() -> service.checkNoticeOfChangeApproval(CASE_ID))
+            assertThatThrownBy(() -> service.findAndTriggerNocDecisionEvent(CASE_ID))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Event token not present");
         }
@@ -110,7 +111,7 @@ public class NoticeOfChangeApprovalServiceTest {
         void shouldThrowErrorWhenCaseViewEventListIsEmpty() {
             caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[]{});
 
-            assertThatThrownBy(() -> service.checkNoticeOfChangeApproval(CASE_ID))
+            assertThatThrownBy(() -> service.findAndTriggerNocDecisionEvent(CASE_ID))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining(NOC_DECISION_EVENT_UNIDENTIFIABLE);
         }
@@ -120,7 +121,7 @@ public class NoticeOfChangeApprovalServiceTest {
         void shouldThrowErrorWhenCaseViewEventListLengthGreaterThanOne() {
             caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[]{caseViewEvent, caseViewEvent});
 
-            assertThatThrownBy(() -> service.checkNoticeOfChangeApproval(CASE_ID))
+            assertThatThrownBy(() -> service.findAndTriggerNocDecisionEvent(CASE_ID))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining(NOC_DECISION_EVENT_UNIDENTIFIABLE);
         }

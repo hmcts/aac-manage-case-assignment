@@ -33,7 +33,7 @@ import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeApprovalService;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
@@ -54,6 +54,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -62,8 +63,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE;
-import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DONE;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_PATH;
@@ -464,8 +465,10 @@ public class NoticeOfChangeControllerTest {
             SubmitCallbackResponse response = controller.checkNoticeOfChangeApproval(request);
 
             assertThat(response).isNotNull();
-            assertThat(response.getConfirmationBody()).isEqualTo(CHECK_NOC_APPROVAL_DONE);
-            assertThat(response.getConfirmationHeader()).isEqualTo(CHECK_NOC_APPROVAL_DONE);
+            assertThat(response.getConfirmationBody()).isEqualTo(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE);
+            assertThat(response.getConfirmationHeader()).isEqualTo(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE);
+
+            verify(approvalService).findAndTriggerNocDecisionEvent(CASE_ID);
         }
 
         @DisplayName("should return 200 status code if all data is valid (ApprovalStatus as a Number)")
@@ -481,8 +484,10 @@ public class NoticeOfChangeControllerTest {
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DONE)))
-                .andExpect(jsonPath("$.confirmation_body", is(CHECK_NOC_APPROVAL_DONE)));
+                .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)))
+                .andExpect(jsonPath("$.confirmation_body", is(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)));
+
+            verify(approvalService).findAndTriggerNocDecisionEvent(CASE_ID);
 
         }
 
@@ -514,8 +519,10 @@ public class NoticeOfChangeControllerTest {
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.confirmation_header", is(APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE)))
-                .andExpect(jsonPath("$.confirmation_body", is(APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE)));
+                .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE)))
+                .andExpect(jsonPath("$.confirmation_body", is(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE)));
+
+            verify(approvalService, never()).findAndTriggerNocDecisionEvent(CASE_ID);
         }
 
         @DisplayName("should return 200 status code if ApprovalStatus is not equal to APPROVED")
@@ -531,6 +538,7 @@ public class NoticeOfChangeControllerTest {
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
+            verify(approvalService, never()).findAndTriggerNocDecisionEvent(CASE_ID);
         }
 
         @DisplayName("should error if case reference in Case Details is empty")

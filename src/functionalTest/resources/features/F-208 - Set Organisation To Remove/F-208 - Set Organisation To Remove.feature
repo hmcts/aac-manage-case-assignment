@@ -16,6 +16,7 @@ Feature: F-208: Set Organisation To Remove
 #    When a request is prepared with appropriate values,
 #      And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
 #      And the request [contains a case record containing exactly one OrganisationPolicy.OrgPolicyCaseAssignedRole matching the ChangeOrganisationRequest.CaseRole],
+#      And the request [is made by the system_user - with caseworker-caa IdAM role],
 #      And it is submitted to call the [SetOrganisationToRemove] operation of [Manage Case Assignment Microservice],
 #
 #    Then a positive response is received,
@@ -33,6 +34,7 @@ Scenario: Must return an error for a non extant case record
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
       And the request [does not contain a case record],
+      And the request [is made by the system_user - with caseworker-caa IdAM role],
       And it is submitted to call the [SetOrganisationToRemove] operation of [Manage Case Assignment Microservice],
 
     Then a negative response is received,
@@ -49,6 +51,7 @@ Scenario: Must return error if the ChangeOrganisationRequest.CaseRole is missing
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
       And the request [contains a case record for which the ChangeOrganisationRequest.CaseRole is missing],
+      And the request [is made by the system_user - with caseworker-caa IdAM role],
       And it is submitted to call the [SetOrganisationToRemove] operation of [Manage Case Assignment Microservice],
 
     Then a negative response is received,
@@ -65,6 +68,7 @@ Scenario: Must return error if the ChangeOrganisationRequest.CaseRole is null
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
       And the request [contains a case record for which the ChangeOrganisationRequest.CaseRole is null],
+      And the request [is made by the system_user - with caseworker-caa IdAM role],
       And it is submitted to call the [SetOrganisationToRemove] operation of [Manage Case Assignment Microservice],
 
     Then a negative response is received,
@@ -81,6 +85,7 @@ Scenario: Must return error if there is more than one OrganisationPolicy CaseRol
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
       And the request [contains a case record containing more than one OrganisationPolicy.OrgPolicyCaseAssignedRole matching the ChangeOrganisationRequest.CaseRole],
+      And the request [is made by the system_user - with caseworker-caa IdAM role],
       And it is submitted to call the [SetOrganisationToRemove] operation of [Manage Case Assignment Microservice],
 
     Then a negative response is received,
@@ -97,6 +102,7 @@ Scenario: Must return error if no OrganisationPolicy CaseRole on the case matche
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
       And the request [does not contain a case record for the OrganisationPolicy.OrgPolicyCaseAssignedRole matching the ChangeOrganisationRequest.CaseRole],
+      And the request [is made by the system_user - with caseworker-caa IdAM role],
       And it is submitted to call the [SetOrganisationToRemove] operation of [Manage Case Assignment Microservice],
 
     Then a negative response is received,
@@ -113,6 +119,7 @@ Scenario: Must return an error for a malformed Case ID
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
       And the request [contains a malformed 16 digit case ID number],
+      And the request [is made by the system_user - with caseworker-caa IdAM role],
       And it is submitted to call the [SetOrganisationToRemove] operation of [Manage Case Assignment Microservice],
 
     Then a negative response is received,

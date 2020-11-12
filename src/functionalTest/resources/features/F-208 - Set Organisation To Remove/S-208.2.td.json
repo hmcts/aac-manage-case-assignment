@@ -7,7 +7,8 @@
   "specs": [
     "system_user - with caseworker-caa IdAM role",
     "intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user",
-    "does not contain a case record"
+    "does not contain a case record",
+    "is made by the system_user - with caseworker-caa IdAM role"
   ],
 
   "request": {

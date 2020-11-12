@@ -11,7 +11,7 @@
   "userTokenClientId": "xuiwebapp",
 
   "user": {
-      "_extends_": "Common_User_For_Request"
+      "_extends_": "ACA_Users_Caseworker_CAA"
   },
 
   "request": {

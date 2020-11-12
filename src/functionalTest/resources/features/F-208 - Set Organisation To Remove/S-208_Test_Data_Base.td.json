@@ -10,8 +10,10 @@
   "s2sClientId": "xui_webapp",
   "userTokenClientId": "xuiwebapp",
 
-  "user": {
+  "users": {
+    "invokingUser": {
       "_extends_": "ACA_Users_Caseworker_CAA"
+    }
   },
 
   "request": {

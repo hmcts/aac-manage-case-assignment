@@ -5,6 +5,7 @@
   "title": "Must return error if no OrganisationPolicy CaseRole on the case matches the ChangeOrganisationRequest.CaseRole",
 
   "specs": [
+    "system_user - with caseworker-caa IdAM role",
     "intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user",
     "does not contain a case record for the OrganisationPolicy.OrgPolicyCaseAssignedRole matching the ChangeOrganisationRequest.CaseRole"
   ],

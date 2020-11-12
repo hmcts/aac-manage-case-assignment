@@ -5,6 +5,7 @@
   "title": "Must return an error for a malformed Case ID",
 
   "specs": [
+    "system_user - with caseworker-caa IdAM role",
     "intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user",
     "contains a malformed 16 digit case ID number"
   ],

@@ -5,6 +5,7 @@
   "title": "Must return error if there is more than one OrganisationPolicy CaseRole on the case which matches the ChangeOrganisationRequest.CaseRole",
 
   "specs": [
+    "system_user - with caseworker-caa IdAM role",
     "intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user",
     "contains a case record containing more than one OrganisationPolicy.OrgPolicyCaseAssignedRole matching the ChangeOrganisationRequest.CaseRole"
   ],

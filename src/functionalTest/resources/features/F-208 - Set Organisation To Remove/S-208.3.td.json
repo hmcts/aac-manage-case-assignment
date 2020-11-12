@@ -5,6 +5,7 @@
   "title": "Must return error if the ChangeOrganisationRequest.CaseRole is missing",
 
   "specs": [
+    "system_user - with caseworker-caa IdAM role",
     "intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user",
     "contains a case record for which the ChangeOrganisationRequest.CaseRole is missing"
   ],

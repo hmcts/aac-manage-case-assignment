@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisat
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
+import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
@@ -38,7 +40,9 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -349,10 +353,23 @@ class DataStoreRepositoryTest {
 
         given(dataStoreApi.getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID)).willReturn(caseUpdateViewEvent);
 
+        ObjectMapper mapper = new ObjectMapper();
+
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put(CHANGE_ORGANISATION_REQUEST_FIELD, mapper.readTree(EXPECTED_NOC_REQUEST_DATA));
+
+        CaseDetails caseDetails = CaseDetails.builder().data(data).build();
+
+        StartEventResource startEventResource = StartEventResource.builder()
+            .caseDetails(caseDetails)
+            .build();
+
+        given(dataStoreApi.getExternalStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID)).willReturn(startEventResource);
+
         given(dataStoreApi.submitEventForCase(any(String.class), any(String.class), any(CaseDataContent.class)))
             .willReturn(CaseResource.builder().build());
 
-        ObjectMapper mapper = new ObjectMapper();
+
         given(jacksonUtils.convertValue(any(), any())).willReturn(mapper.readTree(EXPECTED_NOC_REQUEST_DATA));
 
         ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
@@ -376,7 +393,7 @@ class DataStoreRepositoryTest {
         assertThat(caseDataContentCaptorValue.getEvent().getEventId()).isEqualTo(EVENT_ID);
 
         assertThat(caseDataContentCaptorValue.getData().get(CHANGE_ORGANISATION_REQUEST_FIELD).toString())
-            .hasToString(EXPECTED_NOC_REQUEST_DATA);
+            .isEqualTo(EXPECTED_NOC_REQUEST_DATA);
     }
 
     @Test
@@ -420,7 +437,8 @@ class DataStoreRepositoryTest {
 
     @Test
     @DisplayName("handle missing approval status default value when calling submit event for case")
-    void shouldThrowExceptionWhenSubmitEventForCaseCalledWithoutDefaultApprovalStatusDefaultValue() {
+    void shouldSetDefaultApprovalStatusWhenSubmitEventForCaseCalledWithoutDefaultValue() {
+
         // ARRANGE
         CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
             .caseFields(getCaseViewFields())
@@ -430,13 +448,7 @@ class DataStoreRepositoryTest {
 
         given(dataStoreApi.getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID)).willReturn(caseUpdateViewEvent);
 
-        // ACT & ASSERT
-        IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () ->
-            repository.submitEventForCase(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build())
-        );
 
-        assertThat(illegalStateException.getMessage())
-            .isEqualTo(NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT);
     }
 
     @Test
@@ -445,7 +457,9 @@ class DataStoreRepositoryTest {
 
         // ARRANGE
         given(dataStoreApi.getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID))
-            .willReturn(CaseUpdateViewEvent.builder().build());
+            .willReturn(CaseUpdateViewEvent.builder()
+                            .eventToken("eventToken")
+                            .build());
 
         // ACT & ASSERT
         IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () ->

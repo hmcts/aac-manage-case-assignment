@@ -22,12 +22,10 @@
           "changeOrganisationRequestField": {
             "RequestTimestamp" : "2020-02-20T06:30:00",
             "OrganisationToAdd": {
-              "OrganisationID": "PUBLIC",
-              "OrganisationName": "PUBLIC"
+              "OrganisationID": "PUBLIC"
             },
             "OrganisationToRemove": {
-              "OrganisationID": null,
-              "OrganisationName": null
+              "OrganisationID": null
             },
             "ApprovalStatus": "0"
           }

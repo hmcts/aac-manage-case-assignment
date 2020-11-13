@@ -57,7 +57,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
     public static final String CHANGE_ORGANISATION_REQUEST = "ChangeOrganisationRequest";
 
-    protected final DataStoreApiClient dataStoreApi;
+    private final DataStoreApiClient dataStoreApi;
     private final JacksonUtils jacksonUtils;
     protected final SecurityUtils securityUtils;
 

@@ -2,13 +2,13 @@
   "_guid_": "S-207.3",
   "_extends_": "Check_NoC_Approval__Base",
 
-  "title": "Must return an error response for a malformed Case ID",
+  "title": "Must return error if approval status is not configured at all (empty / null)",
 
   "specs": [
-    "Dil - with a solicitor role",
+    "system user - with caseworker-caa role",
 
     "contains a malformed case record",
-    "is made by the system user (caseworker-caa IdAM role) to check if the NOC Request made by Dil has NOT been configured approvalStatus"
+    "is made by the system user (caseworker-caa IdAM role) to simulate a submitted callback from a NOC Request case event that has null approvalStatus"
   ],
 
   "users": {

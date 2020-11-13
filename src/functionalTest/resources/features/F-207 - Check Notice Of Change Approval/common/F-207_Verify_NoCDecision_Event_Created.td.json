@@ -25,8 +25,8 @@
         {
           "id": "ApplyNoCDecision",
           "event_name": "Apply NoC Decision",
-          "summary": "Check Notice of Change Approval Event",
-          "description": "Check Notice of Change Approval Event",
+          "summary": "Apply NocDecision Event",
+          "description": "Apply NocDecision Event",
           "created_date": "[[ANYTHING_PRESENT]]",
           "user_id": "[[ANYTHING_PRESENT]]",
           "user_last_name": "[[ANYTHING_PRESENT]]",

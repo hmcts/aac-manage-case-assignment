@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.SetOrganisationToRemoveResponse;
-import uk.gov.hmcts.reform.managecase.client.datastore.CallbackCaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
@@ -94,7 +94,7 @@ public class RequestNoticeOfChangeService {
             .build();
     }
 
-    public SetOrganisationToRemoveResponse setOrganisationToRemove(CallbackCaseDetails caseDetails,
+    public SetOrganisationToRemoveResponse setOrganisationToRemove(CaseDetails caseDetails,
                                                                    ChangeOrganisationRequest changeOrganisationRequest,
                                                                    String changeOrganisationKey) {
 
@@ -185,7 +185,7 @@ public class RequestNoticeOfChangeService {
     }
 
     private Optional<ChangeOrganisationRequest> getChangeOrganisationRequest(CaseResource caseResource) {
-        Optional changeOrganisationRequest = Optional.empty();
+        Optional<ChangeOrganisationRequest> changeOrganisationRequest = Optional.empty();
         final Optional<JsonNode> changeOrganisationRequestNode = caseResource.findChangeOrganisationRequestNode();
 
         if (changeOrganisationRequestNode.isPresent()) {

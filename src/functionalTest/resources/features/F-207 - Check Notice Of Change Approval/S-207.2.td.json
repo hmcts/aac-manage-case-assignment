@@ -6,10 +6,10 @@
 
   "specs": [
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
-    "Dil - with a solicitor role for the same jurisdiction",
+    "system user - with caseworker-caa role",
 
     "contains the case record for C1",
-    "is made by the system user (caseworker-caa IdAM role) to check if the NOC Request made by Dil has not been auto-approved"
+    "is made by the system user (caseworker-caa IdAM role) to simulate a submitted callback from a NOC Request case event that has not been auto-approved"
   ],
 
   "users": {
@@ -47,8 +47,8 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body": {
-      "confirmation_header": "auto approval is not configured for the case",
-      "confirmation_body": "auto approval is not configured for the case"
+      "confirmation_header": "Not yet approved",
+      "confirmation_body": "Not yet approved"
     }
   }
 }

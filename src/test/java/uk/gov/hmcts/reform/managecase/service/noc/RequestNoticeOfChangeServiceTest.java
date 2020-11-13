@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.SetOrganisationToRemoveResponse;
-import uk.gov.hmcts.reform.managecase.client.datastore.CallbackCaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
@@ -334,7 +334,7 @@ class RequestNoticeOfChangeServiceTest {
         private OrganisationPolicy organisationPolicy;
         private ChangeOrganisationRequest changeOrganisationRequestBefore;
         private ChangeOrganisationRequest changeOrganisationRequestAfter;
-        private CallbackCaseDetails callbackCaseDetails;
+        private CaseDetails callbackCaseDetails;
 
         @BeforeEach
         void setUp() {
@@ -372,7 +372,7 @@ class RequestNoticeOfChangeServiceTest {
         @Test
         @DisplayName("Set Organisation To Remove should return successfully")
         void setOrganisationToRemoveSuccess() {
-            callbackCaseDetails = CallbackCaseDetails.builder()
+            callbackCaseDetails = CaseDetails.builder()
                 .data(Map.of(
                     "OrganisationPolicyField1",
                     objectMapper.convertValue(organisationPolicy, JsonNode.class),
@@ -402,7 +402,7 @@ class RequestNoticeOfChangeServiceTest {
                 .organisation(organisation)
                 .build();
 
-            callbackCaseDetails = CallbackCaseDetails.builder()
+            callbackCaseDetails = CaseDetails.builder()
                 .data(Map.of(
                     "OrganisationPolicyField1",
                     objectMapper.convertValue(organisationPolicy, JsonNode.class),
@@ -427,7 +427,7 @@ class RequestNoticeOfChangeServiceTest {
         @Test
         @DisplayName("Set Organisation To Remove Should fail when more than one organisation policy matches case role")
         void setOrganisationToRemoveShouldFailWhenThereAreMoreThanOneMatchingOrgPolicies() {
-            callbackCaseDetails = CallbackCaseDetails.builder()
+            callbackCaseDetails = CaseDetails.builder()
                 .data(Map.of(
                     "OrganisationPolicyField1",
                     objectMapper.convertValue(organisationPolicy, JsonNode.class),

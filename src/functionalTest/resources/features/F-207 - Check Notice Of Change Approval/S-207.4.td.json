@@ -5,10 +5,10 @@
   "title": "Must return an error response for a malformed Case ID",
 
   "specs": [
-    "Dil - with a solicitor role",
+    "system user - with caseworker-caa role",
 
     "contains a malformed case record",
-    "is made by the system user (caseworker-caa IdAM role) to check if the NOC Request made by Dil has been auto-approved"
+    "is made by the system user (caseworker-caa IdAM role) to simulate a submitted callback from a NOC Request case event that has been auto-approved"
   ],
 
   "users": {

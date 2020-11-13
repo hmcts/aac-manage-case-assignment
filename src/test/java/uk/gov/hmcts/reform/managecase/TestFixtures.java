@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.assertj.core.util.Maps;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPage;
@@ -69,6 +70,17 @@ public class TestFixtures {
         private CaseDetailsFixture() {
         }
 
+        public static CaseDetails caseDetails() {
+            return defaultCaseDetails().build();
+        }
+
+        public static CaseDetails caseDetails(ChangeOrganisationRequest changeOrganisationRequest) {
+            return defaultCaseDetails()
+                .data(Map.of("changeOrganisationRequestField",
+                             OBJECT_MAPPER.convertValue(changeOrganisationRequest, JsonNode.class)))
+                .build();
+        }
+
         public static CaseDetails caseDetails(String organizationId, String... orgPolicyRoles) {
             Map<String, JsonNode> jsonNodeMap = Stream.of(orgPolicyRoles)
                     .collect(Collectors.toMap(role -> "Field_" + role, role -> jsonNode(organizationId, role),
@@ -76,17 +88,13 @@ public class TestFixtures {
             return defaultCaseDetails().data(jsonNodeMap).build();
         }
 
-        public static CaseDetails caseDetails() {
-            return defaultCaseDetails().build();
-        }
-
         public static CaseDetails.CaseDetailsBuilder defaultCaseDetails() {
             return CaseDetails.builder()
-                    .caseTypeId(CASE_TYPE_ID)
-                    .reference(CASE_ID)
-                    .jurisdiction(JURISDICTION)
-                    .state(null)
-                    .data(Maps.newHashMap("OrganisationPolicy1", jsonNode(ORGANIZATION_ID, CASE_ROLE)));
+                .caseTypeId(CASE_TYPE_ID)
+                .id(CASE_ID)
+                .jurisdiction(JURISDICTION)
+                .state(null)
+                .data(Maps.newHashMap("OrganisationPolicy1", jsonNode(ORGANIZATION_ID, CASE_ROLE)));
         }
 
         public static OrganisationPolicy organisationPolicy(String organizationId, String orgPolicyRole) {

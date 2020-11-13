@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
 import uk.gov.hmcts.reform.managecase.api.payload.SubmitCallbackResponse;
-import uk.gov.hmcts.reform.managecase.client.datastore.CallbackCaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.api.payload.NoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
@@ -64,12 +64,12 @@ public class NoticeOfChangeController {
     public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
     public static final String REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE =
         "The Notice of Change request has been successfully submitted.";
-    public static final String APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE = "auto approval is not configured for the case";
-    public static final String CHECK_NOC_APPROVAL_DONE = "check noc approval has done";
+    public static final String CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE = "Not yet approved";
+    public static final String CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE = "Approval Applied";
+    public static final String APPROVED = "APPROVED";
+    public static final String APPROVED_NUMERIC = "1";
 
     private final NoticeOfChangeQuestions noticeOfChangeQuestions;
-    private static final String APPROVED = "APPROVED";
-    private static final String APPROVED_NUMERIC = "1";
 
     private final NoticeOfChangeApprovalService noticeOfChangeApprovalService;
     private final VerifyNoCAnswersService verifyNoCAnswersService;
@@ -302,8 +302,8 @@ public class NoticeOfChangeController {
         )
     })
     public SubmitCallbackResponse checkNoticeOfChangeApproval(@Valid @RequestBody NoticeOfChangeRequest
-                                                                      noticeOfChangeRequest) {
-        CallbackCaseDetails caseDetails = noticeOfChangeRequest.getCaseDetails();
+                                                              checkNoticeOfChangeApprovalRequest) {
+        CaseDetails caseDetails = checkNoticeOfChangeApprovalRequest.getCaseDetails();
         Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
         if (changeOrganisationRequestFieldJson.isEmpty()) {
             throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
@@ -314,13 +314,13 @@ public class NoticeOfChangeController {
         changeOrganisationRequest.validateChangeOrganisationRequest();
         if (!changeOrganisationRequest.getApprovalStatus().equals(APPROVED_NUMERIC)
             && !changeOrganisationRequest.getApprovalStatus().equals(APPROVED)) {
-            return new SubmitCallbackResponse(APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE,
-                APPROVAL_IS_NOT_CONFIGURED_IN_THE_CASE);
+            return new SubmitCallbackResponse(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE,
+                CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE);
         }
 
-        noticeOfChangeApprovalService.checkNoticeOfChangeApproval(caseDetails.getId());
-        return new SubmitCallbackResponse(CHECK_NOC_APPROVAL_DONE,
-            CHECK_NOC_APPROVAL_DONE);
+        noticeOfChangeApprovalService.findAndTriggerNocDecisionEvent(caseDetails.getId());
+        return new SubmitCallbackResponse(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE,
+            CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE);
     }
 
     @PostMapping(path = SET_ORGANISATION_TO_REMOVE_PATH, produces = APPLICATION_JSON_VALUE)
@@ -361,7 +361,7 @@ public class NoticeOfChangeController {
     })
     public SetOrganisationToRemoveResponse setOrganisationToRemove(@Valid @RequestBody
                                                                        NoticeOfChangeRequest noticeOfChangeRequest) {
-        CallbackCaseDetails caseDetails = noticeOfChangeRequest.getCaseDetails();
+        CaseDetails caseDetails = noticeOfChangeRequest.getCaseDetails();
         Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
 
         if (changeOrganisationRequestFieldJson.isEmpty()) {

@@ -37,6 +37,7 @@ def secrets = [
   's2s-${env}': [
     secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
     secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP'),
+    secret('microservicekey-ccd-data', 'BEFTA_S2S_CLIENT_SECRET_OF_CCD_DATA'),
     secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT')
   ]
 ]
@@ -64,6 +65,7 @@ env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
 env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
+env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
 env.BEFTA_OAUTH2_CLIENT_ID_OF_XUIWEBAPP = "xuiwebapp"
 env.BEFTA_OAUTH2_REDIRECT_URI_OF_XUIWEBAPP = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
 env.BEFTA_OAUTH2_ACCESS_TOKEN_TYPE_OF_XUIWEBAPP = "OIDC"

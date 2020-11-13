@@ -35,16 +35,14 @@
             "OrgPolicyReference": "ApplicantPolicy",
             "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
             "Organisation": {
-              "OrganisationID": "Org1",
-              "OrganisationName": "Organisation 1"
+              "OrganisationID": "Org1"
             }
           },
           "respondentOrganisationPolicy": {
             "OrgPolicyReference": "RespondentPolicy",
             "OrgPolicyCaseAssignedRole": "[RespondentSolicitor]",
             "Organisation": {
-              "OrganisationID": "Org2",
-              "OrganisationName": "Organisation 2"
+              "OrganisationID": "Org2"
             }
           }
         }

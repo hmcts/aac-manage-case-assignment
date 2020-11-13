@@ -9,16 +9,16 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_NoCCaseType",
-      "etid": "manageApplicantOrganisation"
+      "etid": "manageAllOrgPolicies"
     }
   },
 
   "expectedResponse" : {
     "_extends_": "Common_200_Response",
     "body" : {
-      "id": "manageApplicantOrganisation",
-      "name": "Manage Applicant Organisation",
-      "description": "Manage Applicant Organisation",
+      "id": "manageAllOrgPolicies",
+      "name": "Manage Organisation Policies",
+      "description": "Manage Organisation Policies",
       "case_id": "[[ANYTHING_PRESENT]]",
       "case_fields": "[[ANYTHING_PRESENT]]",
       "event_token": "[[ANYTHING_PRESENT]]",

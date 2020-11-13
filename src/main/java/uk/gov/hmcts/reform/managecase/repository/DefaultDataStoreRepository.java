@@ -18,8 +18,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPage;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPageComplexFieldOverride;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
@@ -146,34 +144,34 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         CaseUpdateViewEvent caseUpdateViewEvent = dataStoreApi.getStartEventTrigger(userAuthToken, caseId, eventId);
 
         if (caseUpdateViewEvent != null) {
+
+            if (caseUpdateViewEvent.getEventToken() == null) {
+                throw new IllegalStateException(NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT);
+            }
+
             Optional<CaseViewField> caseViewField = getCaseViewField(caseUpdateViewEvent);
 
             if (caseViewField.isPresent()) {
                 String caseFieldId = caseViewField.get().getId();
 
-                String approvalStatusDefaultValue = getApprovalStatusDefaultValue(
-                    caseUpdateViewEvent.getWizardPages(),
-                    caseFieldId
-                );
+                Event event = Event.builder()
+                    .eventId(eventId)
+                    .description(NOC_REQUEST_DESCRIPTION)
+                    .build();
 
-                if (caseUpdateViewEvent.getEventToken() == null || approvalStatusDefaultValue == null) {
-                    throw new IllegalStateException(NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT);
-                } else {
-                    Event event = Event.builder()
-                        .eventId(eventId)
-                        .description(NOC_REQUEST_DESCRIPTION)
-                        .build();
+                StartEventResource startEventResource =
+                    dataStoreApi.getExternalStartEventTrigger(userAuthToken, caseId, eventId);
+                Map<String, JsonNode> caseData = startEventResource.getCaseDetails().getData();
 
-                    changeOrganisationRequest.setApprovalStatus(approvalStatusDefaultValue);
+                setApprovalStatus(changeOrganisationRequest, caseFieldId, caseData);
 
-                    CaseDataContent caseDataContent = CaseDataContent.builder()
-                        .token(caseUpdateViewEvent.getEventToken())
-                        .event(event)
-                        .data(getCaseDataContentData(caseFieldId, changeOrganisationRequest))
-                        .build();
+                CaseDataContent caseDataContent = CaseDataContent.builder()
+                    .token(caseUpdateViewEvent.getEventToken())
+                    .event(event)
+                    .data(getCaseDataContentData(caseFieldId, changeOrganisationRequest, caseData))
+                    .build();
 
-                    caseResource = dataStoreApi.submitEventForCase(userAuthToken, caseId, caseDataContent);
-                }
+                caseResource = dataStoreApi.submitEventForCase(userAuthToken, caseId, caseDataContent);
             } else {
                 throw new IllegalStateException(MISSING_CASE_FIELD_ID);
             }
@@ -181,26 +179,16 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         return caseResource;
     }
 
-    private String getApprovalStatusDefaultValue(List<WizardPage> wizardPages, String caseFieldId) {
+    private void setApprovalStatus(ChangeOrganisationRequest changeOrganisationRequest,
+                                   String caseFieldId,
+                                   Map<String, JsonNode> caseData) {
+        JsonNode defaultApprovalStatusValue = caseData.get(caseFieldId);
 
-        String returnValue = null;
-        String approvalStatusFieldId = caseFieldId + ".ApprovalStatus";
-        Optional<WizardPage> optionalWizardPage = wizardPages.stream().findFirst();
-
-        if (optionalWizardPage.isPresent()) {
-            WizardPage wizardPage = optionalWizardPage.get();
-            Optional<WizardPageComplexFieldOverride> filteredWizardPageField =
-                wizardPage.getWizardPageFields().stream()
-                .filter(wizardPageField -> wizardPageField.getCaseFieldId().equals(caseFieldId)
-                    && wizardPageField.getComplexFieldOverride(approvalStatusFieldId).isPresent())
-                .map(wizardPageField -> wizardPageField.getComplexFieldOverride(approvalStatusFieldId).get())
-                .findFirst();
-            if (filteredWizardPageField.isPresent()) {
-                returnValue = filteredWizardPageField.get().getDefaultValue();
-            }
+        if (defaultApprovalStatusValue == null
+            || defaultApprovalStatusValue.isMissingNode()
+            || defaultApprovalStatusValue.isEmpty()) {
+            changeOrganisationRequest.setApprovalStatus("0");
         }
-
-        return returnValue;
     }
 
     private Optional<CaseViewField> getCaseViewField(CaseUpdateViewEvent caseUpdateViewEvent) {
@@ -220,11 +208,13 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     private Map<String, JsonNode> getCaseDataContentData(String caseFieldId,
-                                                         ChangeOrganisationRequest changeOrganisationRequest) {
+                                                         ChangeOrganisationRequest changeOrganisationRequest,
+                                                         Map<String, JsonNode> caseDetailsData) {
         Map<String, JsonNode> data = new HashMap<>();
 
         data.put(caseFieldId, jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
 
+        JacksonUtils.merge(caseDetailsData, data);
         return data;
     }
 

@@ -68,8 +68,8 @@ public interface DataStoreApiClient {
 
     @GetMapping(EXTERNAL_START_EVENT_TRIGGER)
     StartEventResource getExternalStartEventTrigger(@RequestHeader(AUTHORIZATION) String userAuthorizationHeader,
-                                             @PathVariable(CASE_ID) String caseId,
-                                             @PathVariable("eventId") String eventId);
+                                                    @PathVariable(CASE_ID) String caseId,
+                                                    @PathVariable("eventId") String eventId);
 
     @PostMapping(SUBMIT_EVENT_FOR_CASE)
     CaseResource submitEventForCase(@RequestHeader(AUTHORIZATION) String userAuthorizationHeader,

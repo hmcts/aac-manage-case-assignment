@@ -81,6 +81,13 @@ public class TestFixtures {
             return defaultCaseDetails().build();
         }
 
+        public static CaseDetails caseDetails(ChangeOrganisationRequest changeOrganisationRequest) {
+            return defaultCaseDetails()
+                .data(Map.of("changeOrganisationRequestField",
+                    OBJECT_MAPPER.convertValue(changeOrganisationRequest, JsonNode.class)))
+                .build();
+        }
+
         public static CaseDetails.CaseDetailsBuilder defaultCaseDetails() {
             return CaseDetails.builder()
                     .caseTypeId(CASE_TYPE_ID)
@@ -96,12 +103,6 @@ public class TestFixtures {
                     .orgPolicyReference(null)
                     .organisation(new Organisation(organizationId, organizationId))
                     .build();
-        }
-        public static CaseDetails caseDetails(ChangeOrganisationRequest changeOrganisationRequest) {
-            return defaultCaseDetails()
-                .data(Map.of("changeOrganisationRequestField",
-                    OBJECT_MAPPER.convertValue(changeOrganisationRequest, JsonNode.class)))
-                .build();
         }
 
         private static JsonNode jsonNode(String organizationId, String orgPolicyRole) {

@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
+import uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -304,6 +305,15 @@ public class NoticeOfChangeControllerIT {
             stubGetCaseViaExternalApi(CASE_ID, caseResource);
 
             stubSubmitEventForCase(CASE_ID, caseResource);
+
+            Map<String, JsonNode> data = new HashMap<>();
+            CaseDetails caseDetails = CaseDetails.builder().data(data).build();
+
+            StartEventResource startEventResource = StartEventResource.builder()
+                .token("token")
+                .caseDetails(caseDetails)
+                .build();
+            WiremockFixtures.stubGetExternalStartEventTrigger(CASE_ID, NOC, startEventResource);
         }
 
         @Test

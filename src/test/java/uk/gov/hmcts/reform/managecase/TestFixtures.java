@@ -88,17 +88,6 @@ public class TestFixtures {
             return defaultCaseDetails().data(jsonNodeMap).build();
         }
 
-        public static CaseDetails caseDetails() {
-            return defaultCaseDetails().build();
-        }
-
-        public static CaseDetails caseDetails(ChangeOrganisationRequest changeOrganisationRequest) {
-            return defaultCaseDetails()
-                .data(Map.of("changeOrganisationRequestField",
-                    OBJECT_MAPPER.convertValue(changeOrganisationRequest, JsonNode.class)))
-                .build();
-        }
-
         public static CaseDetails.CaseDetailsBuilder defaultCaseDetails() {
             return CaseDetails.builder()
                 .caseTypeId(CASE_TYPE_ID)

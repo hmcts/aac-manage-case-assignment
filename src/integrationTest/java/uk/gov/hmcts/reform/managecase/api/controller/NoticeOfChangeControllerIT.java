@@ -68,6 +68,8 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCa
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetChallengeQuestions;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetStartEventTrigger;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSubmitEventForCase;
+import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.PENDING;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.UseConcurrentHashMap",
@@ -310,7 +312,7 @@ public class NoticeOfChangeControllerIT {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)))
-                .andExpect(jsonPath("$.approval_status", is("PENDING")));
+                .andExpect(jsonPath("$.approval_status", is(PENDING.name())));
         }
 
         @Test
@@ -331,7 +333,7 @@ public class NoticeOfChangeControllerIT {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)))
-                .andExpect(jsonPath("$.approval_status", is("APPROVED")));
+                .andExpect(jsonPath("$.approval_status", is(APPROVED.name())));
         }
     }
 }

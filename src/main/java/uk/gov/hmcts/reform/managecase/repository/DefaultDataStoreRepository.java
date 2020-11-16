@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.PENDING;
+
 @Repository
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
 public class DefaultDataStoreRepository implements DataStoreRepository {
@@ -159,7 +161,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         if (defaultApprovalStatusValue == null
             || defaultApprovalStatusValue.isMissingNode()
             || defaultApprovalStatusValue.isEmpty()) {
-            changeOrganisationRequest.setApprovalStatus("0");
+            changeOrganisationRequest.setApprovalStatus(PENDING.name());
         }
     }
 

@@ -20,13 +20,11 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.PENDING;
 
 @Service
 public class RequestNoticeOfChangeService {
-
-    private static final String APPROVED = "APPROVED";
-    private static final String PENDING = "PENDING";
-
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
     private final JacksonUtils jacksonUtils;

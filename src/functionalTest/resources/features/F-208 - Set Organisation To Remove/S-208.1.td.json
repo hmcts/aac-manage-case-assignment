@@ -5,7 +5,7 @@
   "title": "(Happy Path) Successfully set up the OrganisationToRemove in the ChangeOrganisationRequest and return the updated case record for a Remove event",
 
   "specs": [
-    "system_user - with caseworker-caa IdAM role",
+    "system user - with caseworker-caa IdAM role",
     "intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user",
     "contains a case record containing exactly one OrganisationPolicy.OrgPolicyCaseAssignedRole matching the ChangeOrganisationRequest.CaseRole",
     "includes ChangeOrganisationRequest.OrganisationToRemove is equal to the organisation ID in the Organisation policy that has a OrgPolicyCaseAssignedRole matching the COR.CaseRole"

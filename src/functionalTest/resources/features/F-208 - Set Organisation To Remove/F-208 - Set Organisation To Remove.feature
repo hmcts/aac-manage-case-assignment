@@ -11,7 +11,7 @@ Feature: F-208: Set Organisation To Remove
 @S-208.1
 Scenario: (Happy Path) Successfully set up the OrganisationToRemove in the ChangeOrganisationRequest and return the updated case record for a Remove event
 
-    Given a user [system_user - with caseworker-caa IdAM role],
+    Given a user [system user - with caseworker-caa IdAM role],
 
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
@@ -28,7 +28,7 @@ Scenario: (Happy Path) Successfully set up the OrganisationToRemove in the Chang
 @S-208.2
 Scenario: Must return an error for a non extant case record
 
-    Given a user [system_user - with caseworker-caa IdAM role],
+    Given a user [system user - with caseworker-caa IdAM role],
 
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
@@ -44,7 +44,7 @@ Scenario: Must return an error for a non extant case record
 @S-208.3
 Scenario: Must return error if the ChangeOrganisationRequest.CaseRole is missing
 
-    Given a user [system_user - with caseworker-caa IdAM role],
+    Given a user [system user - with caseworker-caa IdAM role],
 
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
@@ -60,7 +60,7 @@ Scenario: Must return error if the ChangeOrganisationRequest.CaseRole is missing
 @S-208.4
 Scenario: Must return error if the ChangeOrganisationRequest.CaseRole is null
 
-    Given a user [system_user - with caseworker-caa IdAM role],
+    Given a user [system user - with caseworker-caa IdAM role],
 
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
@@ -76,7 +76,7 @@ Scenario: Must return error if the ChangeOrganisationRequest.CaseRole is null
 @S-208.5
 Scenario: Must return error if there is more than one OrganisationPolicy CaseRole on the case which matches the ChangeOrganisationRequest.CaseRole
 
-    Given a user [system_user - with caseworker-caa IdAM role],
+    Given a user [system user - with caseworker-caa IdAM role],
 
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
@@ -92,7 +92,7 @@ Scenario: Must return error if there is more than one OrganisationPolicy CaseRol
 @S-208.6
 Scenario: Must return error if no OrganisationPolicy CaseRole on the case matches the ChangeOrganisationRequest.CaseRole
 
-    Given a user [system_user - with caseworker-caa IdAM role],
+    Given a user [system user - with caseworker-caa IdAM role],
 
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],
@@ -108,7 +108,7 @@ Scenario: Must return error if no OrganisationPolicy CaseRole on the case matche
 @S-208.7
 Scenario: Must return an error for a malformed Case ID
 
-    Given a user [system_user - with caseworker-caa IdAM role],
+    Given a user [system user - with caseworker-caa IdAM role],
 
     When a request is prepared with appropriate values,
       And the request [intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user],

@@ -5,7 +5,7 @@
   "title": "Must return an error for a non extant case record",
 
   "specs": [
-    "system_user - with caseworker-caa IdAM role",
+    "system user - with caseworker-caa IdAM role",
     "intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user",
     "does not contain a case record"
   ],

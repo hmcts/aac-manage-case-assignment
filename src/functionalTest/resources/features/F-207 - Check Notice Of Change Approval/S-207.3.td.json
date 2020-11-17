@@ -13,7 +13,7 @@
 
   "users": {
     "invokingUser": {
-      "_extends_": "ACA_Users_Dil"
+      "_extends_": "ACA_Users_Caseworker_CAA"
     }
   },
 

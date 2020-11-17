@@ -60,9 +60,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.defaultCaseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getCaseViewFields;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getWizardPages;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_PATH;
@@ -354,7 +356,7 @@ public class NoticeOfChangeControllerIT {
     @DisplayName("POST /noc/check-noc-approval")
     class CheckNoticeOfChangeApproval extends BaseTest {
 
-        private NoticeOfChangeRequest noticeOfChangeRequest;
+        private NoticeOfChangeRequest checkNoticeOfChangeApprovalRequest;
         private CaseDetails caseDetails;
         private ChangeOrganisationRequest changeOrganisationRequest;
 
@@ -375,7 +377,7 @@ public class NoticeOfChangeControllerIT {
 
             caseDetails =  caseDetails(changeOrganisationRequest);
 
-            noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
+            checkNoticeOfChangeApprovalRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
 
             CaseViewActionableEvent caseViewEvent = new CaseViewActionableEvent();
             caseViewEvent.setId(NOC);
@@ -411,8 +413,8 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldSuccessfullyCheckNoCApprovalWithAutoApproval() throws Exception {
             this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(noticeOfChangeRequest)))
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)))
@@ -429,28 +431,26 @@ public class NoticeOfChangeControllerIT {
                 .approvalStatus("REJECTED")
                 .build();
 
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
-                                          Map.of("changeOrganisationRequestField",
-                                                 mapper.convertValue(changeOrganisationRequest, JsonNode.class)));
-
-            noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
+            caseDetails =  caseDetails(changeOrganisationRequest);
+            checkNoticeOfChangeApprovalRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(noticeOfChangeRequest)))
-                .andExpect(status().isOk());
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE)))
+                .andExpect(jsonPath("$.confirmation_body", is(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE)));
         }
 
         @Test
         void shouldReturnAnErrorIfRequestDoesNotContainChangeOrgRequest() throws Exception {
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State",
-                                          "CaseTypeId", new HashMap<>());
+            caseDetails = defaultCaseDetails().build();
 
-            noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
+            checkNoticeOfChangeApprovalRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(noticeOfChangeRequest)))
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
@@ -459,15 +459,12 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldReturnAnErrorIfChangeOrganisationRequestIsInvalid() throws Exception {
             changeOrganisationRequest.setApprovalStatus(null);
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
-                                          Map.of("changeOrganisationRequestField",
-                                                 mapper.convertValue(changeOrganisationRequest, JsonNode.class)));
-
-            noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
+            caseDetails =  caseDetails(changeOrganisationRequest);
+            checkNoticeOfChangeApprovalRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(noticeOfChangeRequest)))
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
@@ -475,7 +472,7 @@ public class NoticeOfChangeControllerIT {
     }
 
     @Nested
-    @DisplayName("POST /noc/check-noc-approval")
+    @DisplayName("POST /noc/set-organisation-to-remove")
     class SetOrganisationToRemove extends BaseTest {
 
         private NoticeOfChangeRequest noticeOfChangeRequest;
@@ -490,8 +487,8 @@ public class NoticeOfChangeControllerIT {
         @BeforeEach
         public void setup() {
             changeOrganisationRequest = ChangeOrganisationRequest.builder()
-                .organisationToAdd(new Organisation("123", "Org1"))
-                .organisationToRemove(new Organisation(null, null))
+                .organisationToAdd(Organisation.builder().organisationID("123").build())
+                .organisationToRemove(Organisation.builder().organisationID(null).build())
                 .caseRoleId("Role1")
                 .requestTimestamp(LocalDateTime.now())
                 .approvalStatus("APPROVED")
@@ -507,13 +504,7 @@ public class NoticeOfChangeControllerIT {
                 .orgPolicyCaseAssignedRole("Role1")
                 .build();
 
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
-                                                  Map.of(
-                                                      "changeOrganisationRequestField",
-                                                      mapper.convertValue(changeOrganisationRequest, JsonNode.class),
-                                                      "OrganisationPolicyField1",
-                                                      mapper.convertValue(organisationPolicy, JsonNode.class)));
-
+            caseDetails = caseDetails(changeOrganisationRequest, organisationPolicy);
             noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
         }
 
@@ -523,14 +514,15 @@ public class NoticeOfChangeControllerIT {
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(mapper.writeValueAsString(noticeOfChangeRequest)))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.data.changeOrganisationRequestField.OrganisationToRemove.OrganisationID",
+                                    is("Org1")));
         }
 
         @Test
         void shouldReturnAnErrorIfRequestDoesNotContainChangeOrgRequest() throws Exception {
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State",
-                                                  "CaseTypeId", new HashMap<>());
-
+            caseDetails = defaultCaseDetails().data(Map.of()).build();
             noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
@@ -544,10 +536,7 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldReturnAnErrorIfChangeOrganisationRequestIsInvalid() throws Exception {
             changeOrganisationRequest.setApprovalStatus(null);
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
-                                          Map.of("changeOrganisationRequestField",
-                                                 mapper.convertValue(changeOrganisationRequest, JsonNode.class)));
-
+            caseDetails = caseDetails(changeOrganisationRequest);
             noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
@@ -561,10 +550,7 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldReturnAnErrorIfOrganisationToRemoveIsInvalid() throws Exception {
             changeOrganisationRequest.setOrganisationToRemove(new Organisation("Org2", "Organisation 2"));
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
-                                              Map.of("changeOrganisationRequestField",
-                                                     mapper.convertValue(changeOrganisationRequest, JsonNode.class)));
-
+            caseDetails = caseDetails(changeOrganisationRequest);
             noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
@@ -577,10 +563,7 @@ public class NoticeOfChangeControllerIT {
 
         @Test
         void shouldReturnAnErrorIfNoMatchingOrganisationPolicies() throws Exception {
-            caseDetails = new CaseDetails(CASE_ID, "Jurisdiction", "State", "CaseTypeId",
-                                              Map.of("changeOrganisationRequestField",
-                                                     mapper.convertValue(changeOrganisationRequest, JsonNode.class)));
-
+            caseDetails = caseDetails(changeOrganisationRequest);
             noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)

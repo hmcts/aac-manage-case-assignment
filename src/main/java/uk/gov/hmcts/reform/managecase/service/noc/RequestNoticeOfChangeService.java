@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
-import uk.gov.hmcts.reform.managecase.api.payload.SetOrganisationToRemoveResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
@@ -94,9 +94,9 @@ public class RequestNoticeOfChangeService {
             .build();
     }
 
-    public SetOrganisationToRemoveResponse setOrganisationToRemove(CaseDetails caseDetails,
-                                                                   ChangeOrganisationRequest changeOrganisationRequest,
-                                                                   String changeOrganisationKey) {
+    public AboutToSubmitCallbackResponse setOrganisationToRemove(CaseDetails caseDetails,
+                                                                 ChangeOrganisationRequest changeOrganisationRequest,
+                                                                 String changeOrganisationKey) {
 
         List<JsonNode> organisationPolicyNodes = caseDetails.findOrganisationPolicyNodes();
         List<OrganisationPolicy> matchingOrganisationPolicyNodes =
@@ -117,7 +117,7 @@ public class RequestNoticeOfChangeService {
         Map<String, JsonNode> data = new HashMap<>(caseDetails.getData());
         data.put(changeOrganisationKey, jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
 
-        return SetOrganisationToRemoveResponse.builder()
+        return AboutToSubmitCallbackResponse.builder()
             .data(data)
             .build();
     }

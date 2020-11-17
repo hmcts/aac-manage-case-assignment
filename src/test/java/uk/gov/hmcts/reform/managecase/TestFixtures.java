@@ -81,6 +81,16 @@ public class TestFixtures {
                 .build();
         }
 
+        public static CaseDetails caseDetails(ChangeOrganisationRequest changeOrganisationRequest,
+                                              OrganisationPolicy organisationPolicy) {
+            return defaultCaseDetails()
+                .data(Map.of("changeOrganisationRequestField",
+                             OBJECT_MAPPER.convertValue(changeOrganisationRequest, JsonNode.class),
+                             "organisationPolicyField",
+                             OBJECT_MAPPER.convertValue(organisationPolicy, JsonNode.class)))
+                .build();
+        }
+
         public static CaseDetails caseDetails(String organizationId, String... orgPolicyRoles) {
             Map<String, JsonNode> jsonNodeMap = Stream.of(orgPolicyRoles)
                     .collect(Collectors.toMap(role -> "Field_" + role, role -> jsonNode(organizationId, role),

@@ -20,10 +20,11 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
 import uk.gov.hmcts.reform.managecase.api.payload.SubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.NoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
-import uk.gov.hmcts.reform.managecase.api.payload.SetOrganisationToRemoveResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
@@ -329,7 +330,7 @@ public class NoticeOfChangeController {
         @ApiResponse(
             code = 200,
             message = StringUtils.EMPTY,
-            response = SetOrganisationToRemoveResponse.class
+            response = AboutToSubmitCallbackResponse.class
         ),
         @ApiResponse(
             code = 400,
@@ -359,9 +360,9 @@ public class NoticeOfChangeController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
-    public SetOrganisationToRemoveResponse setOrganisationToRemove(@Valid @RequestBody
-                                                                       NoticeOfChangeRequest noticeOfChangeRequest) {
-        CaseDetails caseDetails = noticeOfChangeRequest.getCaseDetails();
+    public AboutToSubmitCallbackResponse setOrganisationToRemove(@Valid @RequestBody
+                                                           AboutToSubmitCallbackRequest aboutToSubmitCallbackRequest) {
+        CaseDetails caseDetails = aboutToSubmitCallbackRequest.getCaseDetails();
         Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
 
         if (changeOrganisationRequestFieldJson.isEmpty()) {

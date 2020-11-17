@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Getter
 @Builder
-@ApiModel("Set Organisation To Remove Response")
-public class SetOrganisationToRemoveResponse {
+@ApiModel("About To Submit Callback Response")
+public class AboutToSubmitCallbackResponse {
     private Map<String, JsonNode> data;
 }

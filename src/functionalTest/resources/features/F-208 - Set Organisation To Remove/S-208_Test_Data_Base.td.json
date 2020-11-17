@@ -7,7 +7,7 @@
   "method": "POST",
   "uri": "noc/set-organisation-to-remove",
 
-  "s2sClientId": "xui_webapp",
+  "s2sClientId": "ccd_data",
   "userTokenClientId": "xuiwebapp",
 
   "users": {

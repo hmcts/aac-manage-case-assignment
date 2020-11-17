@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
-import uk.gov.hmcts.reform.managecase.api.payload.SetOrganisationToRemoveResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
@@ -384,7 +384,7 @@ class RequestNoticeOfChangeServiceTest {
             given(jacksonUtils.convertValue(any(), eq(OrganisationPolicy.class)))
                 .willReturn(organisationPolicy);
 
-            SetOrganisationToRemoveResponse response =
+            AboutToSubmitCallbackResponse response =
                 service.setOrganisationToRemove(callbackCaseDetails,
                                                 changeOrganisationRequestBefore,
                                                 "ChangeOrganisationRequestField");

@@ -2,7 +2,7 @@
   "_guid_": "Challenge_Questions_Response",
   "questions" : [ {
     "case_type_id" : "FT_NoCCaseType",
-    "order" : 4,
+    "order" : 6,
     "question_text" : "What's the name of the party you wish to represent?",
     "answer_field_type" : {
       "id" : "Text",
@@ -20,7 +20,7 @@
     "question_id" : "NoC_Challenge_Name"
   }, {
     "case_type_id" : "FT_NoCCaseType",
-    "order" : 2,
+    "order" : 7,
     "question_text" : "significant date?",
     "answer_field_type" : {
       "id" : "Date",
@@ -33,7 +33,7 @@
       "collection_field_type" : null
     },
     "display_context_parameter" : "#DATETIMEENTRY(dd-MM-yyyy)",
-    "challenge_question_id" : "NoCChallenge",
+    "challenge_question_id" : "NoCChalleng
     "answer_field" : null,
     "question_id" : "NoC_Challenge_Name2"
   } ]

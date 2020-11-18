@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_DECISION_EVENT_UNIDENTIFIABLE;
+import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.APPROVED;
 
 @RestController
 @Validated
@@ -66,8 +67,6 @@ public class NoticeOfChangeController {
         "The Notice of Change request has been successfully submitted.";
     public static final String CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE = "Not yet approved";
     public static final String CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE = "Approval Applied";
-    public static final String APPROVED = "APPROVED";
-    public static final String APPROVED_NUMERIC = "1";
 
     private final NoticeOfChangeQuestions noticeOfChangeQuestions;
 
@@ -311,8 +310,8 @@ public class NoticeOfChangeController {
         ChangeOrganisationRequest changeOrganisationRequest =
             jacksonUtils.convertValue(changeOrganisationRequestFieldJson.get(), ChangeOrganisationRequest.class);
         changeOrganisationRequest.validateChangeOrganisationRequest();
-        if (!changeOrganisationRequest.getApprovalStatus().equals(APPROVED_NUMERIC)
-            && !changeOrganisationRequest.getApprovalStatus().equals(APPROVED)) {
+        if (!changeOrganisationRequest.getApprovalStatus().equals(APPROVED.name())
+            && !changeOrganisationRequest.getApprovalStatus().equals(APPROVED.getValue())) {
             return new SubmitCallbackResponse(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE,
                 CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE);
         }

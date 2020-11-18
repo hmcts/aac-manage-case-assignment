@@ -26,7 +26,7 @@
       "state": "CaseCreated",
 
       "data": {
-        "_extends_": "NoC_Case_Data_With_Org_Policies__expectedResponse",
+        "_extends_": "NoC_Case_Data_With_Org_Policies__publicFields",
 
         "applicantOrganisationPolicy": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][applicantOrganisationPolicy]}",
         "respondentOrganisationPolicy": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][respondentOrganisationPolicy]}",
@@ -34,7 +34,7 @@
       },
 
       "data_classification": {
-        "_extends_": "NoC_Case_Data_Classification_With_Org_Policies",
+        "_extends_": "NoC_Case_Data_Classification_With_Org_Policies__publicFields",
 
         "applicantOrganisationPolicy": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data_classification][applicantOrganisationPolicy]}",
         "respondentOrganisationPolicy": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data_classification][respondentOrganisationPolicy]}",

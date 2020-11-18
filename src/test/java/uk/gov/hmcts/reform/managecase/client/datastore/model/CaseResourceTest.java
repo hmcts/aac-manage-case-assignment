@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.APPROVED;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
 class CaseResourceTest {
@@ -36,7 +37,7 @@ class CaseResourceTest {
             .requestTimestamp(now)
             .organisationToAdd(organisationToAdd)
             .organisationToRemove(organisationToRemove)
-            .approvalStatus("APPROVED")
+            .approvalStatus(APPROVED.name())
             .build();
 
         final String expectedChangeOrganisationRequestJson =

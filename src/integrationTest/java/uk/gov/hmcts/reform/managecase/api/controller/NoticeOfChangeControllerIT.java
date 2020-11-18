@@ -84,6 +84,8 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCh
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetExternalStartEventTriggerAsApprover;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetStartEventTrigger;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSubmitEventForCase;
+import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.PENDING;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.UseConcurrentHashMap",
@@ -326,7 +328,7 @@ public class NoticeOfChangeControllerIT {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)))
-                .andExpect(jsonPath("$.approval_status", is("PENDING")));
+                .andExpect(jsonPath("$.approval_status", is(PENDING.name())));
         }
 
         @Test
@@ -348,7 +350,7 @@ public class NoticeOfChangeControllerIT {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)))
-                .andExpect(jsonPath("$.approval_status", is("APPROVED")));
+                .andExpect(jsonPath("$.approval_status", is(APPROVED.name())));
         }
     }
 
@@ -372,7 +374,7 @@ public class NoticeOfChangeControllerIT {
                 .organisationToRemove(Organisation.builder().organisationID("789").build())
                 .caseRoleId("CaseRoleId")
                 .requestTimestamp(LocalDateTime.now())
-                .approvalStatus(NoticeOfChangeController.APPROVED)
+                .approvalStatus(APPROVED.name())
                 .build();
 
             caseDetails =  caseDetails(changeOrganisationRequest);

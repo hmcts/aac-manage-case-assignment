@@ -44,6 +44,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
+import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.PENDING;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap",
     "PMD.AvoidDuplicateLiterals",
@@ -53,8 +55,6 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.I
 class RequestNoticeOfChangeServiceTest {
 
     private static final String CASE_ID = "1567934206391385";
-    private static final String PENDING = "PENDING";
-    private static final String APPROVED = "APPROVED";
     private static final String INCUMBENT_ORGANISATION_ID = "INCUMBENT_ORG_ID_1";
     private static final String CASE_ASSIGNED_ROLE = "CASE_ASSIGNED_ROLE";
     private static final String NOC_REQUEST_EVENT = "NocRequest";

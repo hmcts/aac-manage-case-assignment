@@ -29,6 +29,18 @@ public final class ValidationError {
         + " organisation as that of the invoker.";
     public static final String ORGANISATION_POLICY_ERROR = "Case ID has to be one for which a case role is"
         + " represented by the invoker's organisation.";
+    public static final String JURISDICTION_CANNOT_BE_BLANK = "Jurisdiciton cannot be blank.";
+    public static final String CASE_TYPE_CANNOT_BE_BLANK = "CaseType cannot be blank.";
+    public static final String NO_ORGANISATION_POLICY_ON_CASE_DATA = "No OrganisationPolicy found on the case data.";
+    public static final String ONGOING_NOC_REQUEST = "There is an ongoing NoCRequest.";
+    public static final String NO_SOLICITOR_ORGANISATION_RECORDED_IN_ORG_POLICY = "The Organisation of the solicitor is"
+        + " not recorded in an Org policy on the case.";
+    public static final String NO_ORGANISATION_ID_IN_ANY_ORG_POLICY = "No Organisation id present in any Org policy"
+        + " on the case.";
+    public static final String ORG_POLICY_CASE_ROLE_NOT_IN_CASE_DEFINITION = "Missing"
+        + " OrganisationPolicy.OrgPolicyCaseAssignedRole %s in the case definition.";
+    public static final String MISSING_COR_CASE_ROLE_ON_THE_CASE_DATA = "Missing %s.%s on the case data.";
+    public static final String MISSING_COR_ON_THE_CASE_DATA = "Missing %s on the case data.";
 
     // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     private ValidationError() {

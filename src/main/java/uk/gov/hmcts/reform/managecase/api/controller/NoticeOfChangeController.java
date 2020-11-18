@@ -15,13 +15,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
+import uk.gov.hmcts.reform.managecase.api.payload.NoCPrepareRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.NoCPrepareResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
-import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
+import uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService;
+import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
@@ -37,16 +42,20 @@ public class NoticeOfChangeController {
     @SuppressWarnings({"squid:S1075"})
     public static final String GET_NOC_QUESTIONS = "/noc-questions";
     public static final String VERIFY_NOC_ANSWERS = "/verify-noc-answers";
+    public static final String NOC_PREPARE_PATH = "/noc-prepare";
 
     public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
 
     private final NoticeOfChangeQuestions noticeOfChangeQuestions;
     private final VerifyNoCAnswersService verifyNoCAnswersService;
+    private final PrepareNoCService prepareNoCService;
 
     public NoticeOfChangeController(NoticeOfChangeQuestions noticeOfChangeQuestions,
-                                    VerifyNoCAnswersService verifyNoCAnswersService) {
+                                    VerifyNoCAnswersService verifyNoCAnswersService,
+                                    PrepareNoCService prepareNoCService) {
         this.noticeOfChangeQuestions = noticeOfChangeQuestions;
         this.verifyNoCAnswersService = verifyNoCAnswersService;
+        this.prepareNoCService = prepareNoCService;
     }
 
     @GetMapping(path = GET_NOC_QUESTIONS, produces = APPLICATION_JSON_VALUE)
@@ -175,6 +184,50 @@ public class NoticeOfChangeController {
         @Valid @RequestBody VerifyNoCAnswersRequest verifyNoCAnswersRequest) {
         NoCRequestDetails result = verifyNoCAnswersService.verifyNoCAnswers(verifyNoCAnswersRequest);
         return result.toVerifyNoCAnswersResponse(VERIFY_NOC_ANSWERS_MESSAGE);
+    }
+
+    @PostMapping(path = NOC_PREPARE_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Prepare NoC request event", notes = "Prepare NoC request event")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "Data with a list of Case Roles attached to the ChangeOrganisationRequest."
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:"
+                + "\n1) " + ValidationError.JURISDICTION_CANNOT_BE_BLANK
+                + "\n2) " + ValidationError.CASE_TYPE_CANNOT_BE_BLANK
+                + "\n3) " + ValidationError.NO_ORGANISATION_POLICY_ON_CASE_DATA
+                + "\n4) " + ValidationError.ONGOING_NOC_REQUEST
+                + "\n5) " + ValidationError.NO_SOLICITOR_ORGANISATION_RECORDED_IN_ORG_POLICY
+                + "\n6) " + ValidationError.NO_ORGANISATION_ID_IN_ANY_ORG_POLICY
+                + "\n7) " + ValidationError.ORG_POLICY_CASE_ROLE_NOT_IN_CASE_DEFINITION
+                + "\n7) " + ValidationError.MISSING_COR_CASE_ROLE_ON_THE_CASE_DATA
+                + "\n8) " + ValidationError.MISSING_COR_ON_THE_CASE_DATA,
+            response = ApiError.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"message\": \"" + ValidationError.ONGOING_NOC_REQUEST + "\",\n"
+                        + "   \"errors\": [ ]\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
+        )
+    })
+    public NoCPrepareResponse prepareNoC(@Valid @RequestBody NoCPrepareRequest noCPrepareRequest) {
+        return new NoCPrepareResponse(prepareNoCService.prepareNoCRequest(noCPrepareRequest.getCaseDetails()));
     }
 
     private void validateCaseIds(String caseId) {

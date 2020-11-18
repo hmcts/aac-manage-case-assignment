@@ -20,7 +20,7 @@
       "state": "CaseCreated",
 
       "data": {
-        "_extends_": "NoC_Case_Data_With_Org_Policies__expectedResponse",
+        "_extends_": "NoC_Case_Data_With_Org_Policies__publicFields",
 
         "applicantOrganisationPolicy": {
           "Organisation": {

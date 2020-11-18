@@ -1,6 +1,6 @@
 {
   "_guid_": "NoC_Case_Data",
-  "_extends_": "NoC_Case_Data__expectedResponse",
+  "_extends_": "NoC_Case_Data__publicFields",
 
   "applicant": {
     "individual": {

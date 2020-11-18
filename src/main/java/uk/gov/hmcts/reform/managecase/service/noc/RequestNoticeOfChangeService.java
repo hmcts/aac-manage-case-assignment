@@ -21,13 +21,11 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.PENDING;
 
 @Service
 public class RequestNoticeOfChangeService {
-
-    private static final String APPROVED = "APPROVED";
-    private static final String PENDING = "PENDING";
-
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
     private final JacksonUtils jacksonUtils;
@@ -46,12 +44,6 @@ public class RequestNoticeOfChangeService {
         this.securityUtils = securityUtils;
     }
 
-    /**
-     * Input parameters to be decided on with Dan, dependant on response from NocAnswers.
-     *
-     * @param noCRequestDetails details of the NoCRequest provided by the call ot NocAnswers
-     * @return RequestNoticeOfChangeResponse
-     */
     public RequestNoticeOfChangeResponse requestNoticeOfChange(NoCRequestDetails noCRequestDetails) {
         String caseId = noCRequestDetails.getCaseViewResource().getReference();
 
@@ -64,18 +56,16 @@ public class RequestNoticeOfChangeService {
 
         String eventId = getEventId(noCRequestDetails);
 
-        // LLD Step 4: Generate the NoCRequest event:
         generateNoCRequestEvent(caseId, invokersOrganisation, incumbentOrganisation, caseRoleId, eventId);
 
-        // LLD Step 5: Confirm if the NoCRequest has been auto-approved:
-        // Reload the case data (EI-3); as the case may have been changed as a result of the post-submit callback to
-        // CheckForNoCApproval operation, return error if detected (Response case - 7).
+        // The case may have been changed as a result of the post-submit callback to CheckForNoCApproval operation.
+        // Case data is therefore reloaded before checking if the NoCRequest has been auto-approved
         CaseResource caseResource = getCaseViaExternalApi(caseId);
 
         boolean isApprovalComplete =
             isNocRequestAutoApprovalCompleted(caseResource, invokersOrganisation, caseRoleId);
 
-        // LLD STep 6: Auto-assign relevant case-roles to the invoker if required, i.e.:
+        // Auto-assign relevant case-roles to the invoker if required
         if (isApprovalComplete
             && isActingAsSolicitor(securityUtils.getUserInfo().getRoles(), caseResource.getJurisdiction())) {
             autoAssignCaseRoles(caseResource, invokersOrganisation);
@@ -116,33 +106,14 @@ public class RequestNoticeOfChangeService {
             .requestTimestamp(LocalDateTime.now())
             .build();
 
+        // Submit the NoCRequest event + event token.  This action will trigger a submitted callback to the
+        // CheckForNoCApproval operation, which will apply additional processing in the event of auto-approval.
         return dataStoreRepository.submitEventForCase(caseId, eventId, changeOrganisationRequest);
-
-        //        Generate the NoCRequest event:
-        //        Call EI-1 to generate an event token for a NoCRequest event for the case, return error if detected
-        //        (Response case - 7).
-        //        Update the following ChangeOrganisationRequest fields and in doing so confirm that the outcome of the
-        //        request is the same as requested in the supplied expected outcome
-        //        OrganisationToAdd = Organisation of the invoker as identified in Step-2.
-        //        OrganisationToRemove = the incumbent organisation as identified in Step-2.
-        //        CaseRole = the CaseRole in the OrganisationPolicy as identified in Step-2.
-        //        RequestTimestamp = now.
-        //            Reason = as specified in the request (may be null if allowed by config).
-        //        Call EI-2 to submit the NoCRequest event + event token, return error if detected (Response case - 7).
-        //... this action will trigger a submitted callback to the CheckForNoCApproval operation, which will apply
-        // additional processing in the event of auto-approval.
     }
 
     private boolean isNocRequestAutoApprovalCompleted(CaseResource caseResource,
                                                       Organisation invokersOrganisation,
                                                       String caseRoleId) {
-        //        Confirm if the following are all true:
-        //        ChangeOrganisationRequest.CaseRole is NULL – i.e. the request has been auto-approved and processed.
-        //        ChangeOrganisationRequest.ApprovalStatus is NULL - i.e. NULL (approved) or 0 (pending).
-        //            The organisation in the OrganisationPolicy identified by the CaseRole saved in Step-2 matches
-        //            that of the organisation of the invoker (also found in Step-2) – i.e. the request was to add or
-        //            replace representation and it was approved.
-        //
         Optional<ChangeOrganisationRequest> changeOrganisationRequest = getChangeOrganisationRequest(caseResource);
 
         return changeOrganisationRequest.isPresent()
@@ -164,14 +135,6 @@ public class RequestNoticeOfChangeService {
 
     private void autoAssignCaseRoles(CaseResource caseResource,
                                      Organisation invokersOrganisation) {
-        //        From the case data reloaded in Step-5: find the Case Roles in any OrganisationPolicy associated with
-        //        the Organisation of the invoker as identified in Step-2.
-        //        Make a single call to EI-4 containing a list item for each case-role identified: holding
-        //            case_id = as specified in the request
-        //        user_id = invoker's IDAM ID
-        //        case_role = case role as identified
-        //        organisation_id = Organisation of the invoker as identified in Step-2.
-        //... return error if detected (Response case - 7).
         List<String> invokerOrgPolicyRoles =
             findInvokerOrgPolicyRoles(caseResource, invokersOrganisation);
 
@@ -182,9 +145,6 @@ public class RequestNoticeOfChangeService {
     private boolean isRequestToAddOrReplaceRepresentationAndApproved(CaseResource caseResource,
                                                                      Organisation organisation,
                                                                      String caseRoleId) {
-        // 1. get all org policies from the caseResource
-        // 2. find org policy that has case role is matching caseRoleId
-        //3. check that organisation for that org policy matches the invokersOrganisation - match only on id
         return findInvokerOrgPolicyRoles(caseResource, organisation).contains(caseRoleId);
     }
 

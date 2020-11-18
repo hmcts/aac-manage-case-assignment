@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
+import uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus;
 
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
 
@@ -26,5 +27,5 @@ public class RequestNoticeOfChangeResponse {
     @JsonProperty("approval_status")
     @ApiModelProperty(value = "Approval status", required = true,
         example = "APPROVED")
-    private final String approvalStatus;
+    private final ApprovalStatus approvalStatus;
 }

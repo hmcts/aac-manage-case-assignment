@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import uk.gov.hmcts.reform.managecase.BaseTest;
-import uk.gov.hmcts.reform.managecase.api.payload.NoticeOfChangeRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.CallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -356,7 +356,7 @@ public class NoticeOfChangeControllerIT {
     @DisplayName("POST /noc/check-noc-approval")
     class CheckNoticeOfChangeApproval extends BaseTest {
 
-        private NoticeOfChangeRequest checkNoticeOfChangeApprovalRequest;
+        private CallbackRequest checkNoticeOfChangeApprovalRequest;
         private CaseDetails caseDetails;
         private ChangeOrganisationRequest changeOrganisationRequest;
 
@@ -368,8 +368,8 @@ public class NoticeOfChangeControllerIT {
         @BeforeEach
         public void setup() throws JsonProcessingException {
             changeOrganisationRequest = ChangeOrganisationRequest.builder()
-                .organisationToAdd(new Organisation("123", "Org1"))
-                .organisationToRemove(new Organisation("789", "Org2"))
+                .organisationToAdd(Organisation.builder().organisationID("123").build())
+                .organisationToRemove(Organisation.builder().organisationID("789").build())
                 .caseRoleId("CaseRoleId")
                 .requestTimestamp(LocalDateTime.now())
                 .approvalStatus(NoticeOfChangeController.APPROVED)
@@ -377,7 +377,7 @@ public class NoticeOfChangeControllerIT {
 
             caseDetails =  caseDetails(changeOrganisationRequest);
 
-            checkNoticeOfChangeApprovalRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
+            checkNoticeOfChangeApprovalRequest = new CallbackRequest(NOC, null, caseDetails);
 
             CaseViewActionableEvent caseViewEvent = new CaseViewActionableEvent();
             caseViewEvent.setId(NOC);
@@ -396,7 +396,6 @@ public class NoticeOfChangeControllerIT {
                 .caseDetails(caseDetails)
                 .build();
 
-            HashMap<String, JsonNode> data = new HashMap<>();
             CaseDataContent caseDataContent = CaseDataContent.builder()
                 .token(startEventResource.getToken())
                 .event(event)
@@ -424,15 +423,15 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldSuccessfullyCheckNoCApprovalWithoutAutoApproval() throws Exception {
             changeOrganisationRequest = ChangeOrganisationRequest.builder()
-                .organisationToAdd(new Organisation("123", "Org1"))
-                .organisationToRemove(new Organisation("789", "Org2"))
+                .organisationToAdd(Organisation.builder().organisationID("123").build())
+                .organisationToRemove(Organisation.builder().organisationID("789").build())
                 .caseRoleId("CaseRoleId")
                 .requestTimestamp(LocalDateTime.now())
                 .approvalStatus("REJECTED")
                 .build();
 
             caseDetails =  caseDetails(changeOrganisationRequest);
-            checkNoticeOfChangeApprovalRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
+            checkNoticeOfChangeApprovalRequest = new CallbackRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -446,7 +445,7 @@ public class NoticeOfChangeControllerIT {
         void shouldReturnAnErrorIfRequestDoesNotContainChangeOrgRequest() throws Exception {
             caseDetails = defaultCaseDetails().build();
 
-            checkNoticeOfChangeApprovalRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
+            checkNoticeOfChangeApprovalRequest = new CallbackRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -460,7 +459,7 @@ public class NoticeOfChangeControllerIT {
         void shouldReturnAnErrorIfChangeOrganisationRequestIsInvalid() throws Exception {
             changeOrganisationRequest.setApprovalStatus(null);
             caseDetails =  caseDetails(changeOrganisationRequest);
-            checkNoticeOfChangeApprovalRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
+            checkNoticeOfChangeApprovalRequest = new CallbackRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -475,7 +474,7 @@ public class NoticeOfChangeControllerIT {
     @DisplayName("POST /noc/set-organisation-to-remove")
     class SetOrganisationToRemove extends BaseTest {
 
-        private NoticeOfChangeRequest noticeOfChangeRequest;
+        private CallbackRequest noticeOfChangeRequest;
         private CaseDetails caseDetails;
         private ChangeOrganisationRequest changeOrganisationRequest;
 
@@ -505,7 +504,7 @@ public class NoticeOfChangeControllerIT {
                 .build();
 
             caseDetails = caseDetails(changeOrganisationRequest, organisationPolicy);
-            noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
+            noticeOfChangeRequest = new CallbackRequest(NOC, null, caseDetails);
         }
 
         @Test
@@ -523,7 +522,7 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldReturnAnErrorIfRequestDoesNotContainChangeOrgRequest() throws Exception {
             caseDetails = defaultCaseDetails().data(Map.of()).build();
-            noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
+            noticeOfChangeRequest = new CallbackRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -537,7 +536,7 @@ public class NoticeOfChangeControllerIT {
         void shouldReturnAnErrorIfChangeOrganisationRequestIsInvalid() throws Exception {
             changeOrganisationRequest.setApprovalStatus(null);
             caseDetails = caseDetails(changeOrganisationRequest);
-            noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
+            noticeOfChangeRequest = new CallbackRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -549,9 +548,9 @@ public class NoticeOfChangeControllerIT {
 
         @Test
         void shouldReturnAnErrorIfOrganisationToRemoveIsInvalid() throws Exception {
-            changeOrganisationRequest.setOrganisationToRemove(new Organisation("Org2", "Organisation 2"));
+            changeOrganisationRequest.setOrganisationToRemove(Organisation.builder().organisationID("Org2").build());
             caseDetails = caseDetails(changeOrganisationRequest);
-            noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
+            noticeOfChangeRequest = new CallbackRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -564,7 +563,7 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldReturnAnErrorIfNoMatchingOrganisationPolicies() throws Exception {
             caseDetails = caseDetails(changeOrganisationRequest);
-            noticeOfChangeRequest = new NoticeOfChangeRequest(NOC, null, caseDetails);
+            noticeOfChangeRequest = new CallbackRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                                      .contentType(MediaType.APPLICATION_JSON)

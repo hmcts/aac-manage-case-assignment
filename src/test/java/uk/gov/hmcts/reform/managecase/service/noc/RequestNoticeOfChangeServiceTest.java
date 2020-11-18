@@ -350,16 +350,16 @@ class RequestNoticeOfChangeServiceTest {
                 .build();
 
             changeOrganisationRequestBefore = ChangeOrganisationRequest.builder()
-                .organisationToAdd(new Organisation("123", "Org1"))
-                .organisationToRemove(new Organisation(null, null))
+                .organisationToAdd(Organisation.builder().organisationID("123").build())
+                .organisationToRemove(Organisation.builder().organisationID(null).build())
                 .caseRoleId("Role1")
                 .requestTimestamp(LocalDateTime.now())
                 .approvalStatus("1")
                 .build();
 
             changeOrganisationRequestAfter = ChangeOrganisationRequest.builder()
-                .organisationToAdd(new Organisation("123", "Org1"))
-                .organisationToRemove(new Organisation("Org1", "Organisation 1"))
+                .organisationToAdd(Organisation.builder().organisationID("123").build())
+                .organisationToRemove(Organisation.builder().organisationID("Org1").build())
                 .caseRoleId("Role1")
                 .requestTimestamp(LocalDateTime.now())
                 .approvalStatus("1")

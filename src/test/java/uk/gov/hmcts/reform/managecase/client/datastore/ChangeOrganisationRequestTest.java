@@ -24,7 +24,7 @@ class ChangeOrganisationRequestTest {
             .caseRoleId("someRole")
             .approvalStatus("0")
             .requestTimestamp(LocalDateTime.now())
-            .organisationToAdd(new Organisation("OrgID", "OrgName"));
+            .organisationToAdd(Organisation.builder().organisationID("OrgID").build());
     }
 
     @Test

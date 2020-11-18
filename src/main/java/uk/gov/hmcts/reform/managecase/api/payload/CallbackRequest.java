@@ -13,7 +13,7 @@ import javax.validation.Valid;
 @AllArgsConstructor
 @ApiModel("About To Submit Callback Request")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AboutToSubmitCallbackRequest {
+public class CallbackRequest {
 
     @JsonProperty("event_id")
     private String eventId;

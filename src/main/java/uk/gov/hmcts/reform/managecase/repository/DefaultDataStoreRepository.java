@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
@@ -111,11 +110,11 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public CaseResource submitEventForCase(String caseId,
+    public CaseDetails submitEventForCase(String caseId,
                                            String eventId,
                                            ChangeOrganisationRequest changeOrganisationRequest) {
 
-        CaseResource caseResource = null;
+        CaseDetails caseDetails = null;
         CaseUpdateViewEvent caseUpdateViewEvent = dataStoreApi.getStartEventTrigger(caseId, eventId);
 
         if (caseUpdateViewEvent != null) {
@@ -145,12 +144,12 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                     .data(getCaseDataContentData(caseFieldId, changeOrganisationRequest, caseData))
                     .build();
 
-                caseResource = dataStoreApi.submitEventForCase(caseId, caseDataContent);
+                caseDetails = dataStoreApi.submitEventForCase(caseId, caseDataContent);
             } else {
                 throw new IllegalStateException(MISSING_CASE_FIELD_ID);
             }
         }
-        return caseResource;
+        return caseDetails;
     }
 
     private void setApprovalStatus(ChangeOrganisationRequest changeOrganisationRequest,
@@ -177,7 +176,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public CaseResource findCaseByCaseIdExternalApi(String caseId) {
+    public CaseDetails findCaseByCaseIdExternalApi(String caseId) {
         return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(caseId);
     }
 

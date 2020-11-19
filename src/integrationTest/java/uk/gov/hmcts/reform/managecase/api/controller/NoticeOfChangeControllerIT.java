@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.managecase.BaseTest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
@@ -164,8 +163,8 @@ public class NoticeOfChangeControllerIT {
             Arrays.asList(challengeQuestion));
         stubGetChallengeQuestions(CASE_TYPE_ID, "NoCChallenge", challengeQuestionsResult);
 
-        CaseResource caseResource = CaseResource.builder().data(caseFields).build();
-        stubGetCaseViaExternalApi(CASE_ID, caseResource);
+        CaseDetails caseDetails = CaseDetails.builder().data(caseFields).build();
+        stubGetCaseViaExternalApi(CASE_ID, caseDetails);
     }
 
     @Nested
@@ -269,7 +268,7 @@ public class NoticeOfChangeControllerIT {
 
         private List<SubmittedChallengeAnswer> submittedChallengeAnswers;
 
-        private CaseResource caseResource;
+        private CaseDetails caseDetails;
 
         @BeforeEach
         void setup() {
@@ -289,11 +288,11 @@ public class NoticeOfChangeControllerIT {
 
             caseFields.put("ChangeOrgRequest", mapper.convertValue(ChangeOrganisationRequest.builder().build(),
                                                                    JsonNode.class));
-            caseResource = CaseResource.builder().data(caseFields).build();
+            caseDetails = CaseDetails.builder().data(caseFields).build();
 
-            stubGetCaseViaExternalApi(CASE_ID, caseResource);
+            stubGetCaseViaExternalApi(CASE_ID, caseDetails);
 
-            stubSubmitEventForCase(CASE_ID, caseResource);
+            stubSubmitEventForCase(CASE_ID, caseDetails);
 
             StartEventResource startEventResource = new StartEventResource();
             startEventResource.setToken("token");
@@ -323,9 +322,9 @@ public class NoticeOfChangeControllerIT {
 
             caseFields.put("OrganisationPolicy", mapper.convertValue(orgPolicy,  JsonNode.class));
 
-            CaseResource caseResource = CaseResource.builder().data(caseFields).build();
-            stubGetCaseViaExternalApi(CASE_ID, caseResource);
-            stubSubmitEventForCase(CASE_ID, caseResource);
+            CaseDetails caseDetails = CaseDetails.builder().data(caseFields).build();
+            stubGetCaseViaExternalApi(CASE_ID, caseDetails);
+            stubSubmitEventForCase(CASE_ID, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                                      .contentType(MediaType.APPLICATION_JSON)

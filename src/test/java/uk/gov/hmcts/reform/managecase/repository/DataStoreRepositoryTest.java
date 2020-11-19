@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
@@ -105,7 +104,7 @@ class DataStoreRepositoryTest {
         // ARRANGE
         CaseDetails caseDetails = CaseDetails.builder()
                 .caseTypeId(CASE_TYPE_ID)
-                .reference(CASE_ID)
+                .id(CASE_ID)
                 .build();
         CaseSearchResponse response = new CaseSearchResponse(Lists.newArrayList(caseDetails));
         given(dataStoreApi.searchCases(anyString(), anyString())).willReturn(response);
@@ -265,7 +264,7 @@ class DataStoreRepositoryTest {
 
     @Test
     @DisplayName("Call ccd-datastore where submitting an event for a case fails")
-    void shouldReturnNullCaseResourceWhenSubmittingEventFails() {
+    void shouldReturnNullCaseDetailsWhenSubmittingEventFails() {
         // ARRANGE
         ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder().build();
 
@@ -273,18 +272,18 @@ class DataStoreRepositoryTest {
             .willReturn(null);
 
         // ACT
-        CaseResource returnedStartEventResource
+        CaseDetails caseDetails
             = repository.submitEventForCase(CASE_ID, EVENT_ID, changeOrganisationRequest);
 
         // ASSERT
         verify(dataStoreApi).getStartEventTrigger(CASE_ID, EVENT_ID);
         verify(dataStoreApi, never()).submitEventForCase(any(), any());
-        assertThat(returnedStartEventResource).isNull();
+        assertThat(caseDetails).isNull();
     }
 
     @Test
     @DisplayName("Call ccd-datastore to submit an event for a case")
-    void shouldReturnCaseResourceWhenSubmittingEventSucceeds() throws JsonProcessingException {
+    void shouldReturnCasDetailsWhenSubmittingEventSucceeds() throws JsonProcessingException {
         // ARRANGE
         CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
             .wizardPages(CaseUpdateViewEventFixture.getWizardPages())
@@ -306,7 +305,7 @@ class DataStoreRepositoryTest {
         given(dataStoreApi.getExternalStartEventTrigger(CASE_ID, EVENT_ID)).willReturn(startEventResource);
 
         given(dataStoreApi.submitEventForCase(any(String.class), any(CaseDataContent.class)))
-            .willReturn(CaseResource.builder().build());
+            .willReturn(CaseDetails.builder().build());
 
 
         given(jacksonUtils.convertValue(any(), any())).willReturn(mapper.readTree(EXPECTED_NOC_REQUEST_DATA));
@@ -339,14 +338,14 @@ class DataStoreRepositoryTest {
     @DisplayName("find case by id using external facing API")
     void shouldFindCaseByIdUsingExternalApi() {
         // ARRANGE
-        CaseResource caseResource = CaseResource.builder().build();
-        given(dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(CASE_ID)).willReturn(caseResource);
+        CaseDetails caseDetails = CaseDetails.builder().build();
+        given(dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(CASE_ID)).willReturn(caseDetails);
 
         // ACT
-        CaseResource result = repository.findCaseByCaseIdExternalApi(CASE_ID);
+        CaseDetails result = repository.findCaseByCaseIdExternalApi(CASE_ID);
 
         // ASSERT
-        assertThat(result).isEqualTo(caseResource);
+        assertThat(result).isEqualTo(caseDetails);
         verify(dataStoreApi).getCaseDetailsByCaseIdViaExternalApi(eq(CASE_ID));
     }
 

@@ -83,7 +83,7 @@ public class TestFixtures {
         public static CaseDetails.CaseDetailsBuilder defaultCaseDetails() {
             return CaseDetails.builder()
                     .caseTypeId(CASE_TYPE_ID)
-                    .reference(CASE_ID)
+                    .id(CASE_ID)
                     .jurisdiction(JURISDICTION)
                     .state(null)
                     .data(Maps.newHashMap("OrganisationPolicy1", jsonNode(ORGANIZATION_ID, CASE_ROLE)));

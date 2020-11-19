@@ -16,7 +16,6 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
@@ -200,23 +199,23 @@ public class WiremockFixtures {
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
-    public static void stubGetCaseViaExternalApi(String caseId, CaseResource caseResource) {
+    public static void stubGetCaseViaExternalApi(String caseId, CaseDetails caseDetails) {
         stubFor(WireMock.get(urlPathEqualTo("/cases/" + caseId))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
                                     .withStatus(HTTP_CREATED)
-                                    .withBody(getJsonString(caseResource))
+                                    .withBody(getJsonString(caseDetails))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     public static void stubSubmitEventForCase(String caseID,
-                                              CaseResource caseResource) {
+                                              CaseDetails caseDetails) {
         stubFor(WireMock.post(urlEqualTo("/cases/" + caseID + "/events"))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
-                                    .withStatus(HTTP_OK).withBody(getJsonString(caseResource))
+                                    .withStatus(HTTP_OK).withBody(getJsonString(caseDetails))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 

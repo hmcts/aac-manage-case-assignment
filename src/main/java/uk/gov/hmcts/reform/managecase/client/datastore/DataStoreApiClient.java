@@ -65,11 +65,11 @@ public interface DataStoreApiClient {
                                                     @PathVariable("eventId")String eventId);
 
     @PostMapping(SUBMIT_EVENT_FOR_CASE)
-    CaseResource submitEventForCase(@PathVariable("caseId") String caseId,
+    CaseDetails submitEventForCase(@PathVariable("caseId") String caseId,
                                     @RequestBody CaseDataContent caseDataContent);
 
     @GetMapping(CASES_WITH_ID)
-    CaseResource getCaseDetailsByCaseIdViaExternalApi(@PathVariable(CASE_ID) String caseId);
+    CaseDetails getCaseDetailsByCaseIdViaExternalApi(@PathVariable(CASE_ID) String caseId);
 
 
 }

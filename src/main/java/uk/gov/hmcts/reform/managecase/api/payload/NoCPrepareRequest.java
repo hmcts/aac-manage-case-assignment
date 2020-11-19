@@ -15,4 +15,13 @@ public class NoCPrepareRequest {
 
     @JsonProperty("case_details")
     private CaseDetails caseDetails;
+
+    @JsonProperty("case_details_before")
+    private CaseDetails caseDetailsBefore;
+
+    @JsonProperty("event_id")
+    private String eventId;
+
+    @JsonProperty("ignore_warning")
+    private Boolean ignoreWarning;
 }

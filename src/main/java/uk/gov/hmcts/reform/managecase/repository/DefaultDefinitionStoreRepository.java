@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.DefinitionStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
@@ -25,6 +26,7 @@ public class DefaultDefinitionStoreRepository implements DefinitionStoreReposito
     }
 
     @Override
+    @Cacheable(value = "caseRoles", key = "#caseTypeId")
     public List<CaseRole> caseRoles(String userId, String jurisdiction, String caseTypeId) {
         return definitionStoreApiClient.caseRoles(userId, jurisdiction, caseTypeId);
     }

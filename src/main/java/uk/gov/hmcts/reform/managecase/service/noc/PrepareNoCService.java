@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,17 +28,15 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_TYPE_CANNOT_BE_BLANK;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.JURISDICTION_CANNOT_BE_BLANK;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MISSING_COR_CASE_ROLE_ON_THE_CASE_DATA;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MISSING_COR_ON_THE_CASE_DATA;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ORG_POLICY_CASE_ROLE_NOT_IN_CASE_DEFINITION;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORGANISATION_ID_IN_ANY_ORG_POLICY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORGANISATION_POLICY_ON_CASE_DATA;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ONGOING_NOC_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_SOLICITOR_ORGANISATION_RECORDED_IN_ORG_POLICY;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ONGOING_NOC_REQUEST;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ORG_POLICY_CASE_ROLE_NOT_IN_CASE_DEFINITION;
 
 @Service
 public class PrepareNoCService {
-    protected static final String COR_FIELD_NAME = "ChangeOrganisationRequest";
     protected static final String COR_CASE_ROLE_ID = "CaseRoleId";
     protected static final String COR_REQUEST_TIMESTAMP = "RequestTimestamp";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -63,21 +60,21 @@ public class PrepareNoCService {
     public Map<String, JsonNode> prepareNoCRequest(CaseDetails caseDetails) {
 
         String jurisdiction = caseDetails.getJurisdiction();
-        String caseType = caseDetails.getCaseTypeId();
+        String caseTypeId = caseDetails.getCaseTypeId();
 
         validate(isBlank(jurisdiction), JURISDICTION_CANNOT_BE_BLANK);
-        validate(isBlank(caseType), CASE_TYPE_CANNOT_BE_BLANK);
+        validate(isBlank(caseTypeId), CASE_TYPE_CANNOT_BE_BLANK);
 
         List<OrganisationPolicy> orgPolicies = findPolicies(caseDetails);
         validate(orgPolicies.isEmpty(), NO_ORGANISATION_POLICY_ON_CASE_DATA);
 
+        String changeOfRequestFieldName = caseDetails.findChangeOrganisationRequestFieldName()
+            .orElseThrow(() -> new ValidationException(MISSING_COR_ON_THE_CASE_DATA));
+
         Map<String, JsonNode> data = caseDetails.getData();
-        // TODO: Fetch the definition to find the ChangeOrganisationRequest field name
-        // TODO: or if https://tools.hmcts.net/jira/browse/RDM-10262 delivered use the COR_FIELD_NAME.
-        validateChangeOrganisationRequest(data, COR_FIELD_NAME);
 
         // check that there isn't an ongoing NoCRequest - if so this new NoCRequest must be rejected
-        String caseRoleId = getCaseRoleId(data, COR_FIELD_NAME);
+        String caseRoleId = getCaseRoleId(data, changeOfRequestFieldName);
         validate(isNotBlank(caseRoleId), ONGOING_NOC_REQUEST);
 
         List<String> caseRoles;
@@ -100,10 +97,10 @@ public class PrepareNoCService {
             );
         }
 
-        List<CaseRole> caseRolesDefinition = getCaseRolesDefinitions(jurisdiction, caseType, caseRoles);
+        List<CaseRole> caseRolesDefinition = getCaseRolesDefinitions(jurisdiction, caseTypeId, caseRoles);
 
-        updateChangeOrganisationRequestCaseRoleId(data, caseRolesDefinition);
-        updateChangeOrganisationRequestRequestTimestamp(data);
+        updateChangeOrganisationRequestCaseRoleId(data, caseRolesDefinition, changeOfRequestFieldName);
+        updateChangeOrganisationRequestRequestTimestamp(data, changeOfRequestFieldName);
 
         return data;
     }
@@ -126,7 +123,8 @@ public class PrepareNoCService {
     }
 
     private void updateChangeOrganisationRequestCaseRoleId(Map<String, JsonNode> data,
-                                                          List<CaseRole> caseRolesDefinition) {
+                                                           List<CaseRole> caseRolesDefinition,
+                                                           String changeOfRequestFieldName) {
         CaseRole firstCaseRole = caseRolesDefinition.get(0);
         ObjectNode root = JSON_NODE_FACTORY.objectNode();
         root.putObject("value").setAll(createObjectNode(firstCaseRole.getId(), firstCaseRole.getName()));
@@ -135,7 +133,7 @@ public class PrepareNoCService {
                         .map(caseRole -> createObjectNode(caseRole.getId(), caseRole.getName()))
                         .collect(toList()));
 
-        JsonNode cor = data.get(COR_FIELD_NAME);
+        JsonNode cor = data.get(changeOfRequestFieldName);
         ((ObjectNode) cor).set(COR_CASE_ROLE_ID, root);
     }
 
@@ -150,29 +148,15 @@ public class PrepareNoCService {
         return JSON_NODE_FACTORY.objectNode().put("code", code).put("label", label);
     }
 
-    private void updateChangeOrganisationRequestRequestTimestamp(Map<String, JsonNode> data) {
-        JsonNode cor = data.get(COR_FIELD_NAME);
+    private void updateChangeOrganisationRequestRequestTimestamp(Map<String, JsonNode> data,
+                                                                 String changeOfRequestFieldName) {
+        JsonNode cor = data.get(changeOfRequestFieldName);
         ((ObjectNode) cor).set(COR_REQUEST_TIMESTAMP, TextNode.valueOf(LocalDateTime.now().toString()));
     }
 
     private String findTheOrganisationIdOfTheInvokerUsingPrd() {
         FindUsersByOrganisationResponse usersByOrganisation = prdRepository.findUsersByOrganisation();
         return usersByOrganisation.getOrganisationIdentifier();
-    }
-
-    private void validateChangeOrganisationRequest(Map<String, JsonNode> data, String corFieldName) {
-        validate(
-            !data.containsKey(corFieldName),
-            format(MISSING_COR_ON_THE_CASE_DATA, corFieldName)
-        );
-        if (!(data.get(corFieldName).getNodeType() == JsonNodeType.OBJECT)
-            || data.get(corFieldName).findPath(COR_CASE_ROLE_ID).isMissingNode()) {
-            throw new ValidationException(format(
-                MISSING_COR_CASE_ROLE_ON_THE_CASE_DATA,
-                corFieldName,
-                COR_CASE_ROLE_ID
-            ));
-        }
     }
 
     private String getCaseRoleId(Map<String, JsonNode> data, String corFieldName) {

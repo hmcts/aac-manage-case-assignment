@@ -192,6 +192,7 @@ public class NoticeOfChangeController {
     @ApiResponses({
         @ApiResponse(
             code = 200,
+            response = NoCPrepareResponse.class,
             message = "Data with a list of Case Roles attached to the ChangeOrganisationRequest."
         ),
         @ApiResponse(
@@ -204,8 +205,8 @@ public class NoticeOfChangeController {
                 + "\n5) " + ValidationError.NO_SOLICITOR_ORGANISATION_RECORDED_IN_ORG_POLICY
                 + "\n6) " + ValidationError.NO_ORGANISATION_ID_IN_ANY_ORG_POLICY
                 + "\n7) " + ValidationError.ORG_POLICY_CASE_ROLE_NOT_IN_CASE_DEFINITION
-                + "\n7) " + ValidationError.MISSING_COR_CASE_ROLE_ON_THE_CASE_DATA
-                + "\n8) " + ValidationError.MISSING_COR_ON_THE_CASE_DATA,
+                + "\n8) " + ValidationError.MISSING_COR_CASE_ROLE_ON_THE_CASE_DATA
+                + "\n9) " + ValidationError.MISSING_COR_ON_THE_CASE_DATA,
             response = ApiError.class,
             examples = @Example({
                 @ExampleProperty(
@@ -227,7 +228,13 @@ public class NoticeOfChangeController {
         )
     })
     public NoCPrepareResponse prepareNoC(@Valid @RequestBody NoCPrepareRequest noCPrepareRequest) {
-        return new NoCPrepareResponse(prepareNoCService.prepareNoCRequest(noCPrepareRequest.getCaseDetails()));
+
+        return NoCPrepareResponse.builder()
+            .data(prepareNoCService.prepareNoCRequest(noCPrepareRequest.getCaseDetails()))
+            .state(noCPrepareRequest.getCaseDetails().getState())
+            .securityClassification(noCPrepareRequest.getCaseDetails().getSecurityClassification())
+            .dataClassification(noCPrepareRequest.getCaseDetails().getDataClassification())
+            .build();
     }
 
     private void validateCaseIds(String caseId) {

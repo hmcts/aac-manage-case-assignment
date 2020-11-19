@@ -308,7 +308,7 @@ public class NoticeOfChangeControllerTest {
 
         @BeforeEach
         void setUp() throws Exception {
-            request = new NoCPrepareRequest(CaseDetails.builder().build());
+            request = new NoCPrepareRequest(CaseDetails.builder().build(), null, "createEvent", true);
             ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder().build();
 
             responseData.put("ChangeOrganisationRequest", objectMapper.readTree(objectMapper.writeValueAsString(cor)));
@@ -330,7 +330,14 @@ public class NoticeOfChangeControllerTest {
                                                 + "\"OrganisationToRemove\":null,"
                                                 + "\"CaseRoleId\":null,"
                                                 + "\"RequestTimestamp\":null,"
-                                                + "\"ApprovalStatus\":null}}}"));
+                                                + "\"ApprovalStatus\":null}},"
+                                                + "\"state\":null,"
+                                                + "\"errors\":null,"
+                                                + "\"warnings\":null,"
+                                                + "\"data_classification\":null,"
+                                                + "\"security_classification\":null,"
+                                                + "\"significant_item\":null"
+                                                + "}"));
         }
     }
 }

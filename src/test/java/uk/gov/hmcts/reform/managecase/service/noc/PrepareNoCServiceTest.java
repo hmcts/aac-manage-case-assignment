@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.SecurityClassification;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
@@ -40,12 +41,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService.COR_CASE_ROLE_ID;
-import static uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService.COR_FIELD_NAME;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports",
     "PMD.TooManyMethods", "PMD.DataflowAnomalyAnalysis"})
 class PrepareNoCServiceTest {
 
+    private static final String COR_FIELD_NAME = "ChangeOrganisationRequestField";
     private static final String REFERENCE = "1602246428939903";
     private static final String JURISDICTION = "Jurisdiction";
     private static final String CASE_TYPE = "caseType1";
@@ -68,6 +69,8 @@ class PrepareNoCServiceTest {
     private JacksonUtils jacksonUtils;
 
     private Map<String, OrganisationPolicy> orgPolicies;
+    private final SecurityClassification securityClassification = SecurityClassification.PUBLIC;
+    private final Map<String, JsonNode> dataClassification = new HashMap<>();
 
     @BeforeEach
     void setUp() {
@@ -94,7 +97,8 @@ class PrepareNoCServiceTest {
             Map<String, JsonNode> caseData = new HashMap<>();
             orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
             caseData.put(COR_FIELD_NAME, changeOrganisationRequestToJsonNode(changeOrganisationRequest()));
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData);
+            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData,
+                                                      securityClassification, dataClassification);
 
             Map<String, JsonNode> result = prepareNoCService.prepareNoCRequest(caseDetails);
 
@@ -120,7 +124,8 @@ class PrepareNoCServiceTest {
             orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
             caseData.put(COR_FIELD_NAME, changeOrganisationRequestToJsonNode(changeOrganisationRequest()));
 
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData);
+            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData,
+                                                      securityClassification, dataClassification);
 
             Map<String, JsonNode> result = prepareNoCService.prepareNoCRequest(caseDetails);
 
@@ -142,7 +147,8 @@ class PrepareNoCServiceTest {
 
             Map<String, JsonNode> caseData = new HashMap<>();
             caseData.put(COR_FIELD_NAME, changeOrganisationRequestToJsonNode(changeOrganisationRequest()));
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData);
+            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData,
+                                                      securityClassification, dataClassification);
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -163,7 +169,8 @@ class PrepareNoCServiceTest {
             Map<String, JsonNode> caseData = new HashMap<>();
             orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
             caseData.put(COR_FIELD_NAME, changeOrganisationRequestToJsonNode(changeOrganisationRequest()));
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData);
+            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData,
+                                                      securityClassification, dataClassification);
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -184,7 +191,8 @@ class PrepareNoCServiceTest {
             orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
             caseData.put(COR_FIELD_NAME, changeOrganisationRequestToJsonNode(ongoingChangeOrganisationRequest()));
 
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData);
+            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData,
+                                                      securityClassification, dataClassification);
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -199,7 +207,8 @@ class PrepareNoCServiceTest {
         @Test
         @DisplayName("should error when Jurisdiction is missing")
         void shouldErrorWhenMissingJurisdiction() {
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, null, "", CASE_TYPE, new HashMap<>());
+            CaseDetails caseDetails = new CaseDetails(REFERENCE, null, "", CASE_TYPE, new HashMap<>(),
+                                                      securityClassification, dataClassification);
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -214,7 +223,8 @@ class PrepareNoCServiceTest {
         @Test
         @DisplayName("should error when CaseType is missing")
         void shouldErrorWhenMissingCaseType() {
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", null, new HashMap<>());
+            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", null, new HashMap<>(),
+                                                      securityClassification, dataClassification);
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -233,7 +243,8 @@ class PrepareNoCServiceTest {
 
             Map<String, JsonNode> caseData = new HashMap<>();
             orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData);
+            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData,
+                                                      securityClassification, dataClassification);
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -241,28 +252,7 @@ class PrepareNoCServiceTest {
             );
             assertThat(
                 exception.getMessage(),
-                is("Missing ChangeOrganisationRequest on the case data.")
-            );
-        }
-
-        @Test
-        @DisplayName("should error when ChangeOrganisationRequest CaseRoleId is missing")
-        void shouldErrorWhenMissingChangeOrganisationRequestCaseRoleId() throws Exception {
-            mockUserCaseRolesForSolicitor();
-
-            Map<String, JsonNode> caseData = new HashMap<>();
-            orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
-            caseData.put(COR_FIELD_NAME, missingCaseRoleId());
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData);
-
-            ValidationException exception = assertThrows(
-                ValidationException.class,
-                () -> prepareNoCService.prepareNoCRequest(caseDetails)
-            );
-
-            assertThat(
-                exception.getMessage(),
-                is("Missing ChangeOrganisationRequest.CaseRoleId on the case data.")
+                is("Missing ChangeOrganisationRequest field on the case data.")
             );
         }
 

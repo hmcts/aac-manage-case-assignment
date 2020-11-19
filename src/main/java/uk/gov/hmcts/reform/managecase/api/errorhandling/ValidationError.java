@@ -39,8 +39,10 @@ public final class ValidationError {
         + " on the case.";
     public static final String ORG_POLICY_CASE_ROLE_NOT_IN_CASE_DEFINITION = "Missing"
         + " OrganisationPolicy.OrgPolicyCaseAssignedRole %s in the case definition.";
-    public static final String MISSING_COR_CASE_ROLE_ON_THE_CASE_DATA = "Missing %s.%s on the case data.";
-    public static final String MISSING_COR_ON_THE_CASE_DATA = "Missing %s on the case data.";
+    public static final String MISSING_COR_CASE_ROLE_ON_THE_CASE_DATA = "Missing ChangeOrganisationRequest CaseRoleId"
+        + " on the case data.";
+    public static final String MISSING_COR_ON_THE_CASE_DATA = "Missing ChangeOrganisationRequest field"
+        + " on the case data.";
 
     // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     private ValidationError() {

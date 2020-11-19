@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.PENDING;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
 @Repository
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
@@ -37,8 +37,8 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     static final String NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT = "Failed to get enough data from start event "
         + "to submit an event for the case";
 
-    static final String MISSING_CASE_FIELD_ID = "Failed to create ChangeOrganisationRequest because of "
-        + "missing case field id";
+    static final String CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID = "Failed to create ChangeOrganisationRequest"
+        + " because of missing case field id";
 
 
     public static final String ES_QUERY = "{\n"
@@ -110,9 +110,9 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public CaseDetails submitEventForCase(String caseId,
-                                           String eventId,
-                                           ChangeOrganisationRequest changeOrganisationRequest) {
+    public CaseDetails submitNoticeOfChangeRequestEvent(String caseId,
+                                                        String eventId,
+                                                        ChangeOrganisationRequest changeOrganisationRequest) {
 
         CaseDetails caseDetails = null;
         CaseUpdateViewEvent caseUpdateViewEvent = dataStoreApi.getStartEventTrigger(caseId, eventId);
@@ -146,7 +146,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
                 caseDetails = dataStoreApi.submitEventForCase(caseId, caseDataContent);
             } else {
-                throw new IllegalStateException(MISSING_CASE_FIELD_ID);
+                throw new IllegalStateException(CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID);
             }
         }
         return caseDetails;

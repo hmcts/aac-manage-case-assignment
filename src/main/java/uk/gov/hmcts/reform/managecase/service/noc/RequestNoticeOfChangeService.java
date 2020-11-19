@@ -20,8 +20,8 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
-import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.APPROVED;
-import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.PENDING;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
 @Service
 public class RequestNoticeOfChangeService {
@@ -105,7 +105,7 @@ public class RequestNoticeOfChangeService {
 
         // Submit the NoCRequest event + event token.  This action will trigger a submitted callback to the
         // CheckForNoCApproval operation, which will apply additional processing in the event of auto-approval.
-        return dataStoreRepository.submitEventForCase(caseId, eventId, changeOrganisationRequest);
+        return dataStoreRepository.submitNoticeOfChangeRequestEvent(caseId, eventId, changeOrganisationRequest);
     }
 
     private boolean isNocRequestAutoApprovalCompleted(CaseDetails caseDetails,

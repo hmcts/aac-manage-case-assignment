@@ -36,8 +36,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.APPROVED;
-import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.PENDING;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap",
     "PMD.AvoidDuplicateLiterals",
@@ -131,9 +131,9 @@ class RequestNoticeOfChangeServiceTest {
         ArgumentCaptor<ChangeOrganisationRequest> corArgumentCaptor
             = ArgumentCaptor.forClass(ChangeOrganisationRequest.class);
 
-        verify(dataStoreRepository).submitEventForCase(caseIdCaptor.capture(),
-                                                       eventIdCaptor.capture(),
-                                                       corArgumentCaptor.capture());
+        verify(dataStoreRepository).submitNoticeOfChangeRequestEvent(caseIdCaptor.capture(),
+                                                                     eventIdCaptor.capture(),
+                                                                     corArgumentCaptor.capture());
 
         assertThat(caseIdCaptor.getValue()).isEqualTo(CASE_ID);
         assertThat(eventIdCaptor.getValue()).isEqualTo(NOC_REQUEST_EVENT);

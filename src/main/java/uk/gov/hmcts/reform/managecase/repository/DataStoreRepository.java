@@ -23,7 +23,9 @@ public interface DataStoreRepository {
 
     CaseViewResource findCaseByCaseId(String caseId);
 
-    CaseDetails submitEventForCase(String caseId, String eventId, ChangeOrganisationRequest changeOrganisationRequest);
+    CaseDetails submitNoticeOfChangeRequestEvent(String caseId,
+                                                 String eventId,
+                                                 ChangeOrganisationRequest changeOrganisationRequest);
 
     CaseDetails findCaseByCaseIdExternalApi(String caseId);
 }

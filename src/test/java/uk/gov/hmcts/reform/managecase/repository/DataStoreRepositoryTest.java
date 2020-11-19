@@ -57,7 +57,7 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFix
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getWizardPages;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.ES_QUERY;
-import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.MISSING_CASE_FIELD_ID;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOC_REQUEST_DESCRIPTION;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT;
 
@@ -272,7 +272,7 @@ class DataStoreRepositoryTest {
 
         // ACT
         CaseDetails caseDetails
-            = repository.submitEventForCase(CASE_ID, EVENT_ID, changeOrganisationRequest);
+            = repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, changeOrganisationRequest);
 
         // ASSERT
         verify(dataStoreApi).getStartEventTrigger(CASE_ID, EVENT_ID);
@@ -316,7 +316,7 @@ class DataStoreRepositoryTest {
             .build();
 
         // ACT
-        repository.submitEventForCase(CASE_ID, EVENT_ID, changeOrganisationRequest);
+        repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, changeOrganisationRequest);
 
         // ASSERT
         verify(dataStoreApi).getStartEventTrigger(CASE_ID, EVENT_ID);
@@ -362,7 +362,7 @@ class DataStoreRepositoryTest {
 
         // ACT & ASSERT
         IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () ->
-            repository.submitEventForCase(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build())
+            repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build())
         );
 
         assertThat(illegalStateException.getMessage())
@@ -383,10 +383,10 @@ class DataStoreRepositoryTest {
 
         // ACT & ASSERT
         IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () ->
-            repository.submitEventForCase(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build())
+            repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build())
         );
 
-        assertThat(illegalStateException.getMessage()).isEqualTo(MISSING_CASE_FIELD_ID);
+        assertThat(illegalStateException.getMessage()).isEqualTo(CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID);
 
         verify(dataStoreApi).getStartEventTrigger(CASE_ID, EVENT_ID);
         verify(dataStoreApi, never()).submitEventForCase(any(), any());

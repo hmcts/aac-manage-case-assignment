@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;

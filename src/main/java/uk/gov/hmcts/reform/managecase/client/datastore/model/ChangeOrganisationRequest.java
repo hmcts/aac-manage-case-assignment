@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.managecase.client.datastore;
+package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

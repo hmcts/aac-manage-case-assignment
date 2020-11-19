@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
-import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
@@ -26,6 +25,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableE
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.HeaderGroupMetadata;
@@ -37,7 +37,6 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -373,23 +372,7 @@ class DataStoreRepositoryTest {
     }
 
     @Test
-    @DisplayName("handle missing approval status default value when calling submit event for case")
-    void shouldSetDefaultApprovalStatusWhenSubmitEventForCaseCalledWithoutDefaultValue() {
-
-        // ARRANGE
-        CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
-            .caseFields(getCaseViewFields())
-            .eventToken(EVENT_TOKEN)
-            .wizardPages(Collections.emptyList())
-            .build();
-
-        given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID)).willReturn(caseUpdateViewEvent);
-
-
-    }
-
-    @Test
-    @DisplayName("handle missing case view field when calling submit event for case")
+    @DisplayName("handle missing Change Organisation Request  case view field when calling submit event for case")
     void shouldThrowExceptionWhenSubmitEventForCaseCalledWithoutCaseViewField() {
 
         // ARRANGE

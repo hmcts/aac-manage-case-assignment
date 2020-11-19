@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
-import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
@@ -123,7 +123,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                 throw new IllegalStateException(NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT);
             }
 
-            Optional<CaseViewField> caseViewField = getCaseViewField(caseUpdateViewEvent);
+            Optional<CaseViewField> caseViewField = getChangeOrganisationRequestCaseViewField(caseUpdateViewEvent);
 
             if (caseViewField.isPresent()) {
                 String caseFieldId = caseViewField.get().getId();
@@ -136,7 +136,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                 StartEventResource startEventResource = dataStoreApi.getExternalStartEventTrigger(caseId, eventId);
                 Map<String, JsonNode> caseData = startEventResource.getCaseDetails().getData();
 
-                setApprovalStatus(changeOrganisationRequest, caseFieldId, caseData);
+                setChangeOrganisationRequestApprovalStatus(changeOrganisationRequest, caseFieldId, caseData);
 
                 CaseDataContent caseDataContent = CaseDataContent.builder()
                     .token(caseUpdateViewEvent.getEventToken())
@@ -152,9 +152,9 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         return caseDetails;
     }
 
-    private void setApprovalStatus(ChangeOrganisationRequest changeOrganisationRequest,
-                                   String caseFieldId,
-                                   Map<String, JsonNode> caseData) {
+    private void setChangeOrganisationRequestApprovalStatus(ChangeOrganisationRequest changeOrganisationRequest,
+                                                            String caseFieldId,
+                                                            Map<String, JsonNode> caseData) {
         JsonNode defaultApprovalStatusValue = caseData.get(caseFieldId);
 
         if (defaultApprovalStatusValue == null
@@ -164,15 +164,15 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         }
     }
 
-    private Optional<CaseViewField> getCaseViewField(CaseUpdateViewEvent caseUpdateViewEvent) {
-        Optional<CaseViewField> caseViewField = Optional.empty();
+    private Optional<CaseViewField> getChangeOrganisationRequestCaseViewField(CaseUpdateViewEvent caseUpdateViewEvent) {
+        Optional<CaseViewField> changeOrgRequestCaseViewField = Optional.empty();
 
         if (caseUpdateViewEvent.getCaseFields() != null) {
-            caseViewField = caseUpdateViewEvent.getCaseFields().stream()
+            changeOrgRequestCaseViewField = caseUpdateViewEvent.getCaseFields().stream()
                 .filter(cvf -> cvf.getFieldTypeDefinition().getId().equals(CHANGE_ORGANISATION_REQUEST))
                 .findFirst();
         }
-        return caseViewField;
+        return changeOrgRequestCaseViewField;
     }
 
     @Override

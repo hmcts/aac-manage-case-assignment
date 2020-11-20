@@ -48,7 +48,7 @@ public class SecurityUtils {
     }
 
     public UserInfo getUserInfo() {
-        return idamRepository.getUserInfo(getUserToken());
+        return idamRepository.getUserInfo(getUserBearerToken());
     }
 
     public String getServiceNameFromS2SToken(String serviceAuthenticationToken) {

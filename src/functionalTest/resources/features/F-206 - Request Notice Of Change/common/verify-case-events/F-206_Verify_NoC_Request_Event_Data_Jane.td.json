@@ -1,0 +1,40 @@
+{
+  "_guid_": "F-206_Verify_NoC_Request_Event_Data_Jane",
+  "_extends_": "F-206_Verify_NoC_Request_Event_Data__Base",
+
+  "specs": [
+    "to get Case Events API returns a NoCRequest event in which the user ID is set to Jane's email address AND the proxied_by field set to the ID of the system user"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Jane"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "auditEvents": [
+        {
+          "id": "${}${[scenarioContext][parentContext][testData][request][body][case_id]}",
+          "user_id": "befta.master.solicitor.jane@gmail.com",
+          "user_last_name": "Solicington",
+          "user_first_name": "Jane",
+          "event_name": "[[ANYTHING_PRESENT]]",
+          "created_date": "[[ANYTHING_PRESENT]]",
+          "case_type_id": "[[ANYTHING_PRESENT]]",
+          "case_type_version": "[[ANYTHING_PRESENT]]",
+          "state_id": "[[ANYTHING_PRESENT]]",
+          "state_name": "[[ANYTHING_PRESENT]]",
+          "data": "[[ANYTHING_PRESENT]]",
+          "data_classification": "[[ANYTHING_PRESENT]]",
+          "security_classification": "[[ANYTHING_PRESENT]]",
+          "significant_item": "[[ANYTHING_PRESENT]]",
+          "proxied_by": "",
+          "proxied_by_last_name": "",
+          "proxied_by_first_name": ""
+        }
+      ]
+    }
+  }
+}

@@ -7,7 +7,7 @@
   "specs": [
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
     "Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's",
-    "a citizen Mario, on behalf of whome Richard will create a case",
+    "a citizen Mario, on behalf of whom Richard will create a case",
 
     "contains a valid case ID for C1",
     "contains any invalid/incorrect answer(s) to any of the question(s) - (wrong number of questions)",

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
+import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.util.HashMap;
@@ -57,12 +58,15 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
     private final DataStoreApiClient dataStoreApi;
     private final JacksonUtils jacksonUtils;
+    private final SecurityUtils securityUtils;
 
     @Autowired
     public DefaultDataStoreRepository(DataStoreApiClient dataStoreApi,
-                                      JacksonUtils jacksonUtils) {
+                                      JacksonUtils jacksonUtils,
+                                      SecurityUtils securityUtils) {
         this.dataStoreApi = dataStoreApi;
         this.jacksonUtils = jacksonUtils;
+        this.securityUtils = securityUtils;
     }
 
     @Override
@@ -141,6 +145,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                 CaseDataContent caseDataContent = CaseDataContent.builder()
                     .token(caseUpdateViewEvent.getEventToken())
                     .event(event)
+                    .onBehalfOfUserToken(securityUtils.getUserToken())
                     .data(getCaseDataContentData(caseFieldId, changeOrganisationRequest, caseData))
                     .build();
 

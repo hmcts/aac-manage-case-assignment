@@ -40,7 +40,11 @@ public class SecurityUtils {
 
     public String getUserToken() {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return BEARER + jwt.getTokenValue();
+        return jwt.getTokenValue();
+    }
+
+    public String getUserBearerToken() {
+        return BEARER + getUserToken();
     }
 
     public UserInfo getUserInfo() {

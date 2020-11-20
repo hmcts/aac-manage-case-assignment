@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.Searc
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
+import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.time.LocalDateTime;
@@ -87,6 +88,9 @@ class DataStoreRepositoryTest {
 
     @Mock
     private JacksonUtils jacksonUtils;
+
+    @Mock
+    private SecurityUtils securityUtils;
 
     @InjectMocks
     private DefaultDataStoreRepository repository;

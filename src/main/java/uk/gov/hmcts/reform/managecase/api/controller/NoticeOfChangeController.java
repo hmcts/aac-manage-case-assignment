@@ -186,7 +186,7 @@ public class NoticeOfChangeController {
         return result.toVerifyNoCAnswersResponse(VERIFY_NOC_ANSWERS_MESSAGE);
     }
 
-    @PostMapping(path = NOC_PREPARE_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(path = NOC_PREPARE_PATH, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Prepare NoC request event", notes = "Prepare NoC request event")
     @ResponseStatus(HttpStatus.OK)
     @ApiResponses({

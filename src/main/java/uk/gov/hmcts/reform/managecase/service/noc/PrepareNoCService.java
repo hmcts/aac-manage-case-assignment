@@ -18,8 +18,10 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -36,6 +38,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.O
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ORG_POLICY_CASE_ROLE_NOT_IN_CASE_DEFINITION;
 
 @Service
+@SuppressWarnings({"PMD.UseLocaleWithCaseConversions"})
 public class PrepareNoCService {
     protected static final String COR_CASE_ROLE_ID = "CaseRoleId";
     protected static final String COR_REQUEST_TIMESTAMP = "RequestTimestamp";
@@ -107,19 +110,22 @@ public class PrepareNoCService {
 
     private List<CaseRole> getCaseRolesDefinitions(String jurisdiction, String caseType, List<String> caseRoles) {
         List<CaseRole> caseRolesDefinition = definitionStoreRepository.caseRoles("0", jurisdiction, caseType);
-        List<String> caseRolesDefinitionIds = caseRolesDefinition.stream()
-            .map(CaseRole::getId).collect(toList());
+        Map<String, CaseRole> collect = caseRolesDefinition.stream()
+            .collect(Collectors.toMap(caseRole -> caseRole.getId().toUpperCase(), Function.identity()));
 
+        List<CaseRole> foundCaseRoles = new ArrayList<>();
         caseRoles.forEach(cr -> {
-            validate(
-                !caseRolesDefinitionIds.contains(cr),
-                format(ORG_POLICY_CASE_ROLE_NOT_IN_CASE_DEFINITION, cr)
-            );
+            validate(!collect.containsKey(cr.toUpperCase()), format(ORG_POLICY_CASE_ROLE_NOT_IN_CASE_DEFINITION, cr));
+
+            CaseRole caseRole = collect.get(cr.toUpperCase());
+            foundCaseRoles.add(CaseRole.builder()
+                .id(cr)
+                .name(caseRole.getName())
+                .description(caseRole.getDescription())
+                .build());
         });
 
-        return caseRolesDefinition.stream()
-            .filter(cr -> caseRoles.contains(cr.getId()))
-            .collect(Collectors.toUnmodifiableList());
+        return foundCaseRoles;
     }
 
     private void updateChangeOrganisationRequestCaseRoleId(Map<String, JsonNode> data,

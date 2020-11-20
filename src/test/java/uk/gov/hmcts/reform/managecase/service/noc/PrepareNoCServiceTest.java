@@ -334,10 +334,10 @@ class PrepareNoCServiceTest {
 
         private void mockDefinitionStoreCaseRoles() {
             List<CaseRole> caseRoleList = new ArrayList<>();
-            caseRoleList.add(CaseRole.builder().id("[Claimant]").name("Claimant").build());
-            caseRoleList.add(CaseRole.builder().id("[Defendant]").name("Defendant").build());
-            caseRoleList.add(CaseRole.builder().id("[Claimant1]").name("Claimant1").build());
-            caseRoleList.add(CaseRole.builder().id("[Other]").name("Other role").build());
+            caseRoleList.add(CaseRole.builder().id("[CLAIMANT]").name("Claimant").build());
+            caseRoleList.add(CaseRole.builder().id("[DEFENDANT]").name("Defendant").build());
+            caseRoleList.add(CaseRole.builder().id("[CLAIMANT1]").name("Claimant1").build());
+            caseRoleList.add(CaseRole.builder().id("[OTHER]").name("Other role").build());
             given(definitionStoreRepository.caseRoles("0", JURISDICTION, CASE_TYPE)).willReturn(caseRoleList);
         }
 

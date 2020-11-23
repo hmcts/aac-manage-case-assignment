@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.managecase.service.noc;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
+import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
@@ -42,7 +42,6 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.O
 public class PrepareNoCService {
     protected static final String COR_CASE_ROLE_ID = "CaseRoleId";
     protected static final String COR_REQUEST_TIMESTAMP = "RequestTimestamp";
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     private final PrdRepository prdRepository;
     private final SecurityUtils securityUtils;
@@ -135,27 +134,13 @@ public class PrepareNoCService {
     private void updateChangeOrganisationRequestCaseRoleId(Map<String, JsonNode> data,
                                                            List<CaseRole> caseRolesDefinition,
                                                            String changeOfRequestFieldName) {
-        CaseRole firstCaseRole = caseRolesDefinition.get(0);
-        ObjectNode root = JSON_NODE_FACTORY.objectNode();
-        root.putObject("value").setAll(createObjectNode(firstCaseRole.getId(), firstCaseRole.getName()));
-        root.putArray("list_items")
-            .addAll(caseRolesDefinition.stream()
-                        .map(caseRole -> createObjectNode(caseRole.getId(), caseRole.getName()))
-                        .collect(toList()));
+        List<DynamicListElement> dynamicListElements = caseRolesDefinition.stream()
+            .map(caseRole -> DynamicListElement.builder().code(caseRole.getId()).label(caseRole.getName()).build())
+            .collect(toList());
+        ObjectNode dynamicList = jacksonUtils.createDynamicList(dynamicListElements.get(0), dynamicListElements);
 
         JsonNode cor = data.get(changeOfRequestFieldName);
-        ((ObjectNode) cor).set(COR_CASE_ROLE_ID, root);
-    }
-
-    /**
-     * Ex.:
-     * {
-     * "code": "[Claimant]",
-     * "label": "Claimant"
-     * }
-     */
-    private ObjectNode createObjectNode(String code, String label) {
-        return JSON_NODE_FACTORY.objectNode().put("code", code).put("label", label);
+        ((ObjectNode) cor).set(COR_CASE_ROLE_ID, dynamicList);
     }
 
     private void updateChangeOrganisationRequestRequestTimestamp(Map<String, JsonNode> data,

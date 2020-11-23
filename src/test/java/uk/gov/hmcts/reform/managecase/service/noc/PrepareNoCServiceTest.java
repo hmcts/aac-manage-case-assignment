@@ -3,12 +3,10 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -36,8 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService.COR_CASE_ROLE_ID;
@@ -53,7 +49,6 @@ class PrepareNoCServiceTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @InjectMocks
     private PrepareNoCService prepareNoCService;
 
     @Mock
@@ -65,8 +60,7 @@ class PrepareNoCServiceTest {
     @Mock
     private SecurityUtils securityUtils;
 
-    @Mock
-    private JacksonUtils jacksonUtils;
+    private final JacksonUtils jacksonUtils = new JacksonUtils(objectMapper);
 
     private Map<String, OrganisationPolicy> orgPolicies;
     private final SecurityClassification securityClassification = SecurityClassification.PUBLIC;
@@ -75,6 +69,10 @@ class PrepareNoCServiceTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
+        prepareNoCService = new PrepareNoCService(prdRepository,
+                                                  securityUtils,
+                                                  jacksonUtils,
+                                                  definitionStoreRepository);
     }
 
     @Nested
@@ -86,7 +84,6 @@ class PrepareNoCServiceTest {
             mockOrgIdentifierInPrdFindUsersByOrganisation("orgName1");
             mockDefinitionStoreCaseRoles();
             orgPolicies = prepareOrganisationPoliciesForSolicitorTest();
-            mockOrganisationPolicies(orgPolicies);
         }
 
         @Test
@@ -120,7 +117,6 @@ class PrepareNoCServiceTest {
 
             Map<String, JsonNode> caseData = new HashMap<>();
             orgPolicies = prepareOrganisationPoliciesForCaseworkerTest();
-            mockOrganisationPolicies(orgPolicies);
             orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
             caseData.put(COR_FIELD_NAME, changeOrganisationRequestToJsonNode(changeOrganisationRequest()));
 
@@ -321,15 +317,6 @@ class PrepareNoCServiceTest {
             orgPolicies.put("orgPolicy3", createOrganisationPolicy("[Claimant1]", "ref3", createOrganisation(null)));
 
             return orgPolicies;
-        }
-
-        private void mockOrganisationPolicies(Map<String, OrganisationPolicy> orgPolicies) {
-            given(jacksonUtils.convertValue(any(ObjectNode.class), eq(OrganisationPolicy.class)))
-                .willReturn(
-                    orgPolicies.get("orgPolicy1"),
-                    orgPolicies.get("orgPolicy2"),
-                    orgPolicies.get("orgPolicy3")
-                );
         }
 
         private void mockDefinitionStoreCaseRoles() {

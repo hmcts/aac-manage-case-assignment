@@ -216,7 +216,7 @@ class PrepareNoCServiceTest {
             );
             assertThat(
                 exception.getMessage(),
-                is("Jurisdiciton cannot be blank.")
+                is("Jurisdiction cannot be blank.")
             );
         }
 

@@ -80,6 +80,16 @@ public class PrepareNoCService {
         String caseRoleId = getCaseRoleId(data, changeOfRequestFieldName);
         validate(isNotBlank(caseRoleId), ONGOING_NOC_REQUEST);
 
+        List<String> caseRoles = prepareCaseRoles(jurisdiction, orgPolicies);
+        List<CaseRole> caseRolesDefinition = getCaseRolesDefinitions(jurisdiction, caseTypeId, caseRoles);
+
+        updateChangeOrganisationRequestCaseRoleId(data, caseRolesDefinition, changeOfRequestFieldName);
+        updateChangeOrganisationRequestRequestTimestamp(data, changeOfRequestFieldName);
+
+        return data;
+    }
+
+    private List<String> prepareCaseRoles(String jurisdiction, List<OrganisationPolicy> orgPolicies) {
         List<String> caseRoles;
 
         if (isInvokingUserSolicitor(jurisdiction)) {
@@ -99,13 +109,7 @@ public class PrepareNoCService {
                 NO_ORGANISATION_ID_IN_ANY_ORG_POLICY
             );
         }
-
-        List<CaseRole> caseRolesDefinition = getCaseRolesDefinitions(jurisdiction, caseTypeId, caseRoles);
-
-        updateChangeOrganisationRequestCaseRoleId(data, caseRolesDefinition, changeOfRequestFieldName);
-        updateChangeOrganisationRequestRequestTimestamp(data, changeOfRequestFieldName);
-
-        return data;
+        return caseRoles;
     }
 
     private List<CaseRole> getCaseRolesDefinitions(String jurisdiction, String caseType, List<String> caseRoles) {

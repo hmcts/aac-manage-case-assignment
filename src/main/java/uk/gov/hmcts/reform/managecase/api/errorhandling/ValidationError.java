@@ -29,7 +29,7 @@ public final class ValidationError {
         + " organisation as that of the invoker.";
     public static final String ORGANISATION_POLICY_ERROR = "Case ID has to be one for which a case role is"
         + " represented by the invoker's organisation.";
-    public static final String JURISDICTION_CANNOT_BE_BLANK = "Jurisdiciton cannot be blank.";
+    public static final String JURISDICTION_CANNOT_BE_BLANK = "Jurisdiction cannot be blank.";
     public static final String CASE_TYPE_CANNOT_BE_BLANK = "CaseType cannot be blank.";
     public static final String NO_ORGANISATION_POLICY_ON_CASE_DATA = "No OrganisationPolicy found on the case data.";
     public static final String ONGOING_NOC_REQUEST = "There is an ongoing NoCRequest.";

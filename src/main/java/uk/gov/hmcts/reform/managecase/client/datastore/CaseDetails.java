@@ -53,16 +53,12 @@ public class CaseDetails {
             .flatMap(List::stream)
             .map(node -> node.findParents(ORGANISATION_REQUEST_TIMESTAMP))
             .flatMap(List::stream)
-            .findFirst();
+            .findAny();
 
-        if (first.isPresent()) {
-            for (Map.Entry<String, JsonNode> entry : getData().entrySet()) {
-                if (entry.getValue().equals(first.get())) {
-                    return Optional.of(entry.getKey());
-                }
-            }
-        }
-        return Optional.empty();
+        return first.flatMap(jsonNode -> getData().entrySet().stream()
+            .filter(entry -> entry.getValue().equals(jsonNode))
+            .map(Map.Entry::getKey)
+            .findAny());
     }
 
     public List<JsonNode> findOrganisationPolicyNodes() {

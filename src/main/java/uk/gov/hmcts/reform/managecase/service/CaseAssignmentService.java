@@ -227,6 +227,6 @@ public class CaseAssignmentService {
 
     private List<String> getAssigneeRoles(String assigneeId) {
         String systemUserToken = idamRepository.getSystemUserAccessToken();
-        return idamRepository.searchUserById(assigneeId, systemUserToken).getRoles();
+        return idamRepository.getUserByUserId(assigneeId, systemUserToken).getRoles();
     }
 }

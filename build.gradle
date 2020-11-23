@@ -188,6 +188,12 @@ dependencyManagement {
     dependencySet(group: 'com.netflix.servo', version: '0.12.4') {
       entry 'servo-core'
     }
+    dependencySet(group: 'org.codehaus.groovy', version: '3.0.3') {
+      entry 'groovy'
+      entry 'groovy-xml'
+      entry 'groovy-json'
+      entry 'groovy-nio'
+    }
   }
 }
 
@@ -286,7 +292,7 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.9.0'
+  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.1.0'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath

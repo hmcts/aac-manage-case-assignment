@@ -45,15 +45,6 @@ public class AuditEvent extends Event {
     @JsonProperty("significant_item")
     private SignificantItem significantItem;
 
-    @JsonProperty("proxied_by")
-    private String proxiedBy;
-
-    @JsonProperty("proxied_by_last_name")
-    private String proxiedByLastName;
-
-    @JsonProperty("proxied_by_first_name")
-    private String proxiedByFirstName;
-
     public Long getId() {
         return id;
     }
@@ -156,30 +147,6 @@ public class AuditEvent extends Event {
 
     public void setSignificantItem(SignificantItem significantItem) {
         this.significantItem = significantItem;
-    }
-
-    public String getProxiedBy() {
-        return proxiedBy;
-    }
-
-    public void setProxiedBy(String proxiedBy) {
-        this.proxiedBy = proxiedBy;
-    }
-
-    public String getProxiedByLastName() {
-        return proxiedByLastName;
-    }
-
-    public void setProxiedByLastName(String proxiedByLastName) {
-        this.proxiedByLastName = proxiedByLastName;
-    }
-
-    public String getProxiedByFirstName() {
-        return proxiedByFirstName;
-    }
-
-    public void setProxiedByFirstName(String proxiedByFirstName) {
-        this.proxiedByFirstName = proxiedByFirstName;
     }
 
     @Deprecated

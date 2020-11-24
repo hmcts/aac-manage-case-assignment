@@ -7,13 +7,19 @@
   "method": "GET",
   "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/cases/{caseId}/events",
 
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
   "request": {
     "_extends_": "Common_Request",
     "headers": {
       "experimental": "true"
     },
     "pathVariables": {
-      "cid": "${[scenarioContext][testData][request][queryParams][case_ids]}"
+      "caseId": "${[scenarioContext][parentContext][testData][request][body][case_id]}"
     }
   }
 }

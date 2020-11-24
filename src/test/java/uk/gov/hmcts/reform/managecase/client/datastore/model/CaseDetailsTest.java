@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.config.JacksonObjectMapperConfig;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
@@ -16,10 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
-class CaseResourceTest {
+public class CaseDetailsTest {
 
     private final ObjectMapper objectMapper = new JacksonObjectMapperConfig().defaultObjectMapper();
 
@@ -61,11 +61,11 @@ class CaseResourceTest {
             new JacksonUtils(objectMapper).convertValue(cor, JsonNode.class)
         );
 
-        CaseResource caseResource = CaseResource.builder().data(data).build();
+        CaseDetails caseDetails = CaseDetails.builder().data(data).build();
 
         // ASSERT
         assertThat(expectedChangeOrganisationRequestJson)
-            .isEqualTo(caseResource.findChangeOrganisationRequestNode().get().toString());
+            .isEqualTo(caseDetails.findChangeOrganisationRequestNode().get().toString());
     }
 
     @Test
@@ -74,9 +74,9 @@ class CaseResourceTest {
         // ARRANGE
         Map<String, JsonNode> data = new HashMap<>();
 
-        CaseResource caseResource = CaseResource.builder().data(data).build();
+        CaseDetails caseDetails = CaseDetails.builder().data(data).build();
 
         // ASSERT
-        assertThat(caseResource.findChangeOrganisationRequestNode()).isNotPresent();
+        assertThat(caseDetails.findChangeOrganisationRequestNode()).isNotPresent();
     }
 }

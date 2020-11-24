@@ -17,9 +17,8 @@ import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
@@ -82,8 +81,8 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCh
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetExternalStartEventTriggerAsApprover;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetStartEventTrigger;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSubmitEventForCase;
-import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.APPROVED;
-import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.PENDING;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.UseConcurrentHashMap",
@@ -177,8 +176,8 @@ public class NoticeOfChangeControllerIT {
             Arrays.asList(challengeQuestion));
         stubGetChallengeQuestions(CASE_TYPE_ID, "NoCChallenge", challengeQuestionsResult);
 
-        CaseResource caseResource = CaseResource.builder().data(caseFields).build();
-        stubGetCaseViaExternalApi(CASE_ID, caseResource);
+        CaseDetails caseDetails = CaseDetails.builder().data(caseFields).build();
+        stubGetCaseViaExternalApi(CASE_ID, caseDetails);
     }
 
     @Nested
@@ -282,7 +281,7 @@ public class NoticeOfChangeControllerIT {
 
         private List<SubmittedChallengeAnswer> submittedChallengeAnswers;
 
-        private CaseResource caseResource;
+        private CaseDetails caseDetails;
 
         @BeforeEach
         void setup() {
@@ -302,11 +301,11 @@ public class NoticeOfChangeControllerIT {
 
             caseFields.put("ChangeOrgRequest", mapper.convertValue(ChangeOrganisationRequest.builder().build(),
                                                                    JsonNode.class));
-            caseResource = CaseResource.builder().data(caseFields).build();
+            caseDetails = CaseDetails.builder().data(caseFields).build();
 
-            stubGetCaseViaExternalApi(CASE_ID, caseResource);
+            stubGetCaseViaExternalApi(CASE_ID, caseDetails);
 
-            stubSubmitEventForCase(CASE_ID, caseResource);
+            stubSubmitEventForCase(CASE_ID, caseDetails);
 
             Map<String, JsonNode> data = new HashMap<>();
             CaseDetails caseDetails = CaseDetails.builder().data(data).build();
@@ -338,9 +337,9 @@ public class NoticeOfChangeControllerIT {
 
             caseFields.put("OrganisationPolicy", mapper.convertValue(orgPolicy,  JsonNode.class));
 
-            CaseResource caseResource = CaseResource.builder().data(caseFields).build();
-            stubGetCaseViaExternalApi(CASE_ID, caseResource);
-            stubSubmitEventForCase(CASE_ID, caseResource);
+            CaseDetails caseDetails = CaseDetails.builder().data(caseFields).build();
+            stubGetCaseViaExternalApi(CASE_ID, caseDetails);
+            stubSubmitEventForCase(CASE_ID, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -403,11 +402,11 @@ public class NoticeOfChangeControllerIT {
                 .data(caseDetails.getData())
                 .build();
 
-            CaseResource caseResource = CaseResource.builder().build();
+            CaseDetails caseDetails = CaseDetails.builder().build();
 
             stubGetCaseInternalAsApprover(CASE_ID, caseViewResource);
             stubGetExternalStartEventTriggerAsApprover(CASE_ID, NOC, startEventResource);
-            stubSubmitEventForCase(CASE_ID, caseDataContent, caseResource);
+            stubSubmitEventForCase(CASE_ID, caseDataContent, caseDetails);
         }
 
         @Test

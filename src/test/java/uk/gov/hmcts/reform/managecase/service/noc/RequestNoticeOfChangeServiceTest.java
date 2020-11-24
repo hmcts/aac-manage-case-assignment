@@ -10,8 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
@@ -36,8 +36,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.APPROVED;
-import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.PENDING;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap",
     "PMD.AvoidDuplicateLiterals",
@@ -61,7 +61,7 @@ class RequestNoticeOfChangeServiceTest {
 
     private NoCRequestDetails noCRequestDetails;
     private Organisation incumbentOrganisation;
-    private CaseResource caseResource;
+    private CaseDetails caseDetails;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -100,9 +100,9 @@ class RequestNoticeOfChangeServiceTest {
             .organisationPolicy(organisationPolicy)
             .build();
 
-        caseResource = CaseResource.builder().reference(CASE_ID).data(new HashMap<>()).build();
+        caseDetails = CaseDetails.builder().id(CASE_ID).data(new HashMap<>()).build();
 
-        given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseResource);
+        given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
     }
 
     @Test
@@ -131,9 +131,9 @@ class RequestNoticeOfChangeServiceTest {
         ArgumentCaptor<ChangeOrganisationRequest> corArgumentCaptor
             = ArgumentCaptor.forClass(ChangeOrganisationRequest.class);
 
-        verify(dataStoreRepository).submitEventForCase(caseIdCaptor.capture(),
-                                                       eventIdCaptor.capture(),
-                                                       corArgumentCaptor.capture());
+        verify(dataStoreRepository).submitNoticeOfChangeRequestEvent(caseIdCaptor.capture(),
+                                                                     eventIdCaptor.capture(),
+                                                                     corArgumentCaptor.capture());
 
         assertThat(caseIdCaptor.getValue()).isEqualTo(CASE_ID);
         assertThat(eventIdCaptor.getValue()).isEqualTo(NOC_REQUEST_EVENT);
@@ -164,10 +164,10 @@ class RequestNoticeOfChangeServiceTest {
         ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
             .caseRoleId(CASE_ASSIGNED_ROLE)
             .build();
-        updateCaseResourceData(caseResource, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
+        updateCaseDetailsData(caseDetails, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
 
         given(jacksonUtils.convertValue(any(), any())).willReturn(changeOrganisationRequest);
-        given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseResource);
+        given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
 
         RequestNoticeOfChangeResponse requestNoticeOfChangeResponse =
             service.requestNoticeOfChange(noCRequestDetails);
@@ -182,9 +182,9 @@ class RequestNoticeOfChangeServiceTest {
         + "Organisation Policies returns PENDING state")
     void testAutoApprovalCorPresentBlankCaseRoleOrgPoliciesNotAssigned() {
         ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder().build();
-        updateCaseResourceData(caseResource, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
+        updateCaseDetailsData(caseDetails, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
 
-        List<OrganisationPolicy> organisationPolicies = updateCaseResourceWithOrganisationPolicies(caseResource);
+        List<OrganisationPolicy> organisationPolicies = updateCaseDetailsWithOrganisationPolicies(caseDetails);
 
         given(jacksonUtils.convertValue(any(JsonNode.class), any()))
             .willReturn(changeOrganisationRequest)
@@ -192,7 +192,7 @@ class RequestNoticeOfChangeServiceTest {
             .willReturn(organisationPolicies.get(1))
             .willReturn(organisationPolicies.get(2));
 
-        given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseResource);
+        given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
 
         RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
             = service.requestNoticeOfChange(noCRequestDetails);
@@ -216,9 +216,9 @@ class RequestNoticeOfChangeServiceTest {
 
     private void nocAutoApprovedByAdminOrSolicitor(boolean isAdminOrSolicitor) {
         ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder().build();
-        updateCaseResourceData(caseResource, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
+        updateCaseDetailsData(caseDetails, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
 
-        List<OrganisationPolicy> organisationPolicies = updateCaseResourceWithOrganisationPolicies(caseResource);
+        List<OrganisationPolicy> organisationPolicies = updateCaseDetailsWithOrganisationPolicies(caseDetails);
 
         Organisation invokersOrganisation =
             Organisation.builder().organisationID(INVOKERS_ORGANISATION_IDENTIFIER).build();
@@ -226,7 +226,7 @@ class RequestNoticeOfChangeServiceTest {
                                                                                ORG_POLICY_REFERENCE,
                                                                                CASE_ASSIGNED_ROLE);
 
-        updateCaseResourceData(caseResource, ORGANISATION_POLICY_KEY, invokersOrganisationPolicy);
+        updateCaseDetailsData(caseDetails, ORGANISATION_POLICY_KEY, invokersOrganisationPolicy);
 
         setInvokerToActAsAnAdminOrSolicitor(isAdminOrSolicitor);
 
@@ -237,13 +237,13 @@ class RequestNoticeOfChangeServiceTest {
             .willReturn(organisationPolicies.get(2))
             .willReturn(invokersOrganisationPolicy);
 
-        given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseResource);
+        given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
     }
 
     @Test
     @DisplayName("Generate a Notice Of Change Request with approval and Auto assignment of case roles")
     void testApprovalComplete() {
-        caseResource.setJurisdiction(JURISDICTION_ONE);
+        caseDetails.setJurisdiction(JURISDICTION_ONE);
         nocAutoApprovedByAdminOrSolicitor(true);
 
         RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
@@ -268,9 +268,9 @@ class RequestNoticeOfChangeServiceTest {
     }
 
     @Test
-    @DisplayName("Generate a Notice Of Change Request with approval and Auto assignment of case roles")
+    @DisplayName("Generate a Notice Of Change Request with approval but no Auto assignment of case roles")
     void testNotActingAsSolicitor() {
-        caseResource.setJurisdiction(JURISDICTION_ONE);
+        caseDetails.setJurisdiction(JURISDICTION_ONE);
         nocAutoApprovedByAdminOrSolicitor(false);
 
         RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
@@ -294,7 +294,7 @@ class RequestNoticeOfChangeServiceTest {
     }
 
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    private List<OrganisationPolicy> updateCaseResourceWithOrganisationPolicies(CaseResource caseResource) {
+    private List<OrganisationPolicy> updateCaseDetailsWithOrganisationPolicies(CaseDetails caseDetails) {
         List<OrganisationPolicy> organisationPolicies = new ArrayList<>();
         for (int loopCounter = 0; loopCounter < 3; loopCounter++) {
             Organisation organisation = Organisation.builder().organisationID("OrganisationId").build();
@@ -302,18 +302,18 @@ class RequestNoticeOfChangeServiceTest {
                 new OrganisationPolicy(organisation, ORG_POLICY_REFERENCE,
                                        "CaseRole" + loopCounter);
             organisationPolicies.add(organisationPolicy);
-            updateCaseResourceData(caseResource, "OrganisationPolicy" + loopCounter, organisationPolicy);
+            updateCaseDetailsData(caseDetails, "OrganisationPolicy" + loopCounter, organisationPolicy);
         }
 
         return organisationPolicies;
     }
 
-    private void updateCaseResourceData(CaseResource caseResource,
-                                        String dataKey,
-                                        Object changeOrganisationRequest) {
-        Map<String, JsonNode> data = caseResource.getData();
+    private void updateCaseDetailsData(CaseDetails caseDetails,
+                                       String dataKey,
+                                       Object changeOrganisationRequest) {
+        Map<String, JsonNode> data = caseDetails.getData();
         data.put(dataKey, objectMapper.convertValue(changeOrganisationRequest, JsonNode.class));
 
-        caseResource.setData(data);
+        caseDetails.setData(data);
     }
 }

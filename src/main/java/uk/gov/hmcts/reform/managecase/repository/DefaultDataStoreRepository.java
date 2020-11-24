@@ -5,13 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
-import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
@@ -28,7 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.PENDING;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
 @Repository("defaultDataStoreRepository")
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
@@ -39,8 +38,8 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     static final String NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT = "Failed to get enough data from start event "
         + "to submit an event for the case";
 
-    static final String MISSING_CASE_FIELD_ID = "Failed to create ChangeOrganisationRequest because of "
-        + "missing case field id";
+    static final String CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID = "Failed to create ChangeOrganisationRequest"
+        + " because of missing case field id";
 
 
     public static final String ES_QUERY = "{\n"
@@ -131,17 +130,17 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public CaseResource submitEventForCaseOnly(String caseId, CaseDataContent caseDataContent) {
+    public CaseDetails submitEventForCaseOnly(String caseId, CaseDataContent caseDataContent) {
         String userAuthToken = getUserAuthToken();
         return dataStoreApi.submitEventForCase(userAuthToken, caseId, caseDataContent);
     }
 
     @Override
-    public CaseResource submitEventForCase(String caseId,
-                                           String eventId,
-                                           ChangeOrganisationRequest changeOrganisationRequest) {
+    public CaseDetails submitNoticeOfChangeRequestEvent(String caseId,
+                                                        String eventId,
+                                                        ChangeOrganisationRequest changeOrganisationRequest) {
 
-        CaseResource caseResource = null;
+        CaseDetails caseDetails = null;
         String userAuthToken = getUserAuthToken();
         CaseUpdateViewEvent caseUpdateViewEvent = dataStoreApi.getStartEventTrigger(userAuthToken, caseId, eventId);
 
@@ -151,7 +150,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                 throw new IllegalStateException(NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT);
             }
 
-            Optional<CaseViewField> caseViewField = getCaseViewField(caseUpdateViewEvent);
+            Optional<CaseViewField> caseViewField = getChangeOrganisationRequestCaseViewField(caseUpdateViewEvent);
 
             if (caseViewField.isPresent()) {
                 String caseFieldId = caseViewField.get().getId();
@@ -165,7 +164,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                     dataStoreApi.getExternalStartEventTrigger(userAuthToken, caseId, eventId);
                 Map<String, JsonNode> caseData = startEventResource.getCaseDetails().getData();
 
-                setApprovalStatus(changeOrganisationRequest, caseFieldId, caseData);
+                setChangeOrganisationRequestApprovalStatus(changeOrganisationRequest, caseFieldId, caseData);
 
                 CaseDataContent caseDataContent = CaseDataContent.builder()
                     .token(caseUpdateViewEvent.getEventToken())
@@ -173,17 +172,17 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                     .data(getCaseDataContentData(caseFieldId, changeOrganisationRequest, caseData))
                     .build();
 
-                caseResource = dataStoreApi.submitEventForCase(userAuthToken, caseId, caseDataContent);
+                caseDetails = dataStoreApi.submitEventForCase(userAuthToken, caseId, caseDataContent);
             } else {
-                throw new IllegalStateException(MISSING_CASE_FIELD_ID);
+                throw new IllegalStateException(CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID);
             }
         }
-        return caseResource;
+        return caseDetails;
     }
 
-    private void setApprovalStatus(ChangeOrganisationRequest changeOrganisationRequest,
-                                   String caseFieldId,
-                                   Map<String, JsonNode> caseData) {
+    private void setChangeOrganisationRequestApprovalStatus(ChangeOrganisationRequest changeOrganisationRequest,
+                                                            String caseFieldId,
+                                                            Map<String, JsonNode> caseData) {
         JsonNode defaultApprovalStatusValue = caseData.get(caseFieldId);
 
         if (defaultApprovalStatusValue == null
@@ -193,19 +192,19 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         }
     }
 
-    private Optional<CaseViewField> getCaseViewField(CaseUpdateViewEvent caseUpdateViewEvent) {
-        Optional<CaseViewField> caseViewField = Optional.empty();
+    private Optional<CaseViewField> getChangeOrganisationRequestCaseViewField(CaseUpdateViewEvent caseUpdateViewEvent) {
+        Optional<CaseViewField> changeOrgRequestCaseViewField = Optional.empty();
 
         if (caseUpdateViewEvent.getCaseFields() != null) {
-            caseViewField = caseUpdateViewEvent.getCaseFields().stream()
+            changeOrgRequestCaseViewField = caseUpdateViewEvent.getCaseFields().stream()
                 .filter(cvf -> cvf.getFieldTypeDefinition().getId().equals(CHANGE_ORGANISATION_REQUEST))
                 .findFirst();
         }
-        return caseViewField;
+        return changeOrgRequestCaseViewField;
     }
 
     @Override
-    public CaseResource findCaseByCaseIdExternalApi(String caseId) {
+    public CaseDetails findCaseByCaseIdExternalApi(String caseId) {
         return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(caseId);
     }
 

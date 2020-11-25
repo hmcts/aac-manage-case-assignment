@@ -26,8 +26,8 @@ import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
-import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
@@ -48,7 +48,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_DECISION_EVENT_UNIDENTIFIABLE;
-import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 
 @RestController
 @Validated
@@ -302,7 +302,7 @@ public class NoticeOfChangeController {
     })
     public SubmitCallbackResponse checkNoticeOfChangeApproval(@Valid @RequestBody CallbackRequest callbackRequest) {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
-        Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
+        Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findCorNodeWithApprovalStatus();
         if (changeOrganisationRequestFieldJson.isEmpty()) {
             throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
         }

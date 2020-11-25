@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.managecase.service.noc;
+package uk.gov.hmcts.reform.managecase.domain;
 
 public enum ApprovalStatus {
     APPROVED("1"), PENDING("0");

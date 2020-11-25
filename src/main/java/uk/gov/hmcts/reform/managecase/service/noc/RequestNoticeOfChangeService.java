@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
@@ -27,8 +26,8 @@ import java.util.Optional;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
-import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.APPROVED;
-import static uk.gov.hmcts.reform.managecase.service.noc.ApprovalStatus.PENDING;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
 @Service
 public class RequestNoticeOfChangeService {
@@ -66,15 +65,15 @@ public class RequestNoticeOfChangeService {
 
         // The case may have been changed as a result of the post-submit callback to CheckForNoCApproval operation.
         // Case data is therefore reloaded before checking if the NoCRequest has been auto-approved
-        CaseResource caseResource = getCaseViaExternalApi(caseId);
+        CaseDetails caseDetails = getCaseViaExternalApi(caseId);
 
         boolean isApprovalComplete =
-            isNocRequestAutoApprovalCompleted(caseResource, invokersOrganisation, caseRoleId);
+            isNocRequestAutoApprovalCompleted(caseDetails, invokersOrganisation, caseRoleId);
 
         // Auto-assign relevant case-roles to the invoker if required
         if (isApprovalComplete
-            && isActingAsSolicitor(securityUtils.getUserInfo().getRoles(), caseResource.getJurisdiction())) {
-            autoAssignCaseRoles(caseResource, invokersOrganisation);
+            && isActingAsSolicitor(securityUtils.getUserInfo().getRoles(), caseDetails.getJurisdiction())) {
+            autoAssignCaseRoles(caseDetails, invokersOrganisation);
         }
 
         return RequestNoticeOfChangeResponse.builder()
@@ -116,7 +115,7 @@ public class RequestNoticeOfChangeService {
         return securityUtils.hasSolicitorRole(roles, jurisdiction);
     }
 
-    private CaseResource getCaseViaExternalApi(String caseId) {
+    private CaseDetails getCaseViaExternalApi(String caseId) {
         return dataStoreRepository.findCaseByCaseIdExternalApi(caseId);
     }
 
@@ -128,7 +127,7 @@ public class RequestNoticeOfChangeService {
         return noCRequestDetails.getCaseViewResource().getCaseViewActionableEvents()[0].getId();
     }
 
-    private CaseResource generateNoCRequestEvent(String caseId,
+    private CaseDetails generateNoCRequestEvent(String caseId,
                                                  Organisation invokersOrganisation,
                                                  Organisation incumbentOrganisation,
                                                  String caseRoleId,
@@ -142,22 +141,22 @@ public class RequestNoticeOfChangeService {
 
         // Submit the NoCRequest event + event token.  This action will trigger a submitted callback to the
         // CheckForNoCApproval operation, which will apply additional processing in the event of auto-approval.
-        return dataStoreRepository.submitEventForCase(caseId, eventId, changeOrganisationRequest);
+        return dataStoreRepository.submitNoticeOfChangeRequestEvent(caseId, eventId, changeOrganisationRequest);
     }
 
-    private boolean isNocRequestAutoApprovalCompleted(CaseResource caseResource,
+    private boolean isNocRequestAutoApprovalCompleted(CaseDetails caseDetails,
                                                       Organisation invokersOrganisation,
                                                       String caseRoleId) {
-        Optional<ChangeOrganisationRequest> changeOrganisationRequest = getChangeOrganisationRequest(caseResource);
+        Optional<ChangeOrganisationRequest> changeOrganisationRequest = getChangeOrganisationRequest(caseDetails);
 
         return changeOrganisationRequest.isPresent()
             && changeOrganisationRequest.get().getCaseRoleId() == null
-            && isRequestToAddOrReplaceRepresentationAndApproved(caseResource, invokersOrganisation, caseRoleId);
+            && isRequestToAddOrReplaceRepresentationAndApproved(caseDetails, invokersOrganisation, caseRoleId);
     }
 
-    private Optional<ChangeOrganisationRequest> getChangeOrganisationRequest(CaseResource caseResource) {
+    private Optional<ChangeOrganisationRequest> getChangeOrganisationRequest(CaseDetails caseDetails) {
         Optional<ChangeOrganisationRequest> changeOrganisationRequest = Optional.empty();
-        final Optional<JsonNode> changeOrganisationRequestNode = caseResource.findChangeOrganisationRequestNode();
+        final Optional<JsonNode> changeOrganisationRequestNode = caseDetails.findChangeOrganisationRequestNode();
 
         if (changeOrganisationRequestNode.isPresent()) {
             changeOrganisationRequest = Optional.of(jacksonUtils.convertValue(changeOrganisationRequestNode.get(),
@@ -167,30 +166,30 @@ public class RequestNoticeOfChangeService {
         return changeOrganisationRequest;
     }
 
-    private void autoAssignCaseRoles(CaseResource caseResource,
+    private void autoAssignCaseRoles(CaseDetails caseDetails,
                                      Organisation invokersOrganisation) {
         List<String> invokerOrgPolicyRoles =
-            findInvokerOrgPolicyRoles(caseResource, invokersOrganisation);
+            findInvokerOrgPolicyRoles(caseDetails, invokersOrganisation);
 
-        dataStoreRepository.assignCase(invokerOrgPolicyRoles, caseResource.getReference(),
+        dataStoreRepository.assignCase(invokerOrgPolicyRoles, caseDetails.getId(),
                                        securityUtils.getUserInfo().getUid(), invokersOrganisation.getOrganisationID());
     }
 
-    private boolean isRequestToAddOrReplaceRepresentationAndApproved(CaseResource caseResource,
+    private boolean isRequestToAddOrReplaceRepresentationAndApproved(CaseDetails caseDetails,
                                                                      Organisation organisation,
                                                                      String caseRoleId) {
-        return findInvokerOrgPolicyRoles(caseResource, organisation).contains(caseRoleId);
+        return findInvokerOrgPolicyRoles(caseDetails, organisation).contains(caseRoleId);
     }
 
-    private List<OrganisationPolicy> findPolicies(CaseResource caseResource) {
-        List<JsonNode> policyNodes = caseResource.findOrganisationPolicyNodes();
+    private List<OrganisationPolicy> findPolicies(CaseDetails caseDetails) {
+        List<JsonNode> policyNodes = caseDetails.findOrganisationPolicyNodes();
         return policyNodes.stream()
             .map(node -> jacksonUtils.convertValue(node, OrganisationPolicy.class))
             .collect(toList());
     }
 
-    private List<String> findInvokerOrgPolicyRoles(CaseResource caseResource, Organisation organisation) {
-        List<OrganisationPolicy> policies = findPolicies(caseResource);
+    private List<String> findInvokerOrgPolicyRoles(CaseDetails caseDetails, Organisation organisation) {
+        List<OrganisationPolicy> policies = findPolicies(caseDetails);
         return policies.stream()
             .filter(policy -> policy.getOrganisation() != null
                 && organisation.getOrganisationID().equalsIgnoreCase(policy.getOrganisation().getOrganisationID()))

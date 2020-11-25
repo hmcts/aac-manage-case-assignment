@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Data
 @Builder
-public class CaseDataContent {
+public class CaseEventCreationPayload {
 
     private Event event;
 

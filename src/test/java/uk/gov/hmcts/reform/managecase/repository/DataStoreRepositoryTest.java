@@ -11,7 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
@@ -303,7 +303,7 @@ class DataStoreRepositoryTest {
         startEventResource.setCaseDetails(caseDetails);
         given(dataStoreApi.getExternalStartEventTrigger(CASE_ID, EVENT_ID)).willReturn(startEventResource);
 
-        given(dataStoreApi.submitEventForCase(any(String.class), any(CaseDataContent.class)))
+        given(dataStoreApi.submitEventForCase(any(String.class), any(CaseEventCreationPayload.class)))
             .willReturn(CaseDetails.builder().build());
 
 
@@ -320,16 +320,16 @@ class DataStoreRepositoryTest {
 
         // ASSERT
         verify(dataStoreApi).getStartEventTrigger(CASE_ID, EVENT_ID);
-        ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
+        ArgumentCaptor<CaseEventCreationPayload> captor = ArgumentCaptor.forClass(CaseEventCreationPayload.class);
         verify(dataStoreApi).submitEventForCase(any(String.class), captor.capture());
 
-        CaseDataContent caseDataContentCaptorValue = captor.getValue();
-        assertThat(caseDataContentCaptorValue.getToken()).isEqualTo(EVENT_TOKEN);
+        CaseEventCreationPayload caseEventCreationPayloadCaptorValue = captor.getValue();
+        assertThat(caseEventCreationPayloadCaptorValue.getToken()).isEqualTo(EVENT_TOKEN);
 
-        assertThat(caseDataContentCaptorValue.getEvent().getDescription()).isEqualTo(NOC_REQUEST_DESCRIPTION);
-        assertThat(caseDataContentCaptorValue.getEvent().getEventId()).isEqualTo(EVENT_ID);
+        assertThat(caseEventCreationPayloadCaptorValue.getEvent().getDescription()).isEqualTo(NOC_REQUEST_DESCRIPTION);
+        assertThat(caseEventCreationPayloadCaptorValue.getEvent().getEventId()).isEqualTo(EVENT_ID);
 
-        assertThat(caseDataContentCaptorValue.getData().get(CHANGE_ORGANISATION_REQUEST_FIELD).toString())
+        assertThat(caseEventCreationPayloadCaptorValue.getData().get(CHANGE_ORGANISATION_REQUEST_FIELD).toString())
             .isEqualTo(EXPECTED_NOC_REQUEST_DATA);
     }
 

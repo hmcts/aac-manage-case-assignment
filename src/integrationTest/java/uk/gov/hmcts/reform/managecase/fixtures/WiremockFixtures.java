@@ -204,7 +204,7 @@ public class WiremockFixtures {
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
-                                    .withStatus(HTTP_CREATED)
+                                    .withStatus(HTTP_OK)
                                     .withBody(getJsonString(caseDetails))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
@@ -215,7 +215,7 @@ public class WiremockFixtures {
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
-                                    .withStatus(HTTP_OK).withBody(getJsonString(caseDetails))
+                                    .withStatus(HTTP_CREATED).withBody(getJsonString(caseDetails))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 

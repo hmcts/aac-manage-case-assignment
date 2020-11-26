@@ -11,14 +11,14 @@
     "body" : {
       "auditEvents": [
         {
-          "id": "[[ANYTHING_PRESENT]]",
+          "id": "nocRequest",
           "description" : "[[ANYTHING_PRESENT]]",
           "user_id": "${[scenarioContext][parentContext][testData][users][invokingUser][id]}",
           "user_last_name": "Solicington",
           "user_first_name": "Bill",
-          "event_name": "[[ANYTHING_PRESENT]]",
+          "event_name": "NoC Request",
           "created_date": "[[ANYTHING_PRESENT]]",
-          "case_type_id": "[[ANYTHING_PRESENT]]",
+          "case_type_id": "FT_NoCCaseType",
           "case_type_version": "[[ANYTHING_PRESENT]]",
           "state_id": "[[ANYTHING_PRESENT]]",
           "state_name": "[[ANYTHING_PRESENT]]",

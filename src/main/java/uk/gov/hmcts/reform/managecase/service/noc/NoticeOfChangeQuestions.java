@@ -35,7 +35,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_EVENT_UNIDENTIFIABLE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
 
@@ -196,7 +196,7 @@ public class NoticeOfChangeQuestions {
             || ArrayUtils.isEmpty(caseViewResource.getCaseViewActionableEvents())) {
             throw new ValidationException(NOC_EVENT_NOT_AVAILABLE);
         } else if (caseViewResource.getCaseViewActionableEvents().length != 1) {
-            throw new ValidationException(NOC_REQUEST_EVENT_UNIDENTIFIABLE);
+            throw new ValidationException(MULTIPLE_NOC_REQUEST_EVENTS);
         }
     }
 

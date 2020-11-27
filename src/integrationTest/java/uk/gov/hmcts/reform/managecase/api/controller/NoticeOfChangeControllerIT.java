@@ -47,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS_MESSAGE;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_EVENT_UNIDENTIFIABLE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
@@ -203,7 +203,7 @@ public class NoticeOfChangeControllerIT {
             this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
                 .queryParam("case_id", CASE_ID))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", is(NOC_REQUEST_EVENT_UNIDENTIFIABLE)));
+                .andExpect(jsonPath("$.message", is(MULTIPLE_NOC_REQUEST_EVENTS)));
         }
 
     }

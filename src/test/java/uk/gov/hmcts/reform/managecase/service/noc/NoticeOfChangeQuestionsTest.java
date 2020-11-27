@@ -47,6 +47,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_EVENT_UNIDENTIFIABLE;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
 
@@ -430,6 +431,22 @@ class NoticeOfChangeQuestionsTest {
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("No NoC events available for this case type");
+        }
+
+        @Test
+        @DisplayName("Must return an error when multiple NOC Request events are available in the case for the user")
+        void shouldThrowErrorWhenMultipleNoCEventsAvailable() {
+            CaseViewResource caseViewResource = new CaseViewResource();
+            caseViewResource.setCaseViewActionableEvents(
+                new CaseViewActionableEvent[]{new CaseViewActionableEvent(), new CaseViewActionableEvent()}
+            );
+
+            given(dataStoreRepository.findCaseByCaseId(CASE_ID))
+                .willReturn(caseViewResource);
+
+            assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining(NOC_REQUEST_EVENT_UNIDENTIFIABLE);
         }
 
         @Test

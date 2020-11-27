@@ -17,7 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
-import uk.gov.hmcts.reform.managecase.api.payload.NoCPrepareRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
@@ -302,13 +302,13 @@ public class NoticeOfChangeControllerTest {
 
         private static final String ENDPOINT_URL = "/noc" + NOC_PREPARE_PATH;
 
-        private NoCPrepareRequest request;
+        private AboutToStartCallbackRequest request;
 
         private final Map<String, JsonNode> responseData = new ConcurrentHashMap<>();
 
         @BeforeEach
         void setUp() throws Exception {
-            request = new NoCPrepareRequest(CaseDetails.builder().build(), null, "createEvent", true);
+            request = new AboutToStartCallbackRequest("createEvent", null, CaseDetails.builder().build());
             ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder().build();
 
             responseData.put("ChangeOrganisationRequest", objectMapper.readTree(objectMapper.writeValueAsString(cor)));

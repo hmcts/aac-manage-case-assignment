@@ -28,20 +28,21 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_TYPE_CANNOT_BE_BLANK;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_TYPE_ID_EMPTY;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.JURISDICTION_CANNOT_BE_BLANK;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MISSING_COR_ON_THE_CASE_DATA;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORGANISATION_ID_IN_ANY_ORG_POLICY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORGANISATION_POLICY_ON_CASE_DATA;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_SOLICITOR_ORGANISATION_RECORDED_IN_ORG_POLICY;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ONGOING_NOC_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ORG_POLICY_CASE_ROLE_NOT_IN_CASE_DEFINITION;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CASE_ROLE_ID;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_REQUEST_TIMESTAMP;
 
 @Service
 @SuppressWarnings({"PMD.UseLocaleWithCaseConversions"})
 public class PrepareNoCService {
-    protected static final String COR_CASE_ROLE_ID = "CaseRoleId";
-    protected static final String COR_REQUEST_TIMESTAMP = "RequestTimestamp";
 
     private final PrdRepository prdRepository;
     private final SecurityUtils securityUtils;
@@ -65,19 +66,21 @@ public class PrepareNoCService {
         String caseTypeId = caseDetails.getCaseTypeId();
 
         validate(isBlank(jurisdiction), JURISDICTION_CANNOT_BE_BLANK);
-        validate(isBlank(caseTypeId), CASE_TYPE_CANNOT_BE_BLANK);
+        validate(isBlank(caseTypeId), CASE_TYPE_ID_EMPTY);
 
         List<OrganisationPolicy> orgPolicies = findPolicies(caseDetails);
         validate(orgPolicies.isEmpty(), NO_ORGANISATION_POLICY_ON_CASE_DATA);
 
         String changeOfRequestFieldName = caseDetails.findChangeOrganisationRequestFieldName()
-            .orElseThrow(() -> new ValidationException(MISSING_COR_ON_THE_CASE_DATA));
+            .orElseThrow(() -> new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID));
 
+        validate(caseDetails.getData().get(changeOfRequestFieldName).path(CASE_ROLE_ID).isMissingNode(),
+                 INVALID_CASE_ROLE_FIELD);
         Map<String, JsonNode> data = caseDetails.getData();
 
         // check that there isn't an ongoing NoCRequest - if so this new NoCRequest must be rejected
         String caseRoleId = getCaseRoleId(data, changeOfRequestFieldName);
-        validate(isNotBlank(caseRoleId), ONGOING_NOC_REQUEST);
+        validate(isNotBlank(caseRoleId), NOC_REQUEST_ONGOING);
 
         List<String> caseRoles = prepareCaseRoles(jurisdiction, orgPolicies);
         List<CaseRole> caseRolesDefinition = getCaseRolesDefinitions(jurisdiction, caseTypeId, caseRoles);
@@ -140,13 +143,13 @@ public class PrepareNoCService {
         ObjectNode dynamicList = jacksonUtils.createDynamicList(dynamicListElements.get(0), dynamicListElements);
 
         JsonNode cor = data.get(changeOfRequestFieldName);
-        ((ObjectNode) cor).set(COR_CASE_ROLE_ID, dynamicList);
+        ((ObjectNode) cor).set(CASE_ROLE_ID, dynamicList);
     }
 
     private void updateChangeOrganisationRequestRequestTimestamp(Map<String, JsonNode> data,
                                                                  String changeOfRequestFieldName) {
         JsonNode cor = data.get(changeOfRequestFieldName);
-        ((ObjectNode) cor).set(COR_REQUEST_TIMESTAMP, TextNode.valueOf(LocalDateTime.now().toString()));
+        ((ObjectNode) cor).set(ORGANISATION_REQUEST_TIMESTAMP, TextNode.valueOf(LocalDateTime.now().toString()));
     }
 
     private String findTheOrganisationIdOfTheInvokerUsingPrd() {
@@ -155,7 +158,7 @@ public class PrepareNoCService {
     }
 
     private String getCaseRoleId(Map<String, JsonNode> data, String corFieldName) {
-        return data.get(corFieldName).findPath(COR_CASE_ROLE_ID).textValue();
+        return data.get(corFieldName).findPath(CASE_ROLE_ID).textValue();
     }
 
     private List<String> findInvokerOrgPolicyRoles(List<OrganisationPolicy> policies, String organisationId) {

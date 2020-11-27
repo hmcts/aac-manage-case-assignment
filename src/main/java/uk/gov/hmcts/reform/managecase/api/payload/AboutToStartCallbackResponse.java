@@ -17,8 +17,8 @@ import java.util.Map;
  */
 @Data
 @Builder
-@ApiModel("Prepare NoC Response")
-public class NoCPrepareResponse {
+@ApiModel("About to Start Callback Response")
+public class AboutToStartCallbackResponse {
 
     @ApiModelProperty("Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
     private Map<String, JsonNode> data;

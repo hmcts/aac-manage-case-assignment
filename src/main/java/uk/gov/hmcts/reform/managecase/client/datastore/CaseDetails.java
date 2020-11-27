@@ -20,10 +20,10 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CaseDetails {
 
-    protected static final String ORGANISATION_TO_ADD = "OrganisationToAdd";
-    protected static final String ORGANISATION_TO_REMOVE = "OrganisationToRemove";
-    protected static final String ORGANISATION_CASE_ROLE_ID = "CaseRoleId";
-    protected static final String ORGANISATION_REQUEST_TIMESTAMP = "RequestTimestamp";
+    public static final String ORGANISATION_TO_ADD = "OrganisationToAdd";
+    public static final String ORGANISATION_TO_REMOVE = "OrganisationToRemove";
+    public static final String CASE_ROLE_ID = "CaseRoleId";
+    public static final String ORGANISATION_REQUEST_TIMESTAMP = "RequestTimestamp";
     public static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
     public static final String ORG_POLICY_REFERENCE = "OrgPolicyReference";
     public static final String ORG_ID = "OrganisationID";
@@ -48,10 +48,6 @@ public class CaseDetails {
             .map(node -> node.findParents(ORGANISATION_TO_ADD))
             .flatMap(List::stream)
             .map(node -> node.findParents(ORGANISATION_TO_REMOVE))
-            .flatMap(List::stream)
-            .map(node -> node.findParents(ORGANISATION_CASE_ROLE_ID))
-            .flatMap(List::stream)
-            .map(node -> node.findParents(ORGANISATION_REQUEST_TIMESTAMP))
             .flatMap(List::stream)
             .findAny();
 

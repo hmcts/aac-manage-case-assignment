@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
-import uk.gov.hmcts.reform.managecase.api.payload.NoCPrepareRequest;
-import uk.gov.hmcts.reform.managecase.api.payload.NoCPrepareResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
@@ -192,27 +192,27 @@ public class NoticeOfChangeController {
     @ApiResponses({
         @ApiResponse(
             code = 200,
-            response = NoCPrepareResponse.class,
+            response = AboutToStartCallbackResponse.class,
             message = "Data with a list of Case Roles attached to the ChangeOrganisationRequest."
         ),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
                 + "\n1) " + ValidationError.JURISDICTION_CANNOT_BE_BLANK
-                + "\n2) " + ValidationError.CASE_TYPE_CANNOT_BE_BLANK
+                + "\n2) " + ValidationError.CASE_TYPE_ID_EMPTY
                 + "\n3) " + ValidationError.NO_ORGANISATION_POLICY_ON_CASE_DATA
-                + "\n4) " + ValidationError.ONGOING_NOC_REQUEST
+                + "\n4) " + ValidationError.NOC_REQUEST_ONGOING
                 + "\n5) " + ValidationError.NO_SOLICITOR_ORGANISATION_RECORDED_IN_ORG_POLICY
                 + "\n6) " + ValidationError.NO_ORGANISATION_ID_IN_ANY_ORG_POLICY
                 + "\n7) " + ValidationError.ORG_POLICY_CASE_ROLE_NOT_IN_CASE_DEFINITION
-                + "\n8) " + ValidationError.MISSING_COR_CASE_ROLE_ON_THE_CASE_DATA
-                + "\n9) " + ValidationError.MISSING_COR_ON_THE_CASE_DATA,
+                + "\n8) " + ValidationError.INVALID_CASE_ROLE_FIELD
+                + "\n9) " + ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID,
             response = ApiError.class,
             examples = @Example({
                 @ExampleProperty(
                     value = "{\n"
                         + "   \"status\": \"BAD_REQUEST\",\n"
-                        + "   \"message\": \"" + ValidationError.ONGOING_NOC_REQUEST + "\",\n"
+                        + "   \"message\": \"" + ValidationError.NOC_REQUEST_ONGOING + "\",\n"
                         + "   \"errors\": [ ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
@@ -227,13 +227,14 @@ public class NoticeOfChangeController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
-    public NoCPrepareResponse prepareNoC(@Valid @RequestBody NoCPrepareRequest noCPrepareRequest) {
+    public AboutToStartCallbackResponse prepareNoC(
+        @Valid @RequestBody AboutToStartCallbackRequest aboutToStartCallbackRequest) {
 
-        return NoCPrepareResponse.builder()
-            .data(prepareNoCService.prepareNoCRequest(noCPrepareRequest.getCaseDetails()))
-            .state(noCPrepareRequest.getCaseDetails().getState())
-            .securityClassification(noCPrepareRequest.getCaseDetails().getSecurityClassification())
-            .dataClassification(noCPrepareRequest.getCaseDetails().getDataClassification())
+        return AboutToStartCallbackResponse.builder()
+            .data(prepareNoCService.prepareNoCRequest(aboutToStartCallbackRequest.getCaseDetails()))
+            .state(aboutToStartCallbackRequest.getCaseDetails().getState())
+            .securityClassification(aboutToStartCallbackRequest.getCaseDetails().getSecurityClassification())
+            .dataClassification(aboutToStartCallbackRequest.getCaseDetails().getDataClassification())
             .build();
     }
 

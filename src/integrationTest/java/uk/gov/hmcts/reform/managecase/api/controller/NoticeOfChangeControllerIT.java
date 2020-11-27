@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.BaseTest;
-import uk.gov.hmcts.reform.managecase.api.payload.NoCPrepareRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
@@ -267,7 +267,8 @@ public class NoticeOfChangeControllerIT {
                 .state("caseCreated")
                 .build();
 
-            NoCPrepareRequest request = new NoCPrepareRequest(caseDetails, caseDetails, "prepareOrganisation", true);
+            AboutToStartCallbackRequest request = new AboutToStartCallbackRequest("prepareOrganisation",
+                                                                                  caseDetails, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                                      .contentType(MediaType.APPLICATION_JSON)

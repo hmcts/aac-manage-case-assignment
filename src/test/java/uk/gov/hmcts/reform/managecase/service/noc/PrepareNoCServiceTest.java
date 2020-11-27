@@ -36,7 +36,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService.COR_CASE_ROLE_ID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_TYPE_ID_EMPTY;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.JURISDICTION_CANNOT_BE_BLANK;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORGANISATION_POLICY_ON_CASE_DATA;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_SOLICITOR_ORGANISATION_RECORDED_IN_ORG_POLICY;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CASE_ROLE_ID;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_ADD;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_REMOVE;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports",
     "PMD.TooManyMethods", "PMD.DataflowAnomalyAnalysis"})
@@ -99,7 +108,7 @@ class PrepareNoCServiceTest {
 
             Map<String, JsonNode> result = prepareNoCService.prepareNoCRequest(caseDetails);
 
-            JsonNode caseRoleId = result.get(COR_FIELD_NAME).findPath(COR_CASE_ROLE_ID);
+            JsonNode caseRoleId = result.get(COR_FIELD_NAME).findPath(CASE_ROLE_ID);
             assertEquals("[Claimant]", caseRoleId.findPath("value").findPath("code").textValue());
             assertEquals("Claimant", caseRoleId.findPath("value").findPath("label").textValue());
             assertTrue(caseRoleId.findPath("list_items").isArray());
@@ -125,7 +134,7 @@ class PrepareNoCServiceTest {
 
             Map<String, JsonNode> result = prepareNoCService.prepareNoCRequest(caseDetails);
 
-            JsonNode caseRoleId = result.get(COR_FIELD_NAME).findPath(COR_CASE_ROLE_ID);
+            JsonNode caseRoleId = result.get(COR_FIELD_NAME).findPath(CASE_ROLE_ID);
             assertEquals("[Claimant]", caseRoleId.findPath("value").findPath("code").textValue());
             assertEquals("Claimant", caseRoleId.findPath("value").findPath("label").textValue());
             assertTrue(caseRoleId.findPath("list_items").isArray());
@@ -150,10 +159,7 @@ class PrepareNoCServiceTest {
                 ValidationException.class,
                 () -> prepareNoCService.prepareNoCRequest(caseDetails)
             );
-            assertThat(
-                exception.getMessage(),
-                is("No OrganisationPolicy found on the case data.")
-            );
+            assertThat(exception.getMessage(), is(NO_ORGANISATION_POLICY_ON_CASE_DATA));
         }
 
         @Test
@@ -172,10 +178,7 @@ class PrepareNoCServiceTest {
                 ValidationException.class,
                 () -> prepareNoCService.prepareNoCRequest(caseDetails)
             );
-            assertThat(
-                exception.getMessage(),
-                is("The Organisation of the solicitor is not recorded in an Org policy on the case.")
-            );
+            assertThat(exception.getMessage(), is(NO_SOLICITOR_ORGANISATION_RECORDED_IN_ORG_POLICY));
         }
 
         @Test
@@ -194,10 +197,7 @@ class PrepareNoCServiceTest {
                 ValidationException.class,
                 () -> prepareNoCService.prepareNoCRequest(caseDetails)
             );
-            assertThat(
-                exception.getMessage(),
-                is("There is an ongoing NoCRequest.")
-            );
+            assertThat(exception.getMessage(), is(NOC_REQUEST_ONGOING));
         }
 
         @Test
@@ -210,10 +210,7 @@ class PrepareNoCServiceTest {
                 ValidationException.class,
                 () -> prepareNoCService.prepareNoCRequest(caseDetails)
             );
-            assertThat(
-                exception.getMessage(),
-                is("Jurisdiction cannot be blank.")
-            );
+            assertThat(exception.getMessage(), is(JURISDICTION_CANNOT_BE_BLANK));
         }
 
         @Test
@@ -226,10 +223,7 @@ class PrepareNoCServiceTest {
                 ValidationException.class,
                 () -> prepareNoCService.prepareNoCRequest(caseDetails)
             );
-            assertThat(
-                exception.getMessage(),
-                is("CaseType cannot be blank.")
-            );
+            assertThat(exception.getMessage(), is(CASE_TYPE_ID_EMPTY));
         }
 
         @Test
@@ -246,10 +240,25 @@ class PrepareNoCServiceTest {
                 ValidationException.class,
                 () -> prepareNoCService.prepareNoCRequest(caseDetails)
             );
-            assertThat(
-                exception.getMessage(),
-                is("Missing ChangeOrganisationRequest field on the case data.")
+            assertThat(exception.getMessage(), is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID));
+        }
+
+        @Test
+        @DisplayName("should error if the ChangeOrganisationRequest.CaseRole is missing ")
+        void shouldErrorWhenMissingCaseRoleOnChangeOrganisationRequest() {
+            mockUserCaseRolesForSolicitor();
+
+            Map<String, JsonNode> caseData = new HashMap<>();
+            orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
+            caseData.put(COR_FIELD_NAME, corWithMissingCaseRoleId());
+            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData,
+                                                      securityClassification, dataClassification);
+
+            ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> prepareNoCService.prepareNoCRequest(caseDetails)
             );
+            assertThat(exception.getMessage(), is(INVALID_CASE_ROLE_FIELD));
         }
 
         private ChangeOrganisationRequest changeOrganisationRequest() {
@@ -265,8 +274,14 @@ class PrepareNoCServiceTest {
                 .build();
         }
 
-        private JsonNode missingCaseRoleId() {
-            return objectToJsonNode("{}");
+        private JsonNode corWithMissingCaseRoleId() {
+            try {
+                return objectMapper.readTree(
+                    "{\"" + ORGANISATION_TO_ADD + "\":{}, \"" + ORGANISATION_TO_REMOVE + "\":{}}");
+            } catch (JsonProcessingException e) {
+                fail();
+                return null;
+            }
         }
 
         private JsonNode changeOrganisationRequestToJsonNode(ChangeOrganisationRequest value) {
@@ -282,8 +297,8 @@ class PrepareNoCServiceTest {
                 return objectMapper.readTree(objectMapper.writeValueAsString(obj));
             } catch (JsonProcessingException e) {
                 fail();
+                return null;
             }
-            return null;
         }
 
         private Map<String, OrganisationPolicy> prepareOrganisationPoliciesForSolicitorTest() {

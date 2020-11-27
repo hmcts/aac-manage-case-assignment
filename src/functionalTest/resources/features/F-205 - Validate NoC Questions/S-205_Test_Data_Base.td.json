@@ -13,7 +13,7 @@
   "request": {
     "_extends_": "Common_Request",
     "body": {
-      "case_id": "${[scenarioContext][childContexts][Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}"
+      "case_id": "${[scenarioContext][childContexts][204_Case_Creation][testData][actualResponse][body][id]}"
     }
   }
 }

@@ -1,0 +1,16 @@
+{
+  "_guid_": "205.12_Update_Org_Policies_Token_Creation",
+  "_extends_" : "204_Update_Org_Policies_Token_Creation",
+
+  "specs" : [
+    "to get the update org policy event trigger"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][205.12_Case_Creation][testData][actualResponse][body][id]}"
+    }
+  }
+
+}

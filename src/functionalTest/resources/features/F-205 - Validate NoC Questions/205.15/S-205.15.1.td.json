@@ -1,6 +1,9 @@
 {
   "_guid_": "S-205.15.1",
-  "_extends_": "S-205.15",
+  "_extends_": "S-205.15_Test_Data_Base",
+
+  "title": "NoC Answers must return a positive response for various correct answers",
+
   "specs": [
     "has answers with extra whitespaces, apostrophes, hyphens and casing that expected"
   ],
@@ -20,6 +23,5 @@
       ]
     }
   }
-
 
 }

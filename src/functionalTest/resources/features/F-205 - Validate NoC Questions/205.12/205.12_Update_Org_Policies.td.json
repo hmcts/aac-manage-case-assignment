@@ -1,0 +1,21 @@
+{
+  "_guid_" : "205.12_Update_Org_Policies",
+  "_extends_" : "204_Update_Org_Policies",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][205.12_Case_Creation][testData][actualResponse][body][id]}"
+    },
+    "body":{
+      "data": {
+        "applicantOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "QUK822N"
+          }
+        }
+      },
+      "event_token": "${[scenarioContext][siblingContexts][205.12_Update_Org_Policies_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+
+}

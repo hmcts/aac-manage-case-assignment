@@ -2,29 +2,32 @@
   "_guid_" : "S-204.8",
   "_extends_" : "S-204_Test_Data_Base",
 
+  "title": "NoC questions must return an error if there is not an Organisation Policy field containing a case role for each set of answers",
+
   "users": {
-    "Benjamin": {
-      "username": "befta.master.solicitor.benjamin@gmail.com",
-      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_2_PWD]]"
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
     }
   },
 
   "specs" : [
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
     "Dil - with a solicitor role for the same jurisdiction as Case C1 below",
+
     "The challenge questions have answers that resolve to three distinct case roles (1,2,3)",
     "The configuration of the case creation event only establishes organisation policies containing case roles 1 and 2",
+
     "is made by Dil to return the questions that need answering in order to become Mario's representative on C1",
     "contains a valid case ID for C1",
     "contains a valid IDAM token for Dil"
-
   ],
 
   "expectedResponse": {
-    "responseCode": 400,
-    "responseMessage": "Bad Request",
+    "_extends_": "ACA_400_Response",
     "body": {
-      "status" : "BAD_REQUEST",
       "message" : "No Organisation Policy for one or more of the roles available for the notice of change request",
       "errors" : [ ]
     }

@@ -1,0 +1,15 @@
+{
+  "_guid_" : "205.12_Case_Creation",
+  "_extends_" : "204_Case_Creation",
+
+  "user": {
+    "_extends_": "ACA_Users_Richard"
+  },
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][siblingContexts][205.12_Case_Creation_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+
+}

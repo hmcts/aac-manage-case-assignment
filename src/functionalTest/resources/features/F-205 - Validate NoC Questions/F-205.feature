@@ -184,14 +184,14 @@ Feature: F-205 Validate Notice of Change Answers
   Scenario: NoC Answers must return an error response when the the invoking user's organisation is already representing the litigant identified by the answers
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
-      And a user [Tony - with a solicitor role for the same jurisdiction within the same organisation from Richard],
-      And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [205.12_Case_Creation],
+      And a user [Dil - with a solicitor role for the same jurisdiction within a different organisation from Richard],
+      And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [205.12_Update_Org_Policies_Token_Creation],
-      And a successful call [to update the applicant org policy] as in [205.12_Update_Org_Policies],
+      And a successful call [to update the applicant org policy so Dil's organisation is representing] as in [205.12_Update_Org_Policies],
       And a wait time of [8] seconds [to allow for Logstash to index the case just created]
 
      When a request is prepared with appropriate values,
-      And the request [is made by Tony to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
+      And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
       And the request [contains all correct answers],
       And it is submitted to call the [ValidateNoCQuestions] operation of [Case Assignment Microservice],
 

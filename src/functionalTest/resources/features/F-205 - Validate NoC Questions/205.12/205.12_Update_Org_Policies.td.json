@@ -2,15 +2,22 @@
   "_guid_" : "205.12_Update_Org_Policies",
   "_extends_" : "204_Update_Org_Policies",
 
+  "specs": [
+    "to update the applicant org policy so Dil's organisation is representing"
+  ],
+
+  "prerequisites": [
+    {
+      "Get_Organisation_Identifier": "205.12_Get_Organisation_Identifier_For_Dil"
+    }
+  ],
+
   "request": {
-    "pathVariables": {
-      "cid": "${[scenarioContext][siblingContexts][205.12_Case_Creation][testData][actualResponse][body][id]}"
-    },
     "body":{
       "data": {
         "applicantOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "QUK822N"
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
           }
         }
       },

@@ -1,8 +1,0 @@
-{
-  "_guid_" : "205.12_Case_Creation_Token_Creation",
-  "_extends_" : "204_Case_Creation_Token_Creation",
-
-  "user": {
-    "_extends_": "ACA_Users_Richard"
-  }
-}

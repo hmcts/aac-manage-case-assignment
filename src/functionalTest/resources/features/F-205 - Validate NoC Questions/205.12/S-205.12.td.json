@@ -6,9 +6,9 @@
 
   "specs" : [
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
-    "Tony - with a solicitor role for the same jurisdiction within the same organisation from Richard",
+    "Dil - with a solicitor role for the same jurisdiction within a different organisation from Richard",
 
-    "is made by Tony to validate the answers provided to the NoC questions in order to become the representative for Mario on C1",
+    "is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1",
     "contains all correct answers"
   ],
 
@@ -17,15 +17,14 @@
       "_extends_": "ACA_Users_Richard"
     },
     "invokingUser": {
-      "_extends_": "ACA_Users_Tony"
+      "_extends_": "ACA_Users_Dil"
     }
   },
 
   "request": {
     "_extends_": "Common_Request",
     "body": {
-      "_extends_": "NoC_Valid_Answers_For_Case_Role_R1",
-      "case_id": "${[scenarioContext][childContexts][205.12_Case_Creation][testData][actualResponse][body][id]}"
+      "_extends_": "NoC_Valid_Answers_For_Case_Role_R1"
     }
   },
 

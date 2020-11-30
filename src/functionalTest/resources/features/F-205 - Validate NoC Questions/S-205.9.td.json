@@ -1,16 +1,22 @@
 {
   "_guid_": "S-205.9",
   "_extends_": "S-205_Test_Data_Base",
+
+  "title": "NoC Answers must return an error when no NOC Request event is available on the case",
+
   "specs" : [
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
     "Dil - with a solicitor role for the same jurisdiction within a different organisation from Richard",
+
     "is made by Dil to validate the answers in order to become Mario's representative on C1",
     "contains all correct answers",
     "identifies that no NOC request event is available on the case"
   ],
 
-
   "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
     "invokingUser": {
       "_extends_": "ACA_Users_Dil"
     }
@@ -19,21 +25,17 @@
   "request": {
     "_extends_": "Common_Request",
     "body": {
-      "_extends_": "Applicant_correct_answers_snippet",
+      "_extends_": "NoC_Valid_Answers_For_Case_Role_R1",
       "case_id": "${[scenarioContext][childContexts][204_NoC_WithoutEvents_Case_Creation_With_Org_Policies][testData][actualResponse][body][id]}"
-
     }
   },
+
   "expectedResponse": {
-    "responseCode": 400,
-    "responseMessage": "Bad Request",
+    "_extends_": "ACA_400_Response",
     "body" : {
-      "status" : "BAD_REQUEST",
       "message" : "No NoC events available for this case type",
       "errors" : [ ]
     }
-
   }
-
 
 }

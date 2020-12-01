@@ -1,0 +1,64 @@
+{
+  "_guid_" : "Event_Creation",
+
+  "productName": "CCD Data Store",
+  "operationName": "Submit case event",
+
+  "method": "POST",
+  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/cases/{cid}/events",
+
+  "request": {
+    "headers" : {
+      "_extends_": "Common_Request_Headers",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
+      "experimental": true
+    },
+    "pathVariables": {
+      "cid": "OVERRIDE CID"
+    },
+    "body":{
+      "data": {
+
+      },
+      "event": {
+        "id": "OVERRIDE ETID",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "OVERRIDE EVENT TOKEN",
+      "ignore_warning": false
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json;charset=UTF-8",
+      "Vary" : "Accept-Encoding"
+    },
+    "body":  {
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "[[ANYTHING_PRESENT]]",
+      "case_type" : "[[ANYTHING_PRESENT]]",
+      "created_on" : "[[ANYTHING_PRESENT]]",
+      "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
+      "state" : "[[ANYTHING_PRESENT]]",
+      "security_classification" : "PUBLIC",
+      "data" : "[[ANYTHING_PRESENT]]",
+      "data_classification" : "[[ANYTHING_PRESENT]]",
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+
+  }
+}

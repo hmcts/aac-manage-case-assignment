@@ -1,0 +1,32 @@
+{
+  "_guid_" : "S-204.3",
+  "_extends_" : "S-204_Test_Data_Base",
+
+  "title": "NoC questions successfully returned for a Case Access Administrator and a Solicitor (but the solicitor role is not for the jurisdiction of the case)",
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Alice"
+    }
+  },
+
+  "specs" : [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Alice - with a caseworker-pui role and a solicitor role for a jurisdiction that does not match Case C1 below",
+
+    "is made by Alice to return the questions that need answering in order to become Mario's representative on C1",
+    "contains a valid case ID for C1",
+    "contains a valid IDAM token for Alice"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "_extends_": "NoC_Challenge_Questions_Response"
+    }
+  }
+
+}

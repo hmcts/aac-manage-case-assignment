@@ -1,0 +1,20 @@
+{
+  "_guid_": "204_Case_Creation",
+  "_extends_": "NoC_Case_Creation__Base",
+
+  "specs": [
+    "by Richard to create a case - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation",
+    "created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation"
+  ],
+
+  "user": {
+    "_extends_": "ACA_Users_Richard"
+  },
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][siblingContexts][204_Case_Creation_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+
+}

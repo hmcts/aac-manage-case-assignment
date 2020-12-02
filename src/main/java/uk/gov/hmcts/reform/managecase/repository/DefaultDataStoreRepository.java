@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.managecase.repository;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
@@ -130,9 +130,9 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public CaseDetails submitEventForCaseOnly(String caseId, CaseDataContent caseDataContent) {
+    public CaseDetails submitEventForCase(String caseId, CaseEventCreationPayload caseEventCreationPayload) {
         String userAuthToken = getUserAuthToken();
-        return dataStoreApi.submitEventForCase(userAuthToken, caseId, caseDataContent);
+        return dataStoreApi.submitEventForCase(userAuthToken, caseId, caseEventCreationPayload);
     }
 
     @Override
@@ -166,13 +166,13 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
                 setChangeOrganisationRequestApprovalStatus(changeOrganisationRequest, caseFieldId, caseData);
 
-                CaseDataContent caseDataContent = CaseDataContent.builder()
+                CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder()
                     .token(caseUpdateViewEvent.getEventToken())
                     .event(event)
                     .data(getCaseDataContentData(caseFieldId, changeOrganisationRequest, caseData))
                     .build();
 
-                caseDetails = dataStoreApi.submitEventForCase(userAuthToken, caseId, caseDataContent);
+                caseDetails = dataStoreApi.submitEventForCase(userAuthToken, caseId, caseEventCreationPayload);
             } else {
                 throw new IllegalStateException(CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID);
             }

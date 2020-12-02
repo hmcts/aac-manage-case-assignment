@@ -32,8 +32,7 @@
       "data" : {
         "applicantOrganisationPolicy" : {
           "Organisation" : {
-            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}",
-            "OrganisationName" : "BEFTA Organisation"
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
           },
           "OrgPolicyReference" : "ApplicantPolicy",
           "OrgPolicyCaseAssignedRole" : "[ApplicantSolicitor]"
@@ -42,16 +41,13 @@
           "OrgPolicyReference" : "RespondentPolicy",
           "OrgPolicyCaseAssignedRole" : "[RespondentSolicitor]",
           "Organisation" : {
-            "OrganisationName" : "BEFTA Organisation"
           }
         },
 
         "changeOrganisationRequestField" : {
           "OrganisationToAdd": {
-            "OrganisationName": null
           },
           "OrganisationToRemove": {
-            "OrganisationName": null
           }
         }
       },
@@ -61,8 +57,7 @@
           "value" : {
             "Organisation" : {
               "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+                "OrganisationID" : "PUBLIC"
               },
               "classification" : "PUBLIC"
             },
@@ -75,8 +70,7 @@
           "value" : {
             "Organisation" : {
               "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+                "OrganisationID" : "PUBLIC"
               },
               "classification" : "PUBLIC"
             },
@@ -90,12 +84,10 @@
           "value" : {
             "OrganisationToAdd" : {
               "value" : {
-                "OrganisationName" : "PUBLIC"
               }
             },
             "OrganisationToRemove" : {
               "value" : {
-                "OrganisationName" : "PUBLIC"
               }
             }
           }

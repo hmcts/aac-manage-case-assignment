@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
@@ -34,7 +34,7 @@ public interface DataStoreRepository {
 
     StartEventResource getExternalStartEventTrigger(String caseId, String eventId);
 
-    CaseDetails submitEventForCaseOnly(String caseId, CaseDataContent caseDataContent);
+    CaseDetails submitEventForCase(String caseId, CaseEventCreationPayload caseEventCreationPayload);
 
     CaseDetails findCaseByCaseIdExternalApi(String caseId);
 }

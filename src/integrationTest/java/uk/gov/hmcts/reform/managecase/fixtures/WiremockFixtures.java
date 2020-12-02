@@ -15,8 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
@@ -206,7 +206,7 @@ public class WiremockFixtures {
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
-                                    .withStatus(HTTP_CREATED)
+                                    .withStatus(HTTP_OK)
                                     .withBody(getJsonString(caseDetails))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
@@ -247,13 +247,13 @@ public class WiremockFixtures {
     }
 
     public static void stubSubmitEventForCase(String caseId,
-                                              CaseDataContent caseDataContent,
+                                              CaseEventCreationPayload caseEventCreationPayload,
                                               CaseDetails caseDetails) throws JsonProcessingException {
         stubFor(WireMock.post(urlPathEqualTo("/cases/" + caseId + "/events"))
                     .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .withRequestBody(equalToJson(
-                        OBJECT_MAPPER.writeValueAsString(caseDataContent)
+                        OBJECT_MAPPER.writeValueAsString(caseEventCreationPayload)
                     ))
                     .willReturn(aResponse()
                                     .withStatus(HTTP_CREATED)

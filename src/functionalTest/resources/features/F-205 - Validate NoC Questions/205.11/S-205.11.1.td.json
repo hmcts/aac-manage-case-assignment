@@ -1,6 +1,7 @@
 {
   "_guid_": "S-205.11.1",
-  "_extends_": "S-205.11",
+  "_extends_": "S-205.11_Test_Data_Base",
+
   "specs": [
     "has no answers"
   ],
@@ -14,14 +15,11 @@
   },
 
   "expectedResponse": {
-    "responseCode" : 400,
-    "responseMessage" : "Bad Request",
+		"_extends_": "ACA_400_Response",
     "body" : {
-      "status" : "BAD_REQUEST",
       "errors" : [ "Challenge question answers can not be empty" ]
     }
 
   }
-
 
 }

@@ -1,16 +1,15 @@
 {
-	"_guid_": "204_NoC_WithoutEvents_Case_Creation_With_Org_Policies_Token_Creation",
+  "_guid_" : "204_Case_Creation_Token_Creation",
   "_extends_" : "Case_Creation_Token_Creation",
 
   "user": {
-    "username": "befta.master.solicitor.becky@gmail.com",
-    "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
+    "_extends_": "ACA_Users_Richard"
   },
 
   "request": {
     "pathVariables": {
       "jid": "BEFTA_MASTER",
-      "ctid": "FT_NoCWithoutEventsCaseType",
+      "ctid": "FT_NoCCaseType",
       "etid": "createCase"
     }
   },
@@ -20,7 +19,7 @@
       "token": "[[ANY_STRING_NOT_NULLABLE]]",
       "case_details": {
         "jurisdiction": "BEFTA_MASTER",
-        "case_type_id": "FT_NoCWithoutEventsCaseType",
+        "case_type_id": "FT_NoCCaseType",
         "supplementary_data": null
       },
       "event_id": "createCase"

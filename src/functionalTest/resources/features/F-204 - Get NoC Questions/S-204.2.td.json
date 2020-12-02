@@ -2,27 +2,31 @@
   "_guid_" : "S-204.2",
   "_extends_" : "S-204_Test_Data_Base",
 
-  "user": {
-    "username" : "befta.pui.caa.1@gmail.com",
-    "password" : "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+  "title": "NoC questions successfully returned for a Case Access Adminisrator",
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Matt"
+    }
   },
 
   "specs" : [
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
-    "created by Richard to create a case - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation",
     "Matt - with a caseworker-pui role and no Solicitor role",
-    "is made by Dil to return the questions that need answering in order to become Mario's representative on C1",
-    "contains a valid case ID for C1",
-    "contains a valid IDAM token for Dil",
-    "to get the update org policy event trigger",
-    "to update the applicant org policy"
 
+    "is made by Matt to return the questions that need answering in order to become Mario's representative on C1",
+    "contains a valid case ID for C1",
+    "contains a valid IDAM token for Matt"
   ],
 
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body": {
-      "_extends_": "Challenge_Questions_Response"
+      "_extends_": "NoC_Challenge_Questions_Response"
     }
   }
+
 }

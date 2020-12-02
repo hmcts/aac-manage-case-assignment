@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.CallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
@@ -397,7 +397,8 @@ public class NoticeOfChangeControllerIT {
                 .caseDetails(caseDetails)
                 .build();
 
-            CaseDataContent caseDataContent = CaseDataContent.builder()
+            HashMap<String, JsonNode> data = new HashMap<>();
+            CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder()
                 .token(startEventResource.getToken())
                 .event(event)
                 .data(caseDetails.getData())
@@ -407,14 +408,14 @@ public class NoticeOfChangeControllerIT {
 
             stubGetCaseInternalAsApprover(CASE_ID, caseViewResource);
             stubGetExternalStartEventTriggerAsApprover(CASE_ID, NOC, startEventResource);
-            stubSubmitEventForCase(CASE_ID, caseDataContent, caseDetails);
+            stubSubmitEventForCase(CASE_ID, caseEventCreationPayload, caseDetails);
         }
 
         @Test
         void shouldSuccessfullyCheckNoCApprovalWithAutoApproval() throws Exception {
             this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)))
@@ -428,15 +429,15 @@ public class NoticeOfChangeControllerIT {
                 .organisationToRemove(Organisation.builder().organisationID("789").build())
                 .caseRoleId("CaseRoleId")
                 .requestTimestamp(LocalDateTime.now())
-                .approvalStatus("REJECTED")
+                .approvalStatus(PENDING.name())
                 .build();
 
             caseDetails =  caseDetails(changeOrganisationRequest);
             checkNoticeOfChangeApprovalRequest = new CallbackRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE)))
                 .andExpect(jsonPath("$.confirmation_body", is(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE)));
@@ -449,8 +450,8 @@ public class NoticeOfChangeControllerIT {
             checkNoticeOfChangeApprovalRequest = new CallbackRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
@@ -463,8 +464,8 @@ public class NoticeOfChangeControllerIT {
             checkNoticeOfChangeApprovalRequest = new CallbackRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));

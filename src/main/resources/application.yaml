@@ -48,7 +48,7 @@ idam:
     redirect_uri: https://manage-case-assignment/oauth2redirect
   caa:
     username: ${IDAM_CAA_USERNAME:master.caa@gmail.com}
-    password: ${IDAM_CAA_ASSWORD:Pa55word11}
+    password: ${IDAM_CAA_PASSWORD:Pa55word11}
   noc-approver:
     username: ${IDAM_NOC_APPROVER_USERNAME:noc.approver@gmail.com}
     password: ${IDAM_NOC_APPROVER_PASSWORD:Pa55word11}

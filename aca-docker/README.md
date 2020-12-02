@@ -71,10 +71,10 @@ see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
 ### Run `ccd-docker` containers  
 - Install and run CCD stack as advised [here](https://github.com/hmcts/ccd-docker).
   
-    Please enable elasticsearch along with other ccd components.
+    Please enable elasticsearch+logstash along with other ccd components.
       
     ```bash
-    ./ccd enable backend sidam sidam-local sidam-local-ccd elasticsearch
+    ./ccd enable backend sidam sidam-local sidam-local-ccd elasticsearch logstash
     ```
   
     before starting the containers, ensure the `ES_DOCKER_ENABLED` environment variable 

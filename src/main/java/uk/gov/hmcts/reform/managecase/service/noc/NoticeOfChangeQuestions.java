@@ -83,7 +83,7 @@ public class NoticeOfChangeQuestions {
                                                                                    .getCaseType().getId(), caseId);
         checkCaseFields(caseSearchResultViewResource);
         UserInfo userInfo = getUserInfo();
-        validateUserRoles(caseViewResource, userInfo);
+        validateUserRoles(userInfo);
         String caseType = caseViewResource.getCaseType().getId();
         ChallengeQuestionsResult challengeQuestionsResult =
             definitionStoreRepository.challengeQuestions(caseType, CHALLENGE_QUESTION_ID);
@@ -122,16 +122,16 @@ public class NoticeOfChangeQuestions {
             .anyMatch(organisationPolicy -> organisationPolicy.getOrgPolicyCaseAssignedRole().equals(role));
     }
 
-    private void validateUserRoles(CaseViewResource caseViewResource, UserInfo userInfo) {
+    private void validateUserRoles(UserInfo userInfo) {
         List<String> roles = userInfo.getRoles();
         if (!roles.contains(PUI_ROLE)
-            && !isActingAsSolicitor(roles, caseViewResource.getCaseType().getJurisdiction().getId())) {
+            && !isActingAsSolicitor(roles)) {
             throw new ValidationException(INSUFFICIENT_PRIVILEGE);
         }
     }
 
-    private boolean isActingAsSolicitor(List<String> roles, String jurisdiction) {
-        return securityUtils.hasSolicitorRole(roles, jurisdiction);
+    private boolean isActingAsSolicitor(List<String> roles) {
+        return securityUtils.hasSolicitorRole(roles);
     }
 
     private UserInfo getUserInfo() {

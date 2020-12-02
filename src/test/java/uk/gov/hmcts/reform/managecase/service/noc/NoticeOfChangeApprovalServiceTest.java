@@ -9,7 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -83,7 +83,7 @@ public class NoticeOfChangeApprovalServiceTest {
         void checkNoticeOfChangeApproval() {
             service.findAndTriggerNocDecisionEvent(CASE_ID);
 
-            ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
+            ArgumentCaptor<CaseEventCreationPayload> captor = ArgumentCaptor.forClass(CaseEventCreationPayload.class);
             verify(repository).submitEventForCaseOnly(eq(CASE_ID), captor.capture());
 
             assertThat(captor.getValue().getEvent().getEventId()).isEqualTo(EVENT_ID);

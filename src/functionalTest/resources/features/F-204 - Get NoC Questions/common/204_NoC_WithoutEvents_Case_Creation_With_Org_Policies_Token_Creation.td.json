@@ -1,0 +1,8 @@
+{
+	"_guid_": "204_NoC_WithoutEvents_Case_Creation_With_Org_Policies_Token_Creation",
+  "_extends_" : "NoC_WithoutEvents_Case_Creation_Token_Creation__Base",
+
+  "user": {
+    "_extends_": "ACA_Users_Richard"
+  }
+}

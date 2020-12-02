@@ -1,6 +1,6 @@
 {
   "_guid_": "S-205.11.5",
-  "_extends_": "S-205.11",
+  "_extends_": "S-205.11_Test_Data_Base",
   "specs": [
     "has a non-null answer where a null answer is expected"
   ],
@@ -8,7 +8,7 @@
   "request": {
     "_extends_": "Common_Request",
     "body": {
-      "case_id": "${[scenarioContext][childContexts][205.11.5_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+      "case_id": "${[scenarioContext][childContexts][205.11.5_Case_Creation][testData][actualResponse][body][id]}",
       "answers": [
         {
           "question_id": "NoC_Challenge_Name",
@@ -23,14 +23,11 @@
   },
 
   "expectedResponse": {
-    "responseCode" : 400,
-    "responseMessage" : "Bad Request",
+    "_extends_": "ACA_400_Response",
     "body" : {
-      "status" : "BAD_REQUEST",
       "message" : "The answers did not match those for any litigant",
       "errors" : [ ]
     }
   }
-
 
 }

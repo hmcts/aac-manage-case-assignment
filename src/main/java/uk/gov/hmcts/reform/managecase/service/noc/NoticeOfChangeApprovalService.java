@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
@@ -52,7 +52,7 @@ public class NoticeOfChangeApprovalService {
                 throw new ValidationException(EVENT_TOKEN_NOT_PRESENT);
             }
 
-            CaseDataContent caseDataContent = CaseDataContent.builder()
+            CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder()
                 .token(startEvent.getToken())
                 .event(Event.builder()
                     .eventId(eventId)
@@ -62,7 +62,7 @@ public class NoticeOfChangeApprovalService {
                 .data(startEvent.getCaseDetails().getData())
                 .build();
 
-            dataStoreRepository.submitEventForCaseOnly(caseId, caseDataContent);
+            dataStoreRepository.submitEventForCaseOnly(caseId, caseEventCreationPayload);
         }
     }
 

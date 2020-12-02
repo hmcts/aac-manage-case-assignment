@@ -397,7 +397,6 @@ public class NoticeOfChangeControllerIT {
                 .caseDetails(caseDetails)
                 .build();
 
-            HashMap<String, JsonNode> data = new HashMap<>();
             CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder()
                 .token(startEventResource.getToken())
                 .event(event)

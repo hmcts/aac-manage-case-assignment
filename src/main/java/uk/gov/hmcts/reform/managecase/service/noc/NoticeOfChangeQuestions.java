@@ -154,17 +154,7 @@ public class NoticeOfChangeQuestions {
     }
 
     private CaseViewResource getCase(String caseId) {
-        CaseViewResource caseViewResource = new CaseViewResource();
-        try {
-            caseViewResource = dataStoreRepository.findCaseByCaseId(caseId);
-        } catch (FeignException e) {
-            if (HttpStatus.NOT_FOUND.value() == e.status()) {
-                throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
-            } else if (HttpStatus.BAD_REQUEST.value() == e.status()) {
-                throw new CaseIdLuhnException(CASE_ID_INVALID);
-            }
-        }
-        return caseViewResource;
+        return dataStoreRepository.findCaseByCaseId(caseId);
     }
 
     private CaseSearchResultViewResource findCaseBy(String caseTypeId, String caseId) {

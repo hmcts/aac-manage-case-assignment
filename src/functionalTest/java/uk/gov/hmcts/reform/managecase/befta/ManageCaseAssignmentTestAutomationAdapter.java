@@ -11,14 +11,12 @@ public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutoma
 
     @Override
     public BeftaTestDataLoader getDataLoader() {
-        return new ManageCaseAssignmentTestDataLoader();
-    }
-
-    private class ManageCaseAssignmentTestDataLoader extends DefaultBeftaTestDataLoader {
-        @Override
-        protected void doLoadTestData() {
-            loader.addCcdRoles();
-            loader.importDefinitions();
-        }
+        return new DefaultBeftaTestDataLoader() {
+            @Override
+            protected void doLoadTestData() {
+                loader.addCcdRoles();
+                loader.importDefinitions();
+            }
+        };
     }
 }

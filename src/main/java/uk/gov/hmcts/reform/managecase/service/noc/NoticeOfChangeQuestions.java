@@ -40,16 +40,9 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
 
 @Service
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis",
-    "PMD.GodClass",
-    "PMD.ExcessiveImports",
-    "PMD.TooManyMethods",
-    "PMD.AvoidDeeplyNestedIfStmts", "PMD.PreserveStackTrace", "PMD.LawOfDemeter",
-    "PMD.AvoidLiteralsInIfCondition", "PMD.CyclomaticComplexity"})
 public class NoticeOfChangeQuestions {
 
     public static final String PUI_ROLE = "pui-caa";
-
 
     private static final String CHALLENGE_QUESTION_ID = "NoCChallenge";
     private static final String CASE_ROLE_ID = "CaseRoleId";

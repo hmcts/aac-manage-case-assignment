@@ -1,10 +1,10 @@
 {
-  "_guid_" : "205.14_Prerequisite_Case_Creation_Call_for_Case_Assignment",
-  "_extends_" : "Prerequisite_Case_Creation_Call_for_Case_Assignment",
+  "_guid_" : "205.14_Case_Creation",
+  "_extends_" : "204_Case_Creation",
 
   "request": {
     "body": {
-      "event_token": "${[scenarioContext][siblingContexts][205.14_Prerequisite_Case_Creation_Call_for_Case_Assignment_Token_Creation][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][siblingContexts][205.14_Case_Creation_Token_Creation][testData][actualResponse][body][token]}",
       "data": {
         "applicant": {
           "individual": {
@@ -50,4 +50,5 @@
       }
     }
   }
+
 }

@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.CheckNoticeOfChangeApprovalReq
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDataContent;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
@@ -396,7 +396,7 @@ public class NoticeOfChangeControllerIT {
                 .build();
 
             HashMap<String, JsonNode> data = new HashMap<>();
-            CaseDataContent caseDataContent = CaseDataContent.builder()
+            CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder()
                 .token(startEventResource.getToken())
                 .event(event)
                 .data(caseDetails.getData())
@@ -406,7 +406,7 @@ public class NoticeOfChangeControllerIT {
 
             stubGetCaseInternalAsApprover(CASE_ID, caseViewResource);
             stubGetExternalStartEventTriggerAsApprover(CASE_ID, NOC, startEventResource);
-            stubSubmitEventForCase(CASE_ID, caseDataContent, caseDetails);
+            stubSubmitEventForCase(CASE_ID, caseEventCreationPayload, caseDetails);
         }
 
         @Test
@@ -427,7 +427,7 @@ public class NoticeOfChangeControllerIT {
                 .organisationToRemove(new Organisation("789", "Org2"))
                 .caseRoleId("CaseRoleId")
                 .requestTimestamp(LocalDateTime.now())
-                .approvalStatus("REJECTED")
+                .approvalStatus(PENDING.name())
                 .build();
 
             caseDetails =  caseDetails(changeOrganisationRequest);

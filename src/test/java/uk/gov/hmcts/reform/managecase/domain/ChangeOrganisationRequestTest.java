@@ -1,10 +1,8 @@
-package uk.gov.hmcts.reform.managecase.client.datastore;
+package uk.gov.hmcts.reform.managecase.domain;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest.ChangeOrganisationRequestBuilder;
-import uk.gov.hmcts.reform.managecase.domain.Organisation;
 
 import javax.validation.ValidationException;
 

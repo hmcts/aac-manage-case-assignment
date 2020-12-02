@@ -1,0 +1,14 @@
+{
+  "_guid_" : "205.11.5_Update_Org_Policies",
+  "_extends_" : "204_Update_Org_Policies",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][205.11.5_Case_Creation][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "event_token": "${[scenarioContext][siblingContexts][205.11.5_Update_Org_Policies_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+
+}

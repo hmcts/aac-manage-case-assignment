@@ -1,6 +1,9 @@
 {
   "_guid_": "S-205.15.2",
-  "_extends_": "S-205.15",
+  "_extends_": "S-205.15_Test_Data_Base",
+
+  "title": "NoC Answers must return an positive response for various correct answers",
+
   "specs": [
     "has one null and one non-null answer as expected"
   ],
@@ -8,7 +11,7 @@
   "request": {
     "_extends_": "Common_Request",
     "body": {
-      "case_id": "${[scenarioContext][childContexts][205.11.5_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+      "case_id": "${[scenarioContext][childContexts][205.11.5_Case_Creation][testData][actualResponse][body][id]}",
 
       "answers": [
         {
@@ -22,6 +25,5 @@
       ]
     }
   }
-
 
 }

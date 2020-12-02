@@ -1,15 +1,21 @@
 {
   "_guid_": "S-205.13",
   "_extends_": "S-205_Test_Data_Base",
+
+  "title": "NoC Answers must return an error when answers do not match a case role in the case to be represented",
+
   "specs" : [
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
     "Dil - with a solicitor role for the same jurisdiction within a different organisation from Richard",
+
     "is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1",
     "contains answers that do not match a case role in the case to be represented"
-
   ],
 
   "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
     "invokingUser": {
       "_extends_": "ACA_Users_Dil"
     }
@@ -30,16 +36,13 @@
       ]
     }
   },
+
   "expectedResponse": {
-    "responseCode": 400,
-    "responseMessage": "Bad Request",
+    "_extends_": "ACA_400_Response",
     "body" : {
-      "status": "BAD_REQUEST",
       "message": "No Organisation Policy for one or more of the roles available for the notice of change request",
       "errors": []
     }
-
   }
-
 
 }

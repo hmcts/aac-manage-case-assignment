@@ -130,7 +130,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public CaseDetails submitEventForCaseOnly(String caseId, CaseEventCreationPayload caseEventCreationPayload) {
+    public CaseDetails submitEventForCase(String caseId, CaseEventCreationPayload caseEventCreationPayload) {
         String userAuthToken = getUserAuthToken();
         return dataStoreApi.submitEventForCase(userAuthToken, caseId, caseEventCreationPayload);
     }

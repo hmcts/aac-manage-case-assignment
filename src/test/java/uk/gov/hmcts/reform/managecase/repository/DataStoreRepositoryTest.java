@@ -301,7 +301,7 @@ class DataStoreRepositoryTest {
             .willReturn(caseDetails);
 
         CaseDetails returnedCaseDetails
-            = repository.submitEventForCaseOnly(CASE_ID, caseEventCreationPayload);
+            = repository.submitEventForCase(CASE_ID, caseEventCreationPayload);
 
         assertThat(returnedCaseDetails).isEqualTo(caseDetails);
     }
@@ -315,7 +315,7 @@ class DataStoreRepositoryTest {
             .willReturn(null);
 
         CaseDetails caseDetails
-            = repository.submitEventForCaseOnly(CASE_ID, caseEventCreationPayload);
+            = repository.submitEventForCase(CASE_ID, caseEventCreationPayload);
 
         assertThat(caseDetails).isNull();
     }

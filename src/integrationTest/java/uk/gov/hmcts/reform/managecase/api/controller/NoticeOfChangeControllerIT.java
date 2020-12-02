@@ -427,7 +427,7 @@ public class NoticeOfChangeControllerIT {
                 .organisationToRemove(new Organisation("789", "Org2"))
                 .caseRoleId("CaseRoleId")
                 .requestTimestamp(LocalDateTime.now())
-                .approvalStatus("REJECTED")
+                .approvalStatus(PENDING.name())
                 .build();
 
             caseDetails =  caseDetails(changeOrganisationRequest);

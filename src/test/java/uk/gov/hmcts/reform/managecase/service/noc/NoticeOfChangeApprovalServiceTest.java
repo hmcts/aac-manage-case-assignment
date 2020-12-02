@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.repository.NocApprovalDataStoreRepository;
-import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 
 import javax.validation.ValidationException;
 import java.util.HashMap;
@@ -84,7 +83,7 @@ public class NoticeOfChangeApprovalServiceTest {
             service.findAndTriggerNocDecisionEvent(CASE_ID);
 
             ArgumentCaptor<CaseEventCreationPayload> captor = ArgumentCaptor.forClass(CaseEventCreationPayload.class);
-            verify(repository).submitEventForCaseOnly(eq(CASE_ID), captor.capture());
+            verify(repository).submitEventForCase(eq(CASE_ID), captor.capture());
 
             assertThat(captor.getValue().getEvent().getEventId()).isEqualTo(EVENT_ID);
             assertThat(captor.getValue().getToken()).isEqualTo(EVENT_TOKEN);

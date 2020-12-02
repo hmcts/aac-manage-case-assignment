@@ -34,7 +34,7 @@ public interface DataStoreRepository {
 
     StartEventResource getExternalStartEventTrigger(String caseId, String eventId);
 
-    CaseDetails submitEventForCaseOnly(String caseId, CaseEventCreationPayload caseEventCreationPayload);
+    CaseDetails submitEventForCase(String caseId, CaseEventCreationPayload caseEventCreationPayload);
 
     CaseDetails findCaseByCaseIdExternalApi(String caseId);
 }

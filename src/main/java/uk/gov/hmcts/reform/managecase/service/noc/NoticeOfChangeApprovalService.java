@@ -62,7 +62,7 @@ public class NoticeOfChangeApprovalService {
                 .data(startEvent.getCaseDetails().getData())
                 .build();
 
-            dataStoreRepository.submitEventForCaseOnly(caseId, caseEventCreationPayload);
+            dataStoreRepository.submitEventForCase(caseId, caseEventCreationPayload);
         }
     }
 

@@ -130,8 +130,8 @@ public class CaseAssignmentControllerIT {
             verify(postRequestedFor(urlEqualTo(CASE_USERS)));
         }
 
-        @DisplayName("Invoker successfully sharing case access with another solicitor in their org" +
-            " and jurisdiction role is mixed case")
+        @DisplayName("Invoker successfully sharing case access with another solicitor in their org"
+            + " and jurisdiction role is mixed case")
         @Test
         void shouldAssignCaseAccess_whenInvokerSuccessfullyShareACaseWithMixedCaseJurisdictionRole()
             throws Exception {
@@ -148,8 +148,8 @@ public class CaseAssignmentControllerIT {
             verify(postRequestedFor(urlEqualTo(CASE_USERS)));
         }
 
-        @DisplayName("Invoker successfully sharing case access with another solicitor in their org" +
-            " and jurisdiction role is upper case")
+        @DisplayName("Invoker successfully sharing case access with another solicitor in their org"
+            + " and jurisdiction role is upper case")
         @Test
         void shouldAssignCaseAccess_whenInvokerSuccessfullyShareACaseWithUpperCaseJurisdictionRole()
             throws Exception {

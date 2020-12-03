@@ -4,11 +4,24 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -17,25 +30,27 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
+import uk.gov.hmcts.reform.managecase.client.prd.ContactInformation;
+import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationAddress;
+import uk.gov.hmcts.reform.managecase.domain.PreviousOrganisation;
 import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequest;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.service.NotifyService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import javax.validation.ValidationException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -72,6 +87,7 @@ class ApplyNoCDecisionServiceTest {
     private static final String USER_ID_1 = "UserId1";
     private static final String USER_ID_2 = "UserId2";
     private static final String USER_ID_3 = "UserId3";
+    private static final String PREVIOUS_ORGANISATIONS = "PreviousOrganisations";
     private final ObjectMapper mapper = new ObjectMapper();
 
     @InjectMocks
@@ -91,9 +107,12 @@ class ApplyNoCDecisionServiceTest {
 
     @BeforeEach
     void setUp() {
+        mapper.registerModule(new JavaTimeModule());
         MockitoAnnotations.initMocks(this);
         applyNoCDecisionService = new ApplyNoCDecisionService(prdRepository, dataStoreRepository,
             notifyService, new JacksonUtils(mapper), mapper);
+        when(prdRepository.findOrganisationAddress(ArgumentMatchers.any()))
+            .thenReturn(new FindOrganisationResponse(emptyList(), ORG_2_ID, ORG_2_NAME));
     }
 
     @Test
@@ -522,8 +541,174 @@ class ApplyNoCDecisionServiceTest {
         );
     }
 
+    @Test
+    void shouldUpdatePreviousOrganisations() throws JsonProcessingException {
+        LocalDateTime dateTime = LocalDateTime.now();
+        CaseDetails caseDetails = CaseDetails.builder()
+            .data(createData())
+            .createdDate(dateTime)
+            .reference(CASE_ID)
+            .build();
+
+        when(dataStoreRepository.getCaseAssignments(singletonList(CASE_ID), null)).thenReturn(emptyList());
+        when(prdRepository.findUsersByOrganisation(ORG_2_ID))
+            .thenReturn(new FindUsersByOrganisationResponse(emptyList(), ORG_2_ID));
+
+        when(prdRepository.findOrganisationAddress(ORG_2_ID))
+            .thenReturn(new FindOrganisationResponse(Lists.newArrayList(orgContactInformation()), ORG_2_ID, ORG_2_NAME));
+
+        ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
+
+        Map<String, JsonNode> result = applyNoCDecisionService.applyNoCDecision(request);
+        ArrayNode arrayNode = (ArrayNode) result.get(ORG_POLICY_2_FIELD).findValue(PREVIOUS_ORGANISATIONS);
+
+        assertAll(
+            () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
+            () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
+                             is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
+                                                  ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
+            () -> assertNotNull(arrayNode),
+            () -> assertNotNull(arrayNode.get(0).findValue("FromTimestamp")),
+            () -> assertNotNull(arrayNode.get(0).findValue("ToTimestamp")),
+            () -> assertThat(arrayNode.get(0).findValue("OrganisationName").textValue(), is(ORG_2_NAME)),
+            () -> assertNotNull(arrayNode.get(0).findValue("OrganisationAddress"))
+        );
+    }
+
+    @Test
+    void shouldUpdatePreviousOrganisationsWhenOnePreviousOrgExists() throws JsonProcessingException {
+        LocalDate fromDate = LocalDate.of(2020, Month.DECEMBER, 1);
+        LocalDate toDate = LocalDate.of(2020, Month.DECEMBER, 3);
+        CaseDetails caseDetails = CaseDetails.builder()
+            .data(createPreviousOrgData(Lists.newArrayList(createPreviousOrganisation(fromDate, toDate))))
+            .createdDate(LocalDateTime.now())
+            .reference(CASE_ID)
+            .build();
+
+        when(dataStoreRepository.getCaseAssignments(singletonList(CASE_ID), null)).thenReturn(emptyList());
+        when(prdRepository.findUsersByOrganisation(ORG_2_ID))
+            .thenReturn(new FindUsersByOrganisationResponse(emptyList(), ORG_2_ID));
+
+        when(prdRepository.findOrganisationAddress(ORG_2_ID))
+            .thenReturn(new FindOrganisationResponse(Lists.newArrayList(orgContactInformation()), ORG_2_ID, ORG_2_NAME));
+
+        ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
+
+        Map<String, JsonNode> result = applyNoCDecisionService.applyNoCDecision(request);
+        ArrayNode arrayNode = (ArrayNode) result.get(ORG_POLICY_2_FIELD).findValue(PREVIOUS_ORGANISATIONS);
+
+        assertAll(
+            () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
+            () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
+                             is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
+                                                  ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
+            () -> assertNotNull(arrayNode),
+            () -> assertThat(arrayNode.size(), is(2)),
+            () -> assertNotNull(arrayNode.get(0).findValue("FromTimestamp")),
+            () -> assertNotNull(arrayNode.get(0).findValue("ToTimestamp")),
+            () -> assertNotNull(arrayNode.get(0).findValue("OrganisationAddress")),
+            () -> assertThat(arrayNode.get(0).findValue("OrganisationName").textValue(), is(ORG_2_NAME))
+            );
+    }
+
+    @Test
+    void shouldUpdatePreviousOrganisationsWhenMoreThanOnePreviousOrgExists() throws JsonProcessingException, IOException {
+        LocalDate fromDate = LocalDate.of(2020, Month.DECEMBER, 1);
+        LocalDate toDate = LocalDate.of(2020, Month.DECEMBER, 2);
+
+        LocalDate fromDate2 = LocalDate.of(2020, Month.DECEMBER, 2);
+        LocalDate toDate2 = LocalDate.of(2020, Month.DECEMBER, 3);
+        CaseDetails caseDetails = CaseDetails.builder()
+            .data(createPreviousOrgData(Lists.newArrayList(createPreviousOrganisation(fromDate, toDate),
+                                                           createPreviousOrganisation(fromDate2, toDate2))))
+            .createdDate(LocalDateTime.now())
+            .reference(CASE_ID)
+            .build();
+
+        when(dataStoreRepository.getCaseAssignments(singletonList(CASE_ID), null)).thenReturn(emptyList());
+        when(prdRepository.findUsersByOrganisation(ORG_2_ID))
+            .thenReturn(new FindUsersByOrganisationResponse(emptyList(), ORG_2_ID));
+
+        when(prdRepository.findOrganisationAddress(ORG_2_ID))
+            .thenReturn(new FindOrganisationResponse(Lists.newArrayList(orgContactInformation()), ORG_2_ID, ORG_2_NAME));
+
+        ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
+
+        Map<String, JsonNode> result = applyNoCDecisionService.applyNoCDecision(request);
+
+        JsonNode prevOrgsNode = result.get(ORG_POLICY_2_FIELD).findValue(PREVIOUS_ORGANISATIONS);
+        List<PreviousOrganisation> previousOrganisations = mapper
+            .readerFor(new TypeReference<List<PreviousOrganisation>>() {}).readValue(prevOrgsNode);
+        LocalDate localDate = LocalDate.now();
+
+        assertAll(
+            () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
+            () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
+                             is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
+                                                  ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
+            () -> assertNotNull(previousOrganisations),
+            () -> assertThat(previousOrganisations.size(), is(3)),
+            () -> assertNotNull(previousOrganisations.get(0).getFromTimestamp()),
+            () -> assertNotNull(previousOrganisations.get(0).getToTimestamp()),
+            () -> assertNotNull(previousOrganisations.get(0).getOrganisationAddresses()),
+            () -> assertThat(previousOrganisations.get(0).getFromTimestamp().getDayOfMonth(), is(3)),
+            () -> assertThat(previousOrganisations.get(0).getToTimestamp().getDayOfMonth(), is(localDate.getDayOfMonth()))
+        );
+    }
+
+    private ContactInformation orgContactInformation() {
+        return ContactInformation.builder()
+            .addressLine1("Address 1")
+            .addressLine2("Line 2")
+            .addressLine3("Line 3")
+            .country("UK")
+            .county("London")
+            .postCode("E6 1AB")
+            .build();
+    }
+
+    private OrganisationAddress organisationAddress() {
+        return OrganisationAddress.builder()
+            .addressLine1("Address 1")
+            .addressLine2("Line 2")
+            .addressLine3("Line 3")
+            .country("UK")
+            .county("London")
+            .postCode("E6 1AB")
+            .build();
+    }
+
+    private PreviousOrganisation createPreviousOrganisation(LocalDate fromDate, LocalDate toDate) {
+        return PreviousOrganisation.builder()
+            .fromTimestamp(LocalDateTime.of(fromDate, LocalTime.now()))
+            .toTimestamp(LocalDateTime.of(toDate, LocalTime.now()))
+            .organisationName(ORG_2_NAME)
+            .organisationAddresses(Lists.newArrayList(organisationAddress()))
+            .build();
+    }
+
     private ProfessionalUser prdUser(int id) {
         return new ProfessionalUser("UserId" + id, "fn" + id, "ln5" + id, String.format("User%sEmail", id), "active");
+    }
+
+    private String orgPolicyAsStringWithPreviousOrg(String organisationId,
+                                                    String organisationName,
+                                                    String orgPolicyReference,
+                                                    String orgPolicyCaseAssignedRole,
+                                                    List<PreviousOrganisation> previousOrganisations) {
+        return String.format("{\"Organisation\":%s,\"OrgPolicyReference\":%s,\"OrgPolicyCaseAssignedRole\":%s, \"PreviousOrganisations\":%s}",
+                             organisationAsString(organisationId, organisationName),
+                             stringValueAsJson(orgPolicyReference),
+                             stringValueAsJson(orgPolicyCaseAssignedRole),
+                             listValueAsJson(previousOrganisations));
+    }
+
+    private String listValueAsJson(List<PreviousOrganisation> previousOrganisations) {
+        try {
+            return mapper.writeValueAsString(previousOrganisations);
+        } catch (JsonProcessingException e) {
+            return "";
+        }
     }
 
     private String orgPolicyAsString(String organisationId,
@@ -579,6 +764,16 @@ class ApplyNoCDecisionServiceTest {
             orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
             organisationAsString(null, null),
             organisationAsString(ORG_2_ID, ORG_2_NAME));
+    }
+
+    private Map<String, JsonNode> createPreviousOrgData(List<PreviousOrganisation> previousOrganisations) throws JsonProcessingException {
+        return createData(orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
+                          orgPolicyAsStringWithPreviousOrg(ORG_2_ID, ORG_2_NAME,
+                                                           ORG_POLICY_2_REF,
+                                                           ORG_POLICY_2_ROLE,
+                                                           previousOrganisations),
+                          organisationAsString(null, null),
+                          organisationAsString(ORG_2_ID, ORG_2_NAME));
     }
 
     private TypeReference<HashMap<String, JsonNode>> getHashMapTypeReference() {

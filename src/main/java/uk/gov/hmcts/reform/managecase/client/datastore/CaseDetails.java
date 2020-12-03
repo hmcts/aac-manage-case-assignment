@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.client.datastore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class CaseDetails {
     public static final String ORG_POLICY_REFERENCE = "OrgPolicyReference";
     public static final String ORG_ID = "OrganisationID";
     public static final String ORG_NAME = "OrganisationName";
+    public static final String PREVIOUS_ORGANISATIONS = "PreviousOrganisations";
 
     private String reference;
     private String jurisdiction;
@@ -35,6 +37,8 @@ public class CaseDetails {
     private String caseTypeId;
     @JsonProperty("case_data")
     private Map<String, JsonNode> data;
+    @JsonProperty("created_date")
+    private LocalDateTime createdDate;
 
     public List<JsonNode> findOrganisationPolicyNodes() {
         return getData().values().stream()

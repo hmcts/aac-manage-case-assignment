@@ -4,6 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,13 +40,6 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQues
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
@@ -89,6 +90,7 @@ public class NoticeOfChangeControllerIT {
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
+        mapper.registerModule(new JavaTimeModule());
         CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
         caseViewActionableEvent.setId("NOC");
         CaseViewResource caseViewResource = new CaseViewResource();
@@ -282,6 +284,7 @@ public class NoticeOfChangeControllerIT {
                 .reference(CASE_ID)
                 .caseTypeId(CASE_TYPE_ID)
                 .data(createData())
+                .createdDate(LocalDateTime.now())
                 .build());
 
             this.mockMvc.perform(post(ENDPOINT_URL)
@@ -310,6 +313,9 @@ public class NoticeOfChangeControllerIT {
                 .andExpect(jsonPath("$.data.OrganisationPolicyField1.OrgPolicyCaseAssignedRole", is(ORG_POLICY_1_ROLE)))
                 .andExpect(jsonPath("$.data.OrganisationPolicyField2.Organisation.OrganisationID").isEmpty())
                 .andExpect(jsonPath("$.data.OrganisationPolicyField2.Organisation.OrganisationName").isEmpty())
+                .andExpect(jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].OrganisationName", is(ORG_2_NAME)))
+                .andExpect(jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].FromTimestamp").isNotEmpty())
+                .andExpect(jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].ToTimestamp").isNotEmpty())
                 .andExpect(jsonPath("$.data.OrganisationPolicyField2.OrgPolicyReference", is(ORG_POLICY_2_REF)))
                 .andExpect(jsonPath("$.data.OrganisationPolicyField2.OrgPolicyCaseAssignedRole", is(ORG_POLICY_2_ROLE)))
                 .andExpect(jsonPath("$.data.TextField", is("TextFieldValue")))

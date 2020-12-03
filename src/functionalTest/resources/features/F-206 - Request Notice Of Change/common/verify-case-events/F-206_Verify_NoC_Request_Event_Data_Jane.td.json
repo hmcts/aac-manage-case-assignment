@@ -40,7 +40,7 @@
           "user_first_name" : "[[ANYTHING_PRESENT]]",
           "event_name" : "[[ANYTHING_PRESENT]]",
           "created_date": "[[ANYTHING_PRESENT]]",
-          "case_type_id" : "FT_NoCCaseType",
+          "case_type_id" : "[[ANYTHING_PRESENT]]",
           "case_type_version": "[[ANYTHING_PRESENT]]",
           "state_id": "[[ANYTHING_PRESENT]]",
           "state_name": "[[ANYTHING_PRESENT]]",

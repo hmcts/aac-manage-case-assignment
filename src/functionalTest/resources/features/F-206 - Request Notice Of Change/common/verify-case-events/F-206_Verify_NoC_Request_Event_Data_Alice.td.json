@@ -38,7 +38,7 @@
           "user_id" : "[[ANYTHING_PRESENT]]",
           "user_last_name" : "[[ANYTHING_PRESENT]]",
           "user_first_name" : "[[ANYTHING_PRESENT]]",
-          "event_name" : "Create Case",
+          "event_name" : "[[ANYTHING_PRESENT]]",
           "created_date": "[[ANYTHING_PRESENT]]",
           "case_type_id" : "[[ANYTHING_PRESENT]]",
           "case_type_version": "[[ANYTHING_PRESENT]]",

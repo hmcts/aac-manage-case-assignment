@@ -11,14 +11,14 @@
     "body" : {
       "auditEvents": [
         {
-          "id": "nocRequest",
+          "id": "[[ANYTHING_PRESENT]]",
           "description" : "[[ANYTHING_PRESENT]]",
           "user_id": "${[scenarioContext][parentContext][testData][users][invokingUser][id]}",
           "user_last_name": "Solicington",
           "user_first_name": "Alice",
           "event_name": "NoC Request",
           "created_date": "[[ANYTHING_PRESENT]]",
-          "case_type_id": "FT_NoCCaseType",
+          "case_type_id": "[[ANYTHING_PRESENT]]",
           "case_type_version": "[[ANYTHING_PRESENT]]",
           "state_id": "[[ANYTHING_PRESENT]]",
           "state_name": "[[ANYTHING_PRESENT]]",
@@ -29,8 +29,29 @@
           "security_classifications": "[[ANYTHING_PRESENT]]",
           "summary": "[[ANY_NULLABLE]]",
           "proxied_by": "[[ANYTHING_PRESENT]]",
-          "proxied_by_last_name": "master",
-          "proxied_by_first_name": "caa"
+          "proxied_by_last_name": "string",
+          "proxied_by_first_name": "mca system"
+        }, {
+          "id" : "[[ANYTHING_PRESENT]]",
+          "summary" : "[[ANY_NULLABLE]]",
+          "description" : "[[ANY_NULLABLE]]",
+          "user_id" : "[[ANYTHING_PRESENT]]",
+          "user_last_name" : "[[ANYTHING_PRESENT]]",
+          "user_first_name" : "[[ANYTHING_PRESENT]]",
+          "event_name" : "Create Case",
+          "created_date": "[[ANYTHING_PRESENT]]",
+          "case_type_id" : "[[ANYTHING_PRESENT]]",
+          "case_type_version": "[[ANYTHING_PRESENT]]",
+          "state_id": "[[ANYTHING_PRESENT]]",
+          "state_name": "[[ANYTHING_PRESENT]]",
+          "data": "[[ANYTHING_PRESENT]]",
+          "data_classification": "[[ANYTHING_PRESENT]]",
+          "security_classification": "[[ANYTHING_PRESENT]]",
+          "significant_item": "[[ANY_NULLABLE]]",
+          "proxied_by" : "[[ANY_NULLABLE]]",
+          "proxied_by_last_name" : "[[ANY_NULLABLE]]",
+          "proxied_by_first_name" : "[[ANY_NULLABLE]]",
+          "security_classifications": "[[ANYTHING_PRESENT]]"
         }
       ],
       "_links" : {

@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_TYPE_ID_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
@@ -79,8 +78,7 @@ public class PrepareNoCService {
         Map<String, JsonNode> data = caseDetails.getData();
 
         // check that there isn't an ongoing NoCRequest - if so this new NoCRequest must be rejected
-        String caseRoleId = getCaseRoleId(data, changeOfRequestFieldName);
-        validate(isNotBlank(caseRoleId), NOC_REQUEST_ONGOING);
+        validate(hasCaseRoleId(data, changeOfRequestFieldName), NOC_REQUEST_ONGOING);
 
         List<String> caseRoles = prepareCaseRoles(jurisdiction, orgPolicies);
         List<CaseRole> caseRolesDefinition = getCaseRolesDefinitions(jurisdiction, caseTypeId, caseRoles);
@@ -157,8 +155,8 @@ public class PrepareNoCService {
         return usersByOrganisation.getOrganisationIdentifier();
     }
 
-    private String getCaseRoleId(Map<String, JsonNode> data, String corFieldName) {
-        return data.get(corFieldName).findPath(CASE_ROLE_ID).textValue();
+    private boolean hasCaseRoleId(Map<String, JsonNode> data, String corFieldName) {
+        return data.get(corFieldName).findPath(CASE_ROLE_ID).isObject();
     }
 
     private List<String> findInvokerOrgPolicyRoles(List<OrganisationPolicy> policies, String organisationId) {

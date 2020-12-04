@@ -6,16 +6,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.managecase.domain.DynamicList;
 import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
 
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.gov.hmcts.reform.managecase.util.JacksonUtils.DL_ELEMENT_CODE;
-import static uk.gov.hmcts.reform.managecase.util.JacksonUtils.DL_ELEMENT_LABEL;
-import static uk.gov.hmcts.reform.managecase.util.JacksonUtils.DL_LIST_ITEMS;
-import static uk.gov.hmcts.reform.managecase.util.JacksonUtils.DL_VALUE;
 
 class JacksonUtilsTest {
 
@@ -53,22 +50,22 @@ class JacksonUtilsTest {
             );
 
             assertAll(
-                () -> assertEquals(
-                    "[Creator]", dynamicList.get(DL_VALUE).get(DL_ELEMENT_CODE).textValue()),
-                () -> assertEquals(
-                    "Creator", dynamicList.get(DL_VALUE).get(DL_ELEMENT_LABEL).textValue()),
-                () -> assertEquals(
-                    "[Creator]", dynamicList.get(DL_LIST_ITEMS).get(0).get(DL_ELEMENT_CODE).textValue()),
-                () -> assertEquals(
-                    "Creator", dynamicList.get(DL_LIST_ITEMS).get(0).get(DL_ELEMENT_LABEL).textValue()),
-                () -> assertEquals(
-                    "[Debtor]", dynamicList.get(DL_LIST_ITEMS).get(1).get(DL_ELEMENT_CODE).textValue()),
-                () -> assertEquals(
-                    "Debtor", dynamicList.get(DL_LIST_ITEMS).get(1).get(DL_ELEMENT_LABEL).textValue()),
-                () -> assertEquals(
-                    "[Litigant]", dynamicList.get(DL_LIST_ITEMS).get(2).get(DL_ELEMENT_CODE).textValue()),
-                () -> assertEquals(
-                    "Litigant", dynamicList.get(DL_LIST_ITEMS).get(2).get(DL_ELEMENT_LABEL).textValue())
+                () -> assertEquals("[Creator]", dynamicList.get(DynamicList.VALUE)
+                    .get(DynamicListElement.CODE).textValue()),
+                () -> assertEquals("Creator", dynamicList.get(DynamicList.VALUE)
+                    .get(DynamicListElement.LABEL).textValue()),
+                () -> assertEquals("[Creator]", dynamicList.get(DynamicList.LIST_ITEMS).get(0)
+                                       .get(DynamicListElement.CODE).textValue()),
+                () -> assertEquals("Creator", dynamicList.get(DynamicList.LIST_ITEMS).get(0)
+                    .get(DynamicListElement.LABEL).textValue()),
+                () -> assertEquals("[Debtor]", dynamicList.get(DynamicList.LIST_ITEMS).get(1)
+                    .get(DynamicListElement.CODE).textValue()),
+                () -> assertEquals("Debtor", dynamicList.get(DynamicList.LIST_ITEMS).get(1)
+                    .get(DynamicListElement.LABEL).textValue()),
+                () -> assertEquals("[Litigant]", dynamicList.get(DynamicList.LIST_ITEMS).get(2)
+                    .get(DynamicListElement.CODE).textValue()),
+                () -> assertEquals("Litigant", dynamicList.get(DynamicList.LIST_ITEMS)
+                    .get(2).get(DynamicListElement.LABEL).textValue())
             );
         }
     }

@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.SecurityClassificat
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.domain.DynamicList;
+import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -267,10 +270,15 @@ class PrepareNoCServiceTest {
         }
 
         private ChangeOrganisationRequest ongoingChangeOrganisationRequest() {
+            DynamicListElement claimantDLE = DynamicListElement.builder().code("[Claimant]").label("Claimant").build();
+
             return ChangeOrganisationRequest.builder()
                 .organisationToAdd(Organisation.builder().build())
                 .organisationToRemove(Organisation.builder().build())
-                .caseRoleId("[Claimant]")
+                .caseRoleId(DynamicList.builder()
+                                .value(claimantDLE)
+                                .listItems(Arrays.asList(claimantDLE))
+                                .build())
                 .build();
         }
 

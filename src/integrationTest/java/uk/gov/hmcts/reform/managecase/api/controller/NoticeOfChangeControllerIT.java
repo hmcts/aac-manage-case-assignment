@@ -255,7 +255,7 @@ public class NoticeOfChangeControllerIT {
         void shouldPrepareNoCEventSuccessfully() throws Exception {
 
             Map<String, JsonNode> data = new HashMap<>();
-            data.put("ChangeOrganisationRequestField", createChangeOrganisatioRequest());
+            data.put("ChangeOrganisationRequestField", createChangeOrganisationRequest());
             data.put("OrganisationPolicyField", createOrganisationPolicyField());
 
 
@@ -296,21 +296,10 @@ public class NoticeOfChangeControllerIT {
                                        + "          }");
         }
 
-        private JsonNode createChangeOrganisatioRequest() throws JsonProcessingException {
+        private JsonNode createChangeOrganisationRequest() throws JsonProcessingException {
             return mapper.readTree("{\n"
                                        + "        \"Reason\": null,\n"
-                                       + "        \"CaseRoleId\": {\n"
-                                       + "          \"value\": {\n"
-                                       + "            \"code\": \"[Defendant]\",\n"
-                                       + "            \"label\": \"Defendant\"\n"
-                                       + "          },\n"
-                                       + "          \"list_items\": [\n"
-                                       + "            {\n"
-                                       + "              \"code\": \"[Defendant]\",\n"
-                                       + "              \"label\": \"Defendant\"\n"
-                                       + "            }\n"
-                                       + "          ]\n"
-                                       + "        },\n"
+                                       + "        \"CaseRoleId\": null,\n"
                                        + "        \"NotesReason\": null,\n"
                                        + "        \"ApprovalStatus\": \"2\",\n"
                                        + "        \"RequestTimestamp\": \"2020-11-20T16:17:36.090968\",\n"

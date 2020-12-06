@@ -1,0 +1,39 @@
+{
+	"_guid_": "S-202.2",
+	"_extends_": "F-202-Base",
+	"title": "Must return an error response when a malformed case ID is provided",
+
+	"specs": [
+		"Becky – a solicitor with the required permissions to create a case",
+		"Benjamin – another solicitor within the same organisation as Becky",
+		"Bill – another solicitor within the same organisation as Becky",
+		"is made by Becky",
+		"contains a correctly-formed comma separated list of the case ID’s which includes the valid case IDs of C1 and C2 plus another case ID which is malformed"
+	],
+
+	"users": {
+		"Benjamin": {
+			"username": "befta.master.solicitor.benjamin@gmail.com",
+			"password": "[[$CCD_BEFTA_MASTER_SOLICITOR_2_PWD]]"
+		},
+		"Bill": {
+			"username": "befta.master.solicitor.bill@gmail.com",
+			"password": "[[$CCD_BEFTA_MASTER_SOLICITOR_3_PWD]]"
+		}
+	},
+
+	"request": {
+		"queryParams": {
+			"case_ids": "${[scenarioContext][childContexts][F-202_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]},${[scenarioContext][childContexts][F-202_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]},MALFORMED"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "ACA_400_Response",
+		"body": {
+			"status": "BAD_REQUEST",
+			"message": "Case ID should contain digits only",
+			"errors": []
+		}
+	}
+}

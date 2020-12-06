@@ -1,6 +1,7 @@
 server:
   port: 4454
-
+  error:
+    include-message: always
 management:
   endpoint:
     health:
@@ -18,6 +19,8 @@ management:
 spring:
   application:
     name: Manage Case Assignment
+  banner:
+    location: classpath:manage-case-assignment-banner.txt
   main:
     allow-bean-definition-overriding: true
   cache:
@@ -40,7 +43,7 @@ idam:
   client:
     id: aac_manage_case_assignment
     secret: ${IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
-    scope: openid roles profile search-user
+    scope: openid roles profile manage-user
     # same for all environments - not used in mca but configured as idam mandates for token generation
     redirect_uri: https://manage-case-assignment/oauth2redirect
   system-user:
@@ -51,7 +54,7 @@ idam:
     totp_secret: ${MANAGE_CASE_S2S_KEY:AAAAAAAAAAAAAAAA}
     url: ${S2S_URL:http://localhost:4502}
   s2s-authorised:
-    services: ${MANAGE_CASE_S2S_AUTHORISED_SERVICES:xui_webapp}
+    services: ${MANAGE_CASE_S2S_AUTHORISED_SERVICES:xui_webapp,finrem_case_orchestration}
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
@@ -72,3 +75,7 @@ mca:
   conditional-apis:
     case-assignments:
       enabled: ${MCA_CONDITIONAL_APIS_CASE_ASSIGNMENTS_ENABLED:true}
+
+notify:
+  api-key: ${NOTIFY_MCA_API_KEY:notify-test-api-key}
+  email-template-id: ${NOTIFY_EMAIL_TEMPLATE_ID:a60215dd-08bb-475e-956c-e97fdb7e448c}

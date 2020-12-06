@@ -1,0 +1,43 @@
+{
+  "_guid_": "S-203.7",
+  "_extends_": "F-203_Base",
+  "title": "Must return an error response for a missing Case ID",
+
+  "specs": [
+    "Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation",
+    "Benjamin - with a solicitor role for the same jurisdiction within the same organisation as Becky",
+    "is made by Becky and intends to unassign access for Benjamin to some cases",
+    "contains the Case ID of C1 and a missing case ID"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Becky"
+    },
+    "Benjamin": {
+      "_extends_": "ACA_Users_Benjamin"
+    }
+  },
+
+  "request": {
+    "body": {
+      "unassignments": [
+        {
+          "case_id": "${[scenarioContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+          "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}"
+        },
+        {
+          "assignee_id": "${[scenarioContext][testData][users][Benjamin][id]}"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "status" : "BAD_REQUEST",
+      "errors": [ "Case ID can not be empty" ]
+    }
+  }
+}

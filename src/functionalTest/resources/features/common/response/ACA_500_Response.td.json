@@ -1,0 +1,12 @@
+{
+  "_guid_": "ACA_500_Response",
+  "_extends_": "Common_Response",
+  "responseCode": 500,
+  "responseMessage": "Internal Server Error",
+  "headers": {
+    "_extends_": "Common_Response_Headers"
+  },
+  "body": {
+    "status": "INTERNAL_SERVER_ERROR"
+  }
+}

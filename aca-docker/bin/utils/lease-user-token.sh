@@ -3,7 +3,7 @@
 set -eu
 
 username=${1}
-password=${2}
+password=${2:-Pa55word11}
 clientSecret=${CCD_API_GATEWAY_IDAM_CLIENT_SECRET:-ccd_gateway_secret}
 redirectUri=${CCD_IDAM_REDIRECT_URL:-http://localhost:3451/oauth2redirect}
 

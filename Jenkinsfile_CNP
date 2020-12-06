@@ -64,7 +64,7 @@ env.BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP = "profile openid roles manage-use
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal"
-env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-pr-601.service.core-compute-preview.internal"
+env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-pr-1260.service.core-compute-preview.internal"
 
 withPipeline("java", product, component) {
   after('test') {

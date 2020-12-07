@@ -1,0 +1,51 @@
+{
+  "_guid_": "Event_Creation_Token_Creation",
+
+  "productName": "CCD Data Store",
+  "operationName": "Fetch event trigger",
+
+  "method": "GET",
+  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/cases/{cid}/event-triggers/{etid}",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "OVERRIDE CID",
+      "etid": "OVERRIDE ETID"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]",
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
+    },
+    "body": {
+      "token": "[[ANY_STRING_NOT_NULLABLE]]",
+      "_links": "[[ANYTHING_PRESENT]]",
+      "event_id": "[[ANYTHING_PRESENT]]",
+      "case_details": {
+        "id": "[[ANYTHING_PRESENT]]",
+        "state": "[[ANYTHING_PRESENT]]",
+        "version": "[[ANYTHING_PRESENT]]",
+        "jurisdiction": "[[ANYTHING_PRESENT]]",
+        "case_type_id": "[[ANYTHING_PRESENT]]",
+        "created_date": "[[ANYTHING_PRESENT]]",
+        "last_modified": "[[ANYTHING_PRESENT]]",
+        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+        "security_classification": "[[ANYTHING_PRESENT]]",
+        "case_data": "[[ANYTHING_PRESENT]]",
+        "supplementary_data" : null,
+        "data_classification": "[[ANYTHING_PRESENT]]",
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": "[[ANYTHING_PRESENT]]"
+      }
+    }
+  }
+}

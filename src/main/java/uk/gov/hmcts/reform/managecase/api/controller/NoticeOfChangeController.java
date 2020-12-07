@@ -22,9 +22,9 @@ import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
-import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.ApplyNoCDecisionService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
@@ -46,14 +46,14 @@ public class NoticeOfChangeController {
 
     public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
 
-    private final NoticeOfChangeService noticeOfChangeService;
+    private final NoticeOfChangeQuestions noticeOfChangeQuestions;
     private final VerifyNoCAnswersService verifyNoCAnswersService;
     private final ApplyNoCDecisionService applyNoCDecisionService;
 
-    public NoticeOfChangeController(NoticeOfChangeService noticeOfChangeService,
+    public NoticeOfChangeController(NoticeOfChangeQuestions noticeOfChangeQuestions,
                                     VerifyNoCAnswersService verifyNoCAnswersService,
                                     ApplyNoCDecisionService applyNoCDecisionService) {
-        this.noticeOfChangeService = noticeOfChangeService;
+        this.noticeOfChangeQuestions = noticeOfChangeQuestions;
         this.verifyNoCAnswersService = verifyNoCAnswersService;
         this.applyNoCDecisionService = applyNoCDecisionService;
     }
@@ -125,7 +125,7 @@ public class NoticeOfChangeController {
                                                                @Valid @NotEmpty(message = "case_id must "
         + "not be empty") String caseId) {
         validateCaseIds(caseId);
-        return noticeOfChangeService.getChallengeQuestions(caseId);
+        return noticeOfChangeQuestions.getChallengeQuestions(caseId);
     }
 
     @PostMapping(path = VERIFY_NOC_ANSWERS, produces = APPLICATION_JSON_VALUE)

@@ -1,0 +1,37 @@
+{
+  "_guid_": "S-205.4",
+  "_extends_": "S-205_Test_Data_Base",
+
+  "title": "NoC Answers must return an error response for a malformed Case ID",
+
+  "specs" : [
+    "Dil - with a solicitor and a pui-caseworker role",
+
+    "is made by Dil to validate the answers to the challenge questions in order to become a representative of a litigant on the case",
+    "contains a malformed case ID for C1",
+    "contains a structurally valid set of answers",
+    "contains a valid IDAM token for Dil"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "_extends_": "NoC_Valid_Answers_For_Case_Role_R1",
+      "case_id": "1602585999999999"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body" : {
+      "errors" : [ "Case ID has to be a valid 16-digit Luhn number" ]
+    }
+  }
+
+}

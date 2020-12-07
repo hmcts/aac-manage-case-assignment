@@ -31,8 +31,8 @@ import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.managecase.service.NoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.ApplyNoCDecisionService;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 
 import javax.validation.ValidationException;
@@ -88,7 +88,7 @@ public class NoticeOfChangeControllerTest {
         protected MockMvc mockMvc;
 
         @MockBean
-        protected NoticeOfChangeService service;
+        protected NoticeOfChangeQuestions service;
 
         @MockBean
         protected VerifyNoCAnswersService verifyNoCAnswersService;
@@ -105,11 +105,6 @@ public class NoticeOfChangeControllerTest {
     @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
     class GetNoticeOfChangeQuestions extends BaseMvcTest {
 
-        @BeforeEach
-        void setUp() {
-
-        }
-
         @Nested
         @DisplayName("GET /noc/noc-questions")
         class GetCaseAssignments extends BaseMvcTest {
@@ -125,14 +120,13 @@ public class NoticeOfChangeControllerTest {
                     .id("Number")
                     .type("Number")
                     .build();
-                ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
-                                                                            "QuestionText1",
-                                                                            fieldType,
-                                                                            null,
-                                                                            "NoC",
-                                                                            ANSWER_FIELD,
-                                                                            "QuestionId1",
-                                                                            null);
+                ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+                    .caseTypeId(CASE_TYPE_ID)
+                    .challengeQuestionId("QuestionId1")
+                    .questionText("QuestionText1")
+                    .answerFieldType(fieldType)
+                    .answerField(ANSWER_FIELD)
+                    .questionId("NoC").build();
                 ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
                     Arrays.asList(challengeQuestion));
 
@@ -157,13 +151,13 @@ public class NoticeOfChangeControllerTest {
                     .id("Number")
                     .type("Number")
                     .build();
-                ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
-                                                                            "QuestionText1",
-                                                                            fieldType,
-                                                                            null,
-                                                                            "NoC",
-                                                                            ANSWER_FIELD,
-                                                                            "QuestionId1", null);
+                ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+                    .caseTypeId(CASE_TYPE_ID)
+                    .challengeQuestionId("QuestionId1")
+                    .questionText("QuestionText1")
+                    .answerFieldType(fieldType)
+                    .answerField(ANSWER_FIELD)
+                    .questionId("NoC").build();
                 ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
                     Arrays.asList(challengeQuestion));
 

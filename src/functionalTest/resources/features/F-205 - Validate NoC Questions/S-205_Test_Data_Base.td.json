@@ -1,0 +1,19 @@
+{
+  "_guid_" : "S-205_Test_Data_Base",
+
+  "productName": "Case Assignment Microservice",
+  "operationName": "ValidateNoCQuestions",
+
+  "method": "POST",
+  "uri": "noc/verify-noc-answers",
+
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "case_id": "${[scenarioContext][childContexts][204_Case_Creation][testData][actualResponse][body][id]}"
+    }
+  }
+}

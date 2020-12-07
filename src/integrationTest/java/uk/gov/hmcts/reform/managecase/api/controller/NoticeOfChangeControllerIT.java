@@ -120,15 +120,15 @@ public class NoticeOfChangeControllerIT {
         );
         ObjectMapper mapper = new ObjectMapper();
         JsonNode actualObj = mapper.readValue("{\n"
-            + "  \"OrganisationPolicy1\": {\n"
-            + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
-            + "    \"OrgPolicyReference\": \"Reference\",\n"
-            + "    \"Organisation\": {\n"
-            + "      \"OrganisationID\": \"QUK822N\",\n"
-            + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
-            + "    }\n"
-            + "  }\n"
-            + "}", JsonNode.class);
+                                                    + "  \"OrganisationPolicy1\": {\n"
+                                                    + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
+                                                    + "    \"OrgPolicyReference\": \"Reference\",\n"
+                                                    + "    \"Organisation\": {\n"
+                                                    + "      \"OrganisationID\": \"QUK822N\",\n"
+                                                    + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
+                                                    + "    }\n"
+                                                    + "  }\n"
+                                                    + "}", JsonNode.class);
 
         caseFields.put(PREDEFINED_COMPLEX_ORGANISATION_POLICY, actualObj);
         SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
@@ -149,14 +149,14 @@ public class NoticeOfChangeControllerIT {
             .id("Number")
             .type("Number")
             .build();
-        ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
-                                                                    "questionText",
-                                                                    fieldType,
-                                                                    null,
-                                                                    "NoC",
-                                                                    ANSWER_FIELD_APPLICANT,
-                                                                    "QuestionId1",
-                                                                    null);
+        ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+            .caseTypeId(CASE_TYPE_ID)
+            .challengeQuestionId("NoC")
+            .questionText("questionText")
+            .answerFieldType(fieldType)
+            .answerField(ANSWER_FIELD_APPLICANT)
+            .questionId("QuestionId1")
+            .order(1).build();
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
             Arrays.asList(challengeQuestion));
         stubGetChallengeQuestions(CASE_TYPE_ID, "NoCChallenge", challengeQuestionsResult);

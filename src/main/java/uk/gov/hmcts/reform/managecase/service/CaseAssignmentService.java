@@ -1,11 +1,8 @@
 package uk.gov.hmcts.reform.managecase.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestedCaseUnassignment;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -29,10 +26,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
-@SuppressWarnings({"PMD.PreserveStackTrace",
-    "PMD.DataflowAnomalyAnalysis",
-    "PMD.DataflowAnomalyAnalysis",
-    "PMD.LawOfDemeter"})
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 @Service
 public class CaseAssignmentService {
 
@@ -197,16 +191,7 @@ public class CaseAssignmentService {
     }
 
     private CaseDetails getCase(CaseAssignment input) {
-        CaseDetails caseDetails = null;
-        try {
-            caseDetails = dataStoreRepository.findCaseByCaseIdExternalApi(input.getCaseId());
-        } catch (FeignException e) {
-            if (HttpStatus.NOT_FOUND.value() == e.status()) {
-                throw new CaseCouldNotBeFetchedException(CASE_COULD_NOT_BE_FETCHED);
-            }
-        }
-
-        return caseDetails;
+        return dataStoreRepository.findCaseByCaseIdExternalApi(input.getCaseId());
     }
 
     private List<String> findInvokerOrgPolicyRoles(CaseDetails caseDetails, String organisation) {

@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.managecase.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import feign.FeignException;
-import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,8 +27,6 @@ import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static feign.Request.Body.empty;
-import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -126,9 +122,8 @@ class CaseAssignmentServiceTest {
         @DisplayName("should throw case could not be fetched error when case is not found")
         void shouldThrowCaseCouldNotBeFetchedException_whenCaseNotFound() {
 
-            Request request = Request.create(Request.HttpMethod.POST, "url", emptyMap(), empty(), null);
             given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
-                .willThrow(new FeignException.NotFound("Not found", request, null));
+                .willThrow(new CaseCouldNotBeFetchedException(CASE_COULD_NOT_BE_FETCHED));
 
             assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
                 .isInstanceOf(CaseCouldNotBeFetchedException.class)

@@ -13,7 +13,6 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.CASES_WITH_ID;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.CASE_USERS;
-import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.SEARCH_CASES;
 
 @FeignClient(
     name = "data-store-api",
@@ -21,9 +20,6 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient
     configuration = DataStoreApiClientConfig.class
 )
 public interface DataStoreApiClient {
-
-    @PostMapping(value = SEARCH_CASES, consumes = APPLICATION_JSON_VALUE)
-    CaseSearchResponse searchCases(@RequestParam("ctid") String caseTypeId,  @RequestBody String jsonSearchRequest);
 
     @PostMapping(value = CASE_USERS, consumes = APPLICATION_JSON_VALUE)
     void assignCase(@RequestBody CaseUserRolesRequest userRolesRequest);

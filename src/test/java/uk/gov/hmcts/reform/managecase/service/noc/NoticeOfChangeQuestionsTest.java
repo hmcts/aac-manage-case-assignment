@@ -41,6 +41,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -191,7 +192,7 @@ class NoticeOfChangeQuestionsTest {
                                              Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicitor")
             );
             given(securityUtils.getUserInfo()).willReturn(userInfo);
-            given(securityUtils.hasSolicitorRole(anyList())).willReturn(true);
+            given(securityUtils.hasSolicitorRole(anyList(), any())).willReturn(true);
             ChallengeQuestionsResult challengeQuestionsResult = service.getChallengeQuestions(CASE_ID);
 
             assertThat(challengeQuestionsResult).isNotNull();
@@ -211,7 +212,7 @@ class NoticeOfChangeQuestionsTest {
                                              Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicitor")
             );
             given(securityUtils.getUserInfo()).willReturn(userInfo);
-            given(securityUtils.hasSolicitorRole(anyList())).willReturn(true);
+            given(securityUtils.hasSolicitorRole(anyList(), any())).willReturn(true);
             NoCRequestDetails noCRequestDetails = service.challengeQuestions(CASE_ID);
 
             assertThat(noCRequestDetails).isNotNull();
@@ -459,7 +460,7 @@ class NoticeOfChangeQuestionsTest {
                                              Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicit")
             );
             given(securityUtils.getUserInfo()).willReturn(userInfo);
-            given(securityUtils.hasSolicitorRole(anyList())).willReturn(false);
+            given(securityUtils.hasSolicitorRole(anyList(), any())).willReturn(false);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)

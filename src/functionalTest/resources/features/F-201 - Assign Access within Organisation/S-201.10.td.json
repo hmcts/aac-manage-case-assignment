@@ -5,14 +5,14 @@
 
   "specs": [
     "S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation",
-    "S2 - who does not have a valid solicitor role for the jurisdiction of C1",
+    "S2 - who does not have a valid solicitor role",
     "intends to assign access within the same organisation for S2 by S1"
   ],
 
   "users": {
     "S2": {
-      "username": "",
-      "password": ""
+      "username": "befta.master.solicitor.david@gmail.com",
+      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_6_PWD]]"
     }
   },
 

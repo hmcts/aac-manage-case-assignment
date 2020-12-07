@@ -40,6 +40,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.COR_MISSING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_NOT_CONSIDERED;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_DATA_PROVIDED;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.UNKNOWN_NOC_APPROVAL_STATUS;
@@ -465,9 +466,9 @@ class ApplyNoCDecisionServiceTest {
     }
 
     @Test
-    void shouldErrorWhenOrganisationToAddIsNotPresent() throws JsonProcessingException {
+    void shouldErrorWhenChangeOrganisationRequestIsNotPresent() throws JsonProcessingException {
         Map<String, JsonNode> data = createData();
-        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).remove(ORGANISATION_TO_ADD);
+        data.remove(CHANGE_ORG_REQUEST_FIELD);
         CaseDetails caseDetails = CaseDetails.builder()
             .data(data)
             .reference(CASE_ID)
@@ -479,9 +480,7 @@ class ApplyNoCDecisionServiceTest {
             () -> applyNoCDecisionService.applyNoCDecision(request));
 
         assertAll(
-            () -> assertThat(exception.getMessage(),
-                is("Fields of type ChangeOrganisationRequest must include both "
-                    + "an OrganisationToAdd and OrganisationToRemove field."))
+            () -> assertThat(exception.getMessage(), is(COR_MISSING))
         );
     }
 

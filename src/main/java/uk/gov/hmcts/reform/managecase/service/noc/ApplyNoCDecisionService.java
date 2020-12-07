@@ -29,6 +29,7 @@ import java.util.Optional;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.COR_MISSING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.COR_MISSING_ORGANISATIONS;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_NOT_CONSIDERED;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_DATA_PROVIDED;
@@ -73,12 +74,12 @@ public class ApplyNoCDecisionService {
             throw new ValidationException(NO_DATA_PROVIDED);
         }
 
-        // TODO: Use ACA-71 method when available on branch
-        JsonNode changeOrganisationRequestField = data.get("ChangeOrganisationRequestField");
+        JsonNode changeOrganisationRequestField = caseDetails.findChangeOrganisationRequestNode()
+            .orElseThrow(() -> new ValidationException(COR_MISSING));
 
+        validateCorFieldOrganisations(changeOrganisationRequestField);
         String approvalStatus = getNonNullStringValue(changeOrganisationRequestField, APPROVAL_STATUS);
         String caseRoleId = getNonNullStringValue(changeOrganisationRequestField, CASE_ROLE_ID);
-        validateCorFieldOrganisations(changeOrganisationRequestField);
 
         if (NOT_CONSIDERED.getCode().equals(approvalStatus)) {
             throw new ValidationException(NOC_REQUEST_NOT_CONSIDERED);

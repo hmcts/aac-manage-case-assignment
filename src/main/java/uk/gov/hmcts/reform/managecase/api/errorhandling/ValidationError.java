@@ -34,6 +34,7 @@ public final class ValidationError {
     public static final String NO_DATA_PROVIDED = "No case data has been provided.";
     public static final String COR_MISSING_ORGANISATIONS = "Fields of type ChangeOrganisationRequest must include "
         + "both an OrganisationToAdd and OrganisationToRemove field.";
+    public static final String COR_MISSING = "No field of type ChangeOrganisationRequest found.";
 
     // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     private ValidationError() {

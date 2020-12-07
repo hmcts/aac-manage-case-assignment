@@ -33,8 +33,8 @@ public final class ValidationError {
         + " represented by the invoker's organisation.";
     public static final String JURISDICTION_CANNOT_BE_BLANK = "Jurisdiction cannot be blank.";
     public static final String NO_ORGANISATION_POLICY_ON_CASE_DATA = "No OrganisationPolicy found on the case data.";
-    public static final String NO_SOLICITOR_ORGANISATION_RECORDED_IN_ORG_POLICY = "The Organisation of the solicitor is"
-        + " not recorded in an Org policy on the case.";
+    public static final String NO_SOLICITOR_ORGANISATION_RECORDED_IN_ORG_POLICY = "The organisation of the solicitor is"
+        + " not recorded in an organisation policy on the case.";
     public static final String NO_ORGANISATION_ID_IN_ANY_ORG_POLICY = "No Organisation id present in any Org policy"
         + " on the case.";
     public static final String ORG_POLICY_CASE_ROLE_NOT_IN_CASE_DEFINITION = "Missing"

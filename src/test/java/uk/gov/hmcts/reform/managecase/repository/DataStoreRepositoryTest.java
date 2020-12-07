@@ -11,8 +11,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
@@ -25,13 +25,14 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableE
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
-import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.HeaderGroupMetadata;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
+import uk.gov.hmcts.reform.managecase.domain.ApprovalStatus;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
@@ -56,8 +57,8 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFix
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getCaseViewFields;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getWizardPages;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
-import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.ES_QUERY;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.ES_QUERY;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOC_REQUEST_DESCRIPTION;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT;
 
@@ -282,7 +283,7 @@ class DataStoreRepositoryTest {
 
     @Test
     @DisplayName("Call ccd-datastore to submit an event for a case")
-    void shouldReturnCasDetailsWhenSubmittingEventSucceeds() throws JsonProcessingException {
+    void shouldReturnCaseDetailsWhenSubmittingEventSucceeds() throws JsonProcessingException {
         // ARRANGE
         CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
             .wizardPages(CaseUpdateViewEventFixture.getWizardPages())
@@ -372,7 +373,7 @@ class DataStoreRepositoryTest {
     }
 
     @Test
-    @DisplayName("handle missing Change Organisation Request  case view field when calling submit event for case")
+    @DisplayName("handle missing Change Organisation Request case view field when calling submit event for case")
     void shouldThrowExceptionWhenSubmitEventForCaseCalledWithoutCaseViewField() {
 
         // ARRANGE
@@ -390,5 +391,35 @@ class DataStoreRepositoryTest {
 
         verify(dataStoreApi).getStartEventTrigger(CASE_ID, EVENT_ID);
         verify(dataStoreApi, never()).submitEventForCase(any(), any());
+    }
+
+    @Test
+    @DisplayName("handle missing default approval status in case data when calling submit event for case")
+    void shouldSetDefaultValueForCORApprovalSubmitEventForCaseCalled() throws JsonProcessingException {
+
+        // ARRANGE
+        CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
+            .wizardPages(CaseUpdateViewEventFixture.getWizardPages())
+            .eventToken(EVENT_TOKEN)
+            .caseFields(getCaseViewFields())
+            .build();
+
+        given(dataStoreApi.getStartEventTrigger(CASE_ID, EVENT_ID)).willReturn(caseUpdateViewEvent);
+
+        StartEventResource startEventResource = new StartEventResource();
+        startEventResource.setCaseDetails(CaseDetails.builder().data(new HashMap<>()).build());
+        given(dataStoreApi.getExternalStartEventTrigger(CASE_ID, EVENT_ID)).willReturn(startEventResource);
+
+        given(dataStoreApi.submitEventForCase(any(String.class), any(CaseEventCreationPayload.class)))
+            .willReturn(CaseDetails.builder().build());
+
+        ArgumentCaptor<ChangeOrganisationRequest> corCaptor = ArgumentCaptor.forClass(ChangeOrganisationRequest.class);
+        given(jacksonUtils.convertValue(corCaptor.capture(), any())).willReturn(null);
+
+        // ACT
+        repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build());
+
+        // ASSERT
+        assertThat(ApprovalStatus.PENDING.getValue()).isEqualTo(corCaptor.getValue().getApprovalStatus());
     }
 }

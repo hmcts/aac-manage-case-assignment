@@ -98,5 +98,6 @@
    HTTP V2 protocol is not used in this project
    ]]></notes>
     <cve>CVE-2020-13943</cve>
+    <cve>CVE-2020-13956</cve>
   </suppress>
 </suppressions>

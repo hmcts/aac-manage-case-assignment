@@ -426,6 +426,25 @@ public class NoticeOfChangeControllerIT {
             return string == null ? "null" : String.format("\"%s\"", string);
         }
 
+        private String caseRoleIdField(String selectedCode) {
+            return String.format("{\n"
+                + "\"value\":  {\n"
+                + "     \"code\": \"%s\",\n"
+                + "     \"label\": \"SomeLabel (Not used)\"\n"
+                + "},\n"
+                + "\"list_items\" : [\n"
+                + "     {\n"
+                + "         \"code\": \"[Defendant]\",\n"
+                + "         \"label\": \"Defendant\"\n"
+                + "     },\n"
+                + "     {\n"
+                + "         \"code\": \"[Claimant]\",\n"
+                + "         \"label\": \"Claimant\"\n"
+                + "     }\n"
+                + "]\n"
+                + "}\n", selectedCode);
+        }
+
         private Map<String, JsonNode> createData(String organisationPolicy1,
                                                  String organisationPolicy2,
                                                  String organisationToAdd,
@@ -437,7 +456,7 @@ public class NoticeOfChangeControllerIT {
                     + "    \"OrganisationPolicyField2\": %s,\n"
                     + "    \"ChangeOrganisationRequestField\": {\n"
                     + "        \"Reason\": null,\n"
-                    + "        \"CaseRoleId\": \"[Claimant]\",\n"
+                    + "        \"CaseRoleId\": %s,\n"
                     + "        \"NotesReason\": \"a\",\n"
                     + "        \"ApprovalStatus\": %s,\n"
                     + "        \"RequestTimestamp\": null,\n"
@@ -445,9 +464,8 @@ public class NoticeOfChangeControllerIT {
                     + "        \"OrganisationToRemove\": %s,\n"
                     + "        \"ApprovalRejectionTimestamp\": null\n"
                     + "    }\n"
-                    + "}", organisationPolicy1, organisationPolicy2, approvalStatus.getCode(),
-                organisationToAdd, organisationToRemove)),
-                getHashMapTypeReference());
+                    + "}", organisationPolicy1, organisationPolicy2, caseRoleIdField("[Claimant]"),
+                approvalStatus.getCode(), organisationToAdd, organisationToRemove)), getHashMapTypeReference());
         }
 
         private Map<String, JsonNode> createData(ApprovalStatus approvalStatus) throws JsonProcessingException {

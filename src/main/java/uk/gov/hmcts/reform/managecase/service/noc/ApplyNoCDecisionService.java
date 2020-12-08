@@ -47,6 +47,8 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANI
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.PrematureDeclaration", "PMD.ExcessiveImports"})
 public class ApplyNoCDecisionService {
 
+    private static final String JSON_PATH_SEPARATOR = "/";
+
     private final PrdRepository prdRepository;
     private final DataStoreRepository dataStoreRepository;
     private final NotifyService notifyService;
@@ -79,12 +81,12 @@ public class ApplyNoCDecisionService {
 
         validateCorFieldOrganisations(changeOrganisationRequestField);
         String approvalStatus = getNonNullStringValue(changeOrganisationRequestField, APPROVAL_STATUS);
-        String caseRoleId = getNonNullStringValue(changeOrganisationRequestField, CASE_ROLE_ID);
+        String caseRoleId = getNonNullStringValue(changeOrganisationRequestField, CASE_ROLE_ID + ".value.code");
 
         if (NOT_CONSIDERED.getCode().equals(approvalStatus)) {
             throw new ValidationException(NOC_REQUEST_NOT_CONSIDERED);
         } else if (REJECTED.getCode().equals(approvalStatus)) {
-            nullifyNode(changeOrganisationRequestField);
+            nullifyNode(changeOrganisationRequestField, CASE_ROLE_ID);
             return data;
         } else if (!APPROVED.getCode().equals(approvalStatus)) {
             throw new ValidationException(UNKNOWN_NOC_APPROVAL_STATUS);
@@ -92,7 +94,7 @@ public class ApplyNoCDecisionService {
 
         applyDecision(caseDetails, changeOrganisationRequestField, caseRoleId);
 
-        nullifyNode(changeOrganisationRequestField);
+        nullifyNode(changeOrganisationRequestField, CASE_ROLE_ID);
         return data;
     }
 
@@ -171,16 +173,17 @@ public class ApplyNoCDecisionService {
         }
     }
 
-    private String getNonNullStringValue(JsonNode node, String key) {
-        if (node.hasNonNull(key)) {
-            return node.get(key).asText();
-        } else {
-            throw new ValidationException(String.format("A value is expected for '%s'", key));
+    private String getNonNullStringValue(JsonNode node, String field) {
+        String path = JSON_PATH_SEPARATOR + field.replaceAll("\\.", JSON_PATH_SEPARATOR);
+        JsonNode nodeAtPath = node.at(path);
+        if (nodeAtPath.isMissingNode() || nodeAtPath.isNull()) {
+            throw new ValidationException(String.format("A value is expected for '%s'", field));
         }
+        return nodeAtPath.asText();
     }
 
-    private void nullifyNode(JsonNode node) {
-        jacksonUtils.nullifyObjectNode((ObjectNode) node);
+    private void nullifyNode(JsonNode node, String... ignoreNestedFields) {
+        jacksonUtils.nullifyObjectNode((ObjectNode) node, ignoreNestedFields);
     }
 
     private List<EmailNotificationRequestStatus> sendRemovalNotification(String caseReference,

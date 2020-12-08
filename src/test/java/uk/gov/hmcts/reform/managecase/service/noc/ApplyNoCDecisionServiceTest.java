@@ -420,14 +420,15 @@ class ApplyNoCDecisionServiceTest {
             () -> applyNoCDecisionService.applyNoCDecision(request));
 
         assertAll(
-            () -> assertThat(exception.getMessage(), is("A value is expected for 'CaseRoleId'"))
+            () -> assertThat(exception.getMessage(), is("A value is expected for 'CaseRoleId.value.code'"))
         );
     }
 
     @Test
     void shouldErrorWhenNoOrgPolicyExistsForCaseRoleId() throws JsonProcessingException {
         Map<String, JsonNode> data = createData();
-        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(CASE_ROLE_ID, new TextNode("UnknownCaseRoleId"));
+        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(CASE_ROLE_ID,
+            mapper.readTree(caseRoleIdField("UnknownCaseRoleId")));
         CaseDetails caseDetails = CaseDetails.builder()
             .data(data)
             .reference(CASE_ID)
@@ -550,6 +551,25 @@ class ApplyNoCDecisionServiceTest {
             + "{\"OrganisationID\":null,\"OrganisationName\":null},\"ApprovalRejectionTimestamp\":null}";
     }
 
+    private String caseRoleIdField(String selectedCode) {
+        return String.format("{\n"
+            + "\"value\":  {\n"
+            + "     \"code\": \"%s\",\n"
+            + "     \"label\": \"SomeLabel (Not used)\"\n"
+            + "},\n"
+            + "\"list_items\" : [\n"
+            + "     {\n"
+            + "         \"code\": \"[Defendant]\",\n"
+            + "         \"label\": \"Defendant\"\n"
+            + "     },\n"
+            + "     {\n"
+            + "         \"code\": \"[Claimant]\",\n"
+            + "         \"label\": \"Claimant\"\n"
+            + "     }\n"
+            + "]\n"
+            + "}\n", selectedCode);
+    }
+
     private Map<String, JsonNode> createData(String organisationPolicy1,
                                              String organisationPolicy2,
                                              String organisationToAdd,
@@ -560,7 +580,7 @@ class ApplyNoCDecisionServiceTest {
                 + "    \"OrganisationPolicyField2\": %s,\n"
                 + "    \"ChangeOrganisationRequestField\": {\n"
                 + "        \"Reason\": null,\n"
-                + "        \"CaseRoleId\": \"[Claimant]\",\n"
+                + "        \"CaseRoleId\": %s,\n"
                 + "        \"NotesReason\": \"a\",\n"
                 + "        \"ApprovalStatus\": 1,\n"
                 + "        \"RequestTimestamp\": null,\n"
@@ -568,8 +588,8 @@ class ApplyNoCDecisionServiceTest {
                 + "        \"OrganisationToRemove\": %s,\n"
                 + "        \"ApprovalRejectionTimestamp\": null\n"
                 + "    }\n"
-                + "}", organisationPolicy1, organisationPolicy2, organisationToAdd, organisationToRemove)),
-            getHashMapTypeReference());
+                + "}", organisationPolicy1, organisationPolicy2, caseRoleIdField("[Claimant]"),
+            organisationToAdd, organisationToRemove)), getHashMapTypeReference());
     }
 
     private Map<String, JsonNode> createData() throws JsonProcessingException {

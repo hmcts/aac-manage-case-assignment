@@ -74,7 +74,7 @@ env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 
 // Variables to switch pipeline logic and wiring per type of build
 def definitionStoreDevelopPr = "PR-575" // This doesn't change frequently, but when it does, only change this value.
-def dataStoreApiDevelopPr    = "PR-601" // This doesn't change frequently, but when it does, only change this value.
+def dataStoreApiDevelopPr    = "PR-1260" // This doesn't change frequently, but when it does, only change this value.
 def prsToUseAaat             = "PR-148" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()

@@ -29,6 +29,7 @@ public class CaseDetails {
     public static final String ORG_ID = "OrganisationID";
     public static final String ORG_NAME = "OrganisationName";
 
+    private String id;
     private String reference;
     private String jurisdiction;
     private String state;

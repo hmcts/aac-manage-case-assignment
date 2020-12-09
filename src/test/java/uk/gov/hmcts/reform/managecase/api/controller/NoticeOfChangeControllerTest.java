@@ -314,7 +314,7 @@ public class NoticeOfChangeControllerTest {
             Map<String, JsonNode> data = new HashMap<>();
             data.put(FIELD_ID, new TextNode(FIELD_VALUE));
             request = new ApplyNoCDecisionRequest(CaseDetails.builder()
-                .reference(CASE_ID)
+                .id(CASE_ID)
                 .caseTypeId(CASE_TYPE_ID)
                 .data(data)
                 .build());
@@ -357,7 +357,7 @@ public class NoticeOfChangeControllerTest {
 
             ArgumentCaptor<ApplyNoCDecisionRequest> captor = ArgumentCaptor.forClass(ApplyNoCDecisionRequest.class);
             verify(applyNoCDecisionService).applyNoCDecision(captor.capture());
-            assertThat(captor.getValue().getCaseDetails().getReference()).isEqualTo(CASE_ID);
+            assertThat(captor.getValue().getCaseDetails().getId()).isEqualTo(CASE_ID);
             assertThat(captor.getValue().getCaseDetails().getCaseTypeId()).isEqualTo(CASE_TYPE_ID);
             assertThat(captor.getValue().getCaseDetails().getData().get(FIELD_ID).asText()).isEqualTo(FIELD_VALUE);
         }

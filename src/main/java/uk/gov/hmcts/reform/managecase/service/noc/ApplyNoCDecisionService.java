@@ -107,9 +107,9 @@ public class ApplyNoCDecisionService {
         Organisation organisationToRemove = objectMapper.convertValue(organisationToRemoveNode, Organisation.class);
 
         if (organisationToAdd == null || isNullOrEmpty(organisationToAdd.getOrganisationID())) {
-            applyRemoveRepresentationDecision(caseDetails.getReference(), orgPolicyNode, organisationToRemove);
+            applyRemoveRepresentationDecision(caseDetails.getId(), orgPolicyNode, organisationToRemove);
         } else {
-            applyAddOrReplaceRepresentationDecision(caseDetails.getReference(), caseRoleId, orgPolicyNode,
+            applyAddOrReplaceRepresentationDecision(caseDetails.getId(), caseRoleId, orgPolicyNode,
                     organisationToAddNode, organisationToAdd, organisationToRemove);
         }
     }

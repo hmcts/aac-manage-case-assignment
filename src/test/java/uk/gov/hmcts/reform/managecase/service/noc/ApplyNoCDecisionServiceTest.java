@@ -100,7 +100,7 @@ class ApplyNoCDecisionServiceTest {
     void shouldUpdateCaseDataWhenRemoveDecisionIsApplied() throws JsonProcessingException {
         CaseDetails caseDetails = CaseDetails.builder()
             .data(createData())
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         when(dataStoreRepository.getCaseAssignments(singletonList(CASE_ID), null)).thenReturn(emptyList());
@@ -126,7 +126,7 @@ class ApplyNoCDecisionServiceTest {
     void shouldRemoveExistingOrgUsersWithAccessWhenRemoveDecisionIsApplied() throws JsonProcessingException {
         CaseDetails caseDetails = CaseDetails.builder()
             .data(createData())
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         List<CaseUserRole> existingCaseAssignments = List.of(
@@ -175,7 +175,7 @@ class ApplyNoCDecisionServiceTest {
                 organisationAsString(ORG_3_ID, ORG_3_NAME),
                 organisationAsString(null, null)
             ))
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         when(prdRepository.findUsersByOrganisation(ORG_3_ID))
@@ -205,7 +205,7 @@ class ApplyNoCDecisionServiceTest {
                 organisationAsString(ORG_3_ID, ORG_3_NAME),
                 organisationAsString(null, null)
             ))
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         String otherRole = "OtherRole";
@@ -248,7 +248,7 @@ class ApplyNoCDecisionServiceTest {
                 organisationAsString(ORG_3_ID, ORG_3_NAME),
                 organisationAsString(ORG_2_ID, ORG_2_NAME)
             ))
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         when(dataStoreRepository.getCaseAssignments(singletonList(CASE_ID), null)).thenReturn(emptyList());
@@ -281,7 +281,7 @@ class ApplyNoCDecisionServiceTest {
                 organisationAsString(ORG_3_ID, ORG_3_NAME),
                 organisationAsString(ORG_2_ID, ORG_2_NAME)
             ))
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         List<CaseUserRole> existingCaseAssignments = List.of(
@@ -330,7 +330,7 @@ class ApplyNoCDecisionServiceTest {
         });
         CaseDetails caseDetails = CaseDetails.builder()
             .data(data)
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
@@ -354,7 +354,7 @@ class ApplyNoCDecisionServiceTest {
         ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS, mapper.nullNode());
         CaseDetails caseDetails = CaseDetails.builder()
             .data(data)
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
@@ -373,7 +373,7 @@ class ApplyNoCDecisionServiceTest {
         ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS, new TextNode(NOT_CONSIDERED.getCode()));
         CaseDetails caseDetails = CaseDetails.builder()
             .data(data)
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
@@ -392,7 +392,7 @@ class ApplyNoCDecisionServiceTest {
         ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS, new TextNode("5"));
         CaseDetails caseDetails = CaseDetails.builder()
             .data(data)
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
@@ -411,7 +411,7 @@ class ApplyNoCDecisionServiceTest {
         ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(CASE_ROLE_ID, mapper.nullNode());
         CaseDetails caseDetails = CaseDetails.builder()
             .data(data)
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
@@ -431,7 +431,7 @@ class ApplyNoCDecisionServiceTest {
             mapper.readTree(caseRoleIdField("UnknownCaseRoleId")));
         CaseDetails caseDetails = CaseDetails.builder()
             .data(data)
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
@@ -451,7 +451,7 @@ class ApplyNoCDecisionServiceTest {
         ((ObjectNode) data.get(ORG_POLICY_1_FIELD)).set(ORG_POLICY_CASE_ASSIGNED_ROLE, new TextNode(ORG_POLICY_2_ROLE));
         CaseDetails caseDetails = CaseDetails.builder()
             .data(data)
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
@@ -471,7 +471,7 @@ class ApplyNoCDecisionServiceTest {
         data.remove(CHANGE_ORG_REQUEST_FIELD);
         CaseDetails caseDetails = CaseDetails.builder()
             .data(data)
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
@@ -490,7 +490,7 @@ class ApplyNoCDecisionServiceTest {
         ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).remove(ORGANISATION_TO_REMOVE);
         CaseDetails caseDetails = CaseDetails.builder()
             .data(data)
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
@@ -508,7 +508,7 @@ class ApplyNoCDecisionServiceTest {
     @Test
     void shouldErrorWhenDataIsNotPresent() throws JsonProcessingException {
         CaseDetails caseDetails = CaseDetails.builder()
-            .reference(CASE_ID)
+            .id(CASE_ID)
             .build();
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);

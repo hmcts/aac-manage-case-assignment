@@ -284,7 +284,7 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldApplyNoCDecisionSuccessfullyWhenApproved() throws Exception {
             ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(CaseDetails.builder()
-                .reference(CASE_ID)
+                .id(CASE_ID)
                 .caseTypeId(CASE_TYPE_ID)
                 .data(createData(APPROVED))
                 .build());
@@ -324,7 +324,7 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldApplyNoCDecisionSuccessfullyWhenRejected() throws Exception {
             ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(CaseDetails.builder()
-                .reference(CASE_ID)
+                .id(CASE_ID)
                 .caseTypeId(CASE_TYPE_ID)
                 .data(createData(REJECTED))
                 .build());
@@ -364,7 +364,7 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldNotApplyNoCDecisionWhenNotConsidered() throws Exception {
             ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(CaseDetails.builder()
-                .reference(CASE_ID)
+                .id(CASE_ID)
                 .caseTypeId(CASE_TYPE_ID)
                 .data(createData(NOT_CONSIDERED))
                 .build());
@@ -381,7 +381,7 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldReturnSuccessResponseWithErrorsArrayForHandledExceptions() throws Exception {
             ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(CaseDetails.builder()
-                .reference(CASE_ID)
+                .id(CASE_ID)
                 .caseTypeId(CASE_TYPE_ID)
                 .build());
 

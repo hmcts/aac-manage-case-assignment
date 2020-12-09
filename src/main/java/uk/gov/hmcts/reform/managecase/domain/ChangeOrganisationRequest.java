@@ -1,32 +1,31 @@
 package uk.gov.hmcts.reform.managecase.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import uk.gov.hmcts.reform.managecase.domain.Organisation;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Getter
+@Data
 @Builder
-@JsonIgnoreProperties(ignoreUnknown = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChangeOrganisationRequest {
 
     @JsonProperty("OrganisationToAdd")
-    private final Organisation organisationToAdd;
+    private Organisation organisationToAdd;
 
     @JsonProperty("OrganisationToRemove")
-    private final Organisation organisationToRemove;
+    private Organisation organisationToRemove;
 
     @JsonProperty("CaseRoleId")
-    private final String caseRoleId;
+    private DynamicList caseRoleId;
 
     @JsonProperty("RequestTimestamp")
-    private final LocalDateTime requestTimestamp;
+    private LocalDateTime requestTimestamp;
 
-    @Setter
     @JsonProperty("ApprovalStatus")
     private String approvalStatus;
 }

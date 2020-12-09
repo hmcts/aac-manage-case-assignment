@@ -5,6 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.managecase.domain.DynamicList;
+import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
+
+import java.util.List;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -59,5 +63,33 @@ public class JacksonUtils {
             }
         }
         return mainNode;
+    }
+
+    /**
+     * Ex.:
+     * {
+     *   "value": {
+     *     "code": "[Claimant]",
+     *     "label": "Claimant"
+     *   },
+     *   "list_items": [
+     *     {
+     *       "code": "[Claimant]",
+     *       "label": "Claimant"
+     *     },
+     *     {
+     *       "code": "[Defendant]",
+     *       "label": "Defendant"
+     *     }
+     *   ]
+     * }
+     */
+    public ObjectNode createDynamicList(DynamicListElement value, List<DynamicListElement> listItems) {
+        DynamicList dynamicList = DynamicList.builder()
+            .value(value)
+            .listItems(listItems)
+            .build();
+
+        return objectMapper.valueToTree(dynamicList);
     }
 }

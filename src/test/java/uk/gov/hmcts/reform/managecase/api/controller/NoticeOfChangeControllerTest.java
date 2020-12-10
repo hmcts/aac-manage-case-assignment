@@ -340,6 +340,7 @@ public class NoticeOfChangeControllerTest {
             // ARRANGE
             NoticeOfChangeController controller = new NoticeOfChangeController(service,
                                                                                verifyNoCAnswersService,
+                                                                               prepareNoCService,
                                                                                requestNoticeOfChangeService);
 
             // ACT
@@ -421,7 +422,7 @@ public class NoticeOfChangeControllerTest {
 
         @BeforeEach
         void setUp() throws Exception {
-            request = new AboutToStartCallbackRequest("createEvent", null, CaseDetails.builder().build());
+            request = new AboutToStartCallbackRequest("createEvent", null, CaseDetails.builder().id(CASE_ID).build());
             ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder().build();
 
             responseData.put("ChangeOrganisationRequest", objectMapper.readTree(objectMapper.writeValueAsString(cor)));

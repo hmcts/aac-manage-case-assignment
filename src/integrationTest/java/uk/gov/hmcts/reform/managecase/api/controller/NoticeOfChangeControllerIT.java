@@ -285,7 +285,7 @@ public class NoticeOfChangeControllerIT {
             CaseDetails caseDetails = CaseDetails.builder()
                 .caseTypeId(CASE_TYPE_ID)
                 .jurisdiction(JURISDICTION)
-                .reference(CASE_ID)
+                .id(CASE_ID)
                 .data(data)
                 .state("caseCreated")
                 .build();

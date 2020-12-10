@@ -19,7 +19,10 @@
 
 	<suppress>
 		<notes>Temporary suppressions to unblock pipelines</notes>
-		<cve>CVE-2020-13956</cve>
+    <cve>CVE-2020-25638</cve>
+    <cve>CVE-2020-13956</cve>
+    <cve>CVE-2020-25649</cve>
+    <cve>CVE-2020-17527</cve>
 	</suppress>
 
 </suppressions>

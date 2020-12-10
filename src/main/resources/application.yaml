@@ -10,7 +10,7 @@ management:
         time-to-live: 10s
       group:
         readiness:
-          include: ping, refreshScope, diskSpace, discoveryComposite, hystrix
+          include: ping, refreshScope
   endpoints:
     web:
       base-path: /

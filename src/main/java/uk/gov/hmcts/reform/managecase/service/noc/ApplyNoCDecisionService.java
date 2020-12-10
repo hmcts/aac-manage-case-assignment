@@ -122,7 +122,7 @@ public class ApplyNoCDecisionService {
                     organisationToAddNode, organisationToAdd, organisationToRemove);
         }
 
-        setOrgPolicyPreviousOrganisations(caseDetails, changeOrganisationRequestField,orgPolicyNode);
+        setOrgPolicyPreviousOrganisations(caseDetails, changeOrganisationRequestField, orgPolicyNode);
     }
 
     private void validateCorFieldOrganisations(JsonNode changeOrganisationRequestField) {
@@ -250,9 +250,8 @@ public class ApplyNoCDecisionService {
                                                    final JsonNode changeOrganisationRequestField,
                                                    final JsonNode orgPolicyNode) {
         JsonNode organisationToRemoveNode = changeOrganisationRequestField.get(ORGANISATION_TO_REMOVE);
-        if (organisationToRemoveNode != null) {
-            Organisation organisationToRemove = objectMapper
-                .convertValue(organisationToRemoveNode, Organisation.class);
+        Organisation organisationToRemove = objectMapper.convertValue(organisationToRemoveNode, Organisation.class);
+        if (organisationToRemove != null && !isNullOrEmpty(organisationToRemove.getOrganisationID())) {
 
             FindOrganisationResponse response = prdRepository
                 .findOrganisationAddress(organisationToRemove.getOrganisationID());

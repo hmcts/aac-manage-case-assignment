@@ -22,7 +22,7 @@ public interface PrdApiClient {
             consumes = APPLICATION_JSON_VALUE)
     FindUsersByOrganisationResponse findActiveUsersByOrganisation(@PathVariable("orgId") String organisationId);
 
-    @GetMapping(value = "/refdata/external/v1/organisations/{orgId}",
+    @GetMapping(value = "/refdata/internal/v1/organisations",
         consumes = APPLICATION_JSON_VALUE)
-    FindOrganisationResponse findOrganisation(@PathVariable("orgId") String organisationId);
+    FindOrganisationResponse findOrganisation(@RequestParam("id") String organisationId);
 }

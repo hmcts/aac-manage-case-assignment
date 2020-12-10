@@ -273,10 +273,10 @@ class ApplyNoCDecisionServiceTest {
     }
 
     @Test
-    void shouldUpdateOrgUsersAccessWhenReplaceDecisionIsApplied() throws JsonProcessingException {
+    void shouldUpdateOrgUsersAccessWhenReplaceDecisionIsApplied1() throws JsonProcessingException {
         CaseDetails caseDetails = CaseDetails.builder()
             .data(createData(
-                orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
+                orgPolicyAsString(null, null, null, null),
                 orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
                 organisationAsString(ORG_3_ID, ORG_3_NAME),
                 organisationAsString(ORG_2_ID, ORG_2_NAME)
@@ -285,15 +285,15 @@ class ApplyNoCDecisionServiceTest {
             .build();
 
         List<CaseUserRole> existingCaseAssignments = List.of(
-            new CaseUserRole(CASE_ID, USER_ID_1, ORG_POLICY_1_ROLE),
-            new CaseUserRole(CASE_ID, USER_ID_2, ORG_POLICY_1_ROLE),
-            new CaseUserRole(CASE_ID, USER_ID_3, ORG_POLICY_1_ROLE)
+            new CaseUserRole(CASE_ID, USER_ID_1, ORG_POLICY_2_ROLE),
+            new CaseUserRole(CASE_ID, USER_ID_2, ORG_POLICY_2_ROLE),
+            new CaseUserRole(CASE_ID, USER_ID_3, ORG_POLICY_2_ROLE)
         );
         when(dataStoreRepository.getCaseAssignments(singletonList(CASE_ID), null))
             .thenReturn(existingCaseAssignments);
 
         FindUsersByOrganisationResponse usersByOrganisation1 = new FindUsersByOrganisationResponse(List.of(
-            prdUser(2), prdUser(4), prdUser(4)), ORG_2_ID);
+            prdUser(2), prdUser(3), prdUser(4)), ORG_2_ID);
         when(prdRepository.findUsersByOrganisation(ORG_2_ID)).thenReturn(usersByOrganisation1);
 
         FindUsersByOrganisationResponse usersByOrganisation2 = new FindUsersByOrganisationResponse(List.of(
@@ -309,7 +309,7 @@ class ApplyNoCDecisionServiceTest {
             () -> assertThat(caseUserRolesCaptor.getValue().size(), is(1)),
             () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
             () -> assertThat(caseUserRolesCaptor.getValue().get(0).getUserId(), is(USER_ID_2)),
-            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseRole(), is(ORG_POLICY_1_ROLE)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseRole(), is(ORG_POLICY_2_ROLE)),
             () -> verify(dataStoreRepository, never()).removeCaseUserRoles(Mockito.any(), Mockito.eq(ORG_1_ID)),
             () -> verify(dataStoreRepository, never()).removeCaseUserRoles(Mockito.any(), Mockito.eq(ORG_3_ID)),
             () -> verify(notifyService).sendEmail(emailRequestsCaptor.capture()),
@@ -317,7 +317,55 @@ class ApplyNoCDecisionServiceTest {
             () -> assertThat(emailRequestsCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
             () -> assertThat(emailRequestsCaptor.getValue().get(0).getEmailAddress(), is("User2Email")),
             () -> verify(dataStoreRepository).assignCase(caseRolesCaptor.capture(), Mockito.eq(CASE_ID),
-                Mockito.eq("UserId3"), Mockito.eq(ORG_3_ID)),
+                Mockito.eq(USER_ID_3), Mockito.eq(ORG_3_ID)),
+            () -> assertThat(caseRolesCaptor.getValue().size(), is(1)),
+            () -> assertThat(caseRolesCaptor.getValue().get(0), is(ORG_POLICY_2_ROLE))
+        );
+    }
+
+    @Test
+    void shouldUpdateOrgUsersAccessWhenReplaceDecisionIsApplied2() throws JsonProcessingException {
+        CaseDetails caseDetails = CaseDetails.builder()
+            .data(createData(
+                orgPolicyAsString(null, null, null, null),
+                orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
+                organisationAsString(ORG_1_ID, ORG_1_NAME),
+                organisationAsString(ORG_2_ID, ORG_2_NAME)
+            ))
+            .id(CASE_ID)
+            .build();
+
+        List<CaseUserRole> existingCaseAssignments = List.of(
+            new CaseUserRole(CASE_ID, USER_ID_1, ORG_POLICY_2_ROLE),
+            new CaseUserRole(CASE_ID, USER_ID_2, ORG_POLICY_2_ROLE)
+        );
+        when(dataStoreRepository.getCaseAssignments(singletonList(CASE_ID), null))
+            .thenReturn(existingCaseAssignments);
+
+        FindUsersByOrganisationResponse usersByOrganisation1 = new FindUsersByOrganisationResponse(List.of(
+            prdUser(1)), ORG_1_ID);
+        when(prdRepository.findUsersByOrganisation(ORG_1_ID)).thenReturn(usersByOrganisation1);
+
+        FindUsersByOrganisationResponse usersByOrganisation2 = new FindUsersByOrganisationResponse(List.of(
+            prdUser(1), prdUser(2)), ORG_2_ID);
+        when(prdRepository.findUsersByOrganisation(ORG_2_ID)).thenReturn(usersByOrganisation2);
+
+        ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
+
+        applyNoCDecisionService.applyNoCDecision(request);
+        assertAll(
+            () -> verify(dataStoreRepository).removeCaseUserRoles(caseUserRolesCaptor.capture(), Mockito.eq(ORG_2_ID)),
+            () -> assertThat(caseUserRolesCaptor.getValue().size(), is(1)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getUserId(), is(USER_ID_2)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseRole(), is(ORG_POLICY_2_ROLE)),
+            () -> verify(dataStoreRepository, never()).removeCaseUserRoles(Mockito.any(), Mockito.eq(ORG_1_ID)),
+            () -> verify(notifyService).sendEmail(emailRequestsCaptor.capture()),
+            () -> assertThat(emailRequestsCaptor.getValue().size(), is(1)),
+            () -> assertThat(emailRequestsCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
+            () -> assertThat(emailRequestsCaptor.getValue().get(0).getEmailAddress(), is("User2Email")),
+            () -> verify(dataStoreRepository).assignCase(caseRolesCaptor.capture(), Mockito.eq(CASE_ID),
+                Mockito.eq(USER_ID_1), Mockito.eq(ORG_1_ID)),
             () -> assertThat(caseRolesCaptor.getValue().size(), is(1)),
             () -> assertThat(caseRolesCaptor.getValue().get(0), is(ORG_POLICY_2_ROLE))
         );

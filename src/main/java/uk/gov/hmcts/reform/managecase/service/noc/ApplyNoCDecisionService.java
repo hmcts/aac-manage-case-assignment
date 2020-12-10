@@ -106,11 +106,15 @@ public class ApplyNoCDecisionService {
         Organisation organisationToAdd = objectMapper.convertValue(organisationToAddNode, Organisation.class);
         Organisation organisationToRemove = objectMapper.convertValue(organisationToRemoveNode, Organisation.class);
 
+        List<CaseUserRole> existingCaseAssignments = dataStoreRepository
+            .getCaseAssignments(singletonList(caseDetails.getId()), null);
+
         if (organisationToAdd == null || isNullOrEmpty(organisationToAdd.getOrganisationID())) {
-            applyRemoveRepresentationDecision(caseDetails.getId(), orgPolicyNode, organisationToRemove);
+            applyRemoveRepresentationDecision(existingCaseAssignments, orgPolicyNode, organisationToRemove,
+                caseDetails.getId());
         } else {
-            applyAddOrReplaceRepresentationDecision(caseDetails.getId(), caseRoleId, orgPolicyNode,
-                    organisationToAddNode, organisationToAdd, organisationToRemove);
+            applyAddOrReplaceRepresentationDecision(existingCaseAssignments, caseRoleId, orgPolicyNode,
+                    organisationToAddNode, organisationToAdd, organisationToRemove, caseDetails.getId());
         }
     }
 
@@ -121,33 +125,49 @@ public class ApplyNoCDecisionService {
         }
     }
 
-    private void applyAddOrReplaceRepresentationDecision(String caseReference,
+    private void applyAddOrReplaceRepresentationDecision(List<CaseUserRole> existingCaseAssignments,
                                                          String caseRoleId,
                                                          JsonNode orgPolicyNode,
                                                          JsonNode organisationToAddNode,
                                                          Organisation organisationToAdd,
-                                                         Organisation organisationToRemove) {
+                                                         Organisation organisationToRemove,
+                                                         String caseReference) {
         setOrgPolicyOrganisation(orgPolicyNode, organisationToAddNode);
-        assignAccessToOrganisationUsers(caseReference, organisationToAdd, caseRoleId);
+        Pair<List<CaseUserRole>, List<ProfessionalUser>> newAssignedUsers = assignAccessToOrganisationUsers(
+            existingCaseAssignments, organisationToAdd, caseRoleId, caseReference);
 
         if (organisationToRemove != null && !isNullOrEmpty(organisationToRemove.getOrganisationID())) {
-            removeOrganisationUsersAccess(caseReference, organisationToRemove, caseRoleId);
+            List<CaseUserRole> filteredCaseAssignments =
+                filterCaseAssignments(existingCaseAssignments, newAssignedUsers.getLeft());
+            removeOrganisationUsersAccess(caseReference, filteredCaseAssignments,
+                organisationToRemove);
         }
     }
 
-    private void applyRemoveRepresentationDecision(String caseReference,
-                                                   JsonNode orgPolicyNode,
-                                                   Organisation organisationToRemove) {
-        nullifyNode(orgPolicyNode.get(ORGANISATION));
-        removeOrganisationUsersAccess(caseReference, organisationToRemove, null);
+    private List<CaseUserRole> filterCaseAssignments(List<CaseUserRole> existingCaseAssignments,
+                                                     List<CaseUserRole> assignmentsToFilter) {
+        List<String> userIdsToFilter = assignmentsToFilter.stream().map(CaseUserRole::getUserId).collect(toList());
+        return existingCaseAssignments.stream()
+            .filter(assignment -> !userIdsToFilter.contains(assignment.getUserId()))
+            .collect(toList());
     }
 
-    private void assignAccessToOrganisationUsers(String caseReference,
-                                                 Organisation organisationToAdd,
-                                                 String caseRoleToBeAssigned) {
+    private void applyRemoveRepresentationDecision(List<CaseUserRole> existingCaseAssignments,
+                                                   JsonNode orgPolicyNode,
+                                                   Organisation organisationToRemove,
+                                                   String caseReference) {
+        nullifyNode(orgPolicyNode.get(ORGANISATION));
+        removeOrganisationUsersAccess(caseReference, existingCaseAssignments, organisationToRemove);
+    }
+
+    private Pair<List<CaseUserRole>, List<ProfessionalUser>> assignAccessToOrganisationUsers(
+        List<CaseUserRole> existingCaseAssignments,
+        Organisation organisationToAdd,
+        String caseRoleToBeAssigned,
+        String caseReference) {
         String organisationId = organisationToAdd.getOrganisationID();
         Pair<List<CaseUserRole>, List<ProfessionalUser>> users =
-            getUsersWithCaseAccess(caseReference, organisationId, null);
+            getUsersWithCaseAccess(existingCaseAssignments, organisationId);
 
         users.getRight().forEach(user -> dataStoreRepository.assignCase(
             singletonList(caseRoleToBeAssigned),
@@ -155,6 +175,8 @@ public class ApplyNoCDecisionService {
             user.getUserIdentifier(),
             organisationId)
         );
+
+        return users;
     }
 
     private void setOrgPolicyOrganisation(JsonNode orgPolicyNode, JsonNode organisationToAddNode) {
@@ -162,10 +184,10 @@ public class ApplyNoCDecisionService {
     }
 
     private void removeOrganisationUsersAccess(String caseReference,
-                                               Organisation organisationToRemove,
-                                               String ignoredRole) {
+                                               List<CaseUserRole> existingCaseAssignments,
+                                               Organisation organisationToRemove) {
         Pair<List<CaseUserRole>, List<ProfessionalUser>> users =
-            getUsersWithCaseAccess(caseReference, organisationToRemove.getOrganisationID(), ignoredRole);
+            getUsersWithCaseAccess(existingCaseAssignments, organisationToRemove.getOrganisationID());
 
         if (!users.getLeft().isEmpty()) {
             dataStoreRepository.removeCaseUserRoles(users.getLeft(), organisationToRemove.getOrganisationID());
@@ -195,17 +217,10 @@ public class ApplyNoCDecisionService {
         return notifyService.sendEmail(emailNotificationRequests);
     }
 
-    private Pair<List<CaseUserRole>, List<ProfessionalUser>> getUsersWithCaseAccess(String caseReference,
-                                                                                    String organisationId,
-                                                                                    String ignoredRole) {
-        List<CaseUserRole> existingCaseAssignments = dataStoreRepository
-            .getCaseAssignments(singletonList(caseReference), null)
-            .stream()
-            .filter(caseUserRole -> !caseUserRole.getCaseRole().equals(ignoredRole))
-            .collect(toList());
-
+    private Pair<List<CaseUserRole>, List<ProfessionalUser>> getUsersWithCaseAccess(
+        List<CaseUserRole> existingCaseAssignments,
+        String organisationId) {
         FindUsersByOrganisationResponse usersByOrganisation = prdRepository.findUsersByOrganisation(organisationId);
-
         return getIntersection(existingCaseAssignments, usersByOrganisation.getUsers());
     }
 

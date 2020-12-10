@@ -10,7 +10,7 @@ management:
         time-to-live: 10s
       group:
         readiness:
-          include: db, ping, refreshScope, diskSpace
+          include: ping, refreshScope, diskSpace, health, info, prometheus
   endpoints:
     web:
       base-path: /

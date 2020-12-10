@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CaseViewEvent {
     private Long id;
 

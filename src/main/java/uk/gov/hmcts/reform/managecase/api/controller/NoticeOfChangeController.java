@@ -9,14 +9,17 @@ import io.swagger.annotations.ExampleProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackResponse;
@@ -24,6 +27,8 @@ import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
+import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
+import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
@@ -46,16 +51,23 @@ public class NoticeOfChangeController {
 
     public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
 
+    public static final String REQUEST_NOTICE_OF_CHANGE_PATH = "/noc-requests";
+    public static final String REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE =
+        "The Notice of Change request has been successfully submitted.";
+
     private final NoticeOfChangeQuestions noticeOfChangeQuestions;
     private final VerifyNoCAnswersService verifyNoCAnswersService;
     private final PrepareNoCService prepareNoCService;
+    private final RequestNoticeOfChangeService requestNoticeOfChangeService;
 
     public NoticeOfChangeController(NoticeOfChangeQuestions noticeOfChangeQuestions,
                                     VerifyNoCAnswersService verifyNoCAnswersService,
-                                    PrepareNoCService prepareNoCService) {
+                                    PrepareNoCService prepareNoCService,
+                                    RequestNoticeOfChangeService requestNoticeOfChangeService) {
         this.noticeOfChangeQuestions = noticeOfChangeQuestions;
         this.verifyNoCAnswersService = verifyNoCAnswersService;
         this.prepareNoCService = prepareNoCService;
+        this.requestNoticeOfChangeService = requestNoticeOfChangeService;
     }
 
     @GetMapping(path = GET_NOC_QUESTIONS, produces = APPLICATION_JSON_VALUE)
@@ -243,4 +255,48 @@ public class NoticeOfChangeController {
             throw new ValidationException("Case ID should contain digits only");
         }
     }
+
+    @PostMapping(path = REQUEST_NOTICE_OF_CHANGE_PATH, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Request Notice of Change Event", notes = "Request Notice of Change Event")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiResponses({
+        @ApiResponse(
+            code = 201,
+            message = REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:"
+                + "\n1) " + ValidationError.CASE_ID_INVALID
+                + "\n2) " + ValidationError.CASE_ID_INVALID_LENGTH
+                + "\n3) " + ValidationError.CASE_ID_EMPTY,
+            response = ApiError.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"message\": \"" + ValidationError.CASE_ID_EMPTY + "\",\n"
+                        + "   \"errors\": [ ]\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
+        )
+    })
+    public RequestNoticeOfChangeResponse requestNoticeOfChange(@Valid @RequestBody RequestNoticeOfChangeRequest
+                                                                                        requestNoticeOfChangeRequest) {
+        VerifyNoCAnswersRequest verifyNoCAnswersRequest
+            = new VerifyNoCAnswersRequest(requestNoticeOfChangeRequest.getCaseId(),
+                                          requestNoticeOfChangeRequest.getAnswers());
+        NoCRequestDetails noCRequestDetails = verifyNoCAnswersService.verifyNoCAnswers(verifyNoCAnswersRequest);
+        return requestNoticeOfChangeService.requestNoticeOfChange(noCRequestDetails);
+    }
+
 }

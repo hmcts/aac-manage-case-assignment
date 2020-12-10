@@ -32,7 +32,6 @@ services:
     networks:
       - ccd-network
 
-
 networks:
   ccd-network:
     external: true

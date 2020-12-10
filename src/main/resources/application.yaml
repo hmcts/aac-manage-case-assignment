@@ -8,11 +8,14 @@ management:
       show-details: "always"
       cache:
         time-to-live: 10s
+      group:
+        readiness:
+          include: db, ping, refreshScope, diskSpace
   endpoints:
     web:
       base-path: /
       exposure:
-        include: health, info, prometheus
+          include: health, info, prometheus
   health:
     probes:
       enabled: true

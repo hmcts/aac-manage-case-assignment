@@ -1,0 +1,41 @@
+{
+  "_guid_": "204_Submit_NoC_Event",
+  "_extends_": "Event_Creation",
+
+  "specs": [
+    "by System user to raise a NoC request on behalf of Mutlu to become a representative for Mario on C1"
+  ],
+
+  "user": {
+    "_extends_": "ACA_Users_Caseworker_CAA"
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][204_Case_Creation][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "changeOrganisationRequestField": {
+          "CaseRoleId": "[ApplicantSolicitor]",
+          "RequestTimestamp": null,
+          "OrganisationToAdd": {
+            "OrganisationID": null
+          },
+          "OrganisationToRemove": {
+            "OrganisationID": null
+          },
+          "Reason": null,
+          "ApprovalRejectionTimestamp": null,
+          "NotesReason": null,
+          "ApprovalStatus": null
+        }
+      },
+      "event": {
+        "id": "nocRequest"
+      },
+      "event_token": "${[scenarioContext][siblingContexts][204_Submit_NoC_Event_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+
+}

@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.COR_MISSING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.COR_MISSING_ORGANISATIONS;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_NOT_CONSIDERED;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_DATA_PROVIDED;
@@ -57,6 +58,8 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.PREVIO
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.PrematureDeclaration", "PMD.ExcessiveImports"})
 @Slf4j
 public class ApplyNoCDecisionService {
+
+    private static final String JSON_PATH_SEPARATOR = "/";
 
     private final PrdRepository prdRepository;
     private final DataStoreRepository dataStoreRepository;
@@ -85,17 +88,17 @@ public class ApplyNoCDecisionService {
             throw new ValidationException(NO_DATA_PROVIDED);
         }
 
-        // TODO: Use ACA-71 method when available on branch
-        JsonNode changeOrganisationRequestField = data.get("ChangeOrganisationRequestField");
+        JsonNode changeOrganisationRequestField = caseDetails.findChangeOrganisationRequestNode()
+            .orElseThrow(() -> new ValidationException(COR_MISSING));
 
-        String approvalStatus = getNonNullStringValue(changeOrganisationRequestField, APPROVAL_STATUS);
-        String caseRoleId = getNonNullStringValue(changeOrganisationRequestField, CASE_ROLE_ID);
         validateCorFieldOrganisations(changeOrganisationRequestField);
+        String approvalStatus = getNonNullStringValue(changeOrganisationRequestField, APPROVAL_STATUS);
+        String caseRoleId = getNonNullStringValue(changeOrganisationRequestField, CASE_ROLE_ID + ".value.code");
 
         if (NOT_CONSIDERED.getCode().equals(approvalStatus)) {
             throw new ValidationException(NOC_REQUEST_NOT_CONSIDERED);
         } else if (REJECTED.getCode().equals(approvalStatus)) {
-            nullifyNode(changeOrganisationRequestField);
+            nullifyNode(changeOrganisationRequestField, CASE_ROLE_ID);
             return data;
         } else if (!APPROVED.getCode().equals(approvalStatus)) {
             throw new ValidationException(UNKNOWN_NOC_APPROVAL_STATUS);
@@ -103,7 +106,7 @@ public class ApplyNoCDecisionService {
 
         applyDecision(caseDetails, changeOrganisationRequestField, caseRoleId);
 
-        nullifyNode(changeOrganisationRequestField);
+        nullifyNode(changeOrganisationRequestField, CASE_ROLE_ID);
         return data;
     }
 
@@ -116,9 +119,9 @@ public class ApplyNoCDecisionService {
         Organisation organisationToRemove = objectMapper.convertValue(organisationToRemoveNode, Organisation.class);
 
         if (organisationToAdd == null || isNullOrEmpty(organisationToAdd.getOrganisationID())) {
-            applyRemoveRepresentationDecision(caseDetails.getReference(), orgPolicyNode, organisationToRemove);
+            applyRemoveRepresentationDecision(caseDetails.getId(), orgPolicyNode, organisationToRemove);
         } else {
-            applyAddOrReplaceRepresentationDecision(caseDetails.getReference(), caseRoleId, orgPolicyNode,
+            applyAddOrReplaceRepresentationDecision(caseDetails.getId(), caseRoleId, orgPolicyNode,
                     organisationToAddNode, organisationToAdd, organisationToRemove);
         }
 
@@ -184,16 +187,17 @@ public class ApplyNoCDecisionService {
         }
     }
 
-    private String getNonNullStringValue(JsonNode node, String key) {
-        if (node.hasNonNull(key)) {
-            return node.get(key).asText();
-        } else {
-            throw new ValidationException(String.format("A value is expected for '%s'", key));
+    private String getNonNullStringValue(JsonNode node, String field) {
+        String path = JSON_PATH_SEPARATOR + field.replaceAll("\\.", JSON_PATH_SEPARATOR);
+        JsonNode nodeAtPath = node.at(path);
+        if (nodeAtPath.isMissingNode() || nodeAtPath.isNull()) {
+            throw new ValidationException(String.format("A value is expected for '%s'", field));
         }
+        return nodeAtPath.asText();
     }
 
-    private void nullifyNode(JsonNode node) {
-        jacksonUtils.nullifyObjectNode((ObjectNode) node);
+    private void nullifyNode(JsonNode node, String... ignoreNestedFields) {
+        jacksonUtils.nullifyObjectNode((ObjectNode) node, ignoreNestedFields);
     }
 
     private List<EmailNotificationRequestStatus> sendRemovalNotification(String caseReference,

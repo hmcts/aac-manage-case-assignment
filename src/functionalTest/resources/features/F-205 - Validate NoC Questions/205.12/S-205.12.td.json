@@ -1,0 +1,39 @@
+{
+  "_guid_": "S-205.12",
+  "_extends_": "S-205_Test_Data_Base",
+
+  "title": "NoC Answers must return an error response when the the invoking user's organisation is already representing the litigant identified by the answers",
+
+  "specs" : [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Dil - with a solicitor role for the same jurisdiction within a different organisation from Richard",
+
+    "is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1",
+    "contains all correct answers"
+  ],
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "_extends_": "NoC_Valid_Answers_For_Case_Role_R1"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body" : {
+      "message" : "The requestor has answered questions uniquely identifying a litigant that they are already representing",
+      "errors" : [ ]
+    }
+  }
+
+}

@@ -1,0 +1,27 @@
+{
+  "_guid_": "S-205.15.1",
+  "_extends_": "S-205.15_Test_Data_Base",
+
+  "title": "NoC Answers must return a positive response for various correct answers",
+
+  "specs": [
+    "has answers with extra whitespaces, apostrophes, hyphens and casing that expected"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "answers": [
+        {
+          "question_id": "NoC_Challenge_Name",
+          "value": "N o'r-on Ha"
+        },
+        {
+          "question_id": "NoC_Challenge_Name2",
+          "value": "1989-09-19"
+        }
+      ]
+    }
+  }
+
+}

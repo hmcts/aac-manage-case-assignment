@@ -1,0 +1,25 @@
+{
+  "_guid_": "S-205.11.1",
+  "_extends_": "S-205.11_Test_Data_Base",
+
+  "specs": [
+    "has no answers"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "answers": [
+      ]
+    }
+  },
+
+  "expectedResponse": {
+		"_extends_": "ACA_400_Response",
+    "body" : {
+      "errors" : [ "Challenge question answers can not be empty" ]
+    }
+
+  }
+
+}

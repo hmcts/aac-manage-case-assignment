@@ -1,0 +1,37 @@
+{
+  "_guid_": "S-205.11.3",
+  "_extends_": "S-205.11_Test_Data_Base",
+
+  "specs": [
+    "has too many answers"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "answers": [
+        {
+          "question_id": "NoC_Challenge_Name",
+          "value": "Noronha"
+        },
+        {
+          "question_id": "NoC_Challenge_Name2",
+          "value": "1989-09-19"
+        },
+        {
+          "question_id": "EXTRA-Q",
+          "value": "EXTRA-ANSWER"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+		"_extends_": "ACA_400_Response",
+    "body": {
+      "message" : "The number of provided answers must match the number of questions - expected 2 answers, received 3",
+      "errors" : [ ]
+    }
+  }
+
+}

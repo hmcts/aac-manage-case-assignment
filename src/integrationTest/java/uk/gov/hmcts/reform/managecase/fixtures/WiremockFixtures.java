@@ -96,7 +96,7 @@ public final class WiremockFixtures {
                                     .withBody(getJsonString(
                                         caseDetails == null ? new CaseSearchResponse() : new CaseSearchResponse(list(
                                             caseDetails))))
-                                    .withHeader("Content-Type", "application/json")));
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     public static void stubSearchCase(String caseTypeId, String searchQuery, CaseDetails caseDetails) {
@@ -191,13 +191,12 @@ public final class WiremockFixtures {
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
-    public static void stubIdamSearch(String userId, UserDetails user) {
-        stubFor(WireMock.get(urlPathEqualTo("/api/v1/users"))
-                    .withQueryParam("query", equalTo("id:\"" + userId + "\""))
-                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-                    .willReturn(aResponse()
-                                    .withStatus(HTTP_OK).withBody(getJsonString(List.of(user)))
-                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    public static void stubIdamGetUserById(String userId, UserDetails user) {
+        stubFor(WireMock.get(urlPathEqualTo("/api/v1/users/" + userId))
+                .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                .willReturn(aResponse()
+                        .withStatus(HTTP_OK).withBody(getJsonString(user))
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     @SuppressWarnings({"PMD.AvoidThrowingRawExceptionTypes", "squid:S112"})

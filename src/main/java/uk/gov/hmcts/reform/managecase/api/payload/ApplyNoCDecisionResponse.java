@@ -14,7 +14,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ApiModel("Verify Notice of Change Answers Response")
+@ApiModel("Apply Notice of Change Decision Response")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApplyNoCDecisionResponse {
 

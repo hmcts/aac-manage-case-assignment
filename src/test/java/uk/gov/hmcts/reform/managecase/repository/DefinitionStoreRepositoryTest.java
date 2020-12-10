@@ -49,14 +49,13 @@ class DefinitionStoreRepositoryTest {
             .id("Number")
             .type("Number")
             .build();
-        ChallengeQuestion challengeQuestion = new ChallengeQuestion(CASE_TYPE_ID, 1,
-                                                                    "QuestionText1",
-                                                                    fieldType,
-                                                                    null,
-                                                                    "NoC",
-                                                                    ANSWER_FIELD,
-                                                                    "QuestionId1",
-                                                                    null);
+        ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+            .caseTypeId(CASE_TYPE_ID)
+            .challengeQuestionId("QuestionId1")
+            .questionText("QuestionText1")
+            .answerFieldType(fieldType)
+            .answerField(ANSWER_FIELD)
+            .questionId("NoC").build();
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
             Arrays.asList(challengeQuestion));
         given(definitionStoreApiClient.challengeQuestions(anyString(), anyString()))

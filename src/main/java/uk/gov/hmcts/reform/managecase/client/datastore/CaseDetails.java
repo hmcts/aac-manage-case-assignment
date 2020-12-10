@@ -11,6 +11,7 @@ import lombok.Getter;
 import javax.validation.ValidationException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
@@ -30,6 +31,7 @@ public class CaseDetails {
     public static final String ORG_NAME = "OrganisationName";
     public static final String PREVIOUS_ORGANISATIONS = "PreviousOrganisations";
 
+    private String id;
     private String reference;
     private String jurisdiction;
     private String state;
@@ -56,5 +58,12 @@ public class CaseDetails {
             })
             .orElseThrow(() -> new ValidationException(String.format("No Organisation Policy found with "
                 + "case role ID '%s'", caseRoleId)));
+    }
+
+    public Optional<JsonNode> findChangeOrganisationRequestNode() {
+        return getData().values().stream()
+            .map(node -> node.findParents(ORGANISATION_TO_ADD))
+            .flatMap(List::stream)
+            .findFirst();
     }
 }

@@ -1,0 +1,41 @@
+{
+  "_guid_": "S-205.10",
+  "_extends_": "S-205_Test_Data_Base",
+
+  "title": "NoC Answers must return an error response when the solicitor does not have access to the jurisdiction of the case",
+
+  "specs" : [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Ashley - with a solicitor role for a different jurisdiction from that of the case that Richard and no pui-caa role will create and within a different organisation from Richard",
+
+    "is made by Ashley to validate the answers in order to become Mario's representative on C1",
+    "contains a valid case ID for C1",
+    "contains a structurally valid set of answers",
+    "contains a valid IDAM token for Dil"
+  ],
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_Ashley"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "_extends_": "NoC_Valid_Answers_For_Case_Role_R1"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body" : {
+      "message" : "Insufficient privileges for notice of change request",
+      "errors" : [ ]
+    }
+  }
+
+}

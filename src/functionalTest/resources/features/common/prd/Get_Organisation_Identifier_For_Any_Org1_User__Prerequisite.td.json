@@ -1,0 +1,15 @@
+{
+  "_guid_": "Get_Organisation_Identifier_For_Any_Org1_User__Prerequisite",
+  "_extends_": "Get_Organisation_Identifier__Base",
+
+  "specs": [
+    "As a prerequisite"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Jane"
+    }
+  }
+
+}

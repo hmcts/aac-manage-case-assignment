@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ApiModel("Verify Notice of Change Answers Request")
+@ApiModel("Apply Notice of Change Decision Request")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ApplyNoCDecisionRequest {
 

@@ -1,0 +1,14 @@
+{
+  "_guid_": "NoC_Valid_Answers_For_Case_Role_R2",
+
+  "answers": [
+    {
+      "question_id": "NoC_Challenge_Name",
+      "value": "alpha innovare"
+    },
+    {
+      "question_id": "NoC_Challenge_Name2",
+      "value": "2020-01-01"
+    }
+  ]
+}

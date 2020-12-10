@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -7,12 +8,15 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.config.JacksonObjectMapperConfig;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.domain.DynamicList;
+import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,15 +29,18 @@ public class CaseDetailsTest {
 
     @Test
     @DisplayName("Find ChangeOrganisationRequest Json nodes from data")
-    void shouldFindChangeOrganisationRequestNodes() {
+    void shouldFindChangeOrganisationRequestNodes() throws JsonProcessingException {
         // ARRANGE
         LocalDateTime now = LocalDateTime.of(2020, Month.MAY, 16, 11, 48, 32);
 
         Organisation organisationToAdd = Organisation.builder().organisationID("id1").build();
         Organisation organisationToRemove = Organisation.builder().organisationID("id2").build();
 
+        DynamicListElement dynamicListElement = DynamicListElement.builder().code("code").label("label").build();
+        DynamicList dynamicList =
+            DynamicList.builder().value(dynamicListElement).listItems(List.of(dynamicListElement)).build();
         ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
-            .caseRoleId("[Claimant]")
+            .caseRoleId(dynamicList)
             .requestTimestamp(now)
             .organisationToAdd(organisationToAdd)
             .organisationToRemove(organisationToRemove)
@@ -48,7 +55,7 @@ public class CaseDetailsTest {
             + "\"OrganisationToRemove\":{"
             +   "\"OrganisationID\":\"" + organisationToRemove.getOrganisationID() + "\""
             + "},"
-            + "\"CaseRoleId\":\"" + cor.getCaseRoleId() + "\","
+            + "\"CaseRoleId\":" + objectMapper.writeValueAsString(dynamicList) + ","
             + "\"RequestTimestamp\":\"" + now + "\","
             + "\"ApprovalStatus\":\"APPROVED\""
             + "}";

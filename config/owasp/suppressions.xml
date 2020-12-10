@@ -101,4 +101,19 @@
     <cve>CVE-2020-13956</cve>
     <cve>CVE-2020-17527</cve>
   </suppress>
+
+  <suppress>
+    <notes><![CDATA[
+			Jar: io.github.openfeign:feign-httpclient-11.0.jar
+			Analysis: No fix or work around available
+		]]></notes>
+    <cve>CVE-2020-13956</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+			httpclient-4.5.12.jar, tomcat-embed-core-9.0.38.jar
+		]]></notes>
+    <cve>CVE-2020-13956</cve>
+    <cve>CVE-2020-17527</cve>
+  </suppress>
 </suppressions>

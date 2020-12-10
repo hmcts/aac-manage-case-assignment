@@ -11,33 +11,42 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.domain.DynamicList;
+import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
+import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
+import javax.validation.ValidationException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
+import static uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService.MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap",
     "PMD.AvoidDuplicateLiterals",
@@ -58,6 +67,7 @@ class RequestNoticeOfChangeServiceTest {
     private static final String SOLICITOR_ROLE = "caseworker-" + JURISDICTION_ONE + "-solicitor";
     private static final String NON_SOLICITOR_ROLE = "caseworker-" + JURISDICTION_ONE + "-citizen";
     private static final String USER_INFO_UID = "userInfoUid";
+    private static final String DYNAMIC_LIST_LABEL = "name";
 
     private NoCRequestDetails noCRequestDetails;
     private Organisation incumbentOrganisation;
@@ -71,6 +81,8 @@ class RequestNoticeOfChangeServiceTest {
     @Mock
     private DataStoreRepository dataStoreRepository;
     @Mock
+    private DefinitionStoreRepository definitionStoreRepository;
+    @Mock
     private PrdRepository prdRepository;
     @Mock
     private SecurityUtils securityUtils;
@@ -81,16 +93,19 @@ class RequestNoticeOfChangeServiceTest {
     void setUp() {
         initMocks(this);
         FindUsersByOrganisationResponse findUsersByOrganisationResponse = new FindUsersByOrganisationResponse(
-            Collections.emptyList(), INVOKERS_ORGANISATION_IDENTIFIER);
+            emptyList(), INVOKERS_ORGANISATION_IDENTIFIER);
         given(prdRepository.findUsersByOrganisation()).willReturn(findUsersByOrganisationResponse);
 
+        CaseViewType caseViewType = new CaseViewType();
+        caseViewType.setId("id");
+        caseViewType.setName(DYNAMIC_LIST_LABEL);
         CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
         caseViewActionableEvent.setId(NOC_REQUEST_EVENT);
         CaseViewActionableEvent[] caseViewActionableEvents = {caseViewActionableEvent};
         CaseViewResource caseViewResource = new CaseViewResource();
         caseViewResource.setReference(CASE_ID);
         caseViewResource.setCaseViewActionableEvents(caseViewActionableEvents);
-
+        caseViewResource.setCaseType(caseViewType);
         incumbentOrganisation = Organisation.builder().organisationID(INCUMBENT_ORGANISATION_ID).build();
         OrganisationPolicy organisationPolicy = new OrganisationPolicy(incumbentOrganisation,
                                                                        ORG_POLICY_REFERENCE, CASE_ASSIGNED_ROLE);
@@ -103,6 +118,9 @@ class RequestNoticeOfChangeServiceTest {
         caseDetails = CaseDetails.builder().id(CASE_ID).data(new HashMap<>()).build();
 
         given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
+
+        List<CaseRole> caseRoles = List.of(CaseRole.builder().id(CASE_ASSIGNED_ROLE).name(DYNAMIC_LIST_LABEL).build());
+        given(definitionStoreRepository.caseRoles(anyString(), anyString(), anyString())).willReturn(caseRoles);
     }
 
     @Test
@@ -138,9 +156,17 @@ class RequestNoticeOfChangeServiceTest {
         assertThat(caseIdCaptor.getValue()).isEqualTo(CASE_ID);
         assertThat(eventIdCaptor.getValue()).isEqualTo(NOC_REQUEST_EVENT);
 
+        DynamicListElement dynamicListElement = DynamicListElement.builder()
+            .code(CASE_ASSIGNED_ROLE)
+            .label(DYNAMIC_LIST_LABEL)
+            .build();
+        DynamicList dynamicList = DynamicList.builder()
+            .value(dynamicListElement)
+            .listItems(List.of(dynamicListElement))
+            .build();
         ChangeOrganisationRequest capturedCor = corArgumentCaptor.getValue();
         assertAll(
-            () -> assertThat(capturedCor.getCaseRoleId()).isEqualTo(CASE_ASSIGNED_ROLE),
+            () -> assertThat(capturedCor.getCaseRoleId()).isEqualTo(dynamicList),
             () -> assertThat(capturedCor.getOrganisationToAdd().getOrganisationID()).isEqualTo(
                 INVOKERS_ORGANISATION_IDENTIFIER),
             () -> assertThat(capturedCor.getOrganisationToRemove()).isEqualTo(organisationToRemove),
@@ -162,7 +188,7 @@ class RequestNoticeOfChangeServiceTest {
     @DisplayName("NoC auto approval with Change Organisation Request and Case Role present returns PENDING state")
     void testAutoApprovalCorPresentCaseRolePresent() {
         ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
-            .caseRoleId(CASE_ASSIGNED_ROLE)
+            .caseRoleId(DynamicList.builder().build())
             .build();
         updateCaseDetailsData(caseDetails, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
 
@@ -279,6 +305,19 @@ class RequestNoticeOfChangeServiceTest {
         verify(dataStoreRepository, never())
             .assignCase(any(), any(String.class), any(String.class), any(String.class));
         assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(APPROVED);
+    }
+
+    @Test
+    @DisplayName("Generate a Notice Of Change Request throws Validation Exception if caseRoleId not "
+        + "present in definition store")
+    void testThrowsValidationErrorIfCaseRoleIdNotPresentInDefinitionStore() {
+        given(definitionStoreRepository.caseRoles(anyString(), anyString(), anyString())).willReturn(emptyList());
+        ValidationException exception = assertThrows(
+            ValidationException.class,
+            () -> service.requestNoticeOfChange(noCRequestDetails)
+        );
+        assertThat(exception.getMessage()).isEqualTo(
+            String.format(MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION, CASE_ASSIGNED_ROLE));
     }
 
     private void setInvokerToActAsAnAdminOrSolicitor(boolean actAsAnAdminOrSolicitor) {

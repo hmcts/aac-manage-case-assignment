@@ -13,5 +13,5 @@ java:
   environment:
     S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     CCD_DATA_STORE_API_BASE_URL: http://ccd-data-store-api-pr-1283.service.core-compute-preview.internal
-    CCD_DEFINITION_STORE_API_BASE_URL: http://ccd-definition-store-api-pr-835.service.core-compute-preview.internal
+    CCD_DEFINITION_STORE_API_BASE_URL: http://ccd-definition-store-api-pr-861.service.core-compute-preview.internal
 

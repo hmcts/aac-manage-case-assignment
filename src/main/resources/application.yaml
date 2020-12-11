@@ -54,7 +54,7 @@ idam:
     totp_secret: ${MANAGE_CASE_S2S_KEY:AAAAAAAAAAAAAAAA}
     url: ${S2S_URL:http://localhost:4502}
   s2s-authorised:
-    services: ${MANAGE_CASE_S2S_AUTHORISED_SERVICES:xui_webapp,ccd_data}
+    services: ${MANAGE_CASE_S2S_AUTHORISED_SERVICES:xui_webapp,ccd_data,finrem_case_orchestration}
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 

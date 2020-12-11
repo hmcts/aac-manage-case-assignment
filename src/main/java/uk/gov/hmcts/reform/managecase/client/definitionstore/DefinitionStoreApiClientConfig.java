@@ -9,6 +9,9 @@ public class DefinitionStoreApiClientConfig {
     public static final String CHALLENGE_QUESTIONS
         = "api/display/challenge-questions/case-type/{ctid}/question-groups/{id}";
 
+    public static final String CASE_ROLES
+        = "api/data/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/roles";
+
     @Bean
     public SystemUserAuthHeadersInterceptor systemUserAuthHeadersInterceptor(SecurityUtils securityUtils) {
         return new SystemUserAuthHeadersInterceptor(securityUtils);

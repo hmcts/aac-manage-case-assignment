@@ -34,14 +34,14 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_NOT_CONSIDERED;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_DATA_PROVIDED;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.UNKNOWN_NOC_APPROVAL_STATUS;
-import static uk.gov.hmcts.reform.managecase.client.datastore.ApprovalStatus.APPROVED;
-import static uk.gov.hmcts.reform.managecase.client.datastore.ApprovalStatus.NOT_CONSIDERED;
-import static uk.gov.hmcts.reform.managecase.client.datastore.ApprovalStatus.REJECTED;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.APPROVAL_STATUS;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CASE_ROLE_ID;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_ADD;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_REMOVE;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.NOT_CONSIDERED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.REJECTED;
 
 @Service
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.PrematureDeclaration", "PMD.ExcessiveImports"})
@@ -83,12 +83,12 @@ public class ApplyNoCDecisionService {
         String approvalStatus = getNonNullStringValue(changeOrganisationRequestField, APPROVAL_STATUS);
         String caseRoleId = getNonNullStringValue(changeOrganisationRequestField, CASE_ROLE_ID + ".value.code");
 
-        if (NOT_CONSIDERED.getCode().equals(approvalStatus)) {
+        if (NOT_CONSIDERED.getValue().equals(approvalStatus)) {
             throw new ValidationException(NOC_REQUEST_NOT_CONSIDERED);
-        } else if (REJECTED.getCode().equals(approvalStatus)) {
+        } else if (REJECTED.getValue().equals(approvalStatus)) {
             nullifyNode(changeOrganisationRequestField, CASE_ROLE_ID);
             return data;
-        } else if (!APPROVED.getCode().equals(approvalStatus)) {
+        } else if (!APPROVED.getValue().equals(approvalStatus)) {
             throw new ValidationException(UNKNOWN_NOC_APPROVAL_STATUS);
         }
 

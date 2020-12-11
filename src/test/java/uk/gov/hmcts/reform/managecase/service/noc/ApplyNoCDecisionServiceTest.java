@@ -44,12 +44,12 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_NOT_CONSIDERED;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_DATA_PROVIDED;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.UNKNOWN_NOC_APPROVAL_STATUS;
-import static uk.gov.hmcts.reform.managecase.client.datastore.ApprovalStatus.NOT_CONSIDERED;
-import static uk.gov.hmcts.reform.managecase.client.datastore.ApprovalStatus.REJECTED;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.APPROVAL_STATUS;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CASE_ROLE_ID;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_REMOVE;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_POLICY_CASE_ASSIGNED_ROLE;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.NOT_CONSIDERED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.REJECTED;
 
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.DataflowAnomalyAnalysis",
     "PMD.JUnitAssertionsShouldIncludeMessage"})
@@ -374,7 +374,7 @@ class ApplyNoCDecisionServiceTest {
     @Test
     void shouldUpdateCaseDataWhenRejectedDecisionIsApplied() throws JsonProcessingException {
         Map<String, JsonNode> data = createData();
-        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS, new TextNode(REJECTED.getCode()) {
+        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS, new TextNode(REJECTED.getValue()) {
         });
         CaseDetails caseDetails = CaseDetails.builder()
             .data(data)
@@ -418,7 +418,8 @@ class ApplyNoCDecisionServiceTest {
     @Test
     void shouldErrorWhenApprovalStatusIsPending() throws JsonProcessingException {
         Map<String, JsonNode> data = createData();
-        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS, new TextNode(NOT_CONSIDERED.getCode()));
+        ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS,
+            new TextNode(NOT_CONSIDERED.getValue()));
         CaseDetails caseDetails = CaseDetails.builder()
             .data(data)
             .id(CASE_ID)

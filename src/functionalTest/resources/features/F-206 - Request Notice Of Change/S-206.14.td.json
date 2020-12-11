@@ -1,0 +1,46 @@
+{
+  "_guid_": "S-206.14",
+  "_extends_": "Request_NoC__Base",
+
+  "title": "(Happy Path) CAA (also a solicitor for the same jurisdiction) requests NoC for a non-represented litigant - auto-approval applies",
+
+  "specs": [
+    "Mario - to initiate a case on his own behalf via a citizen facing application",
+    "Jane - with a pui-caa role and a solicitor role for the same jurisdiction as that of a case initiated by Mario",
+
+    "contains all correct answers in the correct format",
+    "contains answers identifying case role R2",
+
+    "is made by Jane to place a NOC Request for C1"
+  ],
+
+  "users": {
+    "Mario": {
+      "_extends_": "ACA_Users_Mario"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Jane"
+    }
+  },
+
+  "prerequisites": [
+    { "case_snapshot": "F-206_Take_Case_Data_Snapshot_For_NoC_Auto_Approval_Case_Created_By_Mario" }
+  ],
+
+  "request": {
+    "body": {
+      "_extends_": "NoC_Auto_Approval_Valid_Answers_For_Case_Role_R2",
+
+      "case_id": "${[scenarioContext][childContexts][F-206_NoC_Auto_Approval_Case_Creation_By_Mario_With_Assigned_R1_Org_Policy][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "status_message": "The Notice of Change request has been successfully submitted.",
+      "case_role": "[RespondentSolicitor]",
+      "approval_status": "APPROVED"
+    }
+  }
+}

@@ -180,7 +180,7 @@ dependencyManagement {
       entry 'log4j-api'
     }
     // CVE-2020-11996, CVE-2020-13934
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.38') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.40') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
@@ -264,6 +264,8 @@ dependencies {
   implementation "net.minidev:json-smart:2.3"
   implementation "io.github.openfeign:feign-httpclient:11.0"
   implementation "com.github.ben-manes.caffeine:caffeine:2.7.0"
+  implementation "org.apache.httpcomponents:httpclient:4.5.13"
+
 
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
   implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'
@@ -290,7 +292,7 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.1.0'
+  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.16.1'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath

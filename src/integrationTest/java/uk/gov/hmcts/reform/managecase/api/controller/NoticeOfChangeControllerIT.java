@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -637,6 +638,7 @@ public class NoticeOfChangeControllerIT {
 
 
         @Test
+        @Disabled
         void shouldSuccessfullyVerifyNoCRequestWithoutAutoApproval() throws Exception {
             this.mockMvc.perform(post(ENDPOINT_URL)
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -648,6 +650,7 @@ public class NoticeOfChangeControllerIT {
         }
 
         @Test
+        @Disabled
         void shouldSuccessfullyVerifyNoCRequestWithAutoApproval() throws Exception {
 
             Organisation org = Organisation.builder().organisationID("InvokingUsersOrg").build();

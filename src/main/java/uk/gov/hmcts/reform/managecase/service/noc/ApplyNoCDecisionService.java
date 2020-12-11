@@ -3,9 +3,11 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import feign.FeignException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -220,7 +222,19 @@ public class ApplyNoCDecisionService {
     private Pair<List<CaseUserRole>, List<ProfessionalUser>> getUsersWithCaseAccess(
         List<CaseUserRole> existingCaseAssignments,
         String organisationId) {
-        FindUsersByOrganisationResponse usersByOrganisation = prdRepository.findUsersByOrganisation(organisationId);
+        FindUsersByOrganisationResponse usersByOrganisation;
+        try {
+            usersByOrganisation = prdRepository.findUsersByOrganisation(organisationId);
+        } catch (FeignException e) {
+            HttpStatus status = HttpStatus.resolve(e.status());
+
+            String errorMessage = status == HttpStatus.NOT_FOUND
+                ? String.format("Organisation with ID '%s' can not be found.", organisationId)
+                : String.format("Error encountered while retrieving organisation users for organisation ID '%s': %s",
+                organisationId, status.getReasonPhrase());
+
+            throw new ValidationException(errorMessage, e);
+        }
         return getIntersection(existingCaseAssignments, usersByOrganisation.getUsers());
     }
 

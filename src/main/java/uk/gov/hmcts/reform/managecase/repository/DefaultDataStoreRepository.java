@@ -188,7 +188,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         if (defaultApprovalStatusValue == null
             || defaultApprovalStatusValue.isMissingNode()
             || defaultApprovalStatusValue.isEmpty()) {
-            changeOrganisationRequest.setApprovalStatus(PENDING.name());
+            changeOrganisationRequest.setApprovalStatus(PENDING.getValue());
         }
     }
 

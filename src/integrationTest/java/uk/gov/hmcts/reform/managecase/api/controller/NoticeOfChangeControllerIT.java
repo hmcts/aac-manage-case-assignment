@@ -12,13 +12,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import uk.gov.hmcts.reform.managecase.BaseTest;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.CheckNoticeOfChangeApprovalRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
-import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
@@ -32,14 +32,17 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.Heade
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.domain.DynamicList;
+import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
-import uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -58,14 +61,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.defaultCaseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.defaultCaseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getCaseViewFields;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getWizardPages;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.NOC_PREPARE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS;
@@ -73,16 +77,18 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternal;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternalAsApprover;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternalES;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseRoles;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseViaExternalApi;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetChallengeQuestions;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetExternalStartEventTrigger;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetExternalStartEventTriggerAsApprover;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetStartEventTrigger;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSubmitEventForCase;
-import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
-import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.UseConcurrentHashMap",
@@ -176,6 +182,13 @@ public class NoticeOfChangeControllerIT {
             Arrays.asList(challengeQuestion));
         stubGetChallengeQuestions(CASE_TYPE_ID, "NoCChallenge", challengeQuestionsResult);
 
+        List<CaseRole> caseRoleList = Arrays.asList(
+            CaseRole.builder().id("[CLAIMANT]").name("Claimant").description("Claimant").build(),
+            CaseRole.builder().id("[DEFENDANT]").name("Defendant").description("Defendant").build(),
+            CaseRole.builder().id("[OTHER]").name("Other").description("Other").build()
+        );
+        stubGetCaseRoles("0", JURISDICTION, CASE_TYPE_ID, caseRoleList);
+
         CaseDetails caseDetails = CaseDetails.builder().data(caseFields).build();
         stubGetCaseViaExternalApi(CASE_ID, caseDetails);
     }
@@ -267,11 +280,88 @@ public class NoticeOfChangeControllerIT {
     }
 
     @Nested
+    @DisplayName("POST /noc/noc-prepare")
+    class PrepareNoticeOfChange extends BaseTest {
+
+        private static final String ENDPOINT_URL = "/noc" + NOC_PREPARE_PATH;
+
+        @Autowired
+        private MockMvc mockMvc;
+
+        @Test
+        void shouldPrepareNoCEventSuccessfully() throws Exception {
+
+            Map<String, JsonNode> data = new HashMap<>();
+            data.put("ChangeOrganisationRequestField", createChangeOrganisationRequest());
+            data.put("OrganisationPolicyField", createOrganisationPolicyField());
+
+
+            CaseDetails caseDetails = CaseDetails.builder()
+                .caseTypeId(CASE_TYPE_ID)
+                .jurisdiction(JURISDICTION)
+                .id(CASE_ID)
+                .data(data)
+                .state("caseCreated")
+                .build();
+
+            AboutToStartCallbackRequest request = new AboutToStartCallbackRequest("prepareOrganisation",
+                                                                                  caseDetails, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId.value.code", is("[Defendant]")))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId.value.label", is("Defendant")))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId.list_items[0].code",
+                                    is("[Defendant]")))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId.list_items[0].label",
+                                    is("Defendant")))
+                .andExpect(jsonPath("$.data.OrganisationPolicyField.Organisation.OrganisationID",
+                                    is(ORGANISATION_ID)));
+        }
+
+        private JsonNode createOrganisationPolicyField() throws JsonProcessingException {
+            return mapper.readTree("{\n"
+                                       + "            \"Organisation\": {\n"
+                                       + "              \"OrganisationID\": \"QUK822N\",\n"
+                                       + "              \"OrganisationName\": null\n"
+                                       + "            },\n"
+                                       + "            \"OrgPolicyReference\": null,\n"
+                                       + "            \"OrgPolicyCaseAssignedRole\": \"[Defendant]\"\n"
+                                       + "          }");
+        }
+
+        private JsonNode createChangeOrganisationRequest() throws JsonProcessingException {
+            return mapper.readTree("{\n"
+                                       + "        \"Reason\": null,\n"
+                                       + "        \"CaseRoleId\": null,\n"
+                                       + "        \"NotesReason\": null,\n"
+                                       + "        \"ApprovalStatus\": \"2\",\n"
+                                       + "        \"RequestTimestamp\": \"2020-11-20T16:17:36.090968\",\n"
+                                       + "        \"OrganisationToAdd\": {\n"
+                                       + "          \"OrganisationID\": null,\n"
+                                       + "          \"OrganisationName\": null\n"
+                                       + "        },\n"
+                                       + "        \"OrganisationToRemove\": {\n"
+                                       + "          \"OrganisationID\": null,\n"
+                                       + "          \"OrganisationName\": null\n"
+                                       + "        },\n"
+                                       + "        \"ApprovalRejectionTimestamp\": null\n"
+                                       + "      }");
+        }
+    }
+
+    @Nested
     @DisplayName("POST /noc/noc-requests")
     class PostNoticeOfChangeRequests extends BaseTest {
         private static final String ENDPOINT_URL = "/noc" + REQUEST_NOTICE_OF_CHANGE_PATH;
         private static final String EVENT_TOKEN = "EVENT_TOKEN";
         private static final String CHANGE_ORGANISATION_REQUEST_FIELD = "changeOrganisationRequestField";
+        private static final String ZERO = "0";
+        private static final String JURISDICTION = ZERO;
+        private static final String USER_ID = ZERO;
 
         @Autowired
         private MockMvc mockMvc;
@@ -314,7 +404,12 @@ public class NoticeOfChangeControllerIT {
                 .token("token")
                 .caseDetails(caseDetails)
                 .build();
-            WiremockFixtures.stubGetExternalStartEventTrigger(CASE_ID, NOC, startEventResource);
+            stubGetExternalStartEventTrigger(CASE_ID, NOC, startEventResource);
+
+            List<CaseRole> caseRoleList = Arrays.asList(
+                CaseRole.builder().id("APPLICANT").name("Applicant").build()
+            );
+            stubGetCaseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID, caseRoleList);
         }
 
         @Test
@@ -364,12 +459,19 @@ public class NoticeOfChangeControllerIT {
         @Autowired
         private MockMvc mockMvc;
 
+        DynamicListElement dynamicListElement = DynamicListElement.builder().code("code").label("label").build();
+        DynamicList dynamicList = DynamicList.builder()
+            .value(dynamicListElement)
+            .listItems(List.of(dynamicListElement))
+            .build();
+
         @BeforeEach
         public void setup() throws JsonProcessingException {
+
             changeOrganisationRequest = ChangeOrganisationRequest.builder()
                 .organisationToAdd(new Organisation("123", "Org1"))
                 .organisationToRemove(new Organisation("789", "Org2"))
-                .caseRoleId("CaseRoleId")
+                .caseRoleId(dynamicList)
                 .requestTimestamp(LocalDateTime.now())
                 .approvalStatus(APPROVED.name())
                 .build();
@@ -425,7 +527,7 @@ public class NoticeOfChangeControllerIT {
             changeOrganisationRequest = ChangeOrganisationRequest.builder()
                 .organisationToAdd(new Organisation("123", "Org1"))
                 .organisationToRemove(new Organisation("789", "Org2"))
-                .caseRoleId("CaseRoleId")
+                .caseRoleId(dynamicList)
                 .requestTimestamp(LocalDateTime.now())
                 .approvalStatus(PENDING.name())
                 .build();

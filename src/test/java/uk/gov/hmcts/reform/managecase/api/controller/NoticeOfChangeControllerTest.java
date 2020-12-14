@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.CheckNoticeOfChangeApprovalReq
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.SubmitCallbackResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
@@ -27,7 +28,9 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQues
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.config.SecurityConfiguration;
+import uk.gov.hmcts.reform.managecase.domain.ApprovalStatus;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.domain.DynamicList;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
@@ -36,12 +39,15 @@ import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
+import uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -67,6 +73,7 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.NOC_PREPARE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS;
@@ -104,6 +111,9 @@ public class NoticeOfChangeControllerTest {
 
         @MockBean
         protected NoticeOfChangeApprovalService approvalService;
+
+        @MockBean
+        protected PrepareNoCService prepareNoCService;
 
         @MockBean
         protected VerifyNoCAnswersService verifyNoCAnswersService;
@@ -154,7 +164,8 @@ public class NoticeOfChangeControllerTest {
                     = new NoticeOfChangeController(service,
                                                    approvalService,
                                                    verifyNoCAnswersService,
-                                                   requestNoticeOfChangeService,
+                                                  prepareNoCService,
+                                                                                   requestNoticeOfChangeService,
                                                    jacksonUtils);
 
                 // ACT
@@ -352,6 +363,7 @@ public class NoticeOfChangeControllerTest {
             NoticeOfChangeController controller = new NoticeOfChangeController(service,
                                                                                approvalService,
                                                                                verifyNoCAnswersService,
+                                                                               prepareNoCService,
                                                                                requestNoticeOfChangeService,
                                                                                jacksonUtils);
 
@@ -438,7 +450,7 @@ public class NoticeOfChangeControllerTest {
             changeOrganisationRequest = ChangeOrganisationRequest.builder()
                 .organisationToAdd(new Organisation("123", "Org1"))
                 .organisationToRemove(new Organisation("789", "Org2"))
-                .caseRoleId("CaseRoleId")
+                .caseRoleId(DynamicList.builder().build())
                 .requestTimestamp(LocalDateTime.now())
                 .approvalStatus(null)
                 .build();
@@ -457,6 +469,7 @@ public class NoticeOfChangeControllerTest {
                 new NoticeOfChangeController(service,
                                              approvalService,
                                              verifyNoCAnswersService,
+                                             prepareNoCService,
                                              requestNoticeOfChangeService,
                                              jacksonUtils);
 
@@ -503,7 +516,7 @@ public class NoticeOfChangeControllerTest {
         @DisplayName("should return 200 status code if ApprovalStatus is not equal to 1")
         @Test
         void shouldReturnSuccessfullyIfApprovalStatusIsNotApprovedCode() throws Exception {
-            changeOrganisationRequest.setApprovalStatus("0");
+            changeOrganisationRequest.setApprovalStatus(ApprovalStatus.PENDING.getValue());
             caseDetails =  caseDetails(changeOrganisationRequest);
             request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
 
@@ -597,6 +610,52 @@ public class NoticeOfChangeControllerTest {
                                      .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /noc/noc-prepare")
+    @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
+    class PrepareNoticeOfChangeEvent extends BaseMvcTest {
+
+        private static final String ENDPOINT_URL = "/noc" + NOC_PREPARE_PATH;
+
+        private AboutToStartCallbackRequest request;
+
+        private final Map<String, JsonNode> responseData = new ConcurrentHashMap<>();
+
+        @BeforeEach
+        void setUp() throws Exception {
+            request = new AboutToStartCallbackRequest("createEvent", null, CaseDetails.builder().id(CASE_ID).build());
+            ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder().build();
+
+            responseData.put("ChangeOrganisationRequest", objectMapper.readTree(objectMapper.writeValueAsString(cor)));
+
+            given(prepareNoCService.prepareNoCRequest(any(CaseDetails.class)))
+                .willReturn(responseData);
+        }
+
+        @DisplayName("should verify a valid prepareNoCRequest")
+        @Test
+        void shouldPrepareNoCRequest() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(content().string("{\"data\":{\"ChangeOrganisationRequest\":"
+                                                + "{\"OrganisationToAdd\":null,"
+                                                + "\"OrganisationToRemove\":null,"
+                                                + "\"CaseRoleId\":null,"
+                                                + "\"RequestTimestamp\":null,"
+                                                + "\"ApprovalStatus\":null}},"
+                                                + "\"state\":null,"
+                                                + "\"errors\":null,"
+                                                + "\"warnings\":null,"
+                                                + "\"data_classification\":null,"
+                                                + "\"security_classification\":null,"
+                                                + "\"significant_item\":null"
+                                                + "}"));
         }
     }
 }

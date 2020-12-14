@@ -17,7 +17,16 @@
     "body": {
       "data": {
         "changeOrganisationRequestField": {
-          "CaseRoleId": "[ApplicantSolicitor]",
+          "CaseRoleId": {
+              "value" : {
+                "code" : "[APPLICANTSOLICITOR]",
+                "label" : "Applicant Solicitor"
+              },
+              "list_items" : [ {
+                "code" : "[APPLICANTSOLICITOR]",
+                "label" : "Applicant Solicitor"
+              } ]
+          },
           "RequestTimestamp": null,
           "OrganisationToAdd": {
             "OrganisationID": null

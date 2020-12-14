@@ -1,5 +1,5 @@
 {
-  "_guid_" : "update_org_policies",
+  "_guid_" : "Submit_ManageOrgs_Event",
   "_extends_": "Event_Creation",
 
   "request": {
@@ -10,7 +10,7 @@
       "data": {
         "respondentOrganisationPolicy": {
           "OrgPolicyCaseAssignedRole": "[RespondentSolicitor]",
-          "OrgPolicyReference": "respondent",
+          "OrgPolicyReference": "RespondentPolicy",
           "Organisation": {
             "OrganisationID": null,
             "OrganisationName": null
@@ -18,7 +18,7 @@
         },
         "applicantOrganisationPolicy": {
           "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
-          "OrgPolicyReference": "applicant",
+          "OrgPolicyReference": "ApplicantPolicy",
           "Organisation": {
             "OrganisationID": null,
             "OrganisationName": null
@@ -26,7 +26,7 @@
         },
         "otherPartyOrganisationPolicy": {
           "OrgPolicyCaseAssignedRole": "[OtherPartySolicitor]",
-          "OrgPolicyReference": "other",
+          "OrgPolicyReference": "OtherPartyPolicy",
           "Organisation": {
             "OrganisationID": null,
             "OrganisationName": null
@@ -34,24 +34,10 @@
         }
       },
       "event": {
-        "id": "manageAllOrgPolicies",
-        "summary": "",
-        "description": ""
+        "id": "manageAllOrgPolicies"
       },
       "event_token": "OVERWRITE"
     }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_201_Response",
-    "body":  {
-      "_links" : {
-        "self" : {
-          "href" : "[[ANYTHING_PRESENT]]"
-        }
-      },
-      "id" : "[[ANYTHING_PRESENT]]",
-      "jurisdiction" : "BEFTA_MASTER",
-      "case_type" : "FT_NoCCaseType"
-    }
   }
+
 }

@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
@@ -38,27 +39,25 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
 
 @Service
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.ExcessiveImports",
-    "PMD.AvoidDeeplyNestedIfStmts", "PMD.PreserveStackTrace", "PMD.LawOfDemeter",
-    "PMD.AvoidLiteralsInIfCondition", "PMD.CyclomaticComplexity"})
 public class NoticeOfChangeQuestions {
 
     public static final String PUI_ROLE = "pui-caa";
-    public static final String CHANGE_ORG_REQUEST = "ChangeOrganisationRequest";
+
     private static final String CHALLENGE_QUESTION_ID = "NoCChallenge";
     private static final String CASE_ROLE_ID = "CaseRoleId";
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
+
     private final SecurityUtils securityUtils;
 
     @Autowired
     public NoticeOfChangeQuestions(DataStoreRepository dataStoreRepository,
                                    DefinitionStoreRepository definitionStoreRepository,
                                    SecurityUtils securityUtils) {
-
         this.dataStoreRepository = dataStoreRepository;
         this.definitionStoreRepository = definitionStoreRepository;
         this.securityUtils = securityUtils;
@@ -172,7 +171,7 @@ public class NoticeOfChangeQuestions {
             searchResultViewHeaderList.stream()
                 .filter(searchResultViewHeader ->
                             searchResultViewHeader.getCaseFieldTypeDefinition().getId()
-                                .equals(CHANGE_ORG_REQUEST)).collect(Collectors.toList());
+                                .equals(CHANGE_ORGANISATION_REQUEST)).collect(toList());
         if (filteredSearch.size() > 1) {
             throw new ValidationException(CHANGE_REQUEST);
         }
@@ -183,7 +182,7 @@ public class NoticeOfChangeQuestions {
                 JsonNode node = caseFields.get(searchResultViewHeader.getCaseFieldId());
                 if (node != null) {
                     JsonNode caseRoleId = node.findPath(CASE_ROLE_ID);
-                    if (!caseRoleId.isNull()) {
+                    if (!caseRoleId.isMissingNode() && !caseRoleId.isNull()) {
                         throw new ValidationException(NOC_REQUEST_ONGOING);
                     }
                 }
@@ -199,5 +198,4 @@ public class NoticeOfChangeQuestions {
             throw new ValidationException(MULTIPLE_NOC_REQUEST_EVENTS);
         }
     }
-
 }

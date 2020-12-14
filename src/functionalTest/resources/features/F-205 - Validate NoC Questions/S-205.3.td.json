@@ -1,15 +1,23 @@
 {
   "_guid_": "S-205.3",
   "_extends_": "S-205_Test_Data_Base",
+
+  "title": "NoC Answers successfully validated for a CAA who is a solicitor for a different jurisdiction",
+
   "specs" : [
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
     "Alice - with a pui-CAA role and a solicitor role for a different jurisdiction to Case C1 below and in a different organisation to Richard",
+
     "the configuration for the case type of Case C1 is such that there is a NoCRequest event available to users with the IDAM ID Caseworker-CAA when the case is in the state established following case creation",
+
     "is made by Alice to raise a NoC request and intends to validate the answers provided to the NoC questions in order to become the representative for Mario on C1",
     "contains all correct answers"
   ],
 
   "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
     "invokingUser": {
       "_extends_": "ACA_Users_CAA_Alice"
     }
@@ -18,16 +26,15 @@
   "request": {
     "_extends_": "Common_Request",
     "body": {
-      "_extends_": "Applicant_correct_answers_snippet"
+      "_extends_": "NoC_Valid_Answers_For_Case_Role_R1"
     }
   },
+
   "expectedResponse": {
     "_extends_" : "Common_200_Response",
     "body" : {
-      "_extends_" : "correct_question_verification"
+      "_extends_" : "NoC_Answers_Verification"
     }
-
   }
-
 
 }

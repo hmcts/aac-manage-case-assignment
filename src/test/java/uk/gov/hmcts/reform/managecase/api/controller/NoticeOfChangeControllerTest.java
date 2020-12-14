@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,25 +16,35 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.config.SecurityConfiguration;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
+import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
+import uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -50,9 +61,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.NOC_PREPARE_PATH;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_PATH;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS_MESSAGE;
-
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHALLENGE_QUESTION_ANSWERS_EMPTY;
 
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports",
     "squid:S2699"})
@@ -80,7 +97,13 @@ public class NoticeOfChangeControllerTest {
         protected NoticeOfChangeQuestions service;
 
         @MockBean
+        protected PrepareNoCService prepareNoCService;
+
+        @MockBean
         protected VerifyNoCAnswersService verifyNoCAnswersService;
+
+        @MockBean
+        protected RequestNoticeOfChangeService requestNoticeOfChangeService;
 
         @Autowired
         protected ObjectMapper objectMapper;
@@ -118,7 +141,10 @@ public class NoticeOfChangeControllerTest {
 
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 
-                NoticeOfChangeController controller = new NoticeOfChangeController(service, verifyNoCAnswersService);
+                NoticeOfChangeController controller = new NoticeOfChangeController(service,
+                                                                                   verifyNoCAnswersService,
+                                                                                   prepareNoCService,
+                                                                                   requestNoticeOfChangeService);
 
                 // ACT
                 ChallengeQuestionsResult response = controller.getNoticeOfChangeQuestions(CASE_ID);
@@ -250,7 +276,7 @@ public class NoticeOfChangeControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_EMPTY)));
+                .andExpect(jsonPath("$.errors", hasItem(CASE_ID_EMPTY)));
         }
 
         @DisplayName("should fail with 400 bad request when case id is an invalid Luhn number")
@@ -264,8 +290,8 @@ public class NoticeOfChangeControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(2)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_INVALID_LENGTH)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_INVALID)));
+                .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID_LENGTH)))
+                .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID)));
         }
 
         @DisplayName("should fail with 400 bad request when no challenge answers are provided")
@@ -278,7 +304,154 @@ public class NoticeOfChangeControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CHALLENGE_QUESTION_ANSWERS_EMPTY)));
+                .andExpect(jsonPath("$.errors", hasItem(CHALLENGE_QUESTION_ANSWERS_EMPTY)));
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /noc/noc-requests")
+    @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
+    class PostNoticeOfChangeRequest extends BaseMvcTest {
+
+        private NoCRequestDetails noCRequestDetails;
+        private RequestNoticeOfChangeResponse requestNoticeOfChangeResponse;
+        private RequestNoticeOfChangeRequest requestNoticeOfChangeRequest;
+        private List<SubmittedChallengeAnswer> submittedAnswerList;
+
+        @BeforeEach
+        public void setup() {
+            noCRequestDetails = NoCRequestDetails.builder().build();
+            requestNoticeOfChangeResponse = RequestNoticeOfChangeResponse.builder()
+                .status(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)
+                .build();
+
+            submittedAnswerList = List.of(new SubmittedChallengeAnswer("question", "value"));
+            requestNoticeOfChangeRequest = new RequestNoticeOfChangeRequest(CASE_ID, submittedAnswerList);
+
+            given(verifyNoCAnswersService.verifyNoCAnswers(any(VerifyNoCAnswersRequest.class)))
+                .willReturn(noCRequestDetails);
+            given(requestNoticeOfChangeService.requestNoticeOfChange(noCRequestDetails))
+                .willReturn(requestNoticeOfChangeResponse);
+        }
+
+        @DisplayName("happy path test without mockMvc")
+        @Test
+        void directCallHappyPath() {
+            // ARRANGE
+            NoticeOfChangeController controller = new NoticeOfChangeController(service,
+                                                                               verifyNoCAnswersService,
+                                                                               prepareNoCService,
+                                                                               requestNoticeOfChangeService);
+
+            // ACT
+            RequestNoticeOfChangeResponse response = controller.requestNoticeOfChange(requestNoticeOfChangeRequest);
+
+            // ASSERT
+            assertThat(response).isNotNull();
+            assertThat(response).isEqualTo(requestNoticeOfChangeResponse);
+        }
+
+        @DisplayName("should successfully get NoC request")
+        @Test
+        void shouldGetRequestNoticeOfChangeResponseForAValidRequest() throws Exception {
+            this.mockMvc.perform(post("/noc" + REQUEST_NOTICE_OF_CHANGE_PATH)
+                                     .contentType(APPLICATION_JSON_VALUE)
+                                     .content(objectMapper.writeValueAsString(requestNoticeOfChangeRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status_message", is(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)));
+        }
+
+        @DisplayName("should error if request NoC request body is empty")
+        @Test
+        void shouldFailWithBadRequestForEmptyBody() throws Exception {
+            this.mockMvc.perform(post("/noc" + REQUEST_NOTICE_OF_CHANGE_PATH))
+                .andExpect(status().isBadRequest());
+        }
+
+        @DisplayName("should error if request NoC case id is empty")
+        @Test
+        void shouldFailWithBadRequestForEmptyCaseId() throws Exception {
+            requestNoticeOfChangeRequest = new RequestNoticeOfChangeRequest(null, submittedAnswerList);
+            postCallShouldReturnBadRequestWithErrorMessage(requestNoticeOfChangeRequest, CASE_ID_EMPTY);
+        }
+
+        @DisplayName("should error if request NoC case id is invalid")
+        @Test
+        void shouldFailWithBadRequestForInvalidCaseId() throws Exception {
+            requestNoticeOfChangeRequest = new RequestNoticeOfChangeRequest("1nva1l1d3", submittedAnswerList);
+            postCallShouldReturnBadRequestWithErrorMessage(requestNoticeOfChangeRequest, CASE_ID_INVALID);
+        }
+
+        @DisplayName("should error if request NoC case id is invalid length")
+        @Test
+        void shouldFailWithBadRequestForInvalidCaseIdLength() throws Exception {
+            requestNoticeOfChangeRequest = new RequestNoticeOfChangeRequest("12345", submittedAnswerList);
+            postCallShouldReturnBadRequestWithErrorMessage(requestNoticeOfChangeRequest, CASE_ID_INVALID_LENGTH);
+        }
+
+        @DisplayName("should error if request NoC submitted answer list is empty")
+        @Test
+        void shouldFailWithBadRequestForEmptySubmittedAnswerList() throws Exception {
+            requestNoticeOfChangeRequest = new RequestNoticeOfChangeRequest("12345", emptyList());
+            postCallShouldReturnBadRequestWithErrorMessage(requestNoticeOfChangeRequest,
+                                                           CHALLENGE_QUESTION_ANSWERS_EMPTY);
+        }
+
+        private void postCallShouldReturnBadRequestWithErrorMessage(
+                                                            RequestNoticeOfChangeRequest requestNoticeOfChangeRequest,
+                                                            String caseIdInvalid) throws Exception {
+            this.mockMvc.perform(post("/noc" + REQUEST_NOTICE_OF_CHANGE_PATH)
+                                     .contentType(APPLICATION_JSON_VALUE)
+                                     .content(objectMapper.writeValueAsString(requestNoticeOfChangeRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors", hasItem(caseIdInvalid)));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /noc/noc-prepare")
+    @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
+    class PrepareNoticeOfChangeEvent extends BaseMvcTest {
+
+        private static final String ENDPOINT_URL = "/noc" + NOC_PREPARE_PATH;
+
+        private AboutToStartCallbackRequest request;
+
+        private final Map<String, JsonNode> responseData = new ConcurrentHashMap<>();
+
+        @BeforeEach
+        void setUp() throws Exception {
+            request = new AboutToStartCallbackRequest("createEvent", null, CaseDetails.builder().id(CASE_ID).build());
+            ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder().build();
+
+            responseData.put("ChangeOrganisationRequest", objectMapper.readTree(objectMapper.writeValueAsString(cor)));
+
+            given(prepareNoCService.prepareNoCRequest(any(CaseDetails.class)))
+                .willReturn(responseData);
+        }
+
+        @DisplayName("should verify a valid prepareNoCRequest")
+        @Test
+        void shouldPrepareNoCRequest() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(content().string("{\"data\":{\"ChangeOrganisationRequest\":"
+                                                + "{\"OrganisationToAdd\":null,"
+                                                + "\"OrganisationToRemove\":null,"
+                                                + "\"CaseRoleId\":null,"
+                                                + "\"RequestTimestamp\":null,"
+                                                + "\"ApprovalStatus\":null}},"
+                                                + "\"state\":null,"
+                                                + "\"errors\":null,"
+                                                + "\"warnings\":null,"
+                                                + "\"data_classification\":null,"
+                                                + "\"security_classification\":null,"
+                                                + "\"significant_item\":null"
+                                                + "}"));
         }
     }
 }

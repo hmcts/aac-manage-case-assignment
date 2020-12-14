@@ -1,0 +1,26 @@
+{
+  "_guid_" : "205.11.5_Case_Creation",
+  "_extends_" : "204_Case_Creation",
+
+  "request": {
+    "body": {
+      "data" : {
+        "applicant": {
+          "dob": ""
+        }
+      },
+      "event_token": "${[scenarioContext][siblingContexts][205.11.5_Case_Creation_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "applicant": {
+          "dob": ""
+        }
+      }
+    }
+  }
+
+}

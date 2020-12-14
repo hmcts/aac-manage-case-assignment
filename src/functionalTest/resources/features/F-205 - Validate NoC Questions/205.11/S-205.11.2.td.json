@@ -1,6 +1,7 @@
 {
   "_guid_": "S-205.11.2",
-  "_extends_": "S-205.11",
+  "_extends_": "S-205.11_Test_Data_Base",
+
   "specs": [
     "has too few answers"
   ],
@@ -18,14 +19,11 @@
   },
 
   "expectedResponse": {
-    "responseCode" : 400,
-    "responseMessage" : "Bad Request",
+		"_extends_": "ACA_400_Response",
     "body": {
-      "status" : "BAD_REQUEST",
       "message" : "The number of provided answers must match the number of questions - expected 2 answers, received 1",
       "errors" : [ ]
     }
   }
-
 
 }

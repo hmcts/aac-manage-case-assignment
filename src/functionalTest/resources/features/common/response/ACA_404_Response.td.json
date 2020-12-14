@@ -1,0 +1,15 @@
+{
+	"_guid_": "ACA_404_Response",
+	"_extends_": "Common_Response",
+
+	"responseCode": 404,
+	"responseMessage": "Bad Request",
+
+	"headers": {
+		"_extends_": "Common_404_Response_Headers"
+	},
+
+	"body": {
+		"status": "NOT_FOUND"
+	}
+}

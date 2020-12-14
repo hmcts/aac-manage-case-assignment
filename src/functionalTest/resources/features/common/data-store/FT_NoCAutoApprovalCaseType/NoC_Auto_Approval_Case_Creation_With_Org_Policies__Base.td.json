@@ -14,7 +14,7 @@
 	"expectedResponse": {
 		"body": {
 			"case_data": {
-				"_extends_": "NoC_Case_Data_With_Org_Policies"
+				"_extends_": "NoC_Case_Data_With_Org_Policies__publicFields"
 			},
 
 			"data_classification": {

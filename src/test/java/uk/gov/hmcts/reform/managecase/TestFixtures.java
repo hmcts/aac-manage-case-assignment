@@ -6,6 +6,11 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.assertj.core.util.Maps;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPage;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPageComplexFieldOverride;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPageField;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignedUsers;
@@ -18,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
 
 public class TestFixtures {
 
@@ -76,7 +83,7 @@ public class TestFixtures {
         public static CaseDetails.CaseDetailsBuilder defaultCaseDetails() {
             return CaseDetails.builder()
                     .caseTypeId(CASE_TYPE_ID)
-                    .reference(CASE_ID)
+                    .id(CASE_ID)
                     .jurisdiction(JURISDICTION)
                     .state(null)
                     .data(Maps.newHashMap("OrganisationPolicy1", jsonNode(ORGANIZATION_ID, CASE_ROLE)));
@@ -139,4 +146,36 @@ public class TestFixtures {
         }
     }
 
+    public static class CaseUpdateViewEventFixture {
+
+        public static final String CHANGE_ORGANISATION_REQUEST_FIELD = "changeOrganisationRequestField";
+
+        public static List<CaseViewField> getCaseViewFields() {
+            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+            fieldTypeDefinition.setId(CHANGE_ORGANISATION_REQUEST);
+
+            CaseViewField caseViewFields = new CaseViewField();
+            caseViewFields.setId(CHANGE_ORGANISATION_REQUEST_FIELD);
+            caseViewFields.setFieldTypeDefinition(fieldTypeDefinition);
+            return List.of(caseViewFields);
+        }
+
+        public static List<WizardPage> getWizardPages() {
+            return getWizardPages(CHANGE_ORGANISATION_REQUEST_FIELD);
+        }
+
+        public static List<WizardPage> getWizardPages(String caseFieldId) {
+            WizardPageField wizardPageField = new WizardPageField();
+
+            WizardPageComplexFieldOverride wizardPageComplexFieldOverride = new WizardPageComplexFieldOverride();
+            wizardPageComplexFieldOverride.setComplexFieldElementId(caseFieldId + ".ApprovalStatus");
+            wizardPageComplexFieldOverride.setDefaultValue(caseFieldId);
+            wizardPageField.setCaseFieldId(caseFieldId);
+            wizardPageField.setComplexFieldOverrides(List.of(wizardPageComplexFieldOverride));
+
+            WizardPage wizardPage =  new WizardPage();
+            wizardPage.setWizardPageFields(List.of(wizardPageField));
+            return List.of(wizardPage);
+        }
+    }
 }

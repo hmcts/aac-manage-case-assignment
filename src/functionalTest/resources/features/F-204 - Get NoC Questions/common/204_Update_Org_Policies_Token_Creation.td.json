@@ -1,0 +1,20 @@
+{
+  "_guid_": "204_Update_Org_Policies_Token_Creation",
+  "_extends_": "Event_Creation_Token_Creation",
+
+  "specs" : [
+    "to get the update org policy event trigger"
+  ],
+
+  "user": {
+    "_extends_": "ACA_Users_Richard"
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][204_Case_Creation][testData][actualResponse][body][id]}",
+      "etid": "manageAllOrgPolicies"
+    }
+  }
+
+}

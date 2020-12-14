@@ -25,9 +25,9 @@ def secrets = [
     secret('ccd-befta-master-solicitor3-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_3_PWD'),
     secret('ccd-befta-master-solicitor4-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_4_PWD'),
     secret('ccd-befta-master-solicitor5-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_5_PWD'),
-    secret('ccd-befta-master-solicitor5-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_MUTLU_PWD'),
-    secret('ccd-befta-master-solicitor5-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_RICHARD_PWD'),
-    secret('ccd-befta-master-solicitor5-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_TONY_PWD'),
+    secret('ccd-befta-master-solicitor-mutlu-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_MUTLU_PWD'),
+    secret('ccd-befta-master-solicitor-richard-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_RICHARD_PWD'),
+    secret('ccd-befta-master-solicitor-tony-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_TONY_PWD'),
     secret('ccd-befta-jurisdiction3-solicitor1-pwd', 'CCD_BEFTA_JURISDICTION_3_SOLICITOR_1_PWD'),
     secret('ccd-befta-solicitor-4-pwd', 'CCD_BEFTA_SOLICITOR_4_PWD'),
     secret('ccd-befta-caseworker-caa-pwd', 'CCD_BEFTA_CASEWORKER_CAA_PWD'),
@@ -61,6 +61,7 @@ env.BEFTA_S2S_CLIENT_ID = "xui_webapp"
 env.OAUTH2_CLIENT_ID = "ccd_gateway"
 env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
+env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 env.BEFTA_OAUTH2_CLIENT_ID_OF_XUIWEBAPP = "xuiwebapp"
@@ -73,9 +74,9 @@ env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 
 
 // Variables to switch pipeline logic and wiring per type of build
-def definitionStoreDevelopPr = "PR-575" // This doesn't change frequently, but when it does, only change this value.
-def dataStoreApiDevelopPr    = "PR-601" // This doesn't change frequently, but when it does, only change this value.
-def prsToUseAaat             = "PR-148" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
+def definitionStoreDevelopPr = "PR-575"  // This doesn't change frequently, but when it does, only change this value.
+def dataStoreApiDevelopPr    = "PR-1260" // This doesn't change frequently, but when it does, only change this value.
+def prsToUseAaat             = "PR-148,PR-161,PR-167" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
 env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${dataStoreApiDevelopPr}.service.core-compute-preview.internal".toLowerCase()

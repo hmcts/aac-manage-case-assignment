@@ -2,9 +2,6 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-
-import javax.validation.ValidationException;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +32,7 @@ import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
+import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,7 +49,11 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.M
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
 
-@SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.UseConcurrentHashMap",
+    "PMD.AvoidDuplicateLiterals",
+    "PMD.ExcessiveImports",
+    "PMD.TooManyMethods",
+    "PMD.DataflowAnomalyAnalysis"})
 class NoticeOfChangeQuestionsTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
@@ -97,9 +99,9 @@ class NoticeOfChangeQuestionsTest {
 
         @BeforeEach
         void setUp() throws JsonProcessingException {
-
             //internal/cases/caseId
             CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
+            caseViewActionableEvent.setId("NOC");
             CaseViewResource caseViewResource = new CaseViewResource();
             caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[]{caseViewActionableEvent});
             CaseViewType caseViewType = new CaseViewType();
@@ -462,6 +464,5 @@ class NoticeOfChangeQuestionsTest {
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Insufficient privileges for notice of change request");
         }
-
     }
 }

@@ -45,6 +45,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
+
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
@@ -440,7 +442,23 @@ class NoticeOfChangeQuestionsTest {
         }
 
         @Test
-        @DisplayName("Must return an error response when the solicitor does not have access to the "
+        @DisplayName("Must return an error when multiple NOC Request events are available in the case for the user")
+        void shouldThrowErrorWhenMultipleNoCEventsAvailable() {
+            CaseViewResource caseViewResource = new CaseViewResource();
+            caseViewResource.setCaseViewActionableEvents(
+                new CaseViewActionableEvent[]{new CaseViewActionableEvent(), new CaseViewActionableEvent()}
+            );
+
+            given(dataStoreRepository.findCaseByCaseId(CASE_ID))
+                .willReturn(caseViewResource);
+
+            assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining(MULTIPLE_NOC_REQUEST_EVENTS);
+        }
+
+        @Test
+        @DisplayName(" must return an error response when the solicitor does not have access to the "
             + "jurisdiction of the case")
         void shouldThrowErrorInsufficientPrivilegesForSolicitor() {
             UserInfo userInfo = new UserInfo("", "", "", "", "",

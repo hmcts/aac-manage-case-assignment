@@ -204,5 +204,4 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         JacksonUtils.merge(caseDetailsData, data);
         return data;
     }
-
 }

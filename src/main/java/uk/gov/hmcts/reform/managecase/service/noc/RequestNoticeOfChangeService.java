@@ -34,6 +34,9 @@ public class RequestNoticeOfChangeService {
 
     static final String MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION
         = "Missing ChangeOrganisationRequest.CaseRoleID %s in the case definition";
+    private static final String ZERO = "0";
+    private static final String USER_ID = ZERO;
+    private static final String JURISDICTION = ZERO;
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
@@ -125,36 +128,32 @@ public class RequestNoticeOfChangeService {
 
     private DynamicList createCaseRoleIdDynamicList(String caseRoleId, String caseTypeId) {
 
-        Optional<CaseRole> caseRole = getCaseRolesDefinitions(caseRoleId, caseTypeId);
-
-        if (caseRole.isPresent()) {
+        CaseRole caseRole = getCaseRolesDefinitions(caseRoleId, caseTypeId);
+        DynamicList returnValue = null;
+        if (caseRole != null) {
             DynamicListElement element = DynamicListElement.builder()
-                .code(caseRole.get().getId())
-                .label(caseRole.get().getName())
+                .code(caseRole.getId())
+                .label(caseRole.getName())
                 .build();
-            return DynamicList.builder()
+            returnValue = DynamicList.builder()
                 .value(element)
                 .listItems(List.of(element))
                 .build();
         }
-        return null;
+
+        return returnValue;
     }
 
-    private Optional<CaseRole> getCaseRolesDefinitions(String caseRole, String caseType) {
+    private CaseRole getCaseRolesDefinitions(String caseRole, String caseType) {
         String caseRoleLowerCase = caseRole.toLowerCase();
-        // "0" specified for first two parameters as they are not used by definition store API
-        List<CaseRole> caseRolesDefinition = definitionStoreRepository.caseRoles("0", "0", caseType);
-        List<String> caseRolesDefinitionIds = caseRolesDefinition.stream()
-            .map(CaseRole::getId)
-            .map(String::toLowerCase)
-            .collect(toList());
-        if (!caseRolesDefinitionIds.contains(caseRoleLowerCase)) {
-            throw new ValidationException(
-                format(MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION, caseRole));
-        }
+        List<CaseRole> caseRolesDefinition = definitionStoreRepository.caseRoles(USER_ID, JURISDICTION, caseType);
 
         return caseRolesDefinition.stream()
-            .filter(cr -> caseRoleLowerCase.equalsIgnoreCase(cr.getId())).findFirst();
+            .filter(cr -> caseRoleLowerCase.equalsIgnoreCase(cr.getId().toLowerCase()))
+            .findFirst()
+            .orElseThrow(
+                () -> new ValidationException(format(MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION, caseRole))
+            );
     }
 
     private boolean isNocRequestAutoApprovalCompleted(CaseDetails caseDetails,

@@ -43,7 +43,6 @@ import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
-import uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +75,8 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_DETAILS_REQUIRED;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_NOT_CONSIDERED;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_DATA_PROVIDED;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
@@ -89,6 +90,7 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCa
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseRoles;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseViaExternalApi;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetChallengeQuestions;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetExternalStartEventTrigger;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetStartEventTrigger;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisationInternal;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSubmitEventForCase;
@@ -230,9 +232,38 @@ public class NoticeOfChangeControllerIT {
                 .andExpect(status().isBadRequest());
         }
 
+        @DisplayName("Must return 400 bad request when no Noc event is available in the case")
+        @Test
+        void shouldReturnErrorWhenNoCEventIsNotAvailable() throws Exception {
+            CaseViewResource caseViewResource = new CaseViewResource();
+            caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[0]);
+            stubGetCaseInternal(CASE_ID, caseViewResource);
+
+            this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
+                .queryParam("case_id", CASE_ID))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(NOC_EVENT_NOT_AVAILABLE)));
+        }
+
+        @DisplayName("Must return 400 bad request when multiple Noc events are available in the case")
+        @Test
+        void shouldReturnErrorWhenMultipleNoCEventsAreAvailable() throws Exception {
+            CaseViewResource caseViewResource = new CaseViewResource();
+            caseViewResource.setCaseViewActionableEvents(
+                new CaseViewActionableEvent[]{new CaseViewActionableEvent(), new CaseViewActionableEvent()}
+            );
+            stubGetCaseInternal(CASE_ID, caseViewResource);
+
+            this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
+                .queryParam("case_id", CASE_ID))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(MULTIPLE_NOC_REQUEST_EVENTS)));
+        }
+
     }
 
     @Nested
+    @Disabled
     @DisplayName("POST /noc/verify-noc-answers")
     class VerifyNoticeOfChangeQuestions extends BaseTest {
 
@@ -242,7 +273,6 @@ public class NoticeOfChangeControllerIT {
         private MockMvc mockMvc;
 
         @Test
-        @Disabled
         void shouldVerifyNoCAnswersSuccessfully() throws Exception {
             SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer(QUESTION_ID_1,
                 ORGANISATION_ID.toLowerCase(Locale.getDefault()));
@@ -642,6 +672,9 @@ public class NoticeOfChangeControllerIT {
         private static final String ENDPOINT_URL = "/noc" + REQUEST_NOTICE_OF_CHANGE_PATH;
         private static final String EVENT_TOKEN = "EVENT_TOKEN";
         private static final String CHANGE_ORGANISATION_REQUEST_FIELD = "changeOrganisationRequestField";
+        private static final String ZERO = "0";
+        private static final String JURISDICTION = ZERO;
+        private static final String USER_ID = ZERO;
 
         @Autowired
         private MockMvc mockMvc;
@@ -682,12 +715,16 @@ public class NoticeOfChangeControllerIT {
             Map<String, JsonNode> data = new HashMap<>();
             CaseDetails caseDetails = CaseDetails.builder().data(data).build();
             startEventResource.setCaseDetails(caseDetails);
-            WiremockFixtures.stubGetExternalStartEventTrigger(CASE_ID, NOC, startEventResource);
+            stubGetExternalStartEventTrigger(CASE_ID, NOC, startEventResource);
+
+            List<CaseRole> caseRoleList = Arrays.asList(
+                CaseRole.builder().id("APPLICANT").name("Applicant").build()
+            );
+            stubGetCaseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID, caseRoleList);
         }
 
 
         @Test
-        @Disabled
         void shouldSuccessfullyVerifyNoCRequestWithoutAutoApproval() throws Exception {
             this.mockMvc.perform(post(ENDPOINT_URL)
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -699,7 +736,6 @@ public class NoticeOfChangeControllerIT {
         }
 
         @Test
-        @Disabled
         void shouldSuccessfullyVerifyNoCRequestWithAutoApproval() throws Exception {
 
             Organisation org = Organisation.builder().organisationID("InvokingUsersOrg").build();

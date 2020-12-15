@@ -44,6 +44,13 @@
     },
     {
       "userIdentifier": "",
+      "firstName": "David",
+      "lastName": "Solicington",
+      "email": "befta.master.solicitor.david@gmail.com",
+      "idamStatus": "ACTIVE"
+    },
+    {
+      "userIdentifier": "",
       "firstName": "Pui",
       "lastName": "Caa",
       "email": "befta.pui.caa.1@gmail.com",

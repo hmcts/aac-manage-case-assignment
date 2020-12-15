@@ -70,6 +70,4 @@ public interface DataStoreApiClient {
 
     @GetMapping(CASES_WITH_ID)
     CaseDetails getCaseDetailsByCaseIdViaExternalApi(@PathVariable(CASE_ID) String caseId);
-
-
 }

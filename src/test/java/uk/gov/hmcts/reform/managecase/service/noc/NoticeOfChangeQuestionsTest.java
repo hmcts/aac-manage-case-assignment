@@ -45,7 +45,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
+
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
 
@@ -279,7 +286,7 @@ class NoticeOfChangeQuestionsTest {
             given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, null, CASE_ID)).willReturn(resource);
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("Ongoing NoC request in progress");
+                .hasMessageContaining(NOC_REQUEST_ONGOING);
         }
 
         @Test
@@ -324,7 +331,7 @@ class NoticeOfChangeQuestionsTest {
             given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, null, CASE_ID)).willReturn(resource);
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("More than one change request found on the case");
+                .hasMessageContaining(CHANGE_REQUEST);
         }
 
         @Test
@@ -388,7 +395,7 @@ class NoticeOfChangeQuestionsTest {
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(CaseCouldNotBeFoundException.class)
-                .hasMessageContaining("Case could not be found");
+                .hasMessageContaining(CASE_NOT_FOUND);
         }
 
         @Test
@@ -419,8 +426,7 @@ class NoticeOfChangeQuestionsTest {
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("No Organisation Policy for one or more of the roles available for the "
-                                          + "notice of change request");
+                .hasMessageContaining(NO_ORG_POLICY_WITH_ROLE);
         }
 
         @Test
@@ -432,7 +438,7 @@ class NoticeOfChangeQuestionsTest {
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("No NoC events available for this case type");
+                .hasMessageContaining(NOC_EVENT_NOT_AVAILABLE);
         }
 
         @Test
@@ -462,7 +468,21 @@ class NoticeOfChangeQuestionsTest {
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("Insufficient privileges for notice of change request");
+                .hasMessageContaining(INSUFFICIENT_PRIVILEGE);
+        }
+
+        @Test
+        @DisplayName("Must return an error response when user has an invalid Solicitor role")
+        void shouldThrowErrorInvalidSolicitorRole() {
+            UserInfo userInfo = new UserInfo("", "", "", "", "",
+                                             Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicit")
+            );
+            given(securityUtils.getUserInfo()).willReturn(userInfo);
+            given(securityUtils.hasSolicitorRole(anyList(), any())).willReturn(false);
+
+            assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining(INSUFFICIENT_PRIVILEGE);
         }
     }
 }

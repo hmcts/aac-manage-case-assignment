@@ -1,7 +1,12 @@
 {
   "request": {
     "method": "GET",
-    "url": "/refdata/internal/v1/organisations?id=Org2Id"
+    "urlPath": "/refdata/internal/v1/organisations",
+    "queryParameters": {
+      "id": {
+        "equalTo": "QUK822N"
+      }
+    }
   },
   "response": {
     "status": 200,
@@ -20,7 +25,7 @@
           "postCode": "DA15 7LN"
         }
       ],
-      "organisationIdentifier": "Org2Id",
+      "organisationIdentifier": "QUK822N",
       "name": "Org2Name"
     }
   }

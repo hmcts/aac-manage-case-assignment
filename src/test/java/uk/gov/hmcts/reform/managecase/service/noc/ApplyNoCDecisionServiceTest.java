@@ -48,7 +48,7 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.APPROV
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CASE_ROLE_ID;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_REMOVE;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORG_POLICY_CASE_ASSIGNED_ROLE;
-import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.NOT_CONSIDERED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.REJECTED;
 
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.DataflowAnomalyAnalysis",
@@ -419,7 +419,7 @@ class ApplyNoCDecisionServiceTest {
     void shouldErrorWhenApprovalStatusIsPending() throws JsonProcessingException {
         Map<String, JsonNode> data = createData();
         ((ObjectNode) data.get(CHANGE_ORG_REQUEST_FIELD)).set(APPROVAL_STATUS,
-            new TextNode(NOT_CONSIDERED.getValue()));
+            new TextNode(PENDING.getValue()));
         CaseDetails caseDetails = CaseDetails.builder()
             .data(data)
             .id(CASE_ID)

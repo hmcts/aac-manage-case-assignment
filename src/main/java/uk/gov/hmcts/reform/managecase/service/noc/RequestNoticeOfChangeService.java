@@ -27,7 +27,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
-import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.NOT_CONSIDERED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
 @Service
 public class RequestNoticeOfChangeService {
@@ -87,7 +87,7 @@ public class RequestNoticeOfChangeService {
 
         return RequestNoticeOfChangeResponse.builder()
             .caseRole(caseRoleId)
-            .approvalStatus(isApprovalComplete ? APPROVED : NOT_CONSIDERED)
+            .approvalStatus(isApprovalComplete ? APPROVED : PENDING)
             .status(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)
             .build();
     }

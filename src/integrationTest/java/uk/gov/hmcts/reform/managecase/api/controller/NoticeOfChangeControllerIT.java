@@ -82,7 +82,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
-import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.NOT_CONSIDERED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.REJECTED;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseAssignments;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternal;
@@ -433,7 +433,7 @@ public class NoticeOfChangeControllerIT {
             ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(CaseDetails.builder()
                 .id(CASE_ID)
                 .caseTypeId(CASE_TYPE_ID)
-                .data(createData(NOT_CONSIDERED))
+                .data(createData(PENDING))
                 .build());
 
             this.mockMvc.perform(post(ENDPOINT_URL)
@@ -732,7 +732,7 @@ public class NoticeOfChangeControllerIT {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)))
-                .andExpect(jsonPath("$.approval_status", is(NOT_CONSIDERED.name())));
+                .andExpect(jsonPath("$.approval_status", is(PENDING.name())));
         }
 
         @Test

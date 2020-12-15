@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.NOT_CONSIDERED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
 
 @Repository
@@ -166,7 +166,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         if (defaultApprovalStatusValue == null
             || defaultApprovalStatusValue.isMissingNode()
             || defaultApprovalStatusValue.isEmpty()) {
-            changeOrganisationRequest.setApprovalStatus(NOT_CONSIDERED.getValue());
+            changeOrganisationRequest.setApprovalStatus(PENDING.getValue());
         }
     }
 

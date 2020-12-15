@@ -42,7 +42,7 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANI
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_ADD;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_REMOVE;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
-import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.NOT_CONSIDERED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.REJECTED;
 
 @Service
@@ -85,7 +85,7 @@ public class ApplyNoCDecisionService {
         String approvalStatus = getNonNullStringValue(changeOrganisationRequestField, APPROVAL_STATUS);
         String caseRoleId = getNonNullStringValue(changeOrganisationRequestField, CASE_ROLE_ID + ".value.code");
 
-        if (NOT_CONSIDERED.getValue().equals(approvalStatus)) {
+        if (PENDING.getValue().equals(approvalStatus)) {
             throw new ValidationException(NOC_REQUEST_NOT_CONSIDERED);
         } else if (REJECTED.getValue().equals(approvalStatus)) {
             nullifyNode(changeOrganisationRequestField, CASE_ROLE_ID);

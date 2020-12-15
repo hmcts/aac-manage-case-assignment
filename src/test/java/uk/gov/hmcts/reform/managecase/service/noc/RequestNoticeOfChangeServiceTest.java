@@ -45,7 +45,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
-import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.NOT_CONSIDERED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 import static uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService.MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap",
@@ -181,7 +181,7 @@ class RequestNoticeOfChangeServiceTest {
             = service.requestNoticeOfChange(noCRequestDetails);
 
 
-        assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(NOT_CONSIDERED);
+        assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(PENDING);
     }
 
     @Test
@@ -200,7 +200,7 @@ class RequestNoticeOfChangeServiceTest {
 
         verify(dataStoreRepository, never())
             .assignCase(any(), any(String.class), any(String.class), any(String.class));
-        assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(NOT_CONSIDERED);
+        assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(PENDING);
     }
 
     @Test
@@ -223,7 +223,7 @@ class RequestNoticeOfChangeServiceTest {
         RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
             = service.requestNoticeOfChange(noCRequestDetails);
 
-        assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(NOT_CONSIDERED);
+        assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(PENDING);
     }
 
     @Test

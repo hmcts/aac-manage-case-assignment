@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.managecase.domain;
 
 public enum ApprovalStatus {
 
-    NOT_CONSIDERED("0"),
+    PENDING("0"),
     APPROVED("1"),
     REJECTED("2");
 

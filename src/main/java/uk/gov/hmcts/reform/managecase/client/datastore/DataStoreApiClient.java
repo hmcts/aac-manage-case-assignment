@@ -69,6 +69,6 @@ public interface DataStoreApiClient {
                                     @RequestBody CaseEventCreationPayload caseEventCreationPayload);
 
     @GetMapping(CASES_WITH_ID)
-    CaseDetails getCaseDetailsByCaseIdViaExternalApi(@PathVariable("caseId") String caseId);
+    CaseDetails getCaseDetailsByCaseIdViaExternalApi(@PathVariable(CASE_ID) String caseId);
 
 }

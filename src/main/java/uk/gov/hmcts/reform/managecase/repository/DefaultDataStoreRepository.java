@@ -1,20 +1,19 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
@@ -22,15 +21,21 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
-import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.NOT_CONSIDERED;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-@SuppressWarnings({"PMD.PreserveStackTrace",
-    "PMD.DataflowAnomalyAnalysis",
-    "PMD.LawOfDemeter"})
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
+import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
+
 @Repository
+@SuppressWarnings({"PMD.PreserveStackTrace", "PMD.DataflowAnomalyAnalysis",
+    "PMD.LawOfDemeter","PMD.DataflowAnomalyAnalysis",
+    "PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
 public class DefaultDataStoreRepository implements DataStoreRepository {
 
     static final String NOC_REQUEST_DESCRIPTION = "Notice of Change Request Event";
@@ -153,12 +158,6 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         return caseDetails;
     }
 
-    @Override
-    public CaseDetails findCaseByCaseIdExternalApi(String caseId) {
-        return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(caseId);
-    }
-
-
     private void setChangeOrganisationRequestApprovalStatus(ChangeOrganisationRequest changeOrganisationRequest,
                                                             String caseFieldId,
                                                             Map<String, JsonNode> caseData) {
@@ -167,7 +166,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         if (defaultApprovalStatusValue == null
             || defaultApprovalStatusValue.isMissingNode()
             || defaultApprovalStatusValue.isEmpty()) {
-            changeOrganisationRequest.setApprovalStatus(NOT_CONSIDERED.getValue());
+            changeOrganisationRequest.setApprovalStatus(PENDING.getValue());
         }
     }
 
@@ -182,6 +181,19 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         return changeOrgRequestCaseViewField;
     }
 
+    @Override
+    public CaseDetails findCaseByCaseIdExternalApi(String caseId) {
+        CaseDetails caseDetails = null;
+        try {
+            caseDetails = dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(caseId);
+        } catch (FeignException e) {
+            if (HttpStatus.NOT_FOUND.value() == e.status()) {
+                throw new CaseCouldNotBeFetchedException(CASE_COULD_NOT_BE_FETCHED);
+            }
+        }
+        return caseDetails;
+    }
+
     private Map<String, JsonNode> getCaseDataContentData(String caseFieldId,
                                                          ChangeOrganisationRequest changeOrganisationRequest,
                                                          Map<String, JsonNode> caseDetailsData) {
@@ -192,5 +204,4 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         JacksonUtils.merge(caseDetailsData, data);
         return data;
     }
-
 }

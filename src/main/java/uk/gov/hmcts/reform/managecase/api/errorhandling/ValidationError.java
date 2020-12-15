@@ -17,6 +17,7 @@ public final class ValidationError {
     public static final String CHANGE_REQUEST = "More than one change request found on the case";
     public static final String CASE_NOT_FOUND = "Case could not be found";
     public static final String NOC_EVENT_NOT_AVAILABLE = "No NoC events available for this case type";
+    public static final String MULTIPLE_NOC_REQUEST_EVENTS = "Multiple NoC Request events found for the user";
     public static final String INSUFFICIENT_PRIVILEGE = "Insufficient privileges for notice of change request";
     public static final String CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID =
         "ChangeOrganisationRequest field could not be found or appears invalid";

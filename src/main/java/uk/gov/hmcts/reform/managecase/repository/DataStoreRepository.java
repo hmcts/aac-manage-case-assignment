@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DataStoreRepository {
 

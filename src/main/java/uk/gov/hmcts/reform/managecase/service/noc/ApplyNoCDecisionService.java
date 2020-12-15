@@ -53,7 +53,7 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANI
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_REMOVE;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.PREVIOUS_ORGANISATIONS;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
-import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.NOT_CONSIDERED;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.REJECTED;
 
 @Service
@@ -97,7 +97,7 @@ public class ApplyNoCDecisionService {
         String approvalStatus = getNonNullStringValue(changeOrganisationRequestField, APPROVAL_STATUS);
         String caseRoleId = getNonNullStringValue(changeOrganisationRequestField, CASE_ROLE_ID + ".value.code");
 
-        if (NOT_CONSIDERED.getValue().equals(approvalStatus)) {
+        if (PENDING.getValue().equals(approvalStatus)) {
             throw new ValidationException(NOC_REQUEST_NOT_CONSIDERED);
         } else if (REJECTED.getValue().equals(approvalStatus)) {
             nullifyNode(changeOrganisationRequestField, CASE_ROLE_ID);
@@ -241,11 +241,12 @@ public class ApplyNoCDecisionService {
             usersByOrganisation = prdRepository.findUsersByOrganisation(organisationId);
         } catch (FeignException e) {
             HttpStatus status = HttpStatus.resolve(e.status());
+            String reasonPhrase = status == null ? e.getMessage() : status.getReasonPhrase();
 
             String errorMessage = status == HttpStatus.NOT_FOUND
                 ? String.format("Organisation with ID '%s' can not be found.", organisationId)
                 : String.format("Error encountered while retrieving organisation users for organisation ID '%s': %s",
-                organisationId, status.getReasonPhrase());
+                organisationId, reasonPhrase);
 
             throw new ValidationException(errorMessage, e);
         }

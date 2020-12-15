@@ -227,11 +227,12 @@ public class ApplyNoCDecisionService {
             usersByOrganisation = prdRepository.findUsersByOrganisation(organisationId);
         } catch (FeignException e) {
             HttpStatus status = HttpStatus.resolve(e.status());
+            String reasonPhrase = status == null ? e.getMessage() : status.getReasonPhrase();
 
             String errorMessage = status == HttpStatus.NOT_FOUND
                 ? String.format("Organisation with ID '%s' can not be found.", organisationId)
                 : String.format("Error encountered while retrieving organisation users for organisation ID '%s': %s",
-                organisationId, status.getReasonPhrase());
+                organisationId, reasonPhrase);
 
             throw new ValidationException(errorMessage, e);
         }

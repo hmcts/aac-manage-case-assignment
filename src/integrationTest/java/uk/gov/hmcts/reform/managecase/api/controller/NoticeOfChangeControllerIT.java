@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -263,7 +262,6 @@ public class NoticeOfChangeControllerIT {
     }
 
     @Nested
-    @Disabled
     @DisplayName("POST /noc/verify-noc-answers")
     class VerifyNoticeOfChangeQuestions extends BaseTest {
 
@@ -463,6 +461,9 @@ public class NoticeOfChangeControllerIT {
 
         @Test
         void shouldReturnSuccessResponseWithErrorWhenPrdReturnsNotFoundResponseCode() throws Exception {
+            stubFor(WireMock.get(urlEqualTo("/refdata/internal/v1/organisations/UnknownId/users?returnRoles=false"))
+                .willReturn(aResponse().withStatus(404)));
+
             ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(CaseDetails.builder()
                 .id(CASE_ID)
                 .caseTypeId(CASE_TYPE_ID)

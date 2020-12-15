@@ -75,6 +75,8 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
@@ -223,6 +225,34 @@ public class NoticeOfChangeControllerIT {
             this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
                                      .queryParam("case_id", ""))
                 .andExpect(status().isBadRequest());
+        }
+
+        @DisplayName("Must return 400 bad request when no Noc event is available in the case")
+        @Test
+        void shouldReturnErrorWhenNoCEventIsNotAvailable() throws Exception {
+            CaseViewResource caseViewResource = new CaseViewResource();
+            caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[0]);
+            stubGetCaseInternal(CASE_ID, caseViewResource);
+
+            this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
+                .queryParam("case_id", CASE_ID))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(NOC_EVENT_NOT_AVAILABLE)));
+        }
+
+        @DisplayName("Must return 400 bad request when multiple Noc events are available in the case")
+        @Test
+        void shouldReturnErrorWhenMultipleNoCEventsAreAvailable() throws Exception {
+            CaseViewResource caseViewResource = new CaseViewResource();
+            caseViewResource.setCaseViewActionableEvents(
+                new CaseViewActionableEvent[]{new CaseViewActionableEvent(), new CaseViewActionableEvent()}
+            );
+            stubGetCaseInternal(CASE_ID, caseViewResource);
+
+            this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
+                .queryParam("case_id", CASE_ID))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(MULTIPLE_NOC_REQUEST_EVENTS)));
         }
 
     }

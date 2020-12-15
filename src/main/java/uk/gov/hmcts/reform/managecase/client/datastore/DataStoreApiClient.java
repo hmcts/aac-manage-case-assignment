@@ -29,7 +29,6 @@ public interface DataStoreApiClient {
     String CASE_TYPE_ID = "ctid";
 
     String CASES_WITH_ID = "/cases/{caseId}";
-
     String SEARCH_CASES = "/searchCases";
     String INTERNAL_SEARCH_CASES = "/internal/searchCases";
     String CASE_USERS = "/case-users";

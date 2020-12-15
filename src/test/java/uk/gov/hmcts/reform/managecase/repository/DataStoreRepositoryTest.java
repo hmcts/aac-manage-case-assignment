@@ -42,11 +42,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+ master
 
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -65,7 +66,6 @@ import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreReposito
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class DataStoreRepositoryTest {
 
-    private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
     private static final String ASSIGNEE_ID = "0a5874a4-3f38-4bbd-ba4c";
     private static final String ROLE = "caseworker-probate";
     private static final String CASE_ID = "12345678";
@@ -99,8 +99,8 @@ class DataStoreRepositoryTest {
     }
 
     @Test
-    @DisplayName("Find case by caseTypeId and caseId")
-    void shouldFindCaseBy() {
+    @DisplayName("find case by id using external facing API")
+    void shouldFindCaseByIdUsingExternalApi() {
         // ARRANGE
         CaseDetails caseDetails = CaseDetails.builder()
                 .caseTypeId(CASE_TYPE_ID)
@@ -110,26 +110,40 @@ class DataStoreRepositoryTest {
         given(dataStoreApi.searchCases(anyString(), anyString())).willReturn(response);
 
         // ACT
-        Optional<CaseDetails> result = repository.findCaseBy(CASE_TYPE_ID, CASE_ID);
+        CaseDetails result = repository.findCaseByCaseIdExternalApi(CASE_ID);
 
         // ASSERT
-        assertThat(result).get().isEqualTo(caseDetails);
-
-        verify(dataStoreApi).searchCases(eq(CASE_TYPE_ID), eq(String.format(ES_QUERY, CASE_ID)));
+        assertThat(result).isEqualTo(caseDetails);
+        verify(dataStoreApi).getCaseDetailsByCaseIdViaExternalApi(eq(CASE_ID));
     }
 
     @Test
-    @DisplayName("Find case return no cases")
-    void shouldReturnNoCaseForSearch() {
+    @DisplayName("find case by id using external facing API return no cases")
+    void shouldReturnNoCaseForFindCaseByIdUsingExternalApi() {
         // ARRANGE
-        CaseSearchResponse response = new CaseSearchResponse(Lists.newArrayList());
-        given(dataStoreApi.searchCases(anyString(), anyString())).willReturn(response);
+        given(dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(CASE_ID)).willReturn(null);
 
         // ACT
-        Optional<CaseDetails> result = repository.findCaseBy(CASE_TYPE_ID, CASE_ID);
+        CaseDetails result = repository.findCaseByCaseIdExternalApi(CASE_ID);
 
         // ASSERT
-        assertThat(result).isNotPresent();
+        assertThat(result).isNull();
+        verify(dataStoreApi).getCaseDetailsByCaseIdViaExternalApi(eq(CASE_ID));
+    }
+
+    @Test
+    @DisplayName("find case by id using external facing API throws exception if no case found")
+    void shouldThrowExceptionForFindCaseByIdUsingExternalApi() {
+        Request request = Request.create(Request.HttpMethod.POST, "url", emptyMap(), empty(), null);
+
+        // ARRANGE
+        given(dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(CASE_ID))
+            .willThrow(new FeignException.NotFound("Not found", request, null));
+
+        // ACT &  ASSERT
+        assertThatThrownBy(() -> repository.findCaseByCaseIdExternalApi(CASE_ID))
+            .isInstanceOf(CaseCouldNotBeFetchedException.class)
+            .hasMessageContaining(CASE_COULD_NOT_BE_FETCHED);
     }
 
     @Test

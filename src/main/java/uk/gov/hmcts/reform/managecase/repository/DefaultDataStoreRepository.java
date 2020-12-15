@@ -1,16 +1,20 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
-import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
@@ -18,18 +22,15 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.NOT_CONSIDERED;
 
+@SuppressWarnings({"PMD.PreserveStackTrace",
+    "PMD.DataflowAnomalyAnalysis",
+    "PMD.LawOfDemeter"})
 @Repository
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
 public class DefaultDataStoreRepository implements DataStoreRepository {
 
     static final String NOC_REQUEST_DESCRIPTION = "Notice of Change Request Event";
@@ -152,6 +153,12 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         return caseDetails;
     }
 
+    @Override
+    public CaseDetails findCaseByCaseIdExternalApi(String caseId) {
+        return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(caseId);
+    }
+
+
     private void setChangeOrganisationRequestApprovalStatus(ChangeOrganisationRequest changeOrganisationRequest,
                                                             String caseFieldId,
                                                             Map<String, JsonNode> caseData) {
@@ -173,11 +180,6 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                 .findFirst();
         }
         return changeOrgRequestCaseViewField;
-    }
-
-    @Override
-    public CaseDetails findCaseByCaseIdExternalApi(String caseId) {
-        return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(caseId);
     }
 
     private Map<String, JsonNode> getCaseDataContentData(String caseFieldId,

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
+import java.util.Optional;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
@@ -7,7 +8,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface DataStoreRepository {
 

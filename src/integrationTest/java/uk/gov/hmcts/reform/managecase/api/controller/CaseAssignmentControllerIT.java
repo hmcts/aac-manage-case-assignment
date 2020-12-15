@@ -130,6 +130,42 @@ public class CaseAssignmentControllerIT {
             verify(postRequestedFor(urlEqualTo(CASE_USERS)));
         }
 
+        @DisplayName("Invoker successfully sharing case access with another solicitor in their org"
+            + " and jurisdiction role is mixed case")
+        @Test
+        void shouldAssignCaseAccess_whenInvokerSuccessfullyShareACaseWithMixedCaseJurisdictionRole()
+            throws Exception {
+
+            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST1-SoLiciToR"));
+
+            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE))));
+
+            verify(postRequestedFor(urlEqualTo(CASE_USERS)));
+        }
+
+        @DisplayName("Invoker successfully sharing case access with another solicitor in their org"
+            + " and jurisdiction role is upper case")
+        @Test
+        void shouldAssignCaseAccess_whenInvokerSuccessfullyShareACaseWithUpperCaseJurisdictionRole()
+            throws Exception {
+
+            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "CASEWORKER-AUTOTEST1-SOLICITOR"));
+
+            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE))));
+
+            verify(postRequestedFor(urlEqualTo(CASE_USERS)));
+        }
+
         @DisplayName("Must return 400 bad request response if assignee doesn't exist in invoker's organisation")
         @Test
         void shouldReturn400_whenAssigneeNotExistsInInvokersOrg() throws Exception {
@@ -153,7 +189,26 @@ public class CaseAssignmentControllerIT {
 
             stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID)));
 
-            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicitor"));
+            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicitor-role"));
+
+            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(
+                    "$.message",
+                    is(ValidationError.ASSIGNEE_ROLE_ERROR)
+                ));
+        }
+
+        @DisplayName("Must return 400 bad request response if assignee has an invalid solicitor role for the"
+            + " jurisdiction of the case")
+        @Test
+        void shouldReturn400_whenAssigneeHasInvalidJurisdictionRole() throws Exception {
+
+            stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID)));
+
+            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicit"));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
                                      .contentType(MediaType.APPLICATION_JSON)

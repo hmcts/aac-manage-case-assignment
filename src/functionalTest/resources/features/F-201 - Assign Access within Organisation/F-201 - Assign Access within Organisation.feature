@@ -43,7 +43,7 @@ Feature: F-201: Assign Access within Organisation
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-201.3
-  Scenario: must return an error response if assignee doesn't exist in invoker's organisation
+  Scenario: Must return an error response if assignee doesn't exist in invoker's organisation
 
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],
       And a user [S2 - a solicitor within a different organisation who doesn't have access to C1],
@@ -60,7 +60,7 @@ Feature: F-201: Assign Access within Organisation
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-201.4
-  Scenario: must return an error response for a malformed Case ID
+  Scenario: Must return an error response for a malformed Case ID
 
     Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
       And a user [S2 - with a solicitor role within the same organisation],
@@ -75,7 +75,7 @@ Feature: F-201: Assign Access within Organisation
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-201.5
-  Scenario: must return an error response for a missing Case ID
+  Scenario: Must return an error response for a missing Case ID
 
     Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
       And a user [S2 - with a solicitor role within the same organisation],
@@ -90,7 +90,7 @@ Feature: F-201: Assign Access within Organisation
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-201.6
-  Scenario: must return an error response for an assignee user who doesn't have a solicitor role for the jurisdiction of the case
+  Scenario: Must return an error response for an assignee user who doesn't have a solicitor role for the jurisdiction of the case
 
     Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
       And a user [S2 - who does not have a solicitor role for the jurisdiction of C1 but works within the same organisation as S1],
@@ -151,3 +151,17 @@ Feature: F-201: Assign Access within Organisation
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  @S-201.10
+  Scenario: Must return an error response for an assignee user who doesn't have a valid solicitor role for the jurisdiction of the case
+
+    Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
+    And a user [S2 - who does not have a valid solicitor role],
+    And a case [C1, which S1 has just] created as in [F-201_Prerequisite_Case_Creation_C1],
+    And a wait time of [8] seconds [to allow for the case just created to appear in search results],
+
+    When a request is prepared with appropriate values,
+    And the request [intends to assign access within the same organisation for S2 by S1],
+    And it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
+
+    Then a negative response is received,
+    And the response has all the details as expected.

@@ -24,7 +24,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   cache:
-    cache-names: userInfoCache,usersByOrganisationExternal,usersByOrganisationInternal,organisationAddressById,systemUserAccessTokenCache
+    cache-names: userInfoCache,usersByOrganisationExternal,usersByOrganisationInternal,organisationAddressById,systemUserAccessTokenCache,caseRoles
     caffeine:
       spec: expireAfterAccess=1800s
   security:

@@ -29,37 +29,38 @@ import uk.gov.hmcts.reform.managecase.domain.UserDetails;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
+import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 @Service
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 public class CaseAssignmentService {
 
-    public static final String SOLICITOR_ROLE = "caseworker-%s-solicitor";
-
     public static final String CASE_COULD_NOT_BE_FETCHED = "Case could not be fetched";
-
 
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
     private final IdamRepository idamRepository;
     private final JacksonUtils jacksonUtils;
+    private final SecurityUtils securityUtils;
 
     @Autowired
     public CaseAssignmentService(PrdRepository prdRepository,
                                  DataStoreRepository dataStoreRepository,
-                                 IdamRepository idamRepository, JacksonUtils jacksonUtils) {
+                                 IdamRepository idamRepository,
+                                 JacksonUtils jacksonUtils,
+                                 SecurityUtils securityUtils) {
         this.dataStoreRepository = dataStoreRepository;
         this.prdRepository = prdRepository;
         this.idamRepository = idamRepository;
         this.jacksonUtils = jacksonUtils;
+        this.securityUtils = securityUtils;
     }
 
     @SuppressWarnings("PMD")
     public List<String> assignCaseAccess(CaseAssignment assignment) {
 
         CaseDetails caseDetails = getCase(assignment);
-        String solicitorRole = String.format(SOLICITOR_ROLE, caseDetails.getJurisdiction());
 
         FindUsersByOrganisationResponse usersByOrg = prdRepository.findUsersByOrganisation();
         if (!isAssigneePresent(usersByOrg.getUsers(), assignment.getAssigneeId())) {
@@ -67,7 +68,8 @@ public class CaseAssignmentService {
         }
 
         List<String> assigneeRoles = getAssigneeRoles(assignment.getAssigneeId());
-        if (!containsIgnoreCase(assigneeRoles, solicitorRole)) {
+
+        if (!securityUtils.hasSolicitorRole(assigneeRoles, caseDetails.getJurisdiction())) {
             throw new ValidationException(ValidationError.ASSIGNEE_ROLE_ERROR);
         }
 
@@ -219,10 +221,6 @@ public class CaseAssignmentService {
 
     private boolean isAssigneePresent(List<ProfessionalUser> users, String assigneeId) {
         return users.stream().anyMatch(user -> assigneeId.equalsIgnoreCase(user.getUserIdentifier()));
-    }
-
-    private boolean containsIgnoreCase(List<String> list, String value) {
-        return list.stream().anyMatch(value::equalsIgnoreCase);
     }
 
     private List<String> getAssigneeRoles(String assigneeId) {

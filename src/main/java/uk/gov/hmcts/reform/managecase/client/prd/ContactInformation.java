@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.managecase.client.prd;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.List;
-import java.util.UUID;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

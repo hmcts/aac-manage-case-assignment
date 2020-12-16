@@ -19,8 +19,13 @@ public class SystemUserAuthHeadersInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate template) {
-        template.header(AUTHORIZATION, securityUtils.getSystemUserToken());
-        template.header(SERVICE_AUTHORIZATION, securityUtils.getS2SToken());
+        if (!template.headers().containsKey(AUTHORIZATION)) {
+            template.header(AUTHORIZATION, securityUtils.getCaaSystemUserToken());
+        }
+        if (!template.headers().containsKey(SERVICE_AUTHORIZATION)) {
+            template.header(SERVICE_AUTHORIZATION, securityUtils.getS2SToken());
+        }
+        // TODO: will be removed once ccd cleaned in their end
         template.header(EXPERIMENTAL, "true");
     }
 }

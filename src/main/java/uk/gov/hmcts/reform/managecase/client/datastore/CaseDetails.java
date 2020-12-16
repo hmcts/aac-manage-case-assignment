@@ -34,6 +34,8 @@ public class CaseDetails {
     public static final String ORG_ID = "OrganisationID";
     public static final String ORG_NAME = "OrganisationName";
 
+    public static final String APPROVAL_STATUS = "ApprovalStatus";
+
     @JsonProperty("id")
     @JsonAlias("reference") // alias to match with data-store elasticSearch api response
     @NotEmpty(message = ValidationError.CASE_ID_EMPTY)
@@ -82,6 +84,14 @@ public class CaseDetails {
         return getData().values().stream()
             .map(node -> node.findParents(ORGANISATION_TO_ADD))
             .flatMap(List::stream)
+            .findFirst();
+    }
+
+    public Optional<JsonNode> findCorNodeWithApprovalStatus() {
+        return getData().values().stream()
+            .filter(node -> node.findParent(CASE_ROLE_ID) != null)
+            .filter(node -> node.hasNonNull(APPROVAL_STATUS))
+            .filter(node -> node.hasNonNull(ORGANISATION_TO_ADD) || node.hasNonNull(ORGANISATION_TO_REMOVE))
             .findFirst();
     }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.ArrayUtils;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -21,7 +22,9 @@ import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
+import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
+import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
@@ -51,15 +54,20 @@ public class NoticeOfChangeQuestions {
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
-
+    private final PrdRepository prdRepository;
+    private final JacksonUtils jacksonUtils;
     private final SecurityUtils securityUtils;
 
     @Autowired
-    public NoticeOfChangeQuestions(DataStoreRepository dataStoreRepository,
+    public NoticeOfChangeQuestions(@Qualifier("defaultDataStoreRepository") DataStoreRepository dataStoreRepository,
                                    DefinitionStoreRepository definitionStoreRepository,
+                                   PrdRepository prdRepository,
+                                   JacksonUtils jacksonUtils,
                                    SecurityUtils securityUtils) {
         this.dataStoreRepository = dataStoreRepository;
         this.definitionStoreRepository = definitionStoreRepository;
+        this.prdRepository = prdRepository;
+        this.jacksonUtils = jacksonUtils;
         this.securityUtils = securityUtils;
     }
 

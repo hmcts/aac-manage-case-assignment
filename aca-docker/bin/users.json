@@ -1,3 +1,4 @@
 [
-  {"email": "master.caa@gmail.com", "roles": "caseworker,caseworker-caa", "lastName": "caa", "firstName": "master"}
+  {"email": "master.caa@gmail.com", "roles": "caseworker,caseworker-caa", "lastName": "caa", "firstName": "master"},
+  {"email": "noc.approver@gmail.com", "roles": "caseworker-approver", "lastName": "noc", "firstName": "approver"}
 ]

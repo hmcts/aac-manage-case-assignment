@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPageField;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignedUsers;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.UserDetails;
@@ -78,6 +79,13 @@ public class TestFixtures {
 
         public static CaseDetails caseDetails() {
             return defaultCaseDetails().build();
+        }
+
+        public static CaseDetails caseDetails(ChangeOrganisationRequest changeOrganisationRequest) {
+            return defaultCaseDetails()
+                .data(Map.of("changeOrganisationRequestField",
+                    OBJECT_MAPPER.convertValue(changeOrganisationRequest, JsonNode.class)))
+                .build();
         }
 
         public static CaseDetails.CaseDetailsBuilder defaultCaseDetails() {

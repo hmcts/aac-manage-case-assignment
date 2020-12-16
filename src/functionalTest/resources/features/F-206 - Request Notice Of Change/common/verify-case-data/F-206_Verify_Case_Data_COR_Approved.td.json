@@ -1,11 +1,9 @@
 {
   "_guid_": "F-206_Verify_Case_Data_COR_Approved",
-  "_extends_": "F-206_Verify_Case_Data__TEMPORARY_HACK",
+  "_extends_": "F-206_Verify_Case_Data__Base",
 
   "specs": [
-    "to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated",
-
-    "TEMPORARY_HACK: replace 'F-206_Verify_Case_Data__TEMPORARY_HACK' reference with 'F-206_Verify_Case_Data__Base' once 'CheckForNoCApproval' and 'ApplyNoCDecision' are complete"
+    "to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated"
   ],
 
   "request": {
@@ -21,6 +19,8 @@
 
       "data": {
         "respondentOrganisationPolicy" : {
+          "OrgPolicyReference": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][respondentOrganisationPolicy][OrgPolicyReference]}",
+          "OrgPolicyCaseAssignedRole": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][respondentOrganisationPolicy][OrgPolicyCaseAssignedRole]}",
           "Organisation" : {
             "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
           }

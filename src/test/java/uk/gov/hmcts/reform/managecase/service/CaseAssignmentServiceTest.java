@@ -100,7 +100,7 @@ class CaseAssignmentServiceTest {
 
             UserDetails userDetails = UserDetails.builder()
                 .id(ASSIGNEE_ID).roles(List.of("caseworker-AUTOTEST1-solicitor")).build();
-            given(idamRepository.getSystemUserAccessToken()).willReturn(BEAR_TOKEN);
+            given(idamRepository.getCaaSystemUserAccessToken()).willReturn(BEAR_TOKEN);
             given(idamRepository.getUserByUserId(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
         }
 

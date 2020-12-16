@@ -81,9 +81,9 @@ public class CaseDetailsTest {
         // ARRANGE
         Map<String, JsonNode> data = new HashMap<>();
 
-        CaseDetails caseResource = CaseDetails.builder().data(data).build();
+        CaseDetails caseDetails = CaseDetails.builder().data(data).build();
 
         // ASSERT
-        assertThat(caseResource.findChangeOrganisationRequestNode().isPresent()).isFalse();
+        assertThat(caseDetails.findChangeOrganisationRequestNode()).isNotPresent();
     }
 }

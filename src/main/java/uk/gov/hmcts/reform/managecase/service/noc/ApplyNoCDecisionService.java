@@ -7,6 +7,7 @@ import feign.FeignException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
@@ -59,7 +60,7 @@ public class ApplyNoCDecisionService {
 
     @Autowired
     public ApplyNoCDecisionService(PrdRepository prdRepository,
-                                   DataStoreRepository dataStoreRepository,
+                                   @Qualifier("defaultDataStoreRepository") DataStoreRepository dataStoreRepository,
                                    NotifyService notifyService,
                                    JacksonUtils jacksonUtils,
                                    ObjectMapper objectMapper) {

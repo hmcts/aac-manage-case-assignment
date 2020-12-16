@@ -133,15 +133,15 @@ class NoticeOfChangeQuestionsTest {
             caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
             ObjectMapper mapper = new ObjectMapper();
             JsonNode actualObj = mapper.readValue("{\n"
-                                                      + "  \"OrganisationPolicy1\": {\n"
-                                                      + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
-                                                      + "    \"OrgPolicyReference\": \"Reference\",\n"
-                                                      + "    \"Organisation\": {\n"
-                                                      + "      \"OrganisationID\": \"QUK822N\",\n"
-                                                      + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
-                                                      + "    }\n"
-                                                      + "  }\n"
-                                                      + "}", JsonNode.class);
+                + "  \"OrganisationPolicy1\": {\n"
+                + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
+                + "    \"OrgPolicyReference\": \"Reference\",\n"
+                + "    \"Organisation\": {\n"
+                + "      \"OrganisationID\": \"QUK822N\",\n"
+                + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
+                + "    }\n"
+                + "  }\n"
+                + "}", JsonNode.class);
 
             caseFields.put(PREDEFINED_COMPLEX_ORGANISATION_POLICY, actualObj);
             SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
@@ -261,11 +261,11 @@ class NoticeOfChangeQuestionsTest {
             caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
             ObjectMapper mapper = new ObjectMapper();
             JsonNode actualObj = mapper.readValue("   {\n"
-                                                      + "                \"changeOrg\":\n"
-                                                      + "                {\n"
-                                                      + "                    \"CaseRoleId\": \"role\"\n"
-                                                      + "                }\n"
-                                                      + "            }", JsonNode.class);
+                + "                \"changeOrg\":\n"
+                + "                {\n"
+                + "                    \"CaseRoleId\": \"role\"\n"
+                + "                }\n"
+                + "            }", JsonNode.class);
             caseFields.put(CHANGE_ORG, actualObj);
             SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
             viewItems.add(item);
@@ -348,15 +348,15 @@ class NoticeOfChangeQuestionsTest {
             caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
             ObjectMapper mapper = new ObjectMapper();
             JsonNode actualObj = mapper.readValue("{\n"
-                                                      + "  \"OrganisationPolicy1\": {\n"
-                                                      + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
-                                                      + "    \"OrgPolicyReference\": \"Reference\",\n"
-                                                      + "    \"Organisation\": {\n"
-                                                      + "      \"OrganisationID\": \"QUK822N\",\n"
-                                                      + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
-                                                      + "    }\n"
-                                                      + "  }\n"
-                                                      + "}", JsonNode.class);
+                + "  \"OrganisationPolicy1\": {\n"
+                + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
+                + "    \"OrgPolicyReference\": \"Reference\",\n"
+                + "    \"Organisation\": {\n"
+                + "      \"OrganisationID\": \"QUK822N\",\n"
+                + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
+                + "    }\n"
+                + "  }\n"
+                + "}", JsonNode.class);
 
             caseFields.put(PREDEFINED_COMPLEX_ORGANISATION_POLICY, actualObj);
             SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);

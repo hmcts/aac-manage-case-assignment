@@ -1,0 +1,85 @@
+{
+  "_guid_": "S-208.1",
+  "_extends_": "S-208_Test_Data_Base",
+
+  "title": "(Happy Path) Successfully set up the OrganisationToRemove in the ChangeOrganisationRequest and return the updated case record for a Remove event",
+
+  "specs": [
+    "system user - with caseworker-caa IdAM role",
+    "intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user",
+    "contains a case record containing exactly one OrganisationPolicy.OrgPolicyCaseAssignedRole matching the ChangeOrganisationRequest.CaseRole",
+    "includes ChangeOrganisationRequest.OrganisationToRemove is equal to the organisation ID in the Organisation policy that has a OrgPolicyCaseAssignedRole matching the COR.CaseRole"
+  ],
+
+  "request": {
+    "body": {
+      "event_id": "nocRequest_setOrgToRemove",
+      "case_details": {
+        "id": "4444333322221111",
+        "jurisdiction": "BEFTA_MASTER",
+        "state": "open",
+        "case_type_id": "FT_MasterCaseType",
+        "data": {
+          "changeOrganisationRequestField": {
+            "CaseRoleId": "[ApplicantSolicitor]",
+            "RequestTimestamp" : "2020-02-20T06:30:00",
+            "OrganisationToAdd": {
+              "OrganisationID": "PUBLIC"
+            },
+            "OrganisationToRemove": {
+              "OrganisationID": null
+            },
+            "ApprovalStatus": "0"
+          },
+          "applicantOrganisationPolicy": {
+            "OrgPolicyReference": "ApplicantPolicy",
+            "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
+            "Organisation": {
+              "OrganisationID": "Org1"
+            }
+          },
+          "respondentOrganisationPolicy": {
+            "OrgPolicyReference": "RespondentPolicy",
+            "OrgPolicyCaseAssignedRole": "[RespondentSolicitor]",
+            "Organisation": {
+              "OrganisationID": "Org2"
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "data": {
+        "changeOrganisationRequestField": {
+          "CaseRoleId": "[ApplicantSolicitor]",
+          "RequestTimestamp": "2020-02-20T06:30:00",
+          "OrganisationToAdd": {
+            "OrganisationID": "PUBLIC"
+          },
+          "OrganisationToRemove": {
+            "OrganisationID": "Org1"
+          },
+          "ApprovalStatus": "0"
+        },
+        "applicantOrganisationPolicy": {
+          "OrgPolicyReference": "ApplicantPolicy",
+          "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
+          "Organisation": {
+            "OrganisationID": "Org1"
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "OrgPolicyReference": "RespondentPolicy",
+          "OrgPolicyCaseAssignedRole": "[RespondentSolicitor]",
+          "Organisation": {
+            "OrganisationID": "Org2"
+          }
+        }
+      }
+    }
+  }
+}

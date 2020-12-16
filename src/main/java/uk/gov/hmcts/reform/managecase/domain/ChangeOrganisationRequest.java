@@ -9,6 +9,7 @@ import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.S
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class ChangeOrganisationRequest {
     @JsonProperty("OrganisationToAdd")
     private Organisation organisationToAdd;
 
+    @Setter
     @JsonProperty("OrganisationToRemove")
     private Organisation organisationToRemove;
 

@@ -94,4 +94,13 @@ public class CaseDetails {
             .filter(node -> node.hasNonNull(ORGANISATION_TO_ADD) || node.hasNonNull(ORGANISATION_TO_REMOVE))
             .findFirst();
     }
+
+    public String getKeyFromDataWithValue(JsonNode value) {
+        for (String key : data.keySet()) {
+            if (data.get(key).equals(value)) {
+                return key;
+            }
+        }
+        return null;
+    }
 }

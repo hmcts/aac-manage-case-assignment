@@ -6,12 +6,14 @@
     "body" : {
       "auditEvents": [
         {
+          "__ordering__": "UNORDERED"
+        }, {
           "id": "[[ANYTHING_PRESENT]]",
           "description" : "[[ANYTHING_PRESENT]]",
           "user_id": "[[ANYTHING_PRESENT]]",
           "user_last_name": "approver",
           "user_first_name": "noc",
-          "event_name": "NoC Request",
+          "event_name": "[[ANYTHING_PRESENT]]",
           "created_date": "[[ANYTHING_PRESENT]]",
           "case_type_id": "[[ANYTHING_PRESENT]]",
           "case_type_version": "[[ANYTHING_PRESENT]]",

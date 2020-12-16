@@ -7,7 +7,6 @@
   ],
 
   "expectedResponse": {
-    "_extends_": "Common_200_Response",
     "body" : {
       "auditEvents": [
         {
@@ -53,12 +52,7 @@
           "proxied_by_first_name" : "[[ANY_NULLABLE]]",
           "security_classifications": "[[ANYTHING_PRESENT]]"
         }
-      ],
-      "_links" : {
-        "self" : {
-          "href" : "[[ANYTHING_PRESENT]]"
-        }
-      }
+      ]
     }
   }
 }

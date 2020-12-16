@@ -175,6 +175,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                 CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder()
                     .token(caseUpdateViewEvent.getEventToken())
                     .event(event)
+                    .onBehalfOfUserToken(securityUtils.getUserToken())
                     .data(getCaseDataContentData(caseFieldId, changeOrganisationRequest, caseData))
                     .build();
 

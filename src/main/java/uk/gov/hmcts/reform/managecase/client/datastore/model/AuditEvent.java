@@ -45,7 +45,6 @@ public class AuditEvent extends Event {
     @JsonProperty("significant_item")
     private SignificantItem significantItem;
 
-
     public Long getId() {
         return id;
     }

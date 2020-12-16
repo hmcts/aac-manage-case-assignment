@@ -1,0 +1,22 @@
+{
+  "_guid_" : "S-208_Test_Data_Base",
+
+  "productName": "Manage Case Assignment Microservice",
+  "operationName": "SetOrganisationToRemove",
+
+  "method": "POST",
+  "uri": "noc/set-organisation-to-remove",
+
+  "s2sClientId": "ccd_data",
+  "userTokenClientId": "xuiwebapp",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request"
+  }
+}

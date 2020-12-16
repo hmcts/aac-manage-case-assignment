@@ -18,4 +18,7 @@ public class CaseEventCreationPayload {
 
     @JsonProperty("event_token")
     private String token;
+
+    @JsonProperty("on_behalf_of_token")
+    private String onBehalfOfUserToken;
 }

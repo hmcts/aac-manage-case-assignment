@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import uk.gov.hmcts.reform.managecase.BaseTest;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
-import uk.gov.hmcts.reform.managecase.api.payload.CheckNoticeOfChangeApprovalRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.CallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -84,10 +84,12 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.NOC_PREPARE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.SET_ORGANISATION_TO_REMOVE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_DETAILS_REQUIRED;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_NOT_CONSIDERED;
@@ -607,7 +609,7 @@ public class NoticeOfChangeControllerIT {
             };
         }
     }
-    
+
     @Nested
     @DisplayName("POST /noc/noc-prepare")
     class PrepareNoticeOfChange extends BaseTest {
@@ -779,7 +781,7 @@ public class NoticeOfChangeControllerIT {
     @DisplayName("POST /noc/check-noc-approval")
     class CheckNoticeOfChangeApproval extends BaseTest {
 
-        private CheckNoticeOfChangeApprovalRequest checkNoticeOfChangeApprovalRequest;
+        private CallbackRequest checkNoticeOfChangeApprovalRequest;
         private CaseDetails caseDetails;
         private ChangeOrganisationRequest changeOrganisationRequest;
 
@@ -798,8 +800,8 @@ public class NoticeOfChangeControllerIT {
         public void setup() throws JsonProcessingException {
 
             changeOrganisationRequest = ChangeOrganisationRequest.builder()
-                .organisationToAdd(new Organisation("123", "Org1"))
-                .organisationToRemove(new Organisation("789", "Org2"))
+                .organisationToAdd(Organisation.builder().organisationID("123").build())
+                .organisationToRemove(Organisation.builder().organisationID("789").build())
                 .caseRoleId(dynamicList)
                 .requestTimestamp(LocalDateTime.now())
                 .approvalStatus(APPROVED.name())
@@ -807,7 +809,7 @@ public class NoticeOfChangeControllerIT {
 
             caseDetails =  caseDetails(changeOrganisationRequest);
 
-            checkNoticeOfChangeApprovalRequest = new CheckNoticeOfChangeApprovalRequest(NOC, null, caseDetails);
+            checkNoticeOfChangeApprovalRequest = new CallbackRequest(NOC, null, caseDetails);
 
             CaseViewActionableEvent caseViewEvent = new CaseViewActionableEvent();
             caseViewEvent.setId(NOC);
@@ -826,7 +828,6 @@ public class NoticeOfChangeControllerIT {
                 .caseDetails(caseDetails)
                 .build();
 
-            HashMap<String, JsonNode> data = new HashMap<>();
             CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder()
                 .token(startEventResource.getToken())
                 .event(event)
@@ -854,15 +855,15 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldSuccessfullyCheckNoCApprovalWithoutAutoApproval() throws Exception {
             changeOrganisationRequest = ChangeOrganisationRequest.builder()
-                .organisationToAdd(new Organisation("123", "Org1"))
-                .organisationToRemove(new Organisation("789", "Org2"))
+                .organisationToAdd(Organisation.builder().organisationID("123").build())
+                .organisationToRemove(Organisation.builder().organisationID("789").build())
                 .caseRoleId(dynamicList)
                 .requestTimestamp(LocalDateTime.now())
                 .approvalStatus(PENDING.name())
                 .build();
 
             caseDetails =  caseDetails(changeOrganisationRequest);
-            checkNoticeOfChangeApprovalRequest = new CheckNoticeOfChangeApprovalRequest(NOC, null, caseDetails);
+            checkNoticeOfChangeApprovalRequest = new CallbackRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -876,7 +877,7 @@ public class NoticeOfChangeControllerIT {
         void shouldReturnAnErrorIfRequestDoesNotContainChangeOrgRequest() throws Exception {
             caseDetails = defaultCaseDetails().build();
 
-            checkNoticeOfChangeApprovalRequest = new CheckNoticeOfChangeApprovalRequest(NOC, null, caseDetails);
+            checkNoticeOfChangeApprovalRequest = new CallbackRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -890,7 +891,7 @@ public class NoticeOfChangeControllerIT {
         void shouldReturnAnErrorIfChangeOrganisationRequestIsInvalid() throws Exception {
             changeOrganisationRequest.setApprovalStatus(null);
             caseDetails =  caseDetails(changeOrganisationRequest);
-            checkNoticeOfChangeApprovalRequest = new CheckNoticeOfChangeApprovalRequest(NOC, null, caseDetails);
+            checkNoticeOfChangeApprovalRequest = new CallbackRequest(NOC, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -898,6 +899,116 @@ public class NoticeOfChangeControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /noc/set-organisation-to-remove")
+    class SetOrganisationToRemove extends BaseTest {
+
+        private CallbackRequest noticeOfChangeRequest;
+        private CaseDetails caseDetails;
+        private ChangeOrganisationRequest changeOrganisationRequest;
+
+        private static final String ENDPOINT_URL = "/noc" + SET_ORGANISATION_TO_REMOVE_PATH;
+
+        @Autowired
+        private MockMvc mockMvc;
+
+        DynamicListElement dynamicListElement = DynamicListElement.builder().code("Role1").label("label").build();
+        DynamicList dynamicList = DynamicList.builder()
+            .value(dynamicListElement)
+            .listItems(List.of(dynamicListElement))
+            .build();
+
+        @BeforeEach
+        public void setup() {
+            changeOrganisationRequest = ChangeOrganisationRequest.builder()
+                .organisationToAdd(Organisation.builder().organisationID("123").build())
+                .organisationToRemove(Organisation.builder().organisationID(null).build())
+                .caseRoleId(dynamicList)
+                .requestTimestamp(LocalDateTime.now())
+                .approvalStatus("APPROVED")
+                .build();
+
+            Organisation organisation = Organisation.builder()
+                .organisationID("Org1")
+                .build();
+
+            OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
+                .organisation(organisation)
+                .orgPolicyReference("PolicyRef")
+                .orgPolicyCaseAssignedRole("Role1")
+                .build();
+
+            caseDetails = caseDetails(changeOrganisationRequest, organisationPolicy);
+            noticeOfChangeRequest = new CallbackRequest(NOC, null, caseDetails);
+        }
+
+        @Test
+        void shouldSuccessfullySetOrganisationToRemove() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(mapper.writeValueAsString(noticeOfChangeRequest)))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.data.changeOrganisationRequestField.OrganisationToRemove.OrganisationID",
+                                    is("Org1")));
+        }
+
+        @Test
+        void shouldReturnAnErrorIfRequestDoesNotContainChangeOrgRequest() throws Exception {
+            caseDetails = defaultCaseDetails().data(Map.of()).build();
+            noticeOfChangeRequest = new CallbackRequest(NOC, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(mapper.writeValueAsString(noticeOfChangeRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
+        }
+
+        @Test
+        void shouldReturnAnErrorIfChangeOrganisationRequestIsInvalid() throws Exception {
+            changeOrganisationRequest.setApprovalStatus(null);
+            caseDetails = caseDetails(changeOrganisationRequest);
+            noticeOfChangeRequest = new CallbackRequest(NOC, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(mapper.writeValueAsString(noticeOfChangeRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
+        }
+
+        @Test
+        void shouldReturnAnErrorIfOrganisationToRemoveIsInvalid() throws Exception {
+            changeOrganisationRequest.setOrganisationToRemove(Organisation.builder().organisationID("Org2").build());
+            caseDetails = caseDetails(changeOrganisationRequest);
+            noticeOfChangeRequest = new CallbackRequest(NOC, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(mapper.writeValueAsString(noticeOfChangeRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
+        }
+
+        @Test
+        void shouldReturnAnErrorIfNoMatchingOrganisationPolicies() throws Exception {
+            caseDetails = caseDetails(changeOrganisationRequest);
+            noticeOfChangeRequest = new CallbackRequest(NOC, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(mapper.writeValueAsString(noticeOfChangeRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.message", is(INVALID_CASE_ROLE_FIELD)));
         }
     }
 }

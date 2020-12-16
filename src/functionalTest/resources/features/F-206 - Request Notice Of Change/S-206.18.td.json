@@ -8,7 +8,7 @@
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
     "Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's",
     "Emma - with a solicitor role for the same jurisdiction, within a different organisation from Richard's",
-    "a citizen Mario, on behalf of whome Richard will create a case",
+    "a citizen Mario, on behalf of whom Richard will create a case",
 
     "the configuration of the NoC request event has no auto-approval",
     "No user has approved or rejected the NoC request from Emma",

@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -46,7 +45,9 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.org
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.usersByOrganisation;
 
-@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.JUnitAssertionsShouldIncludeMessage", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.MethodNamingConventions",
+    "PMD.JUnitAssertionsShouldIncludeMessage",
+    "PMD.ExcessiveImports"})
 class CaseAssignmentServiceTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
@@ -92,14 +93,14 @@ class CaseAssignmentServiceTest {
         void setUp() {
             caseAssignment = new CaseAssignment(CASE_TYPE_ID, CASE_ID, ASSIGNEE_ID);
 
-            given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, CASE_ID))
-                .willReturn(Optional.of(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE)));
+            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
+                .willReturn(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
             given(prdRepository.findUsersByOrganisation())
                 .willReturn(usersByOrganisation(user(ASSIGNEE_ID)));
 
             UserDetails userDetails = UserDetails.builder()
                 .id(ASSIGNEE_ID).roles(List.of("caseworker-AUTOTEST1-solicitor")).build();
-            given(idamRepository.getSystemUserAccessToken()).willReturn(BEAR_TOKEN);
+            given(idamRepository.getCaaSystemUserAccessToken()).willReturn(BEAR_TOKEN);
             given(idamRepository.getUserByUserId(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
         }
 
@@ -108,8 +109,8 @@ class CaseAssignmentServiceTest {
         void shouldAssignCaseAccess() {
 
             given(securityUtils.hasSolicitorRole(anyList(), anyString())).willReturn(true);
-            given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, CASE_ID))
-                .willReturn(Optional.of(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2)));
+            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
+                .willReturn(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
 
             given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
                 .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE))
@@ -124,11 +125,11 @@ class CaseAssignmentServiceTest {
         }
 
         @Test
-        @DisplayName("should throw case could not be fetched error error when case is not found")
+        @DisplayName("should throw case could not be fetched error when case is not found")
         void shouldThrowCaseCouldNotBeFetchedException_whenCaseNotFound() {
 
-            given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, CASE_ID))
-                .willReturn(Optional.empty());
+            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
+                .willThrow(new CaseCouldNotBeFetchedException(CASE_COULD_NOT_BE_FETCHED));
 
             assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
                 .isInstanceOf(CaseCouldNotBeFetchedException.class)

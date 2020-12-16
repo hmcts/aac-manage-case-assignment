@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPageField;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignedUsers;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.UserDetails;
@@ -69,6 +70,27 @@ public class TestFixtures {
         private CaseDetailsFixture() {
         }
 
+        public static CaseDetails caseDetails() {
+            return defaultCaseDetails().build();
+        }
+
+        public static CaseDetails caseDetails(ChangeOrganisationRequest changeOrganisationRequest) {
+            return defaultCaseDetails()
+                .data(Map.of("changeOrganisationRequestField",
+                             OBJECT_MAPPER.convertValue(changeOrganisationRequest, JsonNode.class)))
+                .build();
+        }
+
+        public static CaseDetails caseDetails(ChangeOrganisationRequest changeOrganisationRequest,
+                                              OrganisationPolicy organisationPolicy) {
+            return defaultCaseDetails()
+                .data(Map.of("changeOrganisationRequestField",
+                             OBJECT_MAPPER.convertValue(changeOrganisationRequest, JsonNode.class),
+                             "organisationPolicyField",
+                             OBJECT_MAPPER.convertValue(organisationPolicy, JsonNode.class)))
+                .build();
+        }
+
         public static CaseDetails caseDetails(String organizationId, String... orgPolicyRoles) {
             Map<String, JsonNode> jsonNodeMap = Stream.of(orgPolicyRoles)
                     .collect(Collectors.toMap(role -> "Field_" + role, role -> jsonNode(organizationId, role),
@@ -76,24 +98,20 @@ public class TestFixtures {
             return defaultCaseDetails().data(jsonNodeMap).build();
         }
 
-        public static CaseDetails caseDetails() {
-            return defaultCaseDetails().build();
-        }
-
         public static CaseDetails.CaseDetailsBuilder defaultCaseDetails() {
             return CaseDetails.builder()
-                    .caseTypeId(CASE_TYPE_ID)
-                    .id(CASE_ID)
-                    .jurisdiction(JURISDICTION)
-                    .state(null)
-                    .data(Maps.newHashMap("OrganisationPolicy1", jsonNode(ORGANIZATION_ID, CASE_ROLE)));
+                .caseTypeId(CASE_TYPE_ID)
+                .id(CASE_ID)
+                .jurisdiction(JURISDICTION)
+                .state(null)
+                .data(Maps.newHashMap("OrganisationPolicy1", jsonNode(ORGANIZATION_ID, CASE_ROLE)));
         }
 
         public static OrganisationPolicy organisationPolicy(String organizationId, String orgPolicyRole) {
             return OrganisationPolicy.builder()
                     .orgPolicyCaseAssignedRole(orgPolicyRole)
                     .orgPolicyReference(null)
-                    .organisation(new Organisation(organizationId, organizationId))
+                    .organisation(Organisation.builder().organisationID(organizationId).build())
                     .build();
         }
 

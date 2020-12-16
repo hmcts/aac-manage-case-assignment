@@ -1,6 +1,7 @@
 {
   "_guid_": "S-205.11.6",
-  "_extends_": "S-205.11",
+  "_extends_": "S-205.11_Test_Data_Base",
+
   "specs": [
     "has a null answer where a non-null answer is expected"
   ],
@@ -22,15 +23,12 @@
   },
 
   "expectedResponse": {
-    "responseCode" : 400,
-    "responseMessage" : "Bad Request",
+		"_extends_": "ACA_400_Response",
     "body" : {
-      "status" : "BAD_REQUEST",
       "message" : "The answers did not match those for any litigant",
       "errors" : [ ]
     }
 
   }
-
 
 }

@@ -45,12 +45,12 @@ import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentContro
 import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.CASE_ASSIGNMENTS_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.GET_ASSIGNMENTS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.UNASSIGN_ACCESS_MESSAGE;
-import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.CASE_USERS;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient.CASE_USERS;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubAssignCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseAssignments;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseDetailsByCaseIdViaExternalApi;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisation;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubIdamGetUserById;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubUnassignCase;
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CASE_ROLE;
@@ -70,8 +70,6 @@ public class CaseAssignmentControllerIT {
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
     private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";
 
-    private static final String RAW_QUERY = "{\"query\":{\"bool\":{\"filter\":{\"term\":{\"reference\":%s}}}}}";
-    private static final String ES_QUERY = String.format(RAW_QUERY, CASE_ID);
     private static final List<String> NULL_CASE_ROLES = null;
 
     @Nested
@@ -92,7 +90,7 @@ public class CaseAssignmentControllerIT {
             // Positive stub mappings - individual tests override again for a specific scenario.
             stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID), user(ANOTHER_USER)));
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor"));
-            stubSearchCase(CASE_TYPE_ID, ES_QUERY, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
+            stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
             stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE);
         }
 
@@ -114,7 +112,8 @@ public class CaseAssignmentControllerIT {
         @Test
         void shouldAssignCaseAccess_withMultipleOrganisationRoles() throws Exception {
 
-            stubSearchCase(CASE_TYPE_ID, ES_QUERY, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
+            stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID,
+                                                     caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
             stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2);
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
@@ -126,6 +125,42 @@ public class CaseAssignmentControllerIT {
                     ASSIGN_ACCESS_MESSAGE,
                     StringUtils.join(List.of(ORG_POLICY_ROLE, ORG_POLICY_ROLE2), ',')
                 ))));
+
+            verify(postRequestedFor(urlEqualTo(CASE_USERS)));
+        }
+
+        @DisplayName("Invoker successfully sharing case access with another solicitor in their org"
+            + " and jurisdiction role is mixed case")
+        @Test
+        void shouldAssignCaseAccess_whenInvokerSuccessfullyShareACaseWithMixedCaseJurisdictionRole()
+            throws Exception {
+
+            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST1-SoLiciToR"));
+
+            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE))));
+
+            verify(postRequestedFor(urlEqualTo(CASE_USERS)));
+        }
+
+        @DisplayName("Invoker successfully sharing case access with another solicitor in their org"
+            + " and jurisdiction role is upper case")
+        @Test
+        void shouldAssignCaseAccess_whenInvokerSuccessfullyShareACaseWithUpperCaseJurisdictionRole()
+            throws Exception {
+
+            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "CASEWORKER-AUTOTEST1-SOLICITOR"));
+
+            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE))));
 
             verify(postRequestedFor(urlEqualTo(CASE_USERS)));
         }
@@ -153,7 +188,26 @@ public class CaseAssignmentControllerIT {
 
             stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID)));
 
-            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicitor"));
+            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicitor-role"));
+
+            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(
+                    "$.message",
+                    is(ValidationError.ASSIGNEE_ROLE_ERROR)
+                ));
+        }
+
+        @DisplayName("Must return 400 bad request response if assignee has an invalid solicitor role for the"
+            + " jurisdiction of the case")
+        @Test
+        void shouldReturn400_whenAssigneeHasInvalidJurisdictionRole() throws Exception {
+
+            stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID)));
+
+            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicit"));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -169,8 +223,7 @@ public class CaseAssignmentControllerIT {
             + " in the case data organisation policies")
         @Test
         void shouldReturn400_whenInvokersOrgIsNotPresentInCaseData() throws Exception {
-
-            stubSearchCase(CASE_TYPE_ID, ES_QUERY, caseDetails("ANOTHER_ORGANIZATION_ID", ORG_POLICY_ROLE));
+            stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, caseDetails("ANOTHER_ORGANIZATION_ID", ORG_POLICY_ROLE));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -183,7 +236,7 @@ public class CaseAssignmentControllerIT {
         @Test
         void shouldReturn500_whenCaseNotFound() throws Exception {
             // ARRANGE
-            stubSearchCase(CASE_TYPE_ID, ES_QUERY, null); // i.e. no case not found
+            stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, null); // i.e. no case not found
 
             // ACT + ASSERT
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)

@@ -1,0 +1,60 @@
+{
+  "_guid_": "S-207.3",
+  "_extends_": "Check_NoC_Approval__Base",
+
+  "title": "Must return error if approval status is not configured at all (empty / null)",
+
+  "specs": [
+    "system user - with caseworker-caa role",
+
+    "contains a malformed case record",
+    "is made by the system user (caseworker-caa IdAM role) to simulate a submitted callback from a NOC Request case event that has null approvalStatus"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
+  "request": {
+    "body": {
+      "event_id": "nocRequest_autoApproval",
+      "case_details": {
+        "id": "1605102929808799",
+        "jurisdiction": "BEFTA_MASTER",
+        "data": {
+          "changeOrganisationRequestField" : {
+            "CaseRoleId" :  {
+              "value" : {
+                "code" : "[RESPONDENTSOLICITOR]",
+                "label" : "Respondent Solicitor"
+              },
+              "list_items" : [ {
+                "code" : "[RESPONDENTSOLICITOR]",
+                "label" : "Respondent Solicitor"
+              } ]
+            },
+            "ApprovalStatus" : null,
+            "RequestTimestamp": "2020-02-20T06:30:00",
+            "OrganisationToAdd" : {
+              "OrganisationID": "Org-Two"
+            },
+            "OrganisationToRemove": {
+              "OrganisationID": null
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "status" : "BAD_REQUEST",
+      "message" : "ChangeOrganisationRequest field could not be found or appears invalid",
+      "errors" : "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

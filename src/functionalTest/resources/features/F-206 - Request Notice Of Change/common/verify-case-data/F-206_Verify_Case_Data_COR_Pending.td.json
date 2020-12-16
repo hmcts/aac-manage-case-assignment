@@ -19,7 +19,16 @@
 
       "data": {
         "changeOrganisationRequestField" : {
-          "CaseRoleId" : "[RespondentSolicitor]",
+          "CaseRoleId" : {
+            "value" : {
+              "code" : "[RESPONDENTSOLICITOR]",
+              "label" : "Respondent Solicitor"
+            },
+            "list_items" : [ {
+              "code" : "[RESPONDENTSOLICITOR]",
+              "label" : "Respondent Solicitor"
+            } ]
+          },
           "ApprovalStatus" : "0",
           "RequestTimestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
           "OrganisationToAdd" : {

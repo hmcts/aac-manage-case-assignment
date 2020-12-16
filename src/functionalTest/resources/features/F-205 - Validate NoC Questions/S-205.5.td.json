@@ -1,11 +1,15 @@
 {
   "_guid_": "S-205.5",
   "_extends_": "S-205_Test_Data_Base",
+
+  "title": "NoC Answers must return an error response for a non-extant Case ID",
+
   "specs" : [
     "Dil - with a solicitor and pui-caseworker role",
+
     "is made by Dil to validate the answers to the challenge questions in order to become a representative on a valid case number for which the case does not exist",
-    "contains a structurally valid set of answers",
     "contains a non-extant case ID for which there is no corresponding case record",
+    "contains a structurally valid set of answers",
     "contains a valid IDAM token for Dil"
   ],
 
@@ -18,19 +22,17 @@
   "request": {
     "_extends_": "Common_Request",
     "body": {
-      "_extends_": "Applicant_correct_answers_snippet",
+      "_extends_": "NoC_Valid_Answers_For_Case_Role_R1",
       "case_id": "1602669054812401"
     }
   },
+
   "expectedResponse": {
-    "responseCode": 404,
-    "responseMessage": "Not Found",
+    "_extends_": "ACA_404_Response",
     "body" : {
-      "status" : "NOT_FOUND",
       "message" : "Case could not be found",
       "errors" : [ ]
     }
   }
-
 
 }

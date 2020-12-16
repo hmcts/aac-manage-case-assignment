@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.ArrayUtils;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -21,7 +22,9 @@ import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
+import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
+import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
@@ -36,6 +39,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
@@ -50,15 +54,20 @@ public class NoticeOfChangeQuestions {
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
-
+    private final PrdRepository prdRepository;
+    private final JacksonUtils jacksonUtils;
     private final SecurityUtils securityUtils;
 
     @Autowired
-    public NoticeOfChangeQuestions(DataStoreRepository dataStoreRepository,
+    public NoticeOfChangeQuestions(@Qualifier("defaultDataStoreRepository") DataStoreRepository dataStoreRepository,
                                    DefinitionStoreRepository definitionStoreRepository,
+                                   PrdRepository prdRepository,
+                                   JacksonUtils jacksonUtils,
                                    SecurityUtils securityUtils) {
         this.dataStoreRepository = dataStoreRepository;
         this.definitionStoreRepository = definitionStoreRepository;
+        this.prdRepository = prdRepository;
+        this.jacksonUtils = jacksonUtils;
         this.securityUtils = securityUtils;
     }
 
@@ -193,6 +202,8 @@ public class NoticeOfChangeQuestions {
         if (caseViewResource.getCaseViewActionableEvents() == null
             || ArrayUtils.isEmpty(caseViewResource.getCaseViewActionableEvents())) {
             throw new ValidationException(NOC_EVENT_NOT_AVAILABLE);
+        } else if (caseViewResource.getCaseViewActionableEvents().length != 1) {
+            throw new ValidationException(MULTIPLE_NOC_REQUEST_EVENTS);
         }
     }
 }

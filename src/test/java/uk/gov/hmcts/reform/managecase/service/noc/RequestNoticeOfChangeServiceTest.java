@@ -4,40 +4,54 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.domain.DynamicList;
+import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
+import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.validation.ValidationException;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
+import static uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService.MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap",
     "PMD.AvoidDuplicateLiterals",
@@ -58,6 +72,7 @@ class RequestNoticeOfChangeServiceTest {
     private static final String SOLICITOR_ROLE = "caseworker-" + JURISDICTION_ONE + "-solicitor";
     private static final String NON_SOLICITOR_ROLE = "caseworker-" + JURISDICTION_ONE + "-citizen";
     private static final String USER_INFO_UID = "userInfoUid";
+    private static final String DYNAMIC_LIST_LABEL = "name";
 
     private NoCRequestDetails noCRequestDetails;
     private Organisation incumbentOrganisation;
@@ -71,6 +86,8 @@ class RequestNoticeOfChangeServiceTest {
     @Mock
     private DataStoreRepository dataStoreRepository;
     @Mock
+    private DefinitionStoreRepository definitionStoreRepository;
+    @Mock
     private PrdRepository prdRepository;
     @Mock
     private SecurityUtils securityUtils;
@@ -81,16 +98,19 @@ class RequestNoticeOfChangeServiceTest {
     void setUp() {
         initMocks(this);
         FindUsersByOrganisationResponse findUsersByOrganisationResponse = new FindUsersByOrganisationResponse(
-            Collections.emptyList(), INVOKERS_ORGANISATION_IDENTIFIER);
+            emptyList(), INVOKERS_ORGANISATION_IDENTIFIER);
         given(prdRepository.findUsersByOrganisation()).willReturn(findUsersByOrganisationResponse);
 
+        CaseViewType caseViewType = new CaseViewType();
+        caseViewType.setId("id");
+        caseViewType.setName(DYNAMIC_LIST_LABEL);
         CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
         caseViewActionableEvent.setId(NOC_REQUEST_EVENT);
         CaseViewActionableEvent[] caseViewActionableEvents = {caseViewActionableEvent};
         CaseViewResource caseViewResource = new CaseViewResource();
         caseViewResource.setReference(CASE_ID);
         caseViewResource.setCaseViewActionableEvents(caseViewActionableEvents);
-
+        caseViewResource.setCaseType(caseViewType);
         incumbentOrganisation = Organisation.builder().organisationID(INCUMBENT_ORGANISATION_ID).build();
         OrganisationPolicy organisationPolicy = new OrganisationPolicy(incumbentOrganisation,
                                                                        ORG_POLICY_REFERENCE, CASE_ASSIGNED_ROLE);
@@ -103,6 +123,9 @@ class RequestNoticeOfChangeServiceTest {
         caseDetails = CaseDetails.builder().id(CASE_ID).data(new HashMap<>()).build();
 
         given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
+
+        List<CaseRole> caseRoles = List.of(CaseRole.builder().id(CASE_ASSIGNED_ROLE).name(DYNAMIC_LIST_LABEL).build());
+        given(definitionStoreRepository.caseRoles(anyString(), anyString(), anyString())).willReturn(caseRoles);
     }
 
     @Test
@@ -138,9 +161,17 @@ class RequestNoticeOfChangeServiceTest {
         assertThat(caseIdCaptor.getValue()).isEqualTo(CASE_ID);
         assertThat(eventIdCaptor.getValue()).isEqualTo(NOC_REQUEST_EVENT);
 
+        DynamicListElement dynamicListElement = DynamicListElement.builder()
+            .code(CASE_ASSIGNED_ROLE)
+            .label(DYNAMIC_LIST_LABEL)
+            .build();
+        DynamicList dynamicList = DynamicList.builder()
+            .value(dynamicListElement)
+            .listItems(List.of(dynamicListElement))
+            .build();
         ChangeOrganisationRequest capturedCor = corArgumentCaptor.getValue();
         assertAll(
-            () -> assertThat(capturedCor.getCaseRoleId()).isEqualTo(CASE_ASSIGNED_ROLE),
+            () -> assertThat(capturedCor.getCaseRoleId()).isEqualTo(dynamicList),
             () -> assertThat(capturedCor.getOrganisationToAdd().getOrganisationID()).isEqualTo(
                 INVOKERS_ORGANISATION_IDENTIFIER),
             () -> assertThat(capturedCor.getOrganisationToRemove()).isEqualTo(organisationToRemove),
@@ -162,7 +193,7 @@ class RequestNoticeOfChangeServiceTest {
     @DisplayName("NoC auto approval with Change Organisation Request and Case Role present returns PENDING state")
     void testAutoApprovalCorPresentCaseRolePresent() {
         ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
-            .caseRoleId(CASE_ASSIGNED_ROLE)
+            .caseRoleId(DynamicList.builder().build())
             .build();
         updateCaseDetailsData(caseDetails, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
 
@@ -281,6 +312,19 @@ class RequestNoticeOfChangeServiceTest {
         assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(APPROVED);
     }
 
+    @Test
+    @DisplayName("Generate a Notice Of Change Request throws Validation Exception if caseRoleId not "
+        + "present in definition store")
+    void testThrowsValidationErrorIfCaseRoleIdNotPresentInDefinitionStore() {
+        given(definitionStoreRepository.caseRoles(anyString(), anyString(), anyString())).willReturn(emptyList());
+        ValidationException exception = assertThrows(
+            ValidationException.class,
+            () -> service.requestNoticeOfChange(noCRequestDetails)
+        );
+        assertThat(exception.getMessage()).isEqualTo(
+            String.format(MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION, CASE_ASSIGNED_ROLE));
+    }
+
     private void setInvokerToActAsAnAdminOrSolicitor(boolean actAsAnAdminOrSolicitor) {
         List<String> roles = actAsAnAdminOrSolicitor ? List.of(SOLICITOR_ROLE) : List.of(NON_SOLICITOR_ROLE);
         UserInfo userInfo = new UserInfo("sub",
@@ -315,5 +359,136 @@ class RequestNoticeOfChangeServiceTest {
         data.put(dataKey, objectMapper.convertValue(changeOrganisationRequest, JsonNode.class));
 
         caseDetails.setData(data);
+    }
+
+    @Nested
+    @DisplayName("Set Organisation To Remove")
+    @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
+    class SetOrganisationToRemove {
+
+        private Organisation organisation;
+        private OrganisationPolicy organisationPolicy;
+        private ChangeOrganisationRequest changeOrganisationRequestBefore;
+        private ChangeOrganisationRequest changeOrganisationRequestAfter;
+        private CaseDetails callbackCaseDetails;
+
+        @BeforeEach
+        void setUp() {
+            organisation = Organisation.builder()
+                .organisationID("Org1")
+                .organisationName("Organisation 1")
+                .build();
+
+            organisationPolicy = OrganisationPolicy.builder()
+                .organisation(organisation)
+                .orgPolicyReference("PolicyRef")
+                .orgPolicyCaseAssignedRole("Role1")
+                .build();
+
+            changeOrganisationRequestBefore = ChangeOrganisationRequest.builder()
+                .organisationToAdd(Organisation.builder().organisationID("123").build())
+                .organisationToRemove(Organisation.builder().organisationID(null).build())
+                .caseRoleId(DynamicList.builder()
+                                .value(DynamicListElement.builder().code("Role1").build())
+                                .build())
+                .requestTimestamp(LocalDateTime.now())
+                .approvalStatus("1")
+                .build();
+
+            changeOrganisationRequestAfter = ChangeOrganisationRequest.builder()
+                .organisationToAdd(Organisation.builder().organisationID("123").build())
+                .organisationToRemove(Organisation.builder().organisationID("Org1").build())
+                .caseRoleId(DynamicList.builder()
+                                .value(DynamicListElement.builder().code("Role1").build())
+                                .build())
+                .requestTimestamp(LocalDateTime.now())
+                .approvalStatus("1")
+                .build();
+
+            given(jacksonUtils.convertValue(any(), eq(JsonNode.class)))
+                .willReturn(objectMapper.convertValue(changeOrganisationRequestAfter, JsonNode.class));
+        }
+
+        @Test
+        @DisplayName("Set Organisation To Remove should return successfully")
+        void setOrganisationToRemoveSuccess() {
+            callbackCaseDetails = CaseDetails.builder()
+                .data(Map.of(
+                    "OrganisationPolicyField1",
+                    objectMapper.convertValue(organisationPolicy, JsonNode.class),
+                    "ChangeOrganisationRequestField",
+                    objectMapper.convertValue(changeOrganisationRequestBefore, JsonNode.class)
+                ))
+                .build();
+
+            given(jacksonUtils.convertValue(any(), eq(OrganisationPolicy.class)))
+                .willReturn(organisationPolicy);
+
+            AboutToSubmitCallbackResponse response =
+                service.setOrganisationToRemove(callbackCaseDetails,
+                                                changeOrganisationRequestBefore,
+                                                "ChangeOrganisationRequestField");
+
+            assertThat(response.getData().get("ChangeOrganisationRequestField"))
+                .isEqualTo(objectMapper.convertValue(changeOrganisationRequestAfter, JsonNode.class));
+        }
+
+        @Test
+        @DisplayName("Set Organisation To Remove Should fail when zero organisation policies match case role")
+        void setOrganisationToRemoveShouldFailWhenThereAreNoMatchingOrgPolicies() {
+            organisationPolicy  = OrganisationPolicy.builder()
+                .orgPolicyCaseAssignedRole("role")
+                .orgPolicyReference("ref")
+                .organisation(organisation)
+                .build();
+
+            callbackCaseDetails = CaseDetails.builder()
+                .data(Map.of(
+                    "OrganisationPolicyField1",
+                    objectMapper.convertValue(organisationPolicy, JsonNode.class),
+                    "ChangeOrganisationRequestField",
+                    objectMapper.convertValue(changeOrganisationRequestBefore, JsonNode.class)
+                ))
+                .build();
+
+            given(jacksonUtils.convertValue(any(), eq(OrganisationPolicy.class)))
+                .willReturn(organisationPolicy);
+
+            ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> service.setOrganisationToRemove(callbackCaseDetails,
+                                                      changeOrganisationRequestBefore,
+                                                      "ChangeOrganisationRequestField"));
+
+            assertThat(exception.getMessage())
+                .isEqualTo(INVALID_CASE_ROLE_FIELD);
+        }
+
+        @Test
+        @DisplayName("Set Organisation To Remove Should fail when more than one organisation policy matches case role")
+        void setOrganisationToRemoveShouldFailWhenThereAreMoreThanOneMatchingOrgPolicies() {
+            callbackCaseDetails = CaseDetails.builder()
+                .data(Map.of(
+                    "OrganisationPolicyField1",
+                    objectMapper.convertValue(organisationPolicy, JsonNode.class),
+                    "OrganisationPolicyField2",
+                    objectMapper.convertValue(organisationPolicy, JsonNode.class),
+                    "ChangeOrganisationRequestField",
+                    objectMapper.convertValue(changeOrganisationRequestBefore, JsonNode.class)
+                ))
+                .build();
+
+            given(jacksonUtils.convertValue(any(), eq(OrganisationPolicy.class)))
+                .willReturn(organisationPolicy);
+
+            ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> service.setOrganisationToRemove(callbackCaseDetails,
+                                                      changeOrganisationRequestBefore,
+                                                      "ChangeOrganisationRequestField"));
+
+            assertThat(exception.getMessage())
+                .isEqualTo(INVALID_CASE_ROLE_FIELD);
+        }
     }
 }

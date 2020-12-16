@@ -3,6 +3,9 @@ java:
   image: 'hmctspublic.azurecr.io/aac/manage-case-assignment:latest'
   ingressHost: aac-manage-case-assignment-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   aadIdentityName: aac
+  autoscaling:
+    enabled: true 
+    maxReplicas: 4
   keyVaults:
     aac:
       secrets:
@@ -11,13 +14,15 @@ java:
         - idam-mca-client-secret
         - idam-mca-system-user-username
         - idam-mca-system-user-password
+        - idam-noc-approver-username
+        - idam-noc-approver-password
         - notify-mca-api-key-secret
   environment:
     IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     IDAM_OIDC_URL: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts
     S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp
+    MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp,ccd_data,finrem_case_orchestration
     MCA_DS_PROXY_URLS_ALLOWED_LIST: /searchCases.*,/internal/searchCases.*,/internal/cases.*
     MCA_DEF_STORE_PROXY_URLS_ALLOWED_LIST: /api/display/challenge-questions.*
     CCD_DATA_STORE_API_BASE_URL: http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal

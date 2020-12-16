@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -17,22 +18,42 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
+import uk.gov.hmcts.reform.managecase.api.payload.SubmitCallbackResponse;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.api.payload.CallbackRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
+import uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService;
+import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
+import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.constraints.NotEmpty;
 
+import java.util.Optional;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_DECISION_EVENT_UNIDENTIFIABLE;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 
 @RestController
 @Validated
@@ -42,23 +63,39 @@ public class NoticeOfChangeController {
     @SuppressWarnings({"squid:S1075"})
     public static final String GET_NOC_QUESTIONS = "/noc-questions";
     public static final String VERIFY_NOC_ANSWERS = "/verify-noc-answers";
+    public static final String NOC_PREPARE_PATH = "/noc-prepare";
 
     public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
 
     public static final String REQUEST_NOTICE_OF_CHANGE_PATH = "/noc-requests";
+    public static final String CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH = "/check-noc-approval";
+    public static final String SET_ORGANISATION_TO_REMOVE_PATH = "/set-organisation-to-remove";
+
     public static final String REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE =
         "The Notice of Change request has been successfully submitted.";
+    public static final String CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE = "Not yet approved";
+    public static final String CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE = "Approval Applied";
 
     private final NoticeOfChangeQuestions noticeOfChangeQuestions;
+
+    private final NoticeOfChangeApprovalService noticeOfChangeApprovalService;
     private final VerifyNoCAnswersService verifyNoCAnswersService;
+    private final PrepareNoCService prepareNoCService;
     private final RequestNoticeOfChangeService requestNoticeOfChangeService;
+    private final JacksonUtils jacksonUtils;
 
     public NoticeOfChangeController(NoticeOfChangeQuestions noticeOfChangeQuestions,
+                                    NoticeOfChangeApprovalService noticeOfChangeApprovalService,
                                     VerifyNoCAnswersService verifyNoCAnswersService,
-                                    RequestNoticeOfChangeService requestNoticeOfChangeService) {
+                                    PrepareNoCService prepareNoCService,
+                                    RequestNoticeOfChangeService requestNoticeOfChangeService,
+                                    JacksonUtils jacksonUtils) {
         this.noticeOfChangeQuestions = noticeOfChangeQuestions;
         this.verifyNoCAnswersService = verifyNoCAnswersService;
+        this.prepareNoCService = prepareNoCService;
         this.requestNoticeOfChangeService = requestNoticeOfChangeService;
+        this.noticeOfChangeApprovalService = noticeOfChangeApprovalService;
+        this.jacksonUtils = jacksonUtils;
     }
 
     @GetMapping(path = GET_NOC_QUESTIONS, produces = APPLICATION_JSON_VALUE)
@@ -189,6 +226,58 @@ public class NoticeOfChangeController {
         return result.toVerifyNoCAnswersResponse(VERIFY_NOC_ANSWERS_MESSAGE);
     }
 
+    @PostMapping(path = NOC_PREPARE_PATH, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Prepare NoC request event", notes = "Prepare NoC request event")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            response = AboutToStartCallbackResponse.class,
+            message = "Data with a list of Case Roles attached to the ChangeOrganisationRequest."
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:"
+                + "\n1) " + ValidationError.JURISDICTION_CANNOT_BE_BLANK
+                + "\n2) " + ValidationError.CASE_TYPE_ID_EMPTY
+                + "\n3) " + ValidationError.NO_ORGANISATION_POLICY_ON_CASE_DATA
+                + "\n4) " + ValidationError.NOC_REQUEST_ONGOING
+                + "\n5) " + ValidationError.NO_SOLICITOR_ORGANISATION_RECORDED_IN_ORG_POLICY
+                + "\n6) " + ValidationError.NO_ORGANISATION_ID_IN_ANY_ORG_POLICY
+                + "\n7) " + ValidationError.ORG_POLICY_CASE_ROLE_NOT_IN_CASE_DEFINITION
+                + "\n8) " + ValidationError.INVALID_CASE_ROLE_FIELD
+                + "\n9) " + ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID,
+            response = ApiError.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"message\": \"" + ValidationError.NOC_REQUEST_ONGOING + "\",\n"
+                        + "   \"errors\": [ ]\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
+        )
+    })
+    public AboutToStartCallbackResponse prepareNoC(
+        @Valid @RequestBody AboutToStartCallbackRequest aboutToStartCallbackRequest) {
+
+        return AboutToStartCallbackResponse.builder()
+            .data(prepareNoCService.prepareNoCRequest(aboutToStartCallbackRequest.getCaseDetails()))
+            .state(aboutToStartCallbackRequest.getCaseDetails().getState())
+            .securityClassification(aboutToStartCallbackRequest.getCaseDetails().getSecurityClassification())
+            .dataClassification(aboutToStartCallbackRequest.getCaseDetails().getDataClassification())
+            .build();
+    }
+
     private void validateCaseIds(String caseId) {
         if (!StringUtils.isNumeric(caseId)) {
             throw new ValidationException("Case ID should contain digits only");
@@ -206,15 +295,15 @@ public class NoticeOfChangeController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                + "\n1) " + ValidationError.CASE_ID_INVALID
-                + "\n2) " + ValidationError.CASE_ID_INVALID_LENGTH
-                + "\n3) " + ValidationError.CASE_ID_EMPTY,
+                + "\n1) " + CASE_ID_INVALID
+                + "\n2) " + CASE_ID_INVALID_LENGTH
+                + "\n3) " + CASE_ID_EMPTY,
             response = ApiError.class,
             examples = @Example({
                 @ExampleProperty(
                     value = "{\n"
                         + "   \"status\": \"BAD_REQUEST\",\n"
-                        + "   \"message\": \"" + ValidationError.CASE_ID_EMPTY + "\",\n"
+                        + "   \"message\": \"" + CASE_ID_EMPTY + "\",\n"
                         + "   \"errors\": [ ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
@@ -238,4 +327,120 @@ public class NoticeOfChangeController {
         return requestNoticeOfChangeService.requestNoticeOfChange(noCRequestDetails);
     }
 
+    @PostMapping(path = CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Check for Notice of Change Approval", notes = "Check for Notice of Change Approval")
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = StringUtils.EMPTY,
+            response = SubmitCallbackResponse.class
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:"
+                + "\n1) " + CASE_ID_INVALID
+                + "\n2) " + CASE_ID_INVALID_LENGTH
+                + "\n3) " + CASE_ID_EMPTY
+                + "\n4) " + CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID
+                + "\n5) " + NOC_DECISION_EVENT_UNIDENTIFIABLE,
+            response = ApiError.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"message\": \"" + CASE_ID_EMPTY + "\",\n"
+                        + "   \"errors\": [ ]\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
+        )
+    })
+    public SubmitCallbackResponse checkNoticeOfChangeApproval(@Valid @RequestBody CallbackRequest callbackRequest) {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findCorNodeWithApprovalStatus();
+        if (changeOrganisationRequestFieldJson.isEmpty()) {
+            throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
+        }
+
+        ChangeOrganisationRequest changeOrganisationRequest =
+            jacksonUtils.convertValue(changeOrganisationRequestFieldJson.get(), ChangeOrganisationRequest.class);
+        changeOrganisationRequest.validateChangeOrganisationRequest();
+        if (!changeOrganisationRequest.getApprovalStatus().equals(APPROVED.name())
+            && !changeOrganisationRequest.getApprovalStatus().equals(APPROVED.getValue())) {
+            return new SubmitCallbackResponse(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE,
+                CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE);
+        }
+
+        noticeOfChangeApprovalService.findAndTriggerNocDecisionEvent(caseDetails.getId());
+        return new SubmitCallbackResponse(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE,
+            CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE);
+    }
+
+    @PostMapping(path = SET_ORGANISATION_TO_REMOVE_PATH, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Set Organisation To Remove", notes = "Set Organisation To Remove")
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = StringUtils.EMPTY,
+            response = AboutToSubmitCallbackResponse.class
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:"
+                + "\n1) " + CASE_ID_INVALID
+                + "\n2) " + CASE_ID_INVALID_LENGTH
+                + "\n3) " + CASE_ID_EMPTY
+                + "\n4) " + CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID
+                + "\n5) " + INVALID_CASE_ROLE_FIELD,
+            response = ApiError.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"message\": \"" + CASE_ID_EMPTY + "\",\n"
+                        + "   \"errors\": [ ]\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
+        )
+    })
+    public AboutToSubmitCallbackResponse setOrganisationToRemove(@Valid @RequestBody CallbackRequest callbackRequest) {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
+
+        if (changeOrganisationRequestFieldJson.isEmpty()) {
+            throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
+        }
+
+        ChangeOrganisationRequest changeOrganisationRequest =
+            jacksonUtils.convertValue(changeOrganisationRequestFieldJson.get(), ChangeOrganisationRequest.class);
+
+        changeOrganisationRequest.validateChangeOrganisationRequest();
+
+        if (changeOrganisationRequest.getOrganisationToRemove().getOrganisationID() != null
+            || changeOrganisationRequest.getOrganisationToRemove().getOrganisationName() != null) {
+            throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
+        }
+        String changeOrganisationKey = caseDetails.getKeyFromDataWithValue(changeOrganisationRequestFieldJson.get());
+
+        return requestNoticeOfChangeService.setOrganisationToRemove(caseDetails,
+                                                                    changeOrganisationRequest,
+                                                                    changeOrganisationKey);
+    }
 }

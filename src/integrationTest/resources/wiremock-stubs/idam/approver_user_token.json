@@ -1,7 +1,10 @@
 {
   "request": {
     "method": "POST",
-    "url": "/o/token"
+    "url": "/o/token",
+    "bodyPatterns" : [{
+      "contains" : "noc.approver%40gmail.com"
+    }]
   },
   "response": {
     "status": 200,
@@ -9,7 +12,7 @@
       "Content-Type": "application/json"
     },
     "jsonBody": {
-      "access_token": "eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9aa"
+      "access_token": "eyJzdWIiOiJjY6ShZ3ciLCJleHAiOlD1OEM0NDUyOTd7co"
     }
   }
 }

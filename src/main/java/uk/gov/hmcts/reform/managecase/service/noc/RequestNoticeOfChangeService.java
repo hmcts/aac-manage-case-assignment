@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -44,7 +45,9 @@ public class RequestNoticeOfChangeService {
     private final SecurityUtils securityUtils;
 
     @Autowired
-    public RequestNoticeOfChangeService(DataStoreRepository dataStoreRepository,
+    public RequestNoticeOfChangeService(NoticeOfChangeQuestions noticeOfChangeQuestions,
+                                        @Qualifier("defaultDataStoreRepository")
+                                            DataStoreRepository dataStoreRepository,
                                         DefinitionStoreRepository definitionStoreRepository,
                                         PrdRepository prdRepository,
                                         JacksonUtils jacksonUtils,
@@ -166,7 +169,7 @@ public class RequestNoticeOfChangeService {
     }
 
     private Optional<ChangeOrganisationRequest> getChangeOrganisationRequest(CaseDetails caseDetails) {
-        Optional changeOrganisationRequest = Optional.empty();
+        Optional<ChangeOrganisationRequest> changeOrganisationRequest = Optional.empty();
         final Optional<JsonNode> changeOrganisationRequestNode = caseDetails.findChangeOrganisationRequestNode();
 
         if (changeOrganisationRequestNode.isPresent()) {

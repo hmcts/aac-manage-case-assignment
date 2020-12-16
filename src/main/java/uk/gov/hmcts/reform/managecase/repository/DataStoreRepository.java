@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
-import java.util.Optional;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
+import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
@@ -27,6 +29,12 @@ public interface DataStoreRepository {
     CaseDetails submitNoticeOfChangeRequestEvent(String caseId,
                                                  String eventId,
                                                  ChangeOrganisationRequest changeOrganisationRequest);
+
+    CaseUpdateViewEvent getStartEventTrigger(String caseId, String eventId);
+
+    StartEventResource getExternalStartEventTrigger(String caseId, String eventId);
+
+    CaseDetails submitEventForCase(String caseId, CaseEventCreationPayload caseEventCreationPayload);
 
     CaseDetails findCaseByCaseIdExternalApi(String caseId);
 }

@@ -77,7 +77,7 @@ public class AuthHeaderRoutingFilter extends ZuulFilter {
     }
 
     private void addSystemUserHeaders(RequestContext context) {
-        context.addZuulRequestHeader(AUTHORIZATION, securityUtils.getSystemUserToken());
+        context.addZuulRequestHeader(AUTHORIZATION, securityUtils.getCaaSystemUserToken());
         context.addZuulRequestHeader(SERVICE_AUTHORIZATION, securityUtils.getS2SToken());
     }
 }

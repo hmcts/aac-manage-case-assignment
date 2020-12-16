@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
@@ -9,6 +11,8 @@ import java.util.List;
 import java.util.Optional;
 
 @ToString
+@Getter
+@Setter
 @SuppressWarnings({"PMD.TooManyFields", "PMD.MissingSerialVersionUID"})
 public class CaseEventDefinition implements Serializable {
 
@@ -47,159 +51,6 @@ public class CaseEventDefinition implements Serializable {
     private Boolean canSaveDraft;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getDisplayOrder() {
-        return displayOrder;
-    }
-
-    public void setDisplayOrder(Integer displayOrder) {
-        this.displayOrder = displayOrder;
-    }
-
-    public List<CaseEventFieldDefinition> getCaseFields() {
-        return caseFields;
-    }
-
-    public void setCaseFields(List<CaseEventFieldDefinition> caseFields) {
-        this.caseFields = caseFields;
-    }
-
-    public List<String> getPreStates() {
-        return preStates;
-    }
-
-    public void setPreStates(List<String> preStates) {
-        this.preStates = preStates;
-    }
-
-    public String getPostState() {
-        return postState;
-    }
-
-    public void setPostState(String postState) {
-        this.postState = postState;
-    }
-
-    public String getCallBackURLAboutToStartEvent() {
-        return callBackURLAboutToStartEvent;
-    }
-
-    public void setCallBackURLAboutToStartEvent(String callBackURLAboutToStartEvent) {
-        this.callBackURLAboutToStartEvent = callBackURLAboutToStartEvent;
-    }
-
-    public List<Integer> getRetriesTimeoutAboutToStartEvent() {
-        return retriesTimeoutAboutToStartEvent;
-    }
-
-    public void setRetriesTimeoutAboutToStartEvent(List<Integer> retriesTimeoutAboutToStartEvent) {
-        this.retriesTimeoutAboutToStartEvent = retriesTimeoutAboutToStartEvent;
-    }
-
-    public String getCallBackURLAboutToSubmitEvent() {
-        return callBackURLAboutToSubmitEvent;
-    }
-
-    public void setCallBackURLAboutToSubmitEvent(String callBackURLAboutToSubmitEvent) {
-        this.callBackURLAboutToSubmitEvent = callBackURLAboutToSubmitEvent;
-    }
-
-    public List<Integer> getRetriesTimeoutURLAboutToSubmitEvent() {
-        return retriesTimeoutURLAboutToSubmitEvent;
-    }
-
-    public void setRetriesTimeoutURLAboutToSubmitEvent(List<Integer> retriesTimeoutURLAboutToSubmitEvent) {
-        this.retriesTimeoutURLAboutToSubmitEvent = retriesTimeoutURLAboutToSubmitEvent;
-    }
-
-    public String getCallBackURLSubmittedEvent() {
-        return callBackURLSubmittedEvent;
-    }
-
-    public void setCallBackURLSubmittedEvent(String callBackURLSubmittedEvent) {
-        this.callBackURLSubmittedEvent = callBackURLSubmittedEvent;
-    }
-
-    public List<Integer> getRetriesTimeoutURLSubmittedEvent() {
-        return retriesTimeoutURLSubmittedEvent;
-    }
-
-    public void setRetriesTimeoutURLSubmittedEvent(List<Integer> retriesTimeoutURLSubmittedEvent) {
-        this.retriesTimeoutURLSubmittedEvent = retriesTimeoutURLSubmittedEvent;
-    }
-
-    public SecurityClassification getSecurityClassification() {
-        return securityClassification;
-    }
-
-    public void setSecurityClassification(SecurityClassification securityClassification) {
-        this.securityClassification = securityClassification;
-    }
-
-
-    public List<AccessControlList> getAccessControlLists() {
-        return accessControlLists;
-    }
-
-    public void setAccessControlLists(List<AccessControlList> accessControlLists) {
-        this.accessControlLists = accessControlLists;
-    }
-
-    public Boolean getShowSummary() {
-        return showSummary;
-    }
-
-    public void setShowSummary(final Boolean showSummary) {
-        this.showSummary = showSummary;
-    }
-
-    public Boolean getShowEventNotes() {
-        return showEventNotes;
-    }
-
-    public void setShowEventNotes(Boolean showEventNotes) {
-        this.showEventNotes = showEventNotes;
-    }
-
-    public String getEndButtonLabel() {
-        return endButtonLabel;
-    }
-
-    public void setEndButtonLabel(String endButtonLabel) {
-        this.endButtonLabel = endButtonLabel;
-    }
-
-    public Boolean getCanSaveDraft() {
-        return canSaveDraft;
-    }
-
-    public void setCanSaveDraft(Boolean canSaveDraft) {
-        this.canSaveDraft = canSaveDraft;
-    }
 
     public Optional<CaseEventFieldDefinition> getCaseEventField(String caseFieldId) {
         return getCaseFields().stream()

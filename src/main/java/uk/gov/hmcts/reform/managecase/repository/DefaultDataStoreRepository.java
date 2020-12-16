@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
+import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.util.HashMap;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
 
-@Repository
+@Repository("defaultDataStoreRepository")
 @SuppressWarnings({"PMD.PreserveStackTrace", "PMD.DataflowAnomalyAnalysis",
     "PMD.LawOfDemeter","PMD.DataflowAnomalyAnalysis",
     "PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
@@ -63,12 +64,15 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
     private final DataStoreApiClient dataStoreApi;
     private final JacksonUtils jacksonUtils;
+    protected final SecurityUtils securityUtils;
 
     @Autowired
     public DefaultDataStoreRepository(DataStoreApiClient dataStoreApi,
-                                      JacksonUtils jacksonUtils) {
+                                      JacksonUtils jacksonUtils,
+                                      SecurityUtils securityUtils) {
         this.dataStoreApi = dataStoreApi;
         this.jacksonUtils = jacksonUtils;
+        this.securityUtils = securityUtils;
     }
 
     @Override
@@ -84,7 +88,11 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
     @Override
     public CaseViewResource findCaseByCaseId(String caseId) {
-        return dataStoreApi.getCaseDetailsByCaseId(caseId);
+        return dataStoreApi.getCaseDetailsByCaseId(getUserAuthToken(), caseId);
+    }
+
+    protected String getUserAuthToken() {
+        return securityUtils.getCaaSystemUserToken();
     }
 
     @Override
@@ -116,12 +124,31 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
+    public CaseUpdateViewEvent getStartEventTrigger(String caseId, String eventId) {
+        String userAuthToken = getUserAuthToken();
+        return dataStoreApi.getStartEventTrigger(userAuthToken, caseId, eventId);
+    }
+
+    @Override
+    public StartEventResource getExternalStartEventTrigger(String caseId, String eventId) {
+        String userAuthToken = getUserAuthToken();
+        return dataStoreApi.getExternalStartEventTrigger(userAuthToken, caseId, eventId);
+    }
+
+    @Override
+    public CaseDetails submitEventForCase(String caseId, CaseEventCreationPayload caseEventCreationPayload) {
+        String userAuthToken = getUserAuthToken();
+        return dataStoreApi.submitEventForCase(userAuthToken, caseId, caseEventCreationPayload);
+    }
+
+    @Override
     public CaseDetails submitNoticeOfChangeRequestEvent(String caseId,
                                                         String eventId,
                                                         ChangeOrganisationRequest changeOrganisationRequest) {
 
         CaseDetails caseDetails = null;
-        CaseUpdateViewEvent caseUpdateViewEvent = dataStoreApi.getStartEventTrigger(caseId, eventId);
+        String userAuthToken = getUserAuthToken();
+        CaseUpdateViewEvent caseUpdateViewEvent = dataStoreApi.getStartEventTrigger(userAuthToken, caseId, eventId);
 
         if (caseUpdateViewEvent != null) {
 
@@ -139,7 +166,8 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                     .description(NOC_REQUEST_DESCRIPTION)
                     .build();
 
-                StartEventResource startEventResource = dataStoreApi.getExternalStartEventTrigger(caseId, eventId);
+                StartEventResource startEventResource =
+                    dataStoreApi.getExternalStartEventTrigger(userAuthToken, caseId, eventId);
                 Map<String, JsonNode> caseData = startEventResource.getCaseDetails().getData();
 
                 setChangeOrganisationRequestApprovalStatus(changeOrganisationRequest, caseFieldId, caseData);
@@ -150,7 +178,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                     .data(getCaseDataContentData(caseFieldId, changeOrganisationRequest, caseData))
                     .build();
 
-                caseDetails = dataStoreApi.submitEventForCase(caseId, caseEventCreationPayload);
+                caseDetails = dataStoreApi.submitEventForCase(userAuthToken, caseId, caseEventCreationPayload);
             } else {
                 throw new IllegalStateException(CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID);
             }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestedCaseUnassignment;
@@ -41,7 +42,7 @@ public class CaseAssignmentService {
 
     @Autowired
     public CaseAssignmentService(PrdRepository prdRepository,
-                                 DataStoreRepository dataStoreRepository,
+                                 @Qualifier("defaultDataStoreRepository") DataStoreRepository dataStoreRepository,
                                  IdamRepository idamRepository,
                                  JacksonUtils jacksonUtils,
                                  SecurityUtils securityUtils) {
@@ -218,7 +219,7 @@ public class CaseAssignmentService {
     }
 
     private List<String> getAssigneeRoles(String assigneeId) {
-        String systemUserToken = idamRepository.getSystemUserAccessToken();
+        String systemUserToken = idamRepository.getCaaSystemUserAccessToken();
         return idamRepository.getUserByUserId(assigneeId, systemUserToken).getRoles();
     }
 }

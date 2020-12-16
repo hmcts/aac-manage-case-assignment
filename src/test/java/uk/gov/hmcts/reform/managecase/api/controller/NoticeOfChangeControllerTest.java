@@ -18,8 +18,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
 import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.CheckNoticeOfChangeApprovalRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.SubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -28,19 +30,24 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQues
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.config.SecurityConfiguration;
+import uk.gov.hmcts.reform.managecase.domain.ApprovalStatus;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.domain.DynamicList;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.managecase.service.noc.ApplyNoCDecisionService;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
+import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +66,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -68,6 +76,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.defaultCaseDetails;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.NOC_PREPARE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_PATH;
@@ -80,6 +93,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHALLENGE_QUESTION_ANSWERS_EMPTY;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
 
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
 public class NoticeOfChangeControllerTest {
@@ -106,6 +120,9 @@ public class NoticeOfChangeControllerTest {
         protected NoticeOfChangeQuestions service;
 
         @MockBean
+        protected NoticeOfChangeApprovalService approvalService;
+
+        @MockBean
         protected PrepareNoCService prepareNoCService;
 
         @MockBean
@@ -116,6 +133,9 @@ public class NoticeOfChangeControllerTest {
 
         @MockBean
         protected RequestNoticeOfChangeService requestNoticeOfChangeService;
+
+        @MockBean
+        protected JacksonUtils jacksonUtils;
 
         @Autowired
         protected ObjectMapper objectMapper;
@@ -154,10 +174,12 @@ public class NoticeOfChangeControllerTest {
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 
                 NoticeOfChangeController controller = new NoticeOfChangeController(service,
+                                                                                   approvalService,
                                                                                    verifyNoCAnswersService,
                                                                                    prepareNoCService,
                                                                                    requestNoticeOfChangeService,
-                                                                                   applyNoCDecisionService);
+                                                                                   applyNoCDecisionService,
+                                                                                   jacksonUtils);
 
                 // ACT
                 ChallengeQuestionsResult response = controller.getNoticeOfChangeQuestions(CASE_ID);
@@ -352,17 +374,20 @@ public class NoticeOfChangeControllerTest {
         void directCallHappyPath() {
             // ARRANGE
             NoticeOfChangeController controller = new NoticeOfChangeController(service,
+                                                                               approvalService,
                                                                                verifyNoCAnswersService,
                                                                                prepareNoCService,
                                                                                requestNoticeOfChangeService,
-                                                                               applyNoCDecisionService);
+                                                                               applyNoCDecisionService,
+                                                                               jacksonUtils);
 
             // ACT
             RequestNoticeOfChangeResponse response = controller.requestNoticeOfChange(requestNoticeOfChangeRequest);
 
             // ASSERT
-            assertThat(response).isNotNull();
-            assertThat(response).isEqualTo(requestNoticeOfChangeResponse);
+            assertThat(response)
+                .isNotNull()
+                .isEqualTo(requestNoticeOfChangeResponse);
         }
 
         @DisplayName("should successfully get NoC request")
@@ -420,6 +445,186 @@ public class NoticeOfChangeControllerTest {
                                      .content(objectMapper.writeValueAsString(requestNoticeOfChangeRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasItem(caseIdInvalid)));
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /noc/check-noc-approval")
+    @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
+    class PostCheckNoticeOfChangeApproval extends BaseMvcTest {
+
+        private CheckNoticeOfChangeApprovalRequest request;
+        private CaseDetails caseDetails;
+        private ChangeOrganisationRequest changeOrganisationRequest;
+
+        private static final String ENDPOINT_URL = "/noc" + CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
+
+        @BeforeEach
+        void setUp() {
+            changeOrganisationRequest = ChangeOrganisationRequest.builder()
+                .organisationToAdd(new Organisation("123", "Org1"))
+                .organisationToRemove(new Organisation("789", "Org2"))
+                .caseRoleId(DynamicList.builder().build())
+                .requestTimestamp(LocalDateTime.now())
+                .approvalStatus(null)
+                .build();
+
+            given(jacksonUtils.convertValue(any(JsonNode.class), any()))
+                .willReturn(changeOrganisationRequest);
+        }
+
+        @DisplayName("happy path test without mockMvc")
+        @Test
+        void directCallHappyPath() {
+            changeOrganisationRequest.setApprovalStatus("1");
+            caseDetails =  caseDetails(changeOrganisationRequest);
+            request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
+            NoticeOfChangeController controller =
+                new NoticeOfChangeController(service,
+                                             approvalService,
+                                             verifyNoCAnswersService,
+                                             prepareNoCService,
+                                             requestNoticeOfChangeService,
+                                             applyNoCDecisionService,
+                                             jacksonUtils);
+
+            SubmitCallbackResponse response = controller.checkNoticeOfChangeApproval(request);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getConfirmationBody()).isEqualTo(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE);
+            assertThat(response.getConfirmationHeader()).isEqualTo(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE);
+
+            verify(approvalService).findAndTriggerNocDecisionEvent(CASE_ID);
+        }
+
+        @DisplayName("should return 200 status code if all data is valid (ApprovalStatus as a Number)")
+        @Test
+        void shouldCheckForNoCApprovalWithNumberForApprovalStatus() throws Exception {
+            changeOrganisationRequest.setApprovalStatus("1");
+            caseDetails =  caseDetails(changeOrganisationRequest);
+            request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)))
+                .andExpect(jsonPath("$.confirmation_body", is(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)));
+
+            verify(approvalService).findAndTriggerNocDecisionEvent(CASE_ID);
+
+        }
+
+        @DisplayName("should return 200 status code if all data is valid (ApprovalStatus as a String)")
+        @Test
+        void shouldCheckForNoCApprovalWithStringForApprovalStatus() throws Exception {
+            changeOrganisationRequest.setApprovalStatus("APPROVED");
+            caseDetails =  caseDetails(changeOrganisationRequest);
+            request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+        }
+
+        @DisplayName("should return 200 status code if ApprovalStatus is not equal to 1")
+        @Test
+        void shouldReturnSuccessfullyIfApprovalStatusIsNotApprovedCode() throws Exception {
+            changeOrganisationRequest.setApprovalStatus(ApprovalStatus.PENDING.getValue());
+            caseDetails =  caseDetails(changeOrganisationRequest);
+            request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE)))
+                .andExpect(jsonPath("$.confirmation_body", is(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE)));
+
+            verify(approvalService, never()).findAndTriggerNocDecisionEvent(CASE_ID);
+        }
+
+        @DisplayName("should return 200 status code if ApprovalStatus is not equal to APPROVED")
+        @Test
+        void shouldReturnSuccessfullyIfApprovalStatusIsNotApproved() throws Exception {
+            changeOrganisationRequest.setApprovalStatus("REJECTED");
+            caseDetails =  caseDetails(changeOrganisationRequest);
+            request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+            verify(approvalService, never()).findAndTriggerNocDecisionEvent(CASE_ID);
+        }
+
+        @DisplayName("should error if case reference in Case Details is empty")
+        @Test
+        void shouldFailIfCaseReferenceIsEmpty() throws Exception {
+            caseDetails = defaultCaseDetails().id(null).build();
+            request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors", hasItem(CASE_ID_EMPTY)));
+        }
+
+        @DisplayName("should error if case reference in Case Details is an invalid length")
+        @Test
+        void shouldFailIfCaseReferenceIsInvalidLength() throws Exception {
+            caseDetails = defaultCaseDetails().id("16032064624").build();
+            request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID_LENGTH)));
+        }
+
+        @DisplayName("should error if case reference in Case Details is an invalid Luhn Number")
+        @Test
+        void shouldFailIfCaseReferenceIsInvalidLuhnNumber() throws Exception {
+            caseDetails = defaultCaseDetails().id("1588234985453947").build();
+            request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID)));
+        }
+
+        @DisplayName("should error if changeOrganisationRequestField not found in Case Details")
+        @Test
+        void shouldFailIfChangeOrganisationRequestFieldNotFound() throws Exception {
+            caseDetails = defaultCaseDetails().build();
+            request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
+        }
+
+        @DisplayName("should error if changeOrganisationRequestField is invalid")
+        @Test
+        void shouldFailIfChangeOrganisationRequestIsInvalid() throws Exception {
+            caseDetails =  caseDetails(changeOrganisationRequest);
+            request = new CheckNoticeOfChangeApprovalRequest(null, null, caseDetails);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
         }
     }
 

@@ -102,4 +102,12 @@ public class CaseDetails {
             .flatMap(List::stream)
             .findFirst();
     }
+
+    public Optional<JsonNode> findCorNodeWithApprovalStatus() {
+        return getData().values().stream()
+            .filter(node -> node.findParent(CASE_ROLE_ID) != null)
+            .filter(node -> node.hasNonNull(APPROVAL_STATUS))
+            .filter(node -> node.hasNonNull(ORGANISATION_TO_ADD) || node.hasNonNull(ORGANISATION_TO_REMOVE))
+            .findFirst();
+    }
 }

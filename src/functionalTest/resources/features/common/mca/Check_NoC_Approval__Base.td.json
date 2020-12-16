@@ -1,0 +1,16 @@
+{
+  "_guid_": "Check_NoC_Approval__Base",
+
+  "productName": "Manage Case Assignment Microservice",
+  "operationName": "Check NoC Approval",
+
+  "method": "POST",
+  "uri": "/noc/check-noc-approval",
+
+  "s2sClientId": "ccd_data",
+  "userTokenClientId": "xuiwebapp",
+
+  "request": {
+    "_extends_": "Common_Request"
+  }
+}

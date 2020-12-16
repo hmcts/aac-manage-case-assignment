@@ -46,9 +46,12 @@ idam:
     scope: openid roles profile manage-user
     # same for all environments - not used in mca but configured as idam mandates for token generation
     redirect_uri: https://manage-case-assignment/oauth2redirect
-  system-user:
-    username: ${IDAM_SYSTEM_USER_USERNAME:master.caa@gmail.com}
-    password: ${IDAM_SYSTEM_USER_PASSWORD:Pa55word11}
+  caa:
+    username: ${IDAM_CAA_USERNAME:master.caa@gmail.com}
+    password: ${IDAM_CAA_PASSWORD:Pa55word11}
+  noc-approver:
+    username: ${IDAM_NOC_APPROVER_USERNAME:noc.approver@gmail.com}
+    password: ${IDAM_NOC_APPROVER_PASSWORD:Pa55word11}
   s2s-auth:
     microservice: aac_manage_case_assignment
     totp_secret: ${MANAGE_CASE_S2S_KEY:AAAAAAAAAAAAAAAA}

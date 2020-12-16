@@ -11,12 +11,14 @@ import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import javax.inject.Named;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 @Named
 @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 public class SecurityUtils {
 
-    private static final String SOLICITOR_ROLE = "caseworker-%s-solicitor";
+    private static final Pattern SOLICITOR_ROLE =
+        Pattern.compile("^caseworker-.+-solicitor$", Pattern.CASE_INSENSITIVE);
 
     public static final String BEARER = "Bearer ";
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
@@ -62,7 +64,7 @@ public class SecurityUtils {
     }
 
     public boolean hasSolicitorRole(List<String> roles, String jurisdiction) {
-        String solicitorRole = String.format(SOLICITOR_ROLE, jurisdiction).toLowerCase(Locale.getDefault());
-        return roles.stream().anyMatch(role -> role.toLowerCase(Locale.getDefault()).startsWith(solicitorRole));
+        return roles.stream().anyMatch(role -> SOLICITOR_ROLE.matcher(role).matches()
+            && role.toLowerCase(Locale.getDefault()).contains(jurisdiction.toLowerCase(Locale.getDefault())));
     }
 }

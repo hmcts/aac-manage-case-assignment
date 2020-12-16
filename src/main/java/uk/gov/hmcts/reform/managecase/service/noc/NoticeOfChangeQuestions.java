@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.ArrayUtils;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
@@ -201,6 +202,8 @@ public class NoticeOfChangeQuestions {
         if (caseViewResource.getCaseViewActionableEvents() == null
             || ArrayUtils.isEmpty(caseViewResource.getCaseViewActionableEvents())) {
             throw new ValidationException(NOC_EVENT_NOT_AVAILABLE);
+        } else if (caseViewResource.getCaseViewActionableEvents().length != 1) {
+            throw new ValidationException(MULTIPLE_NOC_REQUEST_EVENTS);
         }
     }
 }

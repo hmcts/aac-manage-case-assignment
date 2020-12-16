@@ -25,7 +25,16 @@
         "jurisdiction": "BEFTA_MASTER",
         "data": {
           "changeOrganisationRequestField" : {
-            "CaseRoleId" : "[RespondentSolicitor]",
+            "CaseRoleId" :  {
+              "value" : {
+                "code" : "[RESPONDENTSOLICITOR]",
+                "label" : "Respondent Solicitor"
+              },
+              "list_items" : [ {
+                "code" : "[RESPONDENTSOLICITOR]",
+                "label" : "Respondent Solicitor"
+              } ]
+            },
             "ApprovalStatus" : null,
             "RequestTimestamp": "2020-02-20T06:30:00",
             "OrganisationToAdd" : {

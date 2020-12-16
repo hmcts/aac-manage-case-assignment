@@ -46,11 +46,15 @@ public class SecurityUtils {
 
     public String getUserToken() {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return BEARER + jwt.getTokenValue();
+        return jwt.getTokenValue();
+    }
+
+    public String getUserBearerToken() {
+        return BEARER + getUserToken();
     }
 
     public UserInfo getUserInfo() {
-        return idamRepository.getUserInfo(getUserToken());
+        return idamRepository.getUserInfo(getUserBearerToken());
     }
 
     public String getServiceNameFromS2SToken(String serviceAuthenticationToken) {

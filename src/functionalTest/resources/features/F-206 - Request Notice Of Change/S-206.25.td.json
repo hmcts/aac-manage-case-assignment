@@ -7,7 +7,7 @@
   "specs": [
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
     "Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's",
-    "a citizen Mario, on behalf of whome Richard will create a case",
+    "a citizen Mario, on behalf of whom Richard will create a case",
 
     "contains a valid case ID for C1",
     "contains a set of answers that match more than one corresponding case roles for representation",
@@ -28,7 +28,7 @@
     "body": {
       "case_id": "${[scenarioContext][childContexts][F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies_And_Matching_Litigant_Names][testData][actualResponse][body][id]}",
 
-      "answers": [ 
+      "answers": [
         {
           "question_id": "NoC_Challenge_Name",
           "value": "MATCHING-NAME"

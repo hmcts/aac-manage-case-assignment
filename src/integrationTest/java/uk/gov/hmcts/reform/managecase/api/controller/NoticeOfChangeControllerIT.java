@@ -616,7 +616,7 @@ public class NoticeOfChangeControllerIT {
         @Autowired
         private MockMvc mockMvc;
 
-        DynamicListElement dynamicListElement = DynamicListElement.builder().code("code").label("label").build();
+        DynamicListElement dynamicListElement = DynamicListElement.builder().code("Role1").label("label").build();
         DynamicList dynamicList = DynamicList.builder()
             .value(dynamicListElement)
             .listItems(List.of(dynamicListElement))

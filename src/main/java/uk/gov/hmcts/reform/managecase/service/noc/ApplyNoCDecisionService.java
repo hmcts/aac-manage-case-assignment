@@ -334,21 +334,22 @@ public class ApplyNoCDecisionService {
 
     private LocalDateTime getFromTimeStamp(final CaseDetails caseDetails,
                                            final JsonNode orgPolicyNode) {
+        LocalDateTime caseCreatedDate = caseDetails.getCreatedDate();
         try {
             JsonNode prevOrgsNode = orgPolicyNode.get(PREVIOUS_ORGANISATIONS);
 
             if (prevOrgsNode == null) {
-                return caseDetails.getCreatedDate();
+                return caseCreatedDate;
             }
             List<PreviousOrganisation> previousOrganisations = objectMapper
                 .readerFor(new TypeReference<List<PreviousOrganisation>>() {}).readValue(prevOrgsNode);
             if (previousOrganisations.size() == 0) {
-                return caseDetails.getCreatedDate();
+                return caseCreatedDate;
             }
             previousOrganisations.sort(Comparator.comparing(PreviousOrganisation::getToTimestamp));
             return previousOrganisations.get(previousOrganisations.size() - 1).getToTimestamp();
         } catch (IOException ie) {
-            return LocalDateTime.now();
+            return caseCreatedDate;
         }
     }
 }

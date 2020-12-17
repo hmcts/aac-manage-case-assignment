@@ -3,13 +3,15 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
+import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
+import java.util.Optional;
 
 @Service
 public class VerifyNoCAnswersService {
@@ -17,26 +19,28 @@ public class VerifyNoCAnswersService {
     private final NoticeOfChangeQuestions noticeOfChangeQuestions;
     private final ChallengeAnswerValidator challengeAnswerValidator;
     private final PrdRepository prdRepository;
+    private final JacksonUtils jacksonUtils;
 
     @Autowired
     public VerifyNoCAnswersService(NoticeOfChangeQuestions noticeOfChangeQuestions,
                                    ChallengeAnswerValidator challengeAnswerValidator,
-                                   PrdRepository prdRepository) {
+                                   PrdRepository prdRepository, JacksonUtils jacksonUtils) {
         this.noticeOfChangeQuestions = noticeOfChangeQuestions;
         this.challengeAnswerValidator = challengeAnswerValidator;
         this.prdRepository = prdRepository;
+        this.jacksonUtils = jacksonUtils;
     }
 
     public NoCRequestDetails verifyNoCAnswers(VerifyNoCAnswersRequest verifyNoCAnswersRequest) {
         String caseId = verifyNoCAnswersRequest.getCaseId();
         NoCRequestDetails noCRequestDetails = noticeOfChangeQuestions.challengeQuestions(caseId);
-        SearchResultViewItem caseResult = noCRequestDetails.getSearchResultViewItem();
+        CaseDetails caseDetails = noCRequestDetails.getCaseDetails();
 
         String caseRoleId = challengeAnswerValidator
             .getMatchingCaseRole(noCRequestDetails.getChallengeQuestionsResult(),
-                verifyNoCAnswersRequest.getAnswers(), caseResult);
+                verifyNoCAnswersRequest.getAnswers(), caseDetails);
 
-        OrganisationPolicy organisationPolicy = caseResult.findOrganisationPolicyForRole(caseRoleId)
+        OrganisationPolicy organisationPolicy = findPolicy(caseDetails, caseRoleId)
             .orElseThrow(() -> new ValidationException(String.format(
                 "No OrganisationPolicy exists on the case for the case role '%s'", caseRoleId)));
 
@@ -53,5 +57,12 @@ public class VerifyNoCAnswersService {
         return organisation != null
             && prdRepository.findUsersByOrganisation()
             .getOrganisationIdentifier().equals(organisation.getOrganisationID());
+    }
+
+    private Optional<OrganisationPolicy> findPolicy(CaseDetails caseDetails, String caseRoleId) {
+        return caseDetails.findOrganisationPolicyNodes().stream()
+            .map(node -> jacksonUtils.convertValue(node, OrganisationPolicy.class))
+            .filter(policy -> caseRoleId.equalsIgnoreCase(policy.getOrgPolicyCaseAssignedRole()))
+            .findFirst();
     }
 }

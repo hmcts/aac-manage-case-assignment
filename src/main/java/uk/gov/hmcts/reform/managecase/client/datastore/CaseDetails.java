@@ -50,6 +50,7 @@ public class CaseDetails {
     private String state;
 
     @JsonProperty("case_type_id")
+    @JsonAlias("case_type") // alias to match with data-store V2 external api GetCase
     private String caseTypeId;
 
     @JsonProperty("case_data")

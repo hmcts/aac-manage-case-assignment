@@ -23,7 +23,7 @@
           "proxied_by_last_name": "string",
           "proxied_by_first_name": "mca system"
         }, {
-          "_extends_": "Base_Audit_Event",
+          "_extends_": "Base_Audit_Event"
         }
       ]
     }

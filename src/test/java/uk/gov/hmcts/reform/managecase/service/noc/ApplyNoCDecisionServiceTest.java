@@ -47,9 +47,8 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
@@ -188,6 +187,7 @@ class ApplyNoCDecisionServiceTest {
 
     @Test
     void shouldUpdateCaseDataWhenAddDecisionIsApplied() throws JsonProcessingException {
+        LocalDateTime dateTime = LocalDateTime.now();
         CaseDetails caseDetails = CaseDetails.builder()
             .data(createData(
                 orgPolicyAsString(null, null, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
@@ -196,6 +196,7 @@ class ApplyNoCDecisionServiceTest {
                 organisationAsString(null, null)
             ))
             .id(CASE_ID)
+            .createdDate(dateTime)
             .build();
 
         when(prdRepository.findUsersByOrganisation(ORG_3_ID))
@@ -204,15 +205,20 @@ class ApplyNoCDecisionServiceTest {
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
         Map<String, JsonNode> result = applyNoCDecisionService.applyNoCDecision(request);
+        ArrayNode arrayNode = (ArrayNode) result.get(ORG_POLICY_2_FIELD).findValue(PREVIOUS_ORGANISATIONS);
 
         assertAll(
             () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
-            () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
+            () -> assertThat(
+                result.get(ORG_POLICY_1_FIELD).toString(),
                 is(orgPolicyAsString(null, null,
-                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
-            () -> assertThat(result.get(ORG_POLICY_2_FIELD).toString(),
-                is(orgPolicyAsString(ORG_3_ID, ORG_3_NAME,
-                    ORG_POLICY_2_REF, ORG_POLICY_2_ROLE)))
+                                     ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
+            () -> assertNotNull(arrayNode),
+            () -> assertThat(arrayNode.size(), is(1)),
+            () -> assertFalse(arrayNode.get(0).findValue("ToTimestamp").isNull()),
+            () -> assertFalse(arrayNode.get(0).findValue("FromTimestamp").isNull()),
+            () -> assertTrue(arrayNode.get(0).findValue("OrganisationAddress").isNull()),
+            () -> assertTrue(arrayNode.get(0).findValue("OrganisationName").isNull())
         );
     }
 

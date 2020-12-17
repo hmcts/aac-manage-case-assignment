@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
+import feign.FeignException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 import javax.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
-import feign.FeignException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,7 +132,7 @@ public class ApplyNoCDecisionService {
                     organisationToAddNode, organisationToAdd, organisationToRemove, caseDetails.getId());
         }
 
-        setOrgPolicyPreviousOrganisations(caseDetails, changeOrganisationRequestField, orgPolicyNode);
+        setOrgPolicyPreviousOrganisations(caseDetails, organisationToAdd, organisationToRemove, orgPolicyNode);
     }
 
     private void validateCorFieldOrganisations(JsonNode changeOrganisationRequestField) {
@@ -282,10 +282,9 @@ public class ApplyNoCDecisionService {
     }
 
     private void setOrgPolicyPreviousOrganisations(final CaseDetails caseDetails,
-                                                   final JsonNode changeOrganisationRequestField,
+                                                   final Organisation organisationToAdd,
+                                                   final Organisation organisationToRemove,
                                                    final JsonNode orgPolicyNode) {
-        JsonNode organisationToRemoveNode = changeOrganisationRequestField.get(ORGANISATION_TO_REMOVE);
-        Organisation organisationToRemove = objectMapper.convertValue(organisationToRemoveNode, Organisation.class);
         if (organisationToRemove != null && !isNullOrEmpty(organisationToRemove.getOrganisationID())) {
 
             FindOrganisationResponse response = prdRepository
@@ -296,11 +295,22 @@ public class ApplyNoCDecisionService {
                     caseDetails,
                     orgPolicyNode,
                     response);
-                ((ArrayNode) orgPolicyNode
-                    .withArray(PREVIOUS_ORGANISATIONS))
-                    .insert(0, objectMapper.valueToTree(previousOrganisation));
+                insertPreviousOrgNode(orgPolicyNode, previousOrganisation);
             }
+        } else if (organisationToAdd != null && !isNullOrEmpty(organisationToAdd.getOrganisationID())) {
+            PreviousOrganisation previousOrganisation = PreviousOrganisation
+                .builder()
+                .fromTimestamp(getFromTimeStamp(caseDetails, orgPolicyNode))
+                .toTimestamp(LocalDateTime.now())
+                .build();
+            insertPreviousOrgNode(orgPolicyNode, previousOrganisation);
         }
+    }
+
+    private void insertPreviousOrgNode(JsonNode orgPolicyNode, PreviousOrganisation previousOrganisation) {
+        ((ArrayNode) orgPolicyNode
+            .withArray(PREVIOUS_ORGANISATIONS))
+            .insert(0, objectMapper.valueToTree(previousOrganisation));
     }
 
     private PreviousOrganisation createPreviousOrganisation(final CaseDetails caseDetails,

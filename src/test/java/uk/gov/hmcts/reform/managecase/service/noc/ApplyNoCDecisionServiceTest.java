@@ -47,8 +47,11 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -663,6 +666,41 @@ class ApplyNoCDecisionServiceTest {
     }
 
     @Test
+    void shouldUpdatePreviousOrganisationWithFronAndToTimeStampsOnlyAfterInitialApplyNoCDecision()
+        throws JsonProcessingException {
+        CaseDetails caseDetails = CaseDetails.builder()
+            .data(createAddOrgData())
+            .createdDate(LocalDateTime.now())
+            .id(CASE_ID)
+            .build();
+
+        when(dataStoreRepository.getCaseAssignments(singletonList(CASE_ID), null)).thenReturn(emptyList());
+        when(prdRepository.findUsersByOrganisation(ORG_2_ID))
+            .thenReturn(new FindUsersByOrganisationResponse(emptyList(), ORG_2_ID));
+
+        ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
+
+        Map<String, JsonNode> result = applyNoCDecisionService.applyNoCDecision(request);
+        ArrayNode arrayNode = (ArrayNode) result.get(ORG_POLICY_2_FIELD).findValue(PREVIOUS_ORGANISATIONS);
+
+        assertAll(
+            () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
+            () -> assertThat(
+                result.get(ORG_POLICY_1_FIELD).toString(),
+                is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
+                                     ORG_POLICY_1_REF, ORG_POLICY_1_ROLE
+                ))
+            ),
+            () -> assertNotNull(arrayNode),
+            () -> assertThat(arrayNode.size(), is(1)),
+            () -> assertNotNull(arrayNode.get(0).findValue("FromTimestamp")),
+            () -> assertNotNull(arrayNode.get(0).findValue("ToTimestamp")),
+            () -> assertTrue(arrayNode.get(0).findValue("OrganisationAddress").isNull()),
+            () -> assertTrue(arrayNode.get(0).findValue("OrganisationName").isNull())
+        );
+    }
+
+    @Test
     void shouldUpdatePreviousOrganisationsWhenMoreThanOnePreviousOrgExists() throws IOException {
         LocalDate fromDate = LocalDate.of(2020, Month.DECEMBER, 1);
         LocalDate toDate = LocalDate.of(2020, Month.DECEMBER, 2);
@@ -848,6 +886,16 @@ class ApplyNoCDecisionServiceTest {
                                                            previousOrganisations),
                           organisationAsString(null, null),
                           organisationAsString(ORG_2_ID, ORG_2_NAME));
+    }
+
+    private Map<String, JsonNode> createAddOrgData()
+        throws JsonProcessingException {
+        return createData(orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
+                          orgPolicyAsString(ORG_2_ID, ORG_2_NAME,
+                                                           ORG_POLICY_2_REF,
+                                                           ORG_POLICY_2_ROLE),
+                          organisationAsString(ORG_2_ID, ORG_2_NAME),
+                          organisationAsString(null, null));
     }
 
     private TypeReference<HashMap<String, JsonNode>> getHashMapTypeReference() {

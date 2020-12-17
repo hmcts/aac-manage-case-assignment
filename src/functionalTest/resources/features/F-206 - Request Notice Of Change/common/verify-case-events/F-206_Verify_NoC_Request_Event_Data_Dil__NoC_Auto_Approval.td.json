@@ -1,13 +1,15 @@
 {
   "_guid_": "F-206_Verify_NoC_Request_Event_Data_Dil__NoC_Auto_Approval",
-  "_extends_": "F-206_Verify_NoC_Request_Event_Data_Dil",
+  "_extends_": "F-206_Verify_NoC_Request_Event_Data__Base",
+
+  "specs": [
+    "to get Case Events API returns a NoCRequest event in which the user ID is set to Dil's email address AND the proxied_by field set to the ID of the system user"
+  ],
 
   "expectedResponse": {
     "body" : {
       "auditEvents": [
         {
-          "__ordering__": "UNORDERED"
-        }, {
           "id": "[[ANYTHING_PRESENT]]",
           "description" : "[[ANYTHING_PRESENT]]",
           "user_id": "[[ANYTHING_PRESENT]]",

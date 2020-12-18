@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.managecase.domain;
 
 public enum ApprovalStatus {
-    APPROVED("1"), PENDING("0");
+
+    PENDING("0"),
+    APPROVED("1"),
+    REJECTED("2");
 
     String value;
 

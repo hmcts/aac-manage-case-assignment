@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
+import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.CallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
@@ -37,6 +39,7 @@ import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.managecase.service.noc.ApplyNoCDecisionService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
@@ -44,13 +47,17 @@ import uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
+import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Collections.emptyList;
+
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -59,6 +66,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
@@ -68,6 +76,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.defaultCaseDetails;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE;
@@ -80,14 +89,15 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.SET_ORGANISATION_TO_REMOVE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_DETAILS_REQUIRED;
+
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHALLENGE_QUESTION_ANSWERS_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
 
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports",
-    "squid:S2699"})
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
 public class NoticeOfChangeControllerTest {
 
     private static final String CASE_ID = "1588234985453946";
@@ -119,6 +129,9 @@ public class NoticeOfChangeControllerTest {
 
         @MockBean
         protected VerifyNoCAnswersService verifyNoCAnswersService;
+
+        @MockBean
+        protected ApplyNoCDecisionService applyNoCDecisionService;
 
         @MockBean
         protected RequestNoticeOfChangeService requestNoticeOfChangeService;
@@ -162,13 +175,13 @@ public class NoticeOfChangeControllerTest {
 
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 
-                NoticeOfChangeController controller
-                    = new NoticeOfChangeController(service,
-                                                   approvalService,
-                                                   verifyNoCAnswersService,
-                                                   prepareNoCService,
-                                                   requestNoticeOfChangeService,
-                                                   jacksonUtils);
+                NoticeOfChangeController controller = new NoticeOfChangeController(service,
+                                                                                   approvalService,
+                                                                                   verifyNoCAnswersService,
+                                                                                   prepareNoCService,
+                                                                                   requestNoticeOfChangeService,
+                                                                                   applyNoCDecisionService,
+                                                                                   jacksonUtils);
 
                 // ACT
                 ChallengeQuestionsResult response = controller.getNoticeOfChangeQuestions(CASE_ID);
@@ -367,6 +380,7 @@ public class NoticeOfChangeControllerTest {
                                                                                verifyNoCAnswersService,
                                                                                prepareNoCService,
                                                                                requestNoticeOfChangeService,
+                                                                               applyNoCDecisionService,
                                                                                jacksonUtils);
 
             // ACT
@@ -473,6 +487,7 @@ public class NoticeOfChangeControllerTest {
                                              verifyNoCAnswersService,
                                              prepareNoCService,
                                              requestNoticeOfChangeService,
+                                             applyNoCDecisionService,
                                              jacksonUtils);
 
             SubmitCallbackResponse response = controller.checkNoticeOfChangeApproval(request);
@@ -677,6 +692,7 @@ public class NoticeOfChangeControllerTest {
                                              verifyNoCAnswersService,
                                              prepareNoCService,
                                              requestNoticeOfChangeService,
+                                             applyNoCDecisionService,
                                              jacksonUtils);
 
             AboutToSubmitCallbackResponse response = controller.setOrganisationToRemove(request);
@@ -848,6 +864,101 @@ public class NoticeOfChangeControllerTest {
                                                 + "\"security_classification\":null,"
                                                 + "\"significant_item\":null"
                                                 + "}"));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /noc/apply-decision")
+    @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
+    class ApplyNoticeOfChangeDecision extends BaseMvcTest {
+
+        private static final String ENDPOINT_URL = "/noc" + APPLY_NOC_DECISION;
+
+        private static final String FIELD_VALUE = "FieldValue";
+        private static final String FIELD_ID = "FieldId";
+
+        private ApplyNoCDecisionRequest request;
+
+        @BeforeEach
+        void setUp() {
+            Map<String, JsonNode> data = new HashMap<>();
+            data.put(FIELD_ID, new TextNode(FIELD_VALUE));
+            request = new ApplyNoCDecisionRequest(CaseDetails.builder()
+                .id(CASE_ID)
+                .caseTypeId(CASE_TYPE_ID)
+                .data(data)
+                .build());
+            given(applyNoCDecisionService.applyNoCDecision(any(ApplyNoCDecisionRequest.class))).willReturn(data);
+        }
+
+        @DisplayName("should apply notice of change decision successfully for a valid request")
+        @Test
+        void shouldApplyNoticeOfChangeDecision() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.data.length()", is(1)))
+                .andExpect(jsonPath("$.data['FieldId']", is(FIELD_VALUE)))
+                .andExpect(jsonPath("$.errors").doesNotExist());
+        }
+
+        @DisplayName("should accept valid request which includes extra unknown fields")
+        @Test
+        void shouldApplyNoticeOfChangeDecisionWithExtraUnknownField() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"case_details\": {}, \"extra_field\": \"value\"}"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.data.length()", is(1)))
+                .andExpect(jsonPath("$.data['FieldId']", is(FIELD_VALUE)))
+                .andExpect(jsonPath("$.errors").doesNotExist());
+        }
+
+        @DisplayName("should delegate to service domain for a valid request")
+        @Test
+        void shouldDelegateToServiceDomain() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+            ArgumentCaptor<ApplyNoCDecisionRequest> captor = ArgumentCaptor.forClass(ApplyNoCDecisionRequest.class);
+            verify(applyNoCDecisionService).applyNoCDecision(captor.capture());
+            assertThat(captor.getValue().getCaseDetails().getId()).isEqualTo(CASE_ID);
+            assertThat(captor.getValue().getCaseDetails().getCaseTypeId()).isEqualTo(CASE_TYPE_ID);
+            assertThat(captor.getValue().getCaseDetails().getData().get(FIELD_ID).asText()).isEqualTo(FIELD_VALUE);
+        }
+
+        @DisplayName("should fail with 400 bad request when case details is null")
+        @Test
+        void shouldFailWithBadRequestWhenCaseIdIsNull() throws Exception {
+            request = new ApplyNoCDecisionRequest(null);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors", hasItem(CASE_DETAILS_REQUIRED)));
+        }
+
+        @DisplayName("should return 200 with errors array when handled exception occurs")
+        @Test
+        void shouldReturnSuccessResponseWithErrorsArrayForHandledExceptions() throws Exception {
+            String errorMessage = "Error message value";
+            doThrow(new ValidationException(errorMessage))
+                .when(applyNoCDecisionService).applyNoCDecision(any(ApplyNoCDecisionRequest.class));
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors", hasItem(errorMessage)))
+                .andExpect(jsonPath("$.data").doesNotExist());
         }
     }
 }

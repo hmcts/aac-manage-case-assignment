@@ -10,42 +10,44 @@ import io.swagger.annotations.ExampleProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
-import uk.gov.hmcts.reform.managecase.api.payload.SubmitCallbackResponse;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.api.payload.CallbackRequest;
-import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
-import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
-import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.CallbackRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.SubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersResponse;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
+import uk.gov.hmcts.reform.managecase.service.noc.ApplyNoCDecisionService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
-import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
-import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService;
+import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.constraints.NotEmpty;
-
 import java.util.Optional;
 
+import static java.util.Collections.singletonList;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
@@ -58,11 +60,13 @@ import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 @RestController
 @Validated
 @RequestMapping(path = "/noc")
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class NoticeOfChangeController {
 
     @SuppressWarnings({"squid:S1075"})
     public static final String GET_NOC_QUESTIONS = "/noc-questions";
     public static final String VERIFY_NOC_ANSWERS = "/verify-noc-answers";
+    public static final String APPLY_NOC_DECISION = "/apply-decision";
     public static final String NOC_PREPARE_PATH = "/noc-prepare";
 
     public static final String VERIFY_NOC_ANSWERS_MESSAGE = "Notice of Change answers verified successfully";
@@ -82,6 +86,7 @@ public class NoticeOfChangeController {
     private final VerifyNoCAnswersService verifyNoCAnswersService;
     private final PrepareNoCService prepareNoCService;
     private final RequestNoticeOfChangeService requestNoticeOfChangeService;
+    private final ApplyNoCDecisionService applyNoCDecisionService;
     private final JacksonUtils jacksonUtils;
 
     public NoticeOfChangeController(NoticeOfChangeQuestions noticeOfChangeQuestions,
@@ -89,11 +94,13 @@ public class NoticeOfChangeController {
                                     VerifyNoCAnswersService verifyNoCAnswersService,
                                     PrepareNoCService prepareNoCService,
                                     RequestNoticeOfChangeService requestNoticeOfChangeService,
+                                    ApplyNoCDecisionService applyNoCDecisionService,
                                     JacksonUtils jacksonUtils) {
         this.noticeOfChangeQuestions = noticeOfChangeQuestions;
         this.verifyNoCAnswersService = verifyNoCAnswersService;
         this.prepareNoCService = prepareNoCService;
         this.requestNoticeOfChangeService = requestNoticeOfChangeService;
+        this.applyNoCDecisionService = applyNoCDecisionService;
         this.noticeOfChangeApprovalService = noticeOfChangeApprovalService;
         this.jacksonUtils = jacksonUtils;
     }
@@ -224,6 +231,103 @@ public class NoticeOfChangeController {
         @Valid @RequestBody VerifyNoCAnswersRequest verifyNoCAnswersRequest) {
         NoCRequestDetails result = verifyNoCAnswersService.verifyNoCAnswers(verifyNoCAnswersRequest);
         return result.toVerifyNoCAnswersResponse(VERIFY_NOC_ANSWERS_MESSAGE);
+    }
+
+    @PostMapping(path = APPLY_NOC_DECISION, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(
+        value = "Apply Notice of Change decision",
+        notes = "Use to apply a Notice of Change decision on a case.\n\n"
+            + "Note that this operation acts as a callback and therefore it accepts a standard callback request, "
+            + "and similarly returns a standard callback response. As with normal callbacks, the response "
+            + "returns a 200 (success) status when valid parameters have been passed to the operation but "
+            + "processing errors have occurred."
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "Notice of Change decision applied successfully, or one of the following error conditions:\n"
+                + "- A decision has not yet been made on the pending Notice of Change request\n"
+                + "- Approval status is not recognised\n"
+                + "- Case must contain exactly one OrganisationPolicy with the case role\n"
+                + "- ChangeOrganisationRequest complex type is missing an expected field or value\n\n"
+                + "Note that the response will contain *either* `data` (for a success) or `errors` (for an error).",
+            response = ApplyNoCDecisionResponse.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "    \"data\": {\n"
+                        + "        \"TextField\": \"TextFieldValue\",\n"
+                        + "        \"EmailField\": \"aca72@gmail.com\",\n"
+                        + "        \"NumberField\": \"123\",\n"
+                        + "        \"OrganisationPolicyField1\": {\n"
+                        + "            \"Organisation\": {\n"
+                        + "                \"OrganisationID\": null,\n"
+                        + "                \"OrganisationName\": null\n"
+                        + "            },\n"
+                        + "            \"OrgPolicyReference\": \"DefendantPolicy\",\n"
+                        + "            \"OrgPolicyCaseAssignedRole\": \"[Defendant]\"\n"
+                        + "        },\n"
+                        + "        \"OrganisationPolicyField2\": {\n"
+                        + "            \"Organisation\": {\n"
+                        + "                \"OrganisationID\": \"QUK822N\",\n"
+                        + "                \"OrganisationName\": \"SomeOrg\"\n"
+                        + "            },\n"
+                        + "            \"OrgPolicyReference\": \"ClaimantPolicy\",\n"
+                        + "            \"OrgPolicyCaseAssignedRole\": \"[Claimant]\"\n"
+                        + "        },\n"
+                        + "        \"ChangeOrganisationRequestField\": {\n"
+                        + "            \"Reason\": null,\n"
+                        + "            \"CaseRoleId\": null,\n"
+                        + "            \"NotesReason\": null,\n"
+                        + "            \"ApprovalStatus\": null,\n"
+                        + "            \"RequestTimestamp\": null,\n"
+                        + "            \"OrganisationToAdd\": {\n"
+                        + "                \"OrganisationID\": null,\n"
+                        + "                \"OrganisationName\": null\n"
+                        + "            },\n"
+                        + "            \"OrganisationToRemove\": {\n"
+                        + "                \"OrganisationID\": null,\n"
+                        + "                \"OrganisationName\": null\n"
+                        + "            },\n"
+                        + "            \"ApprovalRejectionTimestamp\": null\n"
+                        + "        }\n"
+                        + "    }\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:\n"
+                + "- Request payload does not match the expected format\n",
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "    \"status\": \"BAD_REQUEST\",\n"
+                        + "    \"message\": \"'case_details' are required.\",\n"
+                        + "    \"errors\": []\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
+        )
+    })
+    public ApplyNoCDecisionResponse applyNoticeOfChangeDecision(
+        @Valid @RequestBody ApplyNoCDecisionRequest applyNoCDecisionRequest) {
+        ApplyNoCDecisionResponse result = new ApplyNoCDecisionResponse();
+        try {
+            result.setData(applyNoCDecisionService.applyNoCDecision(applyNoCDecisionRequest));
+        } catch (ValidationException ex) {
+            result.setErrors(singletonList(ex.getMessage()));
+        }
+        return result;
     }
 
     @PostMapping(path = NOC_PREPARE_PATH, produces = APPLICATION_JSON_VALUE)

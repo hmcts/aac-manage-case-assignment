@@ -49,7 +49,7 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubAssignCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseAssignments;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseDetailsByCaseIdViaExternalApi;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisation;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisationExternal;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubIdamGetUserById;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubUnassignCase;
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
@@ -88,7 +88,7 @@ public class CaseAssignmentControllerIT {
         void setUp() {
             request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, ASSIGNEE_ID);
             // Positive stub mappings - individual tests override again for a specific scenario.
-            stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID), user(ANOTHER_USER)));
+            stubGetUsersByOrganisationExternal(usersByOrganisation(user(ASSIGNEE_ID), user(ANOTHER_USER)));
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor"));
             stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
             stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE);
@@ -169,7 +169,7 @@ public class CaseAssignmentControllerIT {
         @Test
         void shouldReturn400_whenAssigneeNotExistsInInvokersOrg() throws Exception {
 
-            stubGetUsersByOrganisation(usersByOrganisation(user(ANOTHER_USER)));
+            stubGetUsersByOrganisationExternal(usersByOrganisation(user(ANOTHER_USER)));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -186,7 +186,7 @@ public class CaseAssignmentControllerIT {
         @Test
         void shouldReturn400_whenAssigneeNotHaveCorrectJurisdictionRole() throws Exception {
 
-            stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID)));
+            stubGetUsersByOrganisationExternal(usersByOrganisation(user(ASSIGNEE_ID)));
 
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicitor-role"));
 
@@ -205,7 +205,7 @@ public class CaseAssignmentControllerIT {
         @Test
         void shouldReturn400_whenAssigneeHasInvalidJurisdictionRole() throws Exception {
 
-            stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID)));
+            stubGetUsersByOrganisationExternal(usersByOrganisation(user(ASSIGNEE_ID)));
 
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicit"));
 
@@ -271,7 +271,7 @@ public class CaseAssignmentControllerIT {
                 .caseRole(CASE_ROLE)
                 .build();
 
-            stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID)));
+            stubGetUsersByOrganisationExternal(usersByOrganisation(user(ASSIGNEE_ID)));
 
             stubGetCaseAssignments(List.of(CASE_ID), List.of(ASSIGNEE_ID), List.of(caseUserRole));
 
@@ -319,7 +319,7 @@ public class CaseAssignmentControllerIT {
             WireMock.resetAllRequests();
 
             // Positive stub mappings - individual tests override again for a specific scenario.
-            stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID), user(ANOTHER_USER)));
+            stubGetUsersByOrganisationExternal(usersByOrganisation(user(ASSIGNEE_ID), user(ANOTHER_USER)));
         }
 
         @DisplayName("Should unassign case successfully for a valid request: single case-role")

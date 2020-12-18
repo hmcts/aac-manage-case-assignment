@@ -12,6 +12,7 @@ import org.hibernate.validator.constraints.LuhnCheck;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.SecurityClassification;
 
+import javax.validation.ValidationException;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -32,11 +33,11 @@ public class CaseDetails {
     public static final String CASE_ROLE_ID = "CaseRoleId";
     public static final String ORGANISATION_REQUEST_TIMESTAMP = "RequestTimestamp";
     public static final String ORG_POLICY_CASE_ASSIGNED_ROLE = "OrgPolicyCaseAssignedRole";
+    public static final String ORGANISATION = "Organisation";
+    public static final String APPROVAL_STATUS = "ApprovalStatus";
     public static final String ORG_POLICY_REFERENCE = "OrgPolicyReference";
     public static final String ORG_ID = "OrganisationID";
     public static final String ORG_NAME = "OrganisationName";
-
-    public static final String APPROVAL_STATUS = "ApprovalStatus";
 
     @JsonProperty("id")
     @JsonAlias("reference") // alias to match with data-store elasticSearch api response
@@ -81,6 +82,17 @@ public class CaseDetails {
             .map(node -> node.findParents(ORG_POLICY_CASE_ASSIGNED_ROLE))
             .flatMap(List::stream)
             .collect(Collectors.toList());
+    }
+
+    public JsonNode findOrganisationPolicyNodeForCaseRole(String caseRoleId) {
+        return findOrganisationPolicyNodes().stream()
+            .filter(node -> node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText().equals(caseRoleId))
+            .reduce((a, b) -> {
+                throw new ValidationException(String.format("More than one Organisation Policy with "
+                    + "case role ID '%s' exists on case", caseRoleId));
+            })
+            .orElseThrow(() -> new ValidationException(String.format("No Organisation Policy found with "
+                + "case role ID '%s'", caseRoleId)));
     }
 
     public Optional<JsonNode> findChangeOrganisationRequestNode() {

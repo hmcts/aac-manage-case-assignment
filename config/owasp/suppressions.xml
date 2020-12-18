@@ -117,4 +117,16 @@
     <cve>CVE-2020-17527</cve>
     <cve>CVE-2020-8908</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+			httpclient-4.5.12.jar
+		]]></notes>
+    <cve>CVE-2020-13956</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+			guava-29.0-jre.jar
+		]]></notes>
+    <cve>CVE-2020-8908</cve>
+  </suppress>
 </suppressions>

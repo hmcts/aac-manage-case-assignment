@@ -80,9 +80,14 @@ public class WiremockFixtures {
         }
     }
 
-    public static void stubGetUsersByOrganisation(FindUsersByOrganisationResponse response) {
+    public static void stubGetUsersByOrganisationExternal(FindUsersByOrganisationResponse response) {
         stubFor(WireMock.get(urlEqualTo("/refdata/external/v1/organisations/users?status=Active&returnRoles=false"))
                     .willReturn(okForJson(response)));
+    }
+
+    public static void stubGetUsersByOrganisationInternal(FindUsersByOrganisationResponse response, String orgId) {
+        stubFor(WireMock.get(urlEqualTo(String.format("/refdata/internal/v1/organisations/%s/users?returnRoles=false",
+            orgId))).willReturn(okForJson(response)));
     }
 
     public static void stubSearchCaseWithPrefix(String caseTypeId, String searchQuery,
@@ -143,6 +148,17 @@ public class WiremockFixtures {
                                     .withStatus(HTTP_OK)
                                     .withBody(getJsonString(new CaseUserRoleResource(caseUserRoles)))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubGetCaseAssignments(List<String> caseIds, List<CaseUserRole> caseUserRoles) {
+        stubFor(WireMock.get(urlPathEqualTo(CASE_USERS))
+            .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+            .withQueryParam("case_ids", equalTo(caseIds.get(0)))
+            .willReturn(aResponse()
+                .withStatus(HTTP_OK)
+                .withBody(getJsonString(new CaseUserRoleResource(caseUserRoles)))
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     public static void stubGetCaseInternal(String caseId, CaseViewResource caseViewResource) {

@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-206_Verify_NoC_Request_Event_Data_Jane",
+  "_guid_": "F-206_Verify_NoC_Request_Event_Data_Jane__NoC_Auto_Approval",
   "_extends_": "F-206_Verify_NoC_Request_Event_Data__Base",
 
   "specs": [
@@ -10,6 +10,11 @@
     "body" : {
       "auditEvents": [
         {
+          "_extends_": "Base_Audit_Event",
+          "user_last_name": "approver",
+          "user_first_name": "noc",
+          "event_name": "Apply NoC Decision"
+        }, {
           "_extends_": "Base_Audit_Event",
           "user_id": "${[scenarioContext][parentContext][testData][users][invokingUser][id]}",
           "user_last_name": "Solicington",

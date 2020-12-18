@@ -10,12 +10,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
+import uk.gov.hmcts.reform.managecase.domain.Organisation;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
+import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
 import java.util.Map;
@@ -26,6 +29,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.DataflowAnomalyAnalysis",
@@ -44,9 +49,12 @@ class VerifyNoCAnswersServiceTest {
     @Mock
     private PrdRepository prdRepository;
 
+    @Mock
+    private JacksonUtils jacksonUtils;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private SearchResultViewItem searchResultViewItem;
+    private CaseDetails caseDetails;
     private ChallengeQuestionsResult challengeQuestionsResult;
     private CaseViewResource caseViewResource;
 
@@ -54,16 +62,24 @@ class VerifyNoCAnswersServiceTest {
     void setUp() throws JsonProcessingException {
         MockitoAnnotations.initMocks(this);
 
-        searchResultViewItem = createCase();
+        caseDetails = createCase();
         challengeQuestionsResult = new ChallengeQuestionsResult();
         caseViewResource = new CaseViewResource();
         NoCRequestDetails details = NoCRequestDetails.builder()
-            .searchResultViewItem(searchResultViewItem)
+            .caseDetails(caseDetails)
             .challengeQuestionsResult(challengeQuestionsResult)
             .caseViewResource(caseViewResource)
             .build();
 
         when(noticeOfChangeQuestions.challengeQuestions("1")).thenReturn(details);
+
+        given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
+            .willReturn(OrganisationPolicy.builder()
+                .orgPolicyCaseAssignedRole("[Defendant]")
+                .orgPolicyReference("DefendantPolicy")
+                .organisation(new Organisation("QUK822NA", "SomeOrg"))
+                .build()
+            );
     }
 
     @Test
@@ -80,7 +96,7 @@ class VerifyNoCAnswersServiceTest {
             () -> assertThat(result.getOrganisationPolicy().getOrgPolicyReference(), is("DefendantPolicy")),
             () -> assertThat(result.getOrganisationPolicy().getOrganisation().getOrganisationID(), is("QUK822NA")),
             () -> assertThat(result.getOrganisationPolicy().getOrganisation().getOrganisationName(), is("SomeOrg")),
-            () -> assertThat(result.getSearchResultViewItem(), is(searchResultViewItem)),
+            () -> assertThat(result.getCaseDetails(), is(caseDetails)),
             () -> assertThat(result.getChallengeQuestionsResult(), is(challengeQuestionsResult)),
             () -> assertThat(result.getCaseViewResource(), is(caseViewResource))
         );
@@ -125,10 +141,12 @@ class VerifyNoCAnswersServiceTest {
         when(prdRepository.findUsersByOrganisation()).thenReturn(prdOrgResponse);
     }
 
-    private SearchResultViewItem createCase() throws JsonProcessingException {
-        Map<String, JsonNode> fields = objectMapper.readValue(caseDataString(),
-            new TypeReference<Map<String, JsonNode>>() {});
-        return new SearchResultViewItem("1", fields, fields);
+    private CaseDetails createCase() throws JsonProcessingException {
+        Map<String, JsonNode> data = objectMapper.readValue(caseDataString(), new TypeReference<>() { });
+        return CaseDetails.builder()
+            .data(data)
+            .id("1")
+            .build();
     }
 
     private String caseDataString() {

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
@@ -37,7 +37,7 @@ class ChallengeAnswerValidatorTest {
     private ChallengeAnswerValidator challengeAnswerValidator;
 
     private List<SubmittedChallengeAnswer> answers;
-    private SearchResultViewItem caseSearchResult;
+    private CaseDetails caseDetails;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -50,7 +50,7 @@ class ChallengeAnswerValidatorTest {
         answers.add(new SubmittedChallengeAnswer(QUESTION_ID_2, "67890"));
         answers.add(new SubmittedChallengeAnswer(QUESTION_ID_3, "1985-07-25"));
 
-        caseSearchResult = createCase();
+        caseDetails = createCase();
     }
 
     @Test
@@ -71,7 +71,7 @@ class ChallengeAnswerValidatorTest {
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         String result = challengeAnswerValidator
-            .getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult);
+            .getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails);
 
         assertThat(result, is("[Claimant]"));
     }
@@ -88,7 +88,7 @@ class ChallengeAnswerValidatorTest {
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         ValidationException exception = assertThrows(ValidationException.class,
-            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
+            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails));
 
         assertThat(exception.getMessage(),
             is("The number of provided answers must match the number of questions - expected 2 answers, received 3"));
@@ -109,7 +109,7 @@ class ChallengeAnswerValidatorTest {
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         ValidationException exception = assertThrows(ValidationException.class,
-            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
+            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails));
 
         assertThat(exception.getMessage(), is("No answer has been provided for question ID 'OtherQuestionId1'"));
     }
@@ -130,7 +130,7 @@ class ChallengeAnswerValidatorTest {
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         ValidationException exception = assertThrows(ValidationException.class,
-            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
+            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails));
 
         assertThat(exception.getMessage(), is("The answers did not uniquely identify a litigant"));
     }
@@ -150,7 +150,7 @@ class ChallengeAnswerValidatorTest {
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         ValidationException exception = assertThrows(ValidationException.class,
-            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
+            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails));
 
         assertThat(exception.getMessage(), is("The answers did not match those for any litigant"));
     }
@@ -164,7 +164,7 @@ class ChallengeAnswerValidatorTest {
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         String result = challengeAnswerValidator
-            .getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult);
+            .getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails);
 
         assertThat(result, is("[Claimant]"));
     }
@@ -178,7 +178,7 @@ class ChallengeAnswerValidatorTest {
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         String result = challengeAnswerValidator
-            .getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult);
+            .getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails);
 
         assertThat(result, is("[Claimant]"));
     }
@@ -192,7 +192,7 @@ class ChallengeAnswerValidatorTest {
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         ValidationException exception = assertThrows(ValidationException.class,
-            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseSearchResult));
+            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails));
 
         assertThat(exception.getMessage(), is("The answers did not match those for any litigant"));
     }
@@ -210,10 +210,12 @@ class ChallengeAnswerValidatorTest {
         return FieldType.builder().type(type).build();
     }
 
-    private SearchResultViewItem createCase() throws JsonProcessingException {
-        Map<String, JsonNode> fields = objectMapper.readValue(caseDataString(),
-            new TypeReference<Map<String, JsonNode>>() {});
-        return new SearchResultViewItem("1", fields, fields);
+    private CaseDetails createCase() throws JsonProcessingException {
+        Map<String, JsonNode> data = objectMapper.readValue(caseDataString(), new TypeReference<>() { });
+        return CaseDetails.builder()
+        .id("1")
+        .data(data)
+        .build();
     }
 
     private String caseDataString() {

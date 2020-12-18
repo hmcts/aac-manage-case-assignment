@@ -86,8 +86,6 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.M
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_NOT_CONSIDERED;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_DATA_PROVIDED;
-import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
-import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.REJECTED;

@@ -161,19 +161,6 @@ public class WiremockFixtures {
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
-    public static void stubGetCaseInternalES(String caseTypeId,
-                                             String searchQuery,
-                                             CaseSearchResultViewResource resource) {
-        stubFor(WireMock.post(urlEqualTo(INTERNAL_SEARCH_CASES + "?ctid=" + caseTypeId))
-                    .withRequestBody(equalToJson(searchQuery))
-                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-                    .willReturn(aResponse()
-                                    .withStatus(HTTP_OK).withBody(getJsonString(resource))
-                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
-    }
-
-
     public static void stubGetCaseInternal(String caseId, CaseViewResource caseViewResource) {
 
         stubFor(WireMock.get(urlPathEqualTo("/internal/cases/" + caseId))

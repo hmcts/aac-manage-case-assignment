@@ -64,7 +64,16 @@
     "body": {
       "data": {
         "changeOrganisationRequestField": {
-          "CaseRoleId": "[ApplicantSolicitor]",
+          "CaseRoleId": {
+            "value": {
+              "code": "[ApplicantSolicitor]",
+              "label": "Applicant Solicitor"
+            },
+            "list_items": [{
+              "code": "[ApplicantSolicitor]",
+              "label": "Applicant Solicitor"
+            }]
+          },
           "RequestTimestamp": "2020-02-20T06:30:00",
           "OrganisationToAdd": {
             "OrganisationID": "PUBLIC"

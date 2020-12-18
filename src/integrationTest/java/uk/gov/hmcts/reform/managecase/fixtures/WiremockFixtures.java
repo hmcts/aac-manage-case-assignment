@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
@@ -46,7 +45,6 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static org.assertj.core.util.Lists.list;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient.CASE_USERS;
-import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient.INTERNAL_SEARCH_CASES;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient.SEARCH_CASES;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
@@ -174,6 +172,7 @@ public class WiremockFixtures {
                                     .withStatus(HTTP_OK).withBody(getJsonString(resource))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
+
 
     public static void stubGetCaseInternal(String caseId, CaseViewResource caseViewResource) {
 

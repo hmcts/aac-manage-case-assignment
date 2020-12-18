@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.managecase.client.datastore.model.CaseFieldPathUtils.getNestedCaseFieldByPath;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -49,6 +51,7 @@ public class CaseDetails {
     private String state;
 
     @JsonProperty("case_type_id")
+    @JsonAlias("case_type") // alias to match with data-store V2 external api GetCase
     private String caseTypeId;
 
     @JsonProperty("case_data")
@@ -115,4 +118,23 @@ public class CaseDetails {
         }
         return null;
     }
+
+    public List<JsonNode> findCorNodes() {
+        return getData().values().stream()
+            .map(node -> node.findParents(ORGANISATION_TO_ADD))
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
+    }
+
+    public boolean hasCaseRoleId() {
+        return getData().values().stream()
+            .map(node -> node.findPath(CASE_ROLE_ID))
+            .anyMatch(node -> !node.isMissingNode() && !node.isNull());
+    }
+
+    public String getFieldValue(String fieldId) {
+        JsonNode fieldNode = getNestedCaseFieldByPath(data, fieldId);
+        return fieldNode == null || fieldNode.isNull() ? null : fieldNode.asText();
+    }
+
 }

@@ -93,7 +93,8 @@ public class TestFixtures {
 
         public static CaseDetails caseDetails(String organizationId, String... orgPolicyRoles) {
             Map<String, JsonNode> jsonNodeMap = Stream.of(orgPolicyRoles)
-                    .collect(Collectors.toMap(role -> "Field_" + role, role -> jsonNode(organizationId, role),
+                    .collect(Collectors.toMap(role -> "Field_" + role,
+                        role -> organisationPolicyJsonNode(organizationId, role),
                         (v1, v2) -> v1, LinkedHashMap::new));
             return defaultCaseDetails().data(jsonNodeMap).build();
         }
@@ -104,7 +105,7 @@ public class TestFixtures {
                 .id(CASE_ID)
                 .jurisdiction(JURISDICTION)
                 .state(null)
-                .data(Maps.newHashMap("OrganisationPolicy1", jsonNode(ORGANIZATION_ID, CASE_ROLE)));
+                .data(Maps.newHashMap("OrganisationPolicy1", organisationPolicyJsonNode(ORGANIZATION_ID, CASE_ROLE)));
         }
 
         public static OrganisationPolicy organisationPolicy(String organizationId, String orgPolicyRole) {
@@ -115,7 +116,7 @@ public class TestFixtures {
                     .build();
         }
 
-        private static JsonNode jsonNode(String organizationId, String orgPolicyRole) {
+        public static JsonNode organisationPolicyJsonNode(String organizationId, String orgPolicyRole) {
             return OBJECT_MAPPER.convertValue(organisationPolicy(organizationId, orgPolicyRole), JsonNode.class);
         }
     }

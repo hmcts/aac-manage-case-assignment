@@ -21,5 +21,16 @@
     "pathVariables": {
       "caseId": "${[scenarioContext][parentContext][testData][request][body][case_id]}"
     }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
   }
 }

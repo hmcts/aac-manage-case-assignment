@@ -11,11 +11,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseIdLuhnException;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeaderGroup;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
@@ -27,22 +24,17 @@ import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
-import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
 
 @Service
 public class NoticeOfChangeQuestions {
@@ -50,7 +42,6 @@ public class NoticeOfChangeQuestions {
     public static final String PUI_ROLE = "pui-caa";
 
     private static final String CHALLENGE_QUESTION_ID = "NoCChallenge";
-    private static final String CASE_ROLE_ID = "CaseRoleId";
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
@@ -79,7 +70,7 @@ public class NoticeOfChangeQuestions {
                 challengeQuestion.setAnswerField(null);
                 return challengeQuestion;
             })
-            .collect(Collectors.toList());
+            .collect(toList());
 
 
         return ChallengeQuestionsResult.builder().questions(challengeQuestionsResponse).build();
@@ -88,27 +79,20 @@ public class NoticeOfChangeQuestions {
     public NoCRequestDetails challengeQuestions(String caseId) {
         CaseViewResource caseViewResource = getCase(caseId);
         checkForCaseEvents(caseViewResource);
-        CaseSearchResultViewResource caseSearchResultViewResource = findCaseBy(caseViewResource
-                                                                                   .getCaseType().getId(), caseId);
-        checkCaseFields(caseSearchResultViewResource);
-        UserInfo userInfo = getUserInfo();
-        validateUserRoles(caseViewResource, userInfo);
-        String caseType = caseViewResource.getCaseType().getId();
+
+        CaseDetails caseDetails = dataStoreRepository.findCaseByCaseIdExternalApi(caseId);
+        checkCaseFields(caseDetails);
+        validateUserRoles(caseDetails.getJurisdiction(), getUserInfo());
         ChallengeQuestionsResult challengeQuestionsResult =
-            definitionStoreRepository.challengeQuestions(caseType, CHALLENGE_QUESTION_ID);
-        Optional<SearchResultViewItem> searchResultViewItem = caseSearchResultViewResource
-            .getCases().stream().findFirst();
-        if (searchResultViewItem.isPresent()) {
-            List<OrganisationPolicy> organisationPolicies = searchResultViewItem.get().findPolicies();
-            checkOrgPoliciesForRoles(challengeQuestionsResult, organisationPolicies);
-        } else {
-            throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
-        }
+            definitionStoreRepository.challengeQuestions(caseDetails.getCaseTypeId(), CHALLENGE_QUESTION_ID);
+
+        List<OrganisationPolicy> organisationPolicies = findPolicies(caseDetails);
+        checkOrgPoliciesForRoles(challengeQuestionsResult, organisationPolicies);
 
         return NoCRequestDetails.builder()
             .caseViewResource(caseViewResource)
             .challengeQuestionsResult(challengeQuestionsResult)
-            .searchResultViewItem(caseSearchResultViewResource.getCases().get(0))
+            .caseDetails(caseDetails)
             .build();
     }
 
@@ -131,10 +115,10 @@ public class NoticeOfChangeQuestions {
             .anyMatch(organisationPolicy -> organisationPolicy.getOrgPolicyCaseAssignedRole().equals(role));
     }
 
-    private void validateUserRoles(CaseViewResource caseViewResource, UserInfo userInfo) {
+    private void validateUserRoles(String jurisdiction, UserInfo userInfo) {
         List<String> roles = userInfo.getRoles();
         if (!roles.contains(PUI_ROLE)
-            && !isActingAsSolicitor(roles, caseViewResource.getCaseType().getJurisdiction().getId())) {
+            && !isActingAsSolicitor(roles, jurisdiction)) {
             throw new ValidationException(INSUFFICIENT_PRIVILEGE);
         }
     }
@@ -161,40 +145,14 @@ public class NoticeOfChangeQuestions {
         return caseViewResource;
     }
 
-    private CaseSearchResultViewResource findCaseBy(String caseTypeId, String caseId) {
-        return dataStoreRepository.findCaseBy(caseTypeId, null, caseId);
-    }
+    private void checkCaseFields(CaseDetails caseDetails) {
 
-    private void checkCaseFields(CaseSearchResultViewResource caseDetails) {
-        if (caseDetails.getCases().isEmpty()) {
-            throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
-        }
-        List<SearchResultViewHeader> searchResultViewHeaderList = new ArrayList<>();
-        Optional<SearchResultViewHeaderGroup> searchResultViewHeaderGroup =
-            caseDetails.getHeaders().stream().findFirst();
-        if (searchResultViewHeaderGroup.isPresent()) {
-            searchResultViewHeaderList = searchResultViewHeaderGroup.get().getFields();
-        }
-        List<SearchResultViewHeader> filteredSearch =
-            searchResultViewHeaderList.stream()
-                .filter(searchResultViewHeader ->
-                            searchResultViewHeader.getCaseFieldTypeDefinition().getId()
-                                .equals(CHANGE_ORGANISATION_REQUEST)).collect(toList());
-        if (filteredSearch.size() > 1) {
+        if (caseDetails.findCorNodes().size() > 1) {
             throw new ValidationException(CHANGE_REQUEST);
         }
-        SearchResultViewItem searchResultViewItem = caseDetails.getCases().get(0);
-        Map<String, JsonNode> caseFields = searchResultViewItem.getFields();
-        for (SearchResultViewHeader searchResultViewHeader : filteredSearch) {
-            if (caseFields.containsKey(searchResultViewHeader.getCaseFieldId())) {
-                JsonNode node = caseFields.get(searchResultViewHeader.getCaseFieldId());
-                if (node != null) {
-                    JsonNode caseRoleId = node.findPath(CASE_ROLE_ID);
-                    if (!caseRoleId.isMissingNode() && !caseRoleId.isNull()) {
-                        throw new ValidationException(NOC_REQUEST_ONGOING);
-                    }
-                }
-            }
+
+        if (caseDetails.hasCaseRoleId()) {
+            throw new ValidationException(NOC_REQUEST_ONGOING);
         }
     }
 
@@ -205,5 +163,12 @@ public class NoticeOfChangeQuestions {
         } else if (caseViewResource.getCaseViewActionableEvents().length != 1) {
             throw new ValidationException(MULTIPLE_NOC_REQUEST_EVENTS);
         }
+    }
+
+    private List<OrganisationPolicy> findPolicies(CaseDetails caseDetails) {
+        List<JsonNode> policyNodes = caseDetails.findOrganisationPolicyNodes();
+        return policyNodes.stream()
+            .map(node -> jacksonUtils.convertValue(node, OrganisationPolicy.class))
+            .collect(toList());
     }
 }

@@ -25,13 +25,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableE
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultView;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.HeaderGroupMetadata;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeaderGroup;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
@@ -45,7 +38,6 @@ import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -79,13 +71,10 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
-import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
-import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternal;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternalAsApprover;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseInternalES;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseRoles;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseViaExternalApi;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetChallengeQuestions;
@@ -103,21 +92,19 @@ public class NoticeOfChangeControllerIT {
     private static final String CASE_TYPE_ID = "caseType";
     private static final String JURISDICTION = "Jurisdiction";
 
-    private static final String RAW_QUERY = "{\"query\":{\"bool\":{\"filter\":{\"term\":{\"reference\":%s}}}}}";
-    private static final String ES_QUERY = String.format(RAW_QUERY, CASE_ID);
     private static final String QUESTION_ID_1 = "QuestionId1";
     private static final String ORGANISATION_ID = "QUK822N";
+    private static final String ORGANISATION_NAME = "CCD Solicitors Limited";
     private final Map<String, JsonNode> caseFields = new HashMap<>();
-    private final List<SearchResultViewItem> viewItems = new ArrayList<>();
     private static final String ANSWER_FIELD_APPLICANT = "${applicant.individual.fullname}|${applicant.company.name}|"
-        + "${applicant.soletrader.name}|${OrganisationPolicy.OrganisationPolicy1"
+        + "${applicant.soletrader.name}|${OrganisationPolicy1"
         + ".Organisation.OrganisationID}:Applicant";
     private static final String NOC = "NOC";
 
     private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
-    void setUp() throws JsonProcessingException {
+    void setUp() {
         CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
         caseViewActionableEvent.setId(NOC);
         CaseViewResource caseViewResource = new CaseViewResource();
@@ -131,41 +118,6 @@ public class NoticeOfChangeControllerIT {
         caseViewType.setJurisdiction(caseViewJurisdiction);
         caseViewResource.setCaseType(caseViewType);
         stubGetCaseInternal(CASE_ID, caseViewResource);
-
-        SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
-        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
-        fieldTypeDefinition.setId(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
-        searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
-        searchResultViewHeader.setCaseFieldId("changeOrg");
-        SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
-            new HeaderGroupMetadata(JURISDICTION, CASE_TYPE_ID),
-            Arrays.asList(searchResultViewHeader),
-            Arrays.asList("111", "222")
-        );
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode actualObj = mapper.readValue("{\n"
-            + "  \"OrganisationPolicy1\": {\n"
-            + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
-            + "    \"OrgPolicyReference\": \"Reference\",\n"
-            + "    \"Organisation\": {\n"
-            + "      \"OrganisationID\": \"QUK822N\",\n"
-            + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
-            + "    }\n"
-            + "  }\n"
-            + "}", JsonNode.class);
-
-        caseFields.put(PREDEFINED_COMPLEX_ORGANISATION_POLICY, actualObj);
-        SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
-        viewItems.add(item);
-        List<SearchResultViewHeaderGroup> headers = new ArrayList<>();
-        headers.add(correctHeader);
-        List<SearchResultViewItem> cases = new ArrayList<>();
-        cases.add(item);
-        Long total = 3L;
-        CaseSearchResultView caseSearchResultView = new CaseSearchResultView(headers, cases, total);
-        CaseSearchResultViewResource resource = new CaseSearchResultViewResource(caseSearchResultView);
-        stubGetCaseInternalES(CASE_TYPE_ID, ES_QUERY, resource);
 
         FieldType fieldType = FieldType.builder()
             .regularExpression("regular expression")
@@ -193,7 +145,27 @@ public class NoticeOfChangeControllerIT {
         );
         stubGetCaseRoles("0", JURISDICTION, CASE_TYPE_ID, caseRoleList);
 
-        CaseDetails caseDetails = CaseDetails.builder().data(caseFields).build();
+        Organisation organisationToAdd = Organisation.builder().organisationID("QUK822N").build();
+        ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
+            .organisationToAdd(organisationToAdd)
+            .build();
+
+        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("Applicant")
+            .orgPolicyReference("ApplicantPolicy")
+            .organisation(new Organisation(ORGANISATION_ID, ORGANISATION_NAME))
+            .build();
+
+        caseFields.put("ChangeOrgRequest", mapper.convertValue(cor, JsonNode.class));
+        caseFields.put("OrganisationPolicy1", mapper.convertValue(organisationPolicy, JsonNode.class));
+
+        CaseDetails caseDetails = CaseDetails.builder()
+            .id(CASE_ID)
+            .caseTypeId(CASE_TYPE_ID)
+            .jurisdiction(JURISDICTION)
+            .data(caseFields)
+            .build();
+
         stubGetCaseViaExternalApi(CASE_ID, caseDetails);
     }
 
@@ -421,9 +393,22 @@ public class NoticeOfChangeControllerIT {
 
             stubGetStartEventTrigger(CASE_ID, NOC, caseUpdateViewEvent);
 
-            caseFields.put("ChangeOrgRequest", mapper.convertValue(ChangeOrganisationRequest.builder().build(),
-                                                                   JsonNode.class));
-            caseDetails = CaseDetails.builder().data(caseFields).build();
+            Organisation organisationToAdd = Organisation.builder().organisationID(ORGANISATION_ID).build();
+            ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
+                .organisationToAdd(organisationToAdd)
+                .build();
+
+            OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
+                .orgPolicyCaseAssignedRole("Applicant")
+                .orgPolicyReference("ApplicantPolicy")
+                .organisation(new Organisation(ORGANISATION_ID, ORGANISATION_NAME))
+                .build();
+
+            caseFields.clear();
+            caseFields.put("ChangeOrgRequest", mapper.convertValue(cor, JsonNode.class));
+            caseFields.put("OrganisationPolicy1", mapper.convertValue(organisationPolicy, JsonNode.class));
+
+            caseDetails = CaseDetails.builder().id(CASE_ID).caseTypeId(CASE_TYPE_ID).data(caseFields).build();
 
             stubGetCaseViaExternalApi(CASE_ID, caseDetails);
 
@@ -464,8 +449,10 @@ public class NoticeOfChangeControllerIT {
 
             caseFields.put("OrganisationPolicy", mapper.convertValue(orgPolicy,  JsonNode.class));
 
-            CaseDetails caseDetails = CaseDetails.builder().data(caseFields).build();
+            caseDetails = CaseDetails.builder().id(CASE_ID).caseTypeId(CASE_TYPE_ID).data(caseFields).build();
+
             stubGetCaseViaExternalApi(CASE_ID, caseDetails);
+
             stubSubmitEventForCase(CASE_ID, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)

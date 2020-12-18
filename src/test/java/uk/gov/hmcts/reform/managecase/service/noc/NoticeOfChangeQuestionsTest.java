@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.managecase.service.noc;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -11,29 +10,27 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultView;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.HeaderGroupMetadata;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeaderGroup;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.domain.DynamicList;
+import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
+import uk.gov.hmcts.reform.managecase.domain.Organisation;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
+import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -43,18 +40,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
-
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicyJsonNode;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
-import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
-import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_ORGANISATION_POLICY;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
+import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap",
     "PMD.AvoidDuplicateLiterals",
@@ -79,11 +76,8 @@ class NoticeOfChangeQuestionsTest {
     private static final String ANSWER_FIELD_RESPONDENT = "${applicant.individual.fullname}|${applicant.company.name}|"
         + "${applicant.soletrader.name}:Respondent";
 
-    private final List<SearchResultViewItem> viewItems = new ArrayList<>();
-    private final Map<String, JsonNode> caseFields = new HashMap<>();
-    private static final String DATE_FIELD = "DateField";
-    private static final String DATETIME_FIELD = "DateTimeField";
-    private static final String TEXT_FIELD = "TextField";
+    private static final String ORG_POLICY_ROLE = "Applicant";
+    private static final String ORGANIZATION_ID = "QUK822N";
 
     @InjectMocks
     private NoticeOfChangeQuestions service;
@@ -94,6 +88,8 @@ class NoticeOfChangeQuestionsTest {
     private DefinitionStoreRepository definitionStoreRepository;
     @Mock
     private SecurityUtils securityUtils;
+    @Mock
+    private JacksonUtils jacksonUtils;
 
     @BeforeEach
     void setUp() {
@@ -105,7 +101,7 @@ class NoticeOfChangeQuestionsTest {
     class AssignCaseAccess {
 
         @BeforeEach
-        void setUp() throws JsonProcessingException {
+        void setUp() {
             //internal/cases/caseId
             CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
             caseViewActionableEvent.setId("NOC");
@@ -121,43 +117,25 @@ class NoticeOfChangeQuestionsTest {
             given(dataStoreRepository.findCaseByCaseId(CASE_ID))
                 .willReturn(caseViewResource);
 
-            // Internal ES query
-            SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
-            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-            fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
-            fieldTypeDefinition.setId(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
-            searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
-            searchResultViewHeader.setCaseFieldId(CHANGE_ORG);
-            caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
-            caseFields.put(DATETIME_FIELD, new TextNode("1985-12-30"));
-            caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode actualObj = mapper.readValue("{\n"
-                + "  \"OrganisationPolicy1\": {\n"
-                + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
-                + "    \"OrgPolicyReference\": \"Reference\",\n"
-                + "    \"Organisation\": {\n"
-                + "      \"OrganisationID\": \"QUK822N\",\n"
-                + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
-                + "    }\n"
-                + "  }\n"
-                + "}", JsonNode.class);
+            // external case by id
+            Organisation organisationToAdd = Organisation.builder().organisationID(ORGANIZATION_ID).build();
+            ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
+                .organisationToAdd(organisationToAdd)
+                .build();
 
-            caseFields.put(PREDEFINED_COMPLEX_ORGANISATION_POLICY, actualObj);
-            SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
-            viewItems.add(item);
-            SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
-                new HeaderGroupMetadata(JURISDICTION, CASE_TYPE),
-                Arrays.asList(searchResultViewHeader), Arrays.asList("111", "222")
+            Map<String, JsonNode> data = new HashMap<>();
+            data.put(
+                "CouldBeAnyChangeOrganisationRequestField",
+                new ObjectMapper().convertValue(cor, JsonNode.class)
             );
-            List<SearchResultViewHeaderGroup> headers = new ArrayList<>();
-            headers.add(correctHeader);
-            List<SearchResultViewItem> cases = new ArrayList<>();
-            cases.add(item);
-            Long total = 3L;
-            CaseSearchResultView caseSearchResultView = new CaseSearchResultView(headers, cases, total);
-            CaseSearchResultViewResource resource = new CaseSearchResultViewResource(caseSearchResultView);
-            given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, null, CASE_ID)).willReturn(resource);
+
+            data.put("OrganisationPolicy1", organisationPolicyJsonNode(ORGANIZATION_ID, ORG_POLICY_ROLE));
+
+            CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).caseTypeId(CASE_TYPE_ID).data(data).build();
+
+            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
+            given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
+                .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE));
 
             //Challenge Questions
             FieldType fieldType = FieldType.builder()
@@ -229,7 +207,7 @@ class NoticeOfChangeQuestionsTest {
                 .isEqualTo(CHALLENGE_QUESTION);
             assertThat(noCRequestDetails.getCaseViewResource()).isNotNull();
             assertThat(noCRequestDetails.getOrganisationPolicy()).isNull();
-            assertThat(noCRequestDetails.getSearchResultViewItem().getCaseId()).isEqualTo("CaseId");
+            assertThat(noCRequestDetails.getCaseDetails().getId()).isEqualTo("1567934206391385");
         }
 
         @Test
@@ -247,155 +225,60 @@ class NoticeOfChangeQuestionsTest {
 
         @Test
         @DisplayName("must return an error response when a NoC request is currently pending on a case")
-        void shouldThrowErrorNoCRequestPending() throws JsonProcessingException {
+        void shouldThrowErrorNoCRequestPending() {
 
-            SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
-            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-            fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
-            fieldTypeDefinition.setId(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
-            searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
-            searchResultViewHeader.setCaseFieldId(CHANGE_ORG);
+            Organisation organisationToAdd = Organisation.builder().organisationID("id1").build();
+            Organisation organisationToRemove = Organisation.builder().organisationID("id2").build();
 
-            caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
-            caseFields.put(DATETIME_FIELD, new TextNode("1985-12-30"));
-            caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode actualObj = mapper.readValue("   {\n"
-                + "                \"changeOrg\":\n"
-                + "                {\n"
-                + "                    \"CaseRoleId\": \"role\"\n"
-                + "                }\n"
-                + "            }", JsonNode.class);
-            caseFields.put(CHANGE_ORG, actualObj);
-            SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
-            viewItems.add(item);
-            SearchResultViewHeaderGroup correctHeader = new SearchResultViewHeaderGroup(
-                new HeaderGroupMetadata(JURISDICTION, CASE_TYPE),
-                Arrays.asList(searchResultViewHeader), Arrays.asList("111", "222")
-            );
-            List<SearchResultViewHeaderGroup> headers = new ArrayList<>();
-            headers.add(correctHeader);
-            List<SearchResultViewItem> cases = new ArrayList<>();
-            cases.add(item);
-            Long total = 3L;
+            DynamicListElement dynamicListElement = DynamicListElement.builder().code("code").label("label").build();
+            DynamicList dynamicList =
+                DynamicList.builder().value(dynamicListElement).listItems(List.of(dynamicListElement)).build();
+            ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
+                .caseRoleId(dynamicList)
+                .organisationToAdd(organisationToAdd)
+                .organisationToRemove(organisationToRemove)
+                .approvalStatus(PENDING.name())
+                .build();
 
-            CaseSearchResultView caseSearchResultView = new CaseSearchResultView(headers, cases, total);
+            JsonNode corNode = new ObjectMapper().convertValue(cor, JsonNode.class);
+            Map<String, JsonNode> data = ImmutableMap.of("COR1", corNode);
 
-            CaseSearchResultViewResource resource = new CaseSearchResultViewResource(caseSearchResultView);
+            CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).data(data).build();
 
-            given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, null, CASE_ID)).willReturn(resource);
+            // external case by id
+            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
+
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining(NOC_REQUEST_ONGOING);
         }
 
         @Test
-        @DisplayName("must return an error response when there is more than one chnage request")
-        void shouldThrowErrorMoreThanOneChangeRequest() throws JsonProcessingException {
+        @DisplayName("must return an error response when there is more than one change request")
+        void shouldThrowErrorMoreThanOneChangeRequest() {
 
-            SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
-            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-            fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
-            fieldTypeDefinition.setId(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
-            searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
-            searchResultViewHeader.setCaseFieldId(CHANGE_ORG);
+            Organisation organisationToAdd = Organisation.builder().organisationID("id1").build();
+            DynamicListElement dynamicListElement = DynamicListElement.builder().code("code").label("label").build();
+            DynamicList dynamicList =
+                DynamicList.builder().value(dynamicListElement).listItems(List.of(dynamicListElement)).build();
 
-            caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
-            caseFields.put(DATETIME_FIELD, new TextNode("1985-12-30"));
-            caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode actualObj = mapper.readValue("   {\n"
-                                                      + "                \"changeOrg\":\n"
-                                                      + "                {\n"
-                                                      + "                    \"CaseRoleId\": \"role\"\n"
-                                                      + "                }\n"
-                                                      + "            }", JsonNode.class);
-            caseFields.put(CHANGE_ORG, actualObj);
-            caseFields.put(CHANGE_ORG, actualObj);
-            SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
-            viewItems.add(item);
-            SearchResultViewHeaderGroup searchResultViewHeaderGroup = new SearchResultViewHeaderGroup(
-                new HeaderGroupMetadata(JURISDICTION, CASE_TYPE),
-                Arrays.asList(searchResultViewHeader, searchResultViewHeader), Arrays.asList("111", "222")
-            );
-            List<SearchResultViewHeaderGroup> headers = new ArrayList<>();
-            headers.add(searchResultViewHeaderGroup);
-            List<SearchResultViewItem> cases = new ArrayList<>();
-            cases.add(item);
-            Long total = 3L;
+            ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
+                .caseRoleId(dynamicList)
+                .organisationToAdd(organisationToAdd)
+                .approvalStatus(PENDING.name())
+                .build();
 
-            CaseSearchResultView caseSearchResultView = new CaseSearchResultView(headers, cases, total);
+            JsonNode corNode = new ObjectMapper().convertValue(cor, JsonNode.class);
+            Map<String, JsonNode> data = ImmutableMap.of("COR1", corNode,"COR2", corNode);
 
-            CaseSearchResultViewResource resource = new CaseSearchResultViewResource(caseSearchResultView);
+            CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).data(data).build();
 
-            given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, null, CASE_ID)).willReturn(resource);
+            // external case by id
+            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
+
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining(CHANGE_REQUEST);
-        }
-
-        @Test
-        @DisplayName("Must return an error if there is no cases returned")
-        void shouldThrowErrorMissingCasesFromInternalSearch() throws JsonProcessingException {
-            SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
-            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-            fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
-            fieldTypeDefinition.setId(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
-            searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
-            searchResultViewHeader.setCaseFieldId(CHANGE_ORG);
-            caseFields.put(DATE_FIELD, new TextNode("2020-10-01"));
-            caseFields.put(DATETIME_FIELD, new TextNode("1985-12-30"));
-            caseFields.put(TEXT_FIELD, new TextNode("Text Value"));
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode actualObj = mapper.readValue("{\n"
-                + "  \"OrganisationPolicy1\": {\n"
-                + "    \"OrgPolicyCaseAssignedRole\": \"Applicant\",\n"
-                + "    \"OrgPolicyReference\": \"Reference\",\n"
-                + "    \"Organisation\": {\n"
-                + "      \"OrganisationID\": \"QUK822N\",\n"
-                + "      \"OrganisationName\": \"CCD Solicitors Limited\"\n"
-                + "    }\n"
-                + "  }\n"
-                + "}", JsonNode.class);
-
-            caseFields.put(PREDEFINED_COMPLEX_ORGANISATION_POLICY, actualObj);
-            SearchResultViewItem item = new SearchResultViewItem("CaseId", caseFields, caseFields);
-            viewItems.add(item);
-            SearchResultViewHeaderGroup searchResultViewHeaderGroup = new SearchResultViewHeaderGroup(
-                new HeaderGroupMetadata(JURISDICTION, CASE_TYPE),
-                Arrays.asList(searchResultViewHeader), Arrays.asList("111", "222")
-            );
-            List<SearchResultViewHeaderGroup> headers = new ArrayList<>();
-            headers.add(searchResultViewHeaderGroup);
-            List<SearchResultViewItem> cases = new ArrayList<>();
-            Long total = 3L;
-            CaseSearchResultView caseSearchResultView = new CaseSearchResultView(headers, cases, total);
-            CaseSearchResultViewResource resource = new CaseSearchResultViewResource(caseSearchResultView);
-            given(dataStoreRepository.findCaseBy(CASE_TYPE_ID, null, CASE_ID)).willReturn(resource);
-
-            FieldType fieldType = FieldType.builder()
-                .max(null)
-                .min(null)
-                .id(FIELD_ID)
-                .type(FIELD_ID)
-                .build();
-            ChallengeAnswer challengeAnswer = new ChallengeAnswer(ANSWER_FIELD_APPLICANT);
-            ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
-                .caseTypeId(CASE_TYPE_ID)
-                .challengeQuestionId("QuestionId1")
-                .questionText(QUESTION_TEXT)
-                .answerFieldType(fieldType)
-                .answerField(ANSWER_FIELD)
-                .answers(Arrays.asList(challengeAnswer))
-                .questionId("NoC").build();
-            ChallengeQuestionsResult challengeQuestionsResult =
-                new ChallengeQuestionsResult(Arrays.asList(challengeQuestion));
-            given(definitionStoreRepository.challengeQuestions(CASE_TYPE_ID, "NoCChallenge"))
-                .willReturn(challengeQuestionsResult);
-
-            assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
-                .isInstanceOf(CaseCouldNotBeFoundException.class)
-                .hasMessageContaining(CASE_NOT_FOUND);
         }
 
         @Test

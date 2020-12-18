@@ -11,9 +11,9 @@ import javax.validation.Valid;
 
 @Getter
 @AllArgsConstructor
-@ApiModel("Check Notice of Change Approval Request")
+@ApiModel("About To Submit Callback Request")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CheckNoticeOfChangeApprovalRequest {
+public class CallbackRequest {
 
     @JsonProperty("event_id")
     private String eventId;

@@ -2,12 +2,15 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
@@ -26,6 +29,7 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
@@ -51,7 +55,7 @@ public class RequestNoticeOfChangeService {
                                         DefinitionStoreRepository definitionStoreRepository,
                                         PrdRepository prdRepository,
                                         JacksonUtils jacksonUtils,
-                                   SecurityUtils securityUtils) {
+                                        SecurityUtils securityUtils) {
         this.dataStoreRepository = dataStoreRepository;
         this.definitionStoreRepository = definitionStoreRepository;
         this.prdRepository = prdRepository;
@@ -91,6 +95,34 @@ public class RequestNoticeOfChangeService {
             .caseRole(caseRoleId)
             .approvalStatus(isApprovalComplete ? APPROVED : PENDING)
             .status(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)
+            .build();
+    }
+
+    public AboutToSubmitCallbackResponse setOrganisationToRemove(CaseDetails caseDetails,
+                                                                 ChangeOrganisationRequest changeOrganisationRequest,
+                                                                 String changeOrganisationKey) {
+
+        List<JsonNode> organisationPolicyNodes = caseDetails.findOrganisationPolicyNodes();
+        List<OrganisationPolicy> matchingOrganisationPolicyNodes =
+            organisationPolicyNodes.stream()
+                .map(node -> jacksonUtils.convertValue(node, OrganisationPolicy.class))
+                .filter(orgPolicy ->
+                            orgPolicy.getOrgPolicyCaseAssignedRole()
+                                .equalsIgnoreCase(changeOrganisationRequest.getCaseRoleId().getValue().getCode()))
+                .collect(toList());
+
+        if (matchingOrganisationPolicyNodes.size() != 1) {
+            throw new ValidationException(INVALID_CASE_ROLE_FIELD);
+        }
+
+        changeOrganisationRequest
+            .setOrganisationToRemove(matchingOrganisationPolicyNodes.get(0).getOrganisation());
+
+        Map<String, JsonNode> data = new HashMap<>(caseDetails.getData());
+        data.put(changeOrganisationKey, jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
+
+        return AboutToSubmitCallbackResponse.builder()
+            .data(data)
             .build();
     }
 

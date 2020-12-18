@@ -21,9 +21,10 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionResponse;
-import uk.gov.hmcts.reform.managecase.api.payload.CheckNoticeOfChangeApprovalRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.CallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.SubmitCallbackResponse;
@@ -52,6 +53,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_DECISION_EVENT_UNIDENTIFIABLE;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 
@@ -71,6 +73,7 @@ public class NoticeOfChangeController {
 
     public static final String REQUEST_NOTICE_OF_CHANGE_PATH = "/noc-requests";
     public static final String CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH = "/check-noc-approval";
+    public static final String SET_ORGANISATION_TO_REMOVE_PATH = "/set-organisation-to-remove";
 
     public static final String REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE =
         "The Notice of Change request has been successfully submitted.";
@@ -464,9 +467,8 @@ public class NoticeOfChangeController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         )
     })
-    public SubmitCallbackResponse checkNoticeOfChangeApproval(@Valid @RequestBody CheckNoticeOfChangeApprovalRequest
-                                                              checkNoticeOfChangeApprovalRequest) {
-        CaseDetails caseDetails = checkNoticeOfChangeApprovalRequest.getCaseDetails();
+    public SubmitCallbackResponse checkNoticeOfChangeApproval(@Valid @RequestBody CallbackRequest callbackRequest) {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
         Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findCorNodeWithApprovalStatus();
         if (changeOrganisationRequestFieldJson.isEmpty()) {
             throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
@@ -484,5 +486,65 @@ public class NoticeOfChangeController {
         noticeOfChangeApprovalService.findAndTriggerNocDecisionEvent(caseDetails.getId());
         return new SubmitCallbackResponse(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE,
             CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE);
+    }
+
+    @PostMapping(path = SET_ORGANISATION_TO_REMOVE_PATH, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Set Organisation To Remove", notes = "Set Organisation To Remove")
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = StringUtils.EMPTY,
+            response = AboutToSubmitCallbackResponse.class
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:"
+                + "\n1) " + CASE_ID_INVALID
+                + "\n2) " + CASE_ID_INVALID_LENGTH
+                + "\n3) " + CASE_ID_EMPTY
+                + "\n4) " + CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID
+                + "\n5) " + INVALID_CASE_ROLE_FIELD,
+            response = ApiError.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"message\": \"" + CASE_ID_EMPTY + "\",\n"
+                        + "   \"errors\": [ ]\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE
+        )
+    })
+    public AboutToSubmitCallbackResponse setOrganisationToRemove(@Valid @RequestBody CallbackRequest callbackRequest) {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
+
+        if (changeOrganisationRequestFieldJson.isEmpty()) {
+            throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
+        }
+
+        ChangeOrganisationRequest changeOrganisationRequest =
+            jacksonUtils.convertValue(changeOrganisationRequestFieldJson.get(), ChangeOrganisationRequest.class);
+
+        changeOrganisationRequest.validateChangeOrganisationRequest();
+
+        if (changeOrganisationRequest.getOrganisationToRemove().getOrganisationID() != null
+            || changeOrganisationRequest.getOrganisationToRemove().getOrganisationName() != null) {
+            throw new ValidationException(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
+        }
+        String changeOrganisationKey = caseDetails.getKeyFromDataWithValue(changeOrganisationRequestFieldJson.get());
+
+        return requestNoticeOfChangeService.setOrganisationToRemove(caseDetails,
+                                                                    changeOrganisationRequest,
+                                                                    changeOrganisationKey);
     }
 }

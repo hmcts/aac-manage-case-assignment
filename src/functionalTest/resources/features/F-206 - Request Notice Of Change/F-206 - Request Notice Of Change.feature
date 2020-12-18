@@ -13,7 +13,7 @@ Scenario: (Happy Path) Solicitor requests NoC to replace representation - no aut
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Dil's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
@@ -26,7 +26,8 @@ Scenario: (Happy Path) Solicitor requests NoC to replace representation - no aut
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to verify that Dil has NOT been granted any case roles for the case] will get the expected response as in [F-206_Verify_Not_Granted_Case_Roles_Dil],
-      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy for R2 has NOT been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Pending].
+      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy for R2 has NOT been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Pending],
+      And another call [to get Case Events API returns a NoCRequest event in which the user ID is set to Dil's email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data_Dil].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -48,7 +49,8 @@ Scenario: (Happy Path) Solicitor requests NoC for a non-represented litigant - n
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to verify that Dil has NOT been granted any case roles for the case] will get the expected response as in [F-206_Verify_Not_Granted_Case_Roles_Dil],
-      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy for R2 has NOT been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Pending].
+      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy for R2 has NOT been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Pending],
+      And another call [to get Case Events API returns a NoCRequest event in which the user ID is set to Dil's email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data_Dil].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -58,7 +60,7 @@ Scenario: (Happy Path) CAA requests NoC to replace representation - no auto-appr
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Matt - with a pui-caa role, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Matt's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
@@ -71,7 +73,8 @@ Scenario: (Happy Path) CAA requests NoC to replace representation - no auto-appr
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to verify that Matt has NOT been granted any case roles for the case] will get the expected response as in [F-206_Verify_Not_Granted_Case_Roles_Matt],
-      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy for R2 has NOT been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Pending].
+      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy for R2 has NOT been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Pending],
+      And another call [to get Case Events API returns a NoCRequest event in which the user ID is set to Matt's email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data_Matt].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -93,7 +96,8 @@ Scenario: (Happy Path) CAA requests NoC for a non-represented litigant - no auto
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to verify that Matt has NOT been granted any case roles for the case] will get the expected response as in [F-206_Verify_Not_Granted_Case_Roles_Matt],
-      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy for R2 has NOT been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Pending].
+      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy for R2 has NOT been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Pending],
+      And another call [to get Case Events API returns a NoCRequest event in which the user ID is set to Matt's email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data_Matt].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -103,7 +107,7 @@ Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) reque
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Alice - with a pui-caa role and a solicitor role for a different jurisdiction, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Alice's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
@@ -116,7 +120,8 @@ Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) reque
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to verify that Alice has NOT been granted any case roles for the case] will get the expected response as in [F-206_Verify_Not_Granted_Case_Roles_Alice],
-      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy for R2 has NOT been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Pending].
+      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy for R2 has NOT been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Pending],
+      And another call [to get Case Events API returns a NoCRequest event in which the user ID is set to Alice's email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data_Alice].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -138,7 +143,8 @@ Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) reque
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to verify that Alice has NOT been granted any case roles for the case] will get the expected response as in [F-206_Verify_Not_Granted_Case_Roles_Alice],
-      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy for R2 has NOT been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Pending].
+      And another call [to verify there is a pending NOC request on the case and the OrganisationPolicy for R2 has NOT been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Pending],
+      And another call [to get Case Events API returns a NoCRequest event in which the user ID is set to Alice's email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data_Alice].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -148,7 +154,7 @@ Scenario: (Happy Path) Solicitor requests NoC to replace representation - auto-a
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Dil's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Auto_Approval_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
@@ -161,7 +167,8 @@ Scenario: (Happy Path) Solicitor requests NoC to replace representation - auto-a
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to verify that Dil HAS been granted case roles R1 & R2 for the case but not R3] will get the expected response as in [F-206_Verify_Granted_Case_Roles_R1_R2_Dil],
-      And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved].
+      And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved],
+      And a call [to get Case Events API returns a NoCRequest event in which the user ID is set to Dil's email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data_Dil].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -183,7 +190,8 @@ Scenario: (Happy Path) Solicitor requests NoC for a non-represented litigant - a
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to verify that Dil HAS been granted case roles R1 & R2 for the case but not R3] will get the expected response as in [F-206_Verify_Granted_Case_Roles_R1_R2_Dil],
-      And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved].
+      And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved],
+      And a call [to get Case Events API returns a NoCRequest event in which the user ID is set to Dil's email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data_Dil].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -193,7 +201,7 @@ Scenario: (Happy Path) CAA requests NoC to replace representation - auto-approva
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Matt - with a pui-caa role, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Matt's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Auto_Approval_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
@@ -206,7 +214,8 @@ Scenario: (Happy Path) CAA requests NoC to replace representation - auto-approva
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to verify that Matt has NOT been granted any case roles for the case] will get the expected response as in [F-206_Verify_Not_Granted_Case_Roles_Matt],
-      And another call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved].
+      And another call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved],
+      And another call [to get Case Events API returns a NoCRequest event in which the user ID is set to Matt's email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data_Matt].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -228,7 +237,8 @@ Scenario: (Happy Path) CAA requests NoC for a non-represented litigant - auto-ap
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to verify that Matt has NOT been granted any case roles for the case] will get the expected response as in [F-206_Verify_Not_Granted_Case_Roles_Matt],
-      And another call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved].
+      And another call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved],
+      And another call [to get Case Events API returns a NoCRequest event in which the user ID is set to Matt's email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data_Matt].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -238,7 +248,7 @@ Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) reque
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Alice - with a pui-caa role and a solicitor role for a different jurisdiction, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Alice's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Auto_Approval_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
@@ -251,7 +261,8 @@ Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) reque
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to verify that Alice has NOT been granted any case roles for the case] will get the expected response as in [F-206_Verify_Not_Granted_Case_Roles_Alice],
-      And another call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved].
+      And another call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved],
+      And another call [to get Case Events API returns a NoCRequest event in which the user ID is set to Alice's email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data_Alice].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -273,7 +284,8 @@ Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) reque
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to verify that Alice has NOT been granted any case roles for the case] will get the expected response as in [F-206_Verify_Not_Granted_Case_Roles_Alice],
-      And another call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved].
+      And another call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved],
+      And another call [to get Case Events API returns a NoCRequest event in which the user ID is set to Alice's email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data_Alice].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -283,7 +295,7 @@ Scenario: (Happy Path) CAA (also a solicitor for the same jurisdiction) requests
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Jane - with a pui-caa role and a solicitor role for the same jurisdiction, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Jane's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Auto_Approval_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
@@ -296,7 +308,8 @@ Scenario: (Happy Path) CAA (also a solicitor for the same jurisdiction) requests
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to verify that Jane HAS been granted case roles R1 & R2 for the case but not R3] will get the expected response as in [F-206_Verify_Granted_Case_Roles_R1_R2_Jane],
-      And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved].
+      And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved],
+      And a call [to get Case Events API returns a NoCRequest event in which the user ID is set to Jane's email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data_Jane].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -318,7 +331,8 @@ Scenario: (Happy Path) CAA (also a solicitor for the same jurisdiction) requests
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to verify that Jane HAS been granted case roles R1 & R2 for the case but not R3] will get the expected response as in [F-206_Verify_Granted_Case_Roles_R1_R2_Jane],
-      And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved]. 
+      And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved],
+      And a call [to get Case Events API returns a NoCRequest event in which the user ID is set to Jane's email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data_Jane].
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -384,7 +398,7 @@ Scenario: Must return an error response when a NoC request is currently pending 
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
       And a user [Emma - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And [the configuration of the NoC request event has no auto-approval] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Dil's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
@@ -410,7 +424,7 @@ Scenario: Must return an error if there is not an Organisation Policy field cont
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which only contains 2 out 3 Org Policies for 3 case roles] as in [F-206_NoC_Case_Creation_By_Richard_With_Only_2_Out_Of_3_Org_Policies],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
       And [The challenge questions have answers that resolve to three distinct case roles (1,2,3)] in the context,
@@ -456,7 +470,7 @@ Scenario: Must return an error response when the solicitor does not have access 
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Ashley - with a solicitor role for a different jurisdiction, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Ashley's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
@@ -478,7 +492,7 @@ Scenario: Must return an error response for an invalid/incorrect answer (mismatc
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Ashley's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
@@ -500,7 +514,7 @@ Scenario: Must return an error response for an invalid/incorrect answer (wrong n
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Ashley's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
@@ -522,7 +536,7 @@ Scenario: Must return an error response for an invalid/incorrect answer (wrong n
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Ashley's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
@@ -544,7 +558,7 @@ Scenario: Must return an error response when the the invoking user's organisatio
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: which are all assigned to Dil's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies_All_To_Org1],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
@@ -566,7 +580,7 @@ Scenario: Must return an error when answers do not match a case role in the case
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Ashley's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
@@ -588,7 +602,7 @@ Scenario: Must return an error when the set of answers match more than one corre
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
-      And [a citizen Mario, on behalf of whome Richard will create a case] in the context,
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles, with litgants that have matching names] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies_And_Matching_Litigant_Names],
       And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 

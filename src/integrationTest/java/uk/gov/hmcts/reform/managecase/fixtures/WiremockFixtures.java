@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
@@ -42,10 +41,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static org.assertj.core.util.Lists.list;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient.CASE_USERS;
-import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient.SEARCH_CASES;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
 public class WiremockFixtures {
@@ -92,15 +89,15 @@ public class WiremockFixtures {
 
     public static void stubSearchCaseWithPrefix(String caseTypeId, String searchQuery,
                                                 CaseDetails caseDetails, String prefix) {
-        stubFor(WireMock.post(urlEqualTo(prefix + SEARCH_CASES + "?ctid=" + caseTypeId))
+        stubFor(WireMock.post(urlEqualTo(prefix + "/searchCases?ctid=" + caseTypeId))
                     .withRequestBody(equalToJson(searchQuery))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
                                     .withStatus(HTTP_OK)
-                                    .withBody(getJsonString(
-                                        caseDetails == null ? new CaseSearchResponse() : new CaseSearchResponse(list(
-                                            caseDetails))))
+                                    .withBody("{"
+                                            + "\"cases\":[" +  getJsonString(caseDetails)
+                                            + "]}")
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 

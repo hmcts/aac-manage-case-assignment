@@ -26,19 +26,12 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableE
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.HeaderGroupMetadata;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeader;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewHeaderGroup;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +52,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.CHANGE_ORGANISATION_REQUEST_FIELD;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getCaseViewFields;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getWizardPages;
-import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOC_REQUEST_DESCRIPTION;
@@ -230,32 +222,6 @@ class DataStoreRepositoryTest {
                 new CaseUserRoleWithOrganisation(CASE_ID, ASSIGNEE_ID, ROLE, ORG_ID),
                 new CaseUserRoleWithOrganisation(CASE_ID2, ASSIGNEE_ID, ROLE, ORG_ID)
             ));
-    }
-
-    @Test
-    @DisplayName("Find case by caseTypeId and caseId")
-    void shouldFindCaseByExternalES() {
-        // ARRANGE
-        SearchResultViewHeader searchResultViewHeader = new SearchResultViewHeader();
-        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
-        fieldTypeDefinition.setType(PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST);
-        searchResultViewHeader.setCaseFieldTypeDefinition(fieldTypeDefinition);
-        SearchResultViewHeaderGroup searchResultViewHeaderGroup = new SearchResultViewHeaderGroup(
-            new HeaderGroupMetadata(JURISDICTION, CASE_TYPE_ID),
-            Arrays.asList(searchResultViewHeader), Arrays.asList("111", "222")
-        );
-        SearchResultViewItem searchResultViewItem = new SearchResultViewItem();
-        CaseSearchResultViewResource caseSearchResultViewResource = new CaseSearchResultViewResource();
-        caseSearchResultViewResource.setCases(Arrays.asList(searchResultViewItem));
-        caseSearchResultViewResource.setHeaders(Arrays.asList(searchResultViewHeaderGroup));
-        given(dataStoreApi.internalSearchCases(anyString(), any(), anyString()))
-            .willReturn(caseSearchResultViewResource);
-
-        // ACT
-        CaseSearchResultViewResource result = repository.findCaseBy(CASE_TYPE_ID, null, CASE_ID);
-
-        // ASSERT
-        assertThat(result).isEqualTo(caseSearchResultViewResource);
     }
 
     @Test

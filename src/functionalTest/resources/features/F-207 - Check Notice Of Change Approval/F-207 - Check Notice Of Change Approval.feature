@@ -14,7 +14,6 @@ Scenario: (Happy Path) Successful verification that checks a NoCRequest has been
   Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
   And a user [system user - with caseworker-caa role],
   And a successful call [by Richard to create a case C1 which contains a role R1 which is assigned to Dil's organisation] as in [F-207_Check_NoC_Auto_Approval_Case_Creation],
-  And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
   When a request is prepared with appropriate values,
   And the request [contains the case record for C1],
@@ -33,7 +32,6 @@ Scenario: (Happy Path) Successful verification that checks a NoCRequest has been
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
     And a user [system user - with caseworker-caa role],
     And a successful call [by Richard to create a case C1 which contains a role R1 which is assigned to Dil's organisation] as in [F-207_Check_NoC_Auto_Approval_Case_Creation],
-    And a wait time of [8] seconds [to allow for the case just created to appear in search results],
 
     When a request is prepared with appropriate values,
     And the request [contains the case record for C1],

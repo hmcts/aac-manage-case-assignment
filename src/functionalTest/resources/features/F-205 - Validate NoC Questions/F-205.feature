@@ -16,7 +16,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
-      And a wait time of [8] seconds [to allow for Logstash to index the case just created]
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -36,7 +35,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
-      And a wait time of [8] seconds [to allow for Logstash to index the case just created]
 
      When a request is prepared with appropriate values,
       And the request [is made by Matt to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -56,7 +54,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
-      And a wait time of [8] seconds [to allow for Logstash to index the case just created]
 
      When a request is prepared with appropriate values,
       And the request [is made by Alice to raise a NoC request and intends to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -128,7 +125,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
       And a successful call [to get the NoC request event trigger] as in [204_Submit_NoC_Event_Token_Creation],
       And a successful call [by System user to raise a NoC request on behalf of Mutlu to become a representative for Mario on C1] as in [204_Submit_NoC_Event],
-      And a wait time of [8] seconds [to allow for Logstash to index the case just created]
       And [No user has approved or rejected the NoC request from Mutlu] in the context of the scenario
 
      When a request is prepared with appropriate values,
@@ -167,7 +163,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
-      And a wait time of [8] seconds [to allow for Logstash to index the case just created]
 
      When a request is prepared with appropriate values,
       And the request [is made by Ashley to validate the answers in order to become Mario's representative on C1],
@@ -188,7 +183,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [205.12_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy so Dil's organisation is representing] as in [205.12_Update_Org_Policies],
-      And a wait time of [8] seconds [to allow for Logstash to index the case just created]
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -207,7 +201,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies_With_Missing_Policy],
-      And a wait time of [8] seconds [to allow for Logstash to index the case just created]
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -226,7 +219,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [205.14_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [205.14_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [205.14_update_applicant_org_policy],
-      And a wait time of [8] seconds [to allow for Logstash to index the case just created]
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -244,7 +236,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [<case creation data file>],
       And a successful call [to get the update org policy event trigger] as in [<org policy update event trigger data file>],
       And a successful call [to update the applicant org policy] as in [<update org policy event trigger>],
-      And a wait time of [8] seconds [to allow for Logstash to index the case just created]
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -289,7 +280,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
-      And a wait time of [8] seconds [to allow for Logstash to index the case just created]
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -308,7 +298,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [205.11.5_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [205.11.5_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [205.11.5_Update_Org_Policies],
-      And a wait time of [8] seconds [to allow for Logstash to index the case just created]
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],

@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -29,22 +27,11 @@ public interface DataStoreApiClient {
     String CASE_TYPE_ID = "ctid";
 
     String CASES_WITH_ID = "/cases/{caseId}";
-    String SEARCH_CASES = "/searchCases";
-    String INTERNAL_SEARCH_CASES = "/internal/searchCases";
     String CASE_USERS = "/case-users";
     String INTERNAL_CASES = "/internal/cases/{caseId}";
     String START_EVENT_TRIGGER = INTERNAL_CASES + "/event-triggers/{eventId}";
     String SUBMIT_EVENT_FOR_CASE = CASES_WITH_ID + "/events";
     String EXTERNAL_START_EVENT_TRIGGER = "/cases/{caseId}/event-triggers/{eventId}";
-
-    @PostMapping(value = SEARCH_CASES, consumes = APPLICATION_JSON_VALUE)
-    CaseSearchResponse searchCases(@RequestParam(CASE_TYPE_ID) String caseTypeId,
-                                   @RequestBody String jsonSearchRequest);
-
-    @PostMapping(value = INTERNAL_SEARCH_CASES, consumes = APPLICATION_JSON_VALUE)
-    CaseSearchResultViewResource internalSearchCases(@RequestParam(CASE_TYPE_ID) String caseTypeId,
-                                                     @RequestParam ("use_case") Optional<String> useCase,
-                                                     @RequestBody String jsonSearchRequest);
 
     @PostMapping(value = CASE_USERS, consumes = APPLICATION_JSON_VALUE)
     void assignCase(@RequestBody CaseUserRolesRequest userRolesRequest);

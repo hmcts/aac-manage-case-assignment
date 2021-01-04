@@ -45,7 +45,11 @@ def secrets = [
     secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP'),
     secret('microservicekey-ccd-data', 'BEFTA_S2S_CLIENT_SECRET_OF_CCD_DATA'),
     secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT')
-  ]
+  ],
+   'aac-${env}': [
+      secret('idam-mca-system-user-username', 'BEFTA_IDAM_CAA_USERNAME'),
+      secret('idam-mca-system-user-password', 'BEFTA_IDAM_CAA_PASSWORD')
+    ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {

@@ -15,10 +15,7 @@
           "user_last_name": "Solicington",
           "user_first_name": "Bill",
           "event_name": "NoC Request",
-          "proxied_by_last_name": "string",
-          "proxied_by_first_name": "mca system"
-        }, {
-          "_extends_": "Base_Audit_Event"
+          "proxied_by": "${[scenarioContext][testData][users][invokingUser][id]}"
         }
       ]
     }

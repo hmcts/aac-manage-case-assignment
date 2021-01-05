@@ -12,13 +12,8 @@
         {
           "_extends_": "Base_Audit_Event",
           "user_id": "${[scenarioContext][parentContext][testData][users][invokingUser][id]}",
-          "user_last_name": "CAA 1",
-          "user_first_name": "CCD PUI",
           "event_name": "NoC Request",
-          "proxied_by_last_name": "string",
-          "proxied_by_first_name": "mca system"
-        }, {
-          "_extends_": "Base_Audit_Event"
+          "proxied_by": "${[scenarioContext][testData][users][invokingUser][id]}"
         }
       ]
     }

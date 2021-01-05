@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-206_Verify_NoC_Request_Event_Data_Dil__NoC_Auto_Approval_NonRepresentedLitigant",
+  "_extends_": "F-206_Verify_NoC_Request_Event_Data_Dil__NoC_Auto_Approval",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  }
+}

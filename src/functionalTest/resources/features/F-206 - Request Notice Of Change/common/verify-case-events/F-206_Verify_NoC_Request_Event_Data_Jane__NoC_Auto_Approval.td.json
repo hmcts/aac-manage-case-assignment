@@ -6,13 +6,20 @@
     "to get Case Events API returns a NoCRequest event in which the user ID is set to Jane's email address AND the proxied_by field set to the ID of the system user"
   ],
 
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "systemUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
   "expectedResponse": {
     "body" : {
       "auditEvents": [
         {
           "_extends_": "Base_Audit_Event",
-          "user_last_name": "approver",
-          "user_first_name": "noc",
           "event_name": "Apply NoC Decision"
         }, {
           "_extends_": "Base_Audit_Event",
@@ -20,8 +27,7 @@
           "user_last_name": "Solicington",
           "user_first_name": "Jane",
           "event_name": "NoC Request",
-          "proxied_by_last_name": "string",
-          "proxied_by_first_name": "mca system"
+          "proxied_by": "${[scenarioContext][testData][users][systemUser][id]}"
         }, {
           "_extends_": "Base_Audit_Event"
         }

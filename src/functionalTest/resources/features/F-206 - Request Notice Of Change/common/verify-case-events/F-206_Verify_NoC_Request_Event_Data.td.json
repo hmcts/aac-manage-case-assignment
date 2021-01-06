@@ -1,9 +1,9 @@
 {
-  "_guid_": "F-206_Verify_NoC_Request_Event_Data_Jane",
+  "_guid_": "F-206_Verify_NoC_Request_Event_Data",
   "_extends_": "F-206_Verify_NoC_Request_Event_Data__Base",
 
   "specs": [
-    "to get Case Events API returns a NoCRequest event in which the user ID is set to Jane's email address AND the proxied_by field set to the ID of the system user"
+    "to get Case Events API returns a NoCRequest event in which the user ID is set to invoking users email address AND the proxied_by field set to the ID of the system user"
   ],
 
   "expectedResponse": {
@@ -12,12 +12,8 @@
         {
           "_extends_": "Base_Audit_Event",
           "user_id": "${[scenarioContext][parentContext][testData][users][invokingUser][id]}",
-          "user_last_name": "Solicington",
-          "user_first_name": "Jane",
           "event_name": "NoC Request",
           "proxied_by": "${[scenarioContext][testData][users][invokingUser][id]}"
-        }, {
-          "_extends_": "Base_Audit_Event"
         }
       ]
     }

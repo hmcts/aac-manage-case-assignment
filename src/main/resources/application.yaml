@@ -15,7 +15,7 @@ management:
     web:
       base-path: /
       exposure:
-          include: health, info, prometheus
+        include: health, info, prometheus
   health:
     probes:
       enabled: true

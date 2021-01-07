@@ -9,9 +9,15 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 
 import javax.inject.Named;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 @Named
 public class SecurityUtils {
+
+    private static final Pattern SOLICITOR_ROLE =
+        Pattern.compile("^caseworker-.+-solicitor$", Pattern.CASE_INSENSITIVE);
 
     public static final String BEARER = "Bearer ";
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
@@ -50,6 +56,11 @@ public class SecurityUtils {
 
     private String removeBearerFromToken(String token) {
         return token.startsWith(BEARER) ? token.substring(BEARER.length()) : token;
+    }
+
+    public boolean hasSolicitorRole(List<String> roles, String jurisdiction) {
+        return roles.stream().anyMatch(role -> SOLICITOR_ROLE.matcher(role).matches()
+            && role.toLowerCase(Locale.getDefault()).contains(jurisdiction.toLowerCase(Locale.getDefault())));
     }
 
 }

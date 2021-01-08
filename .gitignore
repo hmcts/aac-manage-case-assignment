@@ -27,4 +27,5 @@ definition_files/
 /BEFTA Report for Smoke Tests/
 /BEFTA Report for Functional Tests/
 /aca-docker/mocks/wiremock/__files/prd_users.json
+/aca-docker/mocks/wiremock/__files/prd_users_Org-Two.json
 /bin/

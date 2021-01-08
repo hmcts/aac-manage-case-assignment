@@ -25,7 +25,7 @@
     "body": {
       "event_id": "nocRequest_autoApproval",
       "case_details": {
-        "id": "${[scenarioContext][childContexts][F-207_Check_NoC_Auto_Approval_Case_Creation][testData][actualResponse][body][id]}",
+        "id": "${[scenarioContext][childContexts][S-207.2-CaseCreation_NoCRequest_Pending][testData][actualResponse][body][id]}",
         "jurisdiction": "BEFTA_MASTER",
         "data": {
           "changeOrganisationRequestField" : {

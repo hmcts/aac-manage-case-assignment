@@ -16,3 +16,5 @@ export MCA_API_BASE_URL=http://host.docker.internal:4454
 
 export BEFTA_IDAM_CAA_USERNAME=master.caa@gmail.com
 export BEFTA_IDAM_CAA_PASSWORD=Pa55word11
+export BEFTA_IDAM_NOC_APPROVER_USERNAME=noc.approver@gmail.com
+export BEFTA_IDAM_NOC_APPROVER_PASSWORD=Pa55word11

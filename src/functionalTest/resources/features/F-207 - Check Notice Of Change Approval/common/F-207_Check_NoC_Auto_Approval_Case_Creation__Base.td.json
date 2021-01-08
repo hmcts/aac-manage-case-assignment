@@ -1,0 +1,153 @@
+{
+  "_guid_": "F-207_Check_NoC_Auto_Approval_Case_Creation__Base",
+  "_extends_": "NoC_Auto_Approval_Case_Creation_With_Org_Policies__Base",
+
+  "specs": [
+    "by Richard to create a case C1 which contains a role R1 which is assigned to Dil's organisation"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Richard"
+    }
+  },
+
+  "prerequisites": [
+    {
+      "Token_Creation": "F-207_Check_NoC_Auto_Approval_Case_Creation_Token_Creation",
+      "Get_Organisation_Identifier": "Get_Organisation_Identifier_For_Any_Org1_User__Prerequisite"
+    }
+  ],
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+
+      "data": {
+        "applicantOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "Org-Two"
+          }
+        },
+        "otherPartyOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "Org-Two"
+          }
+        },
+        "changeOrganisationRequestField" : {
+          "CaseRoleId" :  {
+            "value" : {
+              "code" : "[RESPONDENTSOLICITOR]",
+              "label" : "Respondent Solicitor"
+            },
+            "list_items" : [ {
+              "code" : "[RESPONDENTSOLICITOR]",
+              "label" : "Respondent Solicitor"
+            } ]
+          },
+          "ApprovalStatus" : "1",
+          "RequestTimestamp": "2020-02-20T06:30:00",
+          "OrganisationToAdd" : {
+            "OrganisationID": "Org-Two"
+          },
+          "OrganisationToRemove": {
+            "OrganisationID": null
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "applicantOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "Org-Two"
+          }
+        },
+        "otherPartyOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "Org-Two"
+          }
+        },
+        "changeOrganisationRequestField": {
+          "CaseRoleId": {
+            "value": {
+              "code": "[RESPONDENTSOLICITOR]",
+              "label": "Respondent Solicitor"
+            },
+            "list_items": [
+              {
+                "code": "[RESPONDENTSOLICITOR]",
+                "label": "Respondent Solicitor"
+              }
+            ]
+          },
+          "ApprovalStatus": "1",
+          "RequestTimestamp": "2020-02-20T06:30:00",
+          "OrganisationToAdd": {
+            "OrganisationID": "Org-Two"
+          },
+          "OrganisationToRemove": {
+            "OrganisationID": null
+          }
+        }
+      },
+      "data_classification": {
+        "changeOrganisationRequestField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "ApprovalStatus" : "PUBLIC",
+            "CaseRoleId" : "PUBLIC",
+            "RequestTimestamp" : "PUBLIC",
+            "OrganisationToAdd" : {
+              "classification" : "PUBLIC",
+              "value" : {
+                "OrganisationID" : "PUBLIC"
+              }
+            },
+            "OrganisationToRemove" : {
+              "classification" : "PUBLIC",
+              "value" : {
+                "OrganisationID" : "PUBLIC"
+              }
+            }
+          }
+        }
+      },
+      "security_classifications": {
+        "changeOrganisationRequestField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "ApprovalStatus" : "PUBLIC",
+            "CaseRoleId" : "PUBLIC",
+            "RequestTimestamp" : "PUBLIC",
+            "OrganisationToAdd" : {
+              "classification" : "PUBLIC",
+              "value" : {
+                "OrganisationID" : "PUBLIC"
+              }
+            },
+            "OrganisationToRemove" : {
+              "classification" : "PUBLIC",
+              "value" : {
+                "OrganisationID" : "PUBLIC"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

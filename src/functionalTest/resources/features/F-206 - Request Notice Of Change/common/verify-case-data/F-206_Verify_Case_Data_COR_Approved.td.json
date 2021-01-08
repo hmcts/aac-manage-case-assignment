@@ -26,10 +26,8 @@
           }
         },
 
-        "changeOrganisationRequestField" : {
-          "Reason": null,
+      "changeOrganisationRequestField" : {
           "CaseRoleId": null,
-          "NotesReason": null,
           "ApprovalStatus": null,
           "RequestTimestamp": null,
           "OrganisationToAdd": {
@@ -37,17 +35,14 @@
           },
           "OrganisationToRemove": {
             "OrganisationID": null
-          },
-          "ApprovalRejectionTimestamp": null
+          }
         }
       },
 
       "data_classification": {
         "changeOrganisationRequestField" : {
           "value" : {
-            "Reason" : "PUBLIC",
             "CaseRoleId" : "PUBLIC",
-            "NotesReason" : "PUBLIC",
             "ApprovalStatus" : "PUBLIC",
             "RequestTimestamp" : "PUBLIC",
             "OrganisationToAdd" : {
@@ -61,8 +56,7 @@
                 "OrganisationID" : "PUBLIC"
               },
               "classification" : "PUBLIC"
-            },
-            "ApprovalRejectionTimestamp" : "PUBLIC"
+            }
           },
           "classification" : "PUBLIC"
         }

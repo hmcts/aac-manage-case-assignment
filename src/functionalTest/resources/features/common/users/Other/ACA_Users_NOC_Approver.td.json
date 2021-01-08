@@ -1,0 +1,6 @@
+{
+  "_guid_": "ACA_Users_NOC_Approver",
+
+  "username": "[[$BEFTA_IDAM_NOC_APPROVER_USERNAME]]",
+  "password": "[[$BEFTA_IDAM_NOC_APPROVER_PASSWORD]]"
+}

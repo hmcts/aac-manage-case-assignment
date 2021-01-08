@@ -55,6 +55,8 @@ function generatePrdUsersFileFromTemplate() {
   echo ""
 }
 
+# The template files contain the BEFTA users defined in the actors list below
+# https://tools.hmcts.net/confluence/display/RCCD/MCA+BEFTA+Actors+list
 generatePrdUsersFileFromTemplate "prd_users_template.json" "prd_users.json"
 generatePrdUsersFileFromTemplate "prd_users_template_Org-Two.json" "prd_users_Org-Two.json"
 

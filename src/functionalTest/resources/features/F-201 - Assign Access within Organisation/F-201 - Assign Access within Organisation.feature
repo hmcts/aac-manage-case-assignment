@@ -146,7 +146,6 @@ Feature: F-201: Assign Access within Organisation
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
   @S-201.10
   Scenario: Must return an error response for an assignee user who doesn't have a valid solicitor role for the jurisdiction of the case
 
@@ -161,3 +160,4 @@ Feature: F-201: Assign Access within Organisation
 
     Then a negative response is received,
     And the response has all the details as expected.
+    

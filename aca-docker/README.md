@@ -56,7 +56,10 @@ see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
       ./bin/findPrdUserIds.sh
     ```
 
-    This script updates placeholders in `aca-docker/mocks/wiremock/__files/prd_users.json`
+    This script updates placeholders in 
+    
+    `aca-docker/mocks/wiremock/__files/prd_users.json`\
+    `aca-docker/mocks/wiremock/__files/prd_users_Org-Two.json`
 
     You need to run this script every time you run `./bin/add-users.sh`, as adding users will
     use generate new GUIDs.
@@ -71,16 +74,10 @@ see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
 ### Run `ccd-docker` containers
 - Install and run CCD stack as advised [here](https://github.com/hmcts/ccd-docker).
 
-    Please enable elasticsearch+logstash along with other ccd components.
+    Please enable following ccd components.
     ```bash
-    ./ccd enable backend sidam sidam-local sidam-local-ccd elasticsearch logstash
+    ./ccd enable backend sidam sidam-local sidam-local-ccd
     ```
-
-    before starting the containers, ensure the `ES_DOCKER_ENABLED` environment variable
-    (listed in `aca-docker\bin\env_variables-all` ) is set to `true`
-
-    If `ccd-docker` was running before `ES_DOCKER_ENABLED` was set, you will need to restart the
-    `definiton-store-api` and `data-store-api` containers to pick up this new environment variable
 
     *Memory and CPU allocations may need to be increased for successful execution of ccd applications altogether*
 

@@ -34,6 +34,10 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.I
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis",
+    "PMD.AvoidLiteralsInIfCondition",
+    "PMD.UseLocaleWithCaseConversions",
+    "PMD.UseConcurrentHashMap"})
 @Service
 public class RequestNoticeOfChangeService {
 
@@ -50,8 +54,7 @@ public class RequestNoticeOfChangeService {
     private final SecurityUtils securityUtils;
 
     @Autowired
-    public RequestNoticeOfChangeService(NoticeOfChangeQuestions noticeOfChangeQuestions,
-                                        @Qualifier("defaultDataStoreRepository")
+    public RequestNoticeOfChangeService(@Qualifier("defaultDataStoreRepository")
                                             DataStoreRepository dataStoreRepository,
                                         DefinitionStoreRepository definitionStoreRepository,
                                         PrdRepository prdRepository,
@@ -99,6 +102,7 @@ public class RequestNoticeOfChangeService {
             .build();
     }
 
+    @SuppressWarnings({"PMD.LinguisticNaming"})
     public AboutToSubmitCallbackResponse setOrganisationToRemove(CaseDetails caseDetails,
                                                                  ChangeOrganisationRequest changeOrganisationRequest,
                                                                  String changeOrganisationKey) {

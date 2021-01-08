@@ -19,7 +19,12 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.EVENT_TOKEN_NOT_PRESENT;
 
 @Service
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.GodClass", "PMD.ExcessiveImports", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis",
+    "PMD.GodClass",
+    "PMD.ExcessiveImports",
+    "PMD.TooManyMethods",
+    "PMD.LawOfDemeter",
+    "PMD.PreserveStackTrace"})
 public class NoticeOfChangeApprovalService {
 
     private static final int EXPECTED_NUMBER_OF_EVENTS = 1;

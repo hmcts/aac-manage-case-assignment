@@ -20,12 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_REMOVE;
 
+@SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.LawOfDemeter"})
 class CaseDetailsTest {
     private static final String COR_FIELD_NAME = "ChangeOrganisationRequestField2";
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
-    private ObjectMapper objectMapper = new ObjectMapper()
+    private final ObjectMapper objectMapper = new ObjectMapper()
         .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
 
     @Test
@@ -90,6 +91,7 @@ class CaseDetailsTest {
         assertEquals("CMC", caseDetails.getJurisdiction());
     }
 
+    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     @Test
     void shouldSerialiseToCaseIdAlways() throws Exception {
 

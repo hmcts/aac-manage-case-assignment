@@ -40,7 +40,7 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CASE_R
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_REQUEST_TIMESTAMP;
 
 @Service
-@SuppressWarnings({"PMD.UseLocaleWithCaseConversions"})
+@SuppressWarnings({"PMD.UseLocaleWithCaseConversions", "PMD.ExcessiveImports"})
 public class PrepareNoCService {
 
     private final PrdRepository prdRepository;

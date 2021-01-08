@@ -60,7 +60,7 @@ import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 @RestController
 @Validated
 @RequestMapping(path = "/noc")
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "PMD.UnnecessaryFullyQualifiedName"})
 public class NoticeOfChangeController {
 
     @SuppressWarnings({"squid:S1075"})
@@ -488,6 +488,7 @@ public class NoticeOfChangeController {
             CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE);
     }
 
+    @SuppressWarnings("PMD.LinguisticNaming")
     @PostMapping(path = SET_ORGANISATION_TO_REMOVE_PATH, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Set Organisation To Remove", notes = "Set Organisation To Remove")
     @ApiResponses({

@@ -37,6 +37,8 @@ import static org.mockito.Mockito.when;
     "PMD.UseConcurrentHashMap"})
 class VerifyNoCAnswersServiceTest {
 
+    private static final String DEFENDANT = "[Defendant]";
+
     @InjectMocks
     private VerifyNoCAnswersService verifyNoCAnswersService;
 
@@ -75,7 +77,7 @@ class VerifyNoCAnswersServiceTest {
 
         given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
             .willReturn(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole("[Defendant]")
+                .orgPolicyCaseAssignedRole(DEFENDANT)
                 .orgPolicyReference("DefendantPolicy")
                 .organisation(new Organisation("QUK822NA", "SomeOrg"))
                 .build()
@@ -85,14 +87,14 @@ class VerifyNoCAnswersServiceTest {
     @Test
     void shouldVerifyNoCAnswersSuccessfully() {
         mockPrdResponse("ORGID1");
-        when(challengeAnswerValidator.getMatchingCaseRole(any(), any(), any())).thenReturn("[Defendant]");
+        when(challengeAnswerValidator.getMatchingCaseRole(any(), any(), any())).thenReturn(DEFENDANT);
 
         VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest("1", emptyList());
 
         NoCRequestDetails result = verifyNoCAnswersService.verifyNoCAnswers(request);
 
         assertAll(
-            () -> assertThat(result.getOrganisationPolicy().getOrgPolicyCaseAssignedRole(), is("[Defendant]")),
+            () -> assertThat(result.getOrganisationPolicy().getOrgPolicyCaseAssignedRole(), is(DEFENDANT)),
             () -> assertThat(result.getOrganisationPolicy().getOrgPolicyReference(), is("DefendantPolicy")),
             () -> assertThat(result.getOrganisationPolicy().getOrganisation().getOrganisationID(), is("QUK822NA")),
             () -> assertThat(result.getOrganisationPolicy().getOrganisation().getOrganisationName(), is("SomeOrg")),
@@ -122,7 +124,7 @@ class VerifyNoCAnswersServiceTest {
     void shouldErrorWhenRequestingUserIsInSameOrganisationAsIdentifiedOrgPolicy() {
         mockPrdResponse("QUK822NA");
         when(challengeAnswerValidator.getMatchingCaseRole(any(), any(), any()))
-            .thenReturn("[Defendant]");
+            .thenReturn(DEFENDANT);
 
         VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest("1", emptyList());
 
@@ -161,7 +163,7 @@ class VerifyNoCAnswersServiceTest {
             + "            \"OrganisationName\": \"SomeOrg\"\n"
             + "        },\n"
             + "        \"OrgPolicyReference\": \"DefendantPolicy\",\n"
-            + "        \"OrgPolicyCaseAssignedRole\": \"[Defendant]\"\n"
+            + "        \"OrgPolicyCaseAssignedRole\": \"" + DEFENDANT + "\"\n"
             + "    },\n"
             + "    \"OrganisationPolicyField2\": {\n"
             + "        \"Organisation\": {\n"

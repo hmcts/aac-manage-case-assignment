@@ -40,6 +40,7 @@ public class ChangeOrganisationRequest {
     @JsonProperty("ApprovalStatus")
     private String approvalStatus;
 
+    @SuppressWarnings("PMD.UselessParentheses")
     public void validateChangeOrganisationRequest() {
         if (this.getCaseRoleId() == null
             || StringUtils.isBlank(this.getApprovalStatus())

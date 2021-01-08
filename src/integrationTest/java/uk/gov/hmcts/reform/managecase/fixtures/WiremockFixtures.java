@@ -52,6 +52,7 @@ public class WiremockFixtures {
     public static final String APPROVER_USER_TOKEN = "Bearer eyJzdWIiOiJjY6ShZ3ciLCJleHAiOlD1OEM0NDUyOTd7co";
     public static final String S2S_TOKEN = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9"
         + ".WWRzROlKxLQCJw5h0h0dHb9hHfbBhF2Idwv1z4L4FnqSw3VZ38ZRLuDmwr3tj-8oOv6EfLAxV0dJAPtUT203Iw";
+    public static final String CASES = "/cases/";
 
     private static final ObjectMapper OBJECT_MAPPER = new Jackson2ObjectMapperBuilder()
         .modules(new Jdk8Module())
@@ -215,8 +216,9 @@ public class WiremockFixtures {
     }
 
     public static void stubGetCaseViaExternalApi(String caseId, CaseDetails caseDetails) {
-        stubFor(WireMock.get(urlPathEqualTo("/cases/" + caseId))
+        stubFor(WireMock.get(urlPathEqualTo(CASES + caseId))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
                                     .withStatus(HTTP_OK)
@@ -238,7 +240,7 @@ public class WiremockFixtures {
     public static void stubGetExternalStartEventTrigger(String caseId,
                                                                   String eventId,
                                                                   StartEventResource startEventResource) {
-        stubFor(WireMock.get(urlPathEqualTo("/cases/" + caseId + "/event-triggers/" + eventId))
+        stubFor(WireMock.get(urlPathEqualTo(CASES + caseId + "/event-triggers/" + eventId))
             .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
             .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
             .willReturn(aResponse()
@@ -250,7 +252,7 @@ public class WiremockFixtures {
     public static void stubGetExternalStartEventTriggerAsApprover(String caseId,
                                                           String eventId,
                                                           StartEventResource startEventResource) {
-        stubFor(WireMock.get(urlPathEqualTo("/cases/" + caseId + "/event-triggers/" + eventId))
+        stubFor(WireMock.get(urlPathEqualTo(CASES + caseId + "/event-triggers/" + eventId))
             .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
             .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
             .willReturn(aResponse()
@@ -262,7 +264,7 @@ public class WiremockFixtures {
     public static void stubSubmitEventForCase(String caseId,
                                               CaseEventCreationPayload caseEventCreationPayload,
                                               CaseDetails caseDetails) throws JsonProcessingException {
-        stubFor(WireMock.post(urlPathEqualTo("/cases/" + caseId + "/events"))
+        stubFor(WireMock.post(urlPathEqualTo(CASES + caseId + "/events"))
                     .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .withRequestBody(equalToJson(
@@ -276,7 +278,7 @@ public class WiremockFixtures {
 
     public static void stubSubmitEventForCase(String caseID,
                                               CaseDetails caseDetails) {
-        stubFor(WireMock.post(urlEqualTo("/cases/" + caseID + "/events"))
+        stubFor(WireMock.post(urlEqualTo(CASES + caseID + "/events"))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
@@ -285,7 +287,7 @@ public class WiremockFixtures {
     }
 
     public static void stubGetCaseDetailsByCaseIdViaExternalApi(String caseId, CaseDetails caseDetails) {
-        stubFor(WireMock.get(urlEqualTo("/cases/" + caseId))
+        stubFor(WireMock.get(urlEqualTo(CASES + caseId))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()

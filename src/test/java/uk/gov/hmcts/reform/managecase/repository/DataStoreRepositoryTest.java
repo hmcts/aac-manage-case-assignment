@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
@@ -58,7 +57,7 @@ import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreReposito
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT;
 import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
 
-@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.UseConcurrentHashMap"})
 class DataStoreRepositoryTest {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
@@ -327,7 +326,7 @@ class DataStoreRepositoryTest {
     void shouldReturnCaseDetailsWhenSubmittingEventSucceeds() throws JsonProcessingException {
         // ARRANGE
         CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
-            .wizardPages(CaseUpdateViewEventFixture.getWizardPages())
+            .wizardPages(getWizardPages())
             .eventToken(EVENT_TOKEN)
             .caseFields(getCaseViewFields())
             .build();
@@ -428,7 +427,7 @@ class DataStoreRepositoryTest {
 
         // ARRANGE
         CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
-            .wizardPages(CaseUpdateViewEventFixture.getWizardPages())
+            .wizardPages(getWizardPages())
             .eventToken(EVENT_TOKEN)
             .caseFields(getCaseViewFields())
             .build();

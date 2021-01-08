@@ -8,14 +8,12 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.managecase.domain.DynamicList;
 import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
 
-import java.util.List;
-
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
-import java.util.Arrays;
-import java.util.List;
-
+@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 @Component
 public class JacksonUtils {
 
@@ -34,7 +32,7 @@ public class JacksonUtils {
      * Nullify all fields within an object node - all fields are set to null nodes.
      * NOTE: Arrays are not supported
      * @param node object node to be nullified
-     * @param ignoredNestedFields names of fields that will be set to NullNode, even if they are nested fields
+     * @param ignoreNestedFields names of fields that will be set to NullNode, even if they are nested fields
      */
     public void nullifyObjectNode(ObjectNode node, String... ignoreNestedFields) {
         List<String> ignoredNestedFieldsList = Arrays.asList(ignoreNestedFields);
@@ -46,15 +44,15 @@ public class JacksonUtils {
             }
         });
     }
-    
+
     public static void merge(Map<String, JsonNode> mergeFrom, Map<String, JsonNode> mergeInto) {
 
         for (String key : mergeFrom.keySet()) {
             JsonNode value = mergeFrom.get(key);
-            if (!mergeInto.containsKey(key)) {
-                mergeInto.put(key, value);
-            } else {
+            if (mergeInto.containsKey(key)) {
                 mergeInto.put(key, merge(mergeInto.get(key), value));
+            } else {
+                mergeInto.put(key, value);
             }
         }
     }

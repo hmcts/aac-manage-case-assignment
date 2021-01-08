@@ -63,10 +63,8 @@ class NoticeOfChangeQuestionsTest {
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
     private static final String CASE_ID = "1567934206391385";
     private static final String JURISDICTION = "Jurisdiction";
-    private static final String CASE_TYPE = "CaseTypeA";
     private static final String QUESTION_TEXT = "QuestionText1";
     private static final String FIELD_ID = "Number";
-    private static final String CHANGE_ORG = "changeOrg";
     private static final String CHALLENGE_QUESTION = "NoC";
     private static final String ANSWER_FIELD = "${applicant.individual.fullname}|${applicant.company.name}|"
         + "${applicant.soletrader.name}:Applicant,${respondent.individual.fullname}|${respondent.company.name}"

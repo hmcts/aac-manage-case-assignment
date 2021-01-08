@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.JUnitAssertionsShouldIncludeMessage"})
 class JacksonUtilsTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();

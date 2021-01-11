@@ -1,45 +1,33 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
+
+@SuppressWarnings({"PMD.PreserveStackTrace",
+    "PMD.DataflowAnomalyAnalysis",
+    "PMD.LawOfDemeter"})
 @Repository
 public class DefaultDataStoreRepository implements DataStoreRepository {
-
-    public static final String ES_QUERY = "{\n"
-        + "   \"query\":{\n"
-        + "      \"bool\":{\n"
-        + "         \"filter\":{\n"
-        + "            \"term\":{\n"
-        + "               \"reference\":%s\n"
-        + "            }\n"
-        + "         }\n"
-        + "      }\n"
-        + "   }\n"
-        + "}";
 
     private final DataStoreApiClient dataStoreApi;
 
     @Autowired
     public DefaultDataStoreRepository(DataStoreApiClient dataStoreApi) {
         this.dataStoreApi = dataStoreApi;
-    }
-
-    @Override
-    public Optional<CaseDetails> findCaseBy(String caseTypeId, String caseId) {
-        CaseSearchResponse searchResponse = dataStoreApi.searchCases(caseTypeId, String.format(ES_QUERY, caseId));
-        return searchResponse.getCases().stream().findFirst();
     }
 
     @Override
@@ -70,4 +58,16 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         dataStoreApi.removeCaseUserRoles(new CaseUserRolesRequest(caseUsers));
     }
 
+    @Override
+    public CaseDetails findCaseByCaseIdExternalApi(String caseId) {
+        CaseDetails caseDetails = null;
+        try {
+            caseDetails = dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(caseId);
+        } catch (FeignException e) {
+            if (HttpStatus.NOT_FOUND.value() == e.status()) {
+                throw new CaseCouldNotBeFetchedException(CASE_COULD_NOT_BE_FETCHED);
+            }
+        }
+        return caseDetails;
+    }
 }

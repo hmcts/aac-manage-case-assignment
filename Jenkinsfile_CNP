@@ -36,7 +36,6 @@ def secrets = [
     secret('ccd-befta-master-solicitor-tony-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_TONY_PWD'),
     secret('ccd-befta-jurisdiction3-solicitor1-pwd', 'CCD_BEFTA_JURISDICTION_3_SOLICITOR_1_PWD'),
     secret('ccd-befta-solicitor-4-pwd', 'CCD_BEFTA_SOLICITOR_4_PWD'),
-    secret('ccd-befta-caseworker-caa-pwd', 'CCD_BEFTA_CASEWORKER_CAA_PWD'),
     secret('ccd-befta-citizen-2-pwd', 'CCD_BEFTA_CITIZEN_2_PWD'),
     secret('ccd-befta-pui-caa-1-pwd', 'CCD_BEFTA_PUI_CAA_1_PWD')
   ],
@@ -45,7 +44,11 @@ def secrets = [
     secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP'),
     secret('microservicekey-ccd-data', 'BEFTA_S2S_CLIENT_SECRET_OF_CCD_DATA'),
     secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT')
-  ]
+  ],
+   'aac-${env}': [
+      secret('idam-mca-system-user-username', 'BEFTA_IDAM_CAA_USERNAME'),
+      secret('idam-mca-system-user-password', 'BEFTA_IDAM_CAA_PASSWORD')
+    ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {

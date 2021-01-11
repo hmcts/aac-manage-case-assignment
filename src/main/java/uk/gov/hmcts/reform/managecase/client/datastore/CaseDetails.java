@@ -86,7 +86,7 @@ public class CaseDetails {
 
     public JsonNode findOrganisationPolicyNodeForCaseRole(String caseRoleId) {
         return findOrganisationPolicyNodes().stream()
-            .filter(node -> node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText().equals(caseRoleId))
+            .filter(node -> node.get(ORG_POLICY_CASE_ASSIGNED_ROLE).asText().equalsIgnoreCase(caseRoleId))
             .reduce((a, b) -> {
                 throw new ValidationException(String.format("More than one Organisation Policy with "
                     + "case role ID '%s' exists on case", caseRoleId));

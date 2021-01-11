@@ -6,21 +6,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
-import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.elasticsearch.CaseSearchResultViewResource;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
@@ -73,17 +71,6 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         this.dataStoreApi = dataStoreApi;
         this.jacksonUtils = jacksonUtils;
         this.securityUtils = securityUtils;
-    }
-
-    @Override
-    public Optional<CaseDetails> findCaseBy(String caseTypeId, String caseId) {
-        CaseSearchResponse searchResponse = dataStoreApi.searchCases(caseTypeId, String.format(ES_QUERY, caseId));
-        return searchResponse.getCases().stream().findFirst();
-    }
-
-    @Override
-    public CaseSearchResultViewResource findCaseBy(String caseTypeId, Optional<String> useCase, String caseId) {
-        return dataStoreApi.internalSearchCases(caseTypeId,null, String.format(ES_QUERY, caseId));
     }
 
     @Override

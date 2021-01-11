@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 public class DataStoreApiClientConfig {
 
+    public static final String CASES_WITH_ID = "/cases/{caseId}";
     public static final String SEARCH_CASES = "/searchCases";
     public static final String CASE_USERS = "/case-users";
 

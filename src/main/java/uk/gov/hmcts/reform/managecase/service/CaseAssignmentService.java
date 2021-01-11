@@ -1,21 +1,8 @@
 package uk.gov.hmcts.reform.managecase.service;
 
-import static java.util.stream.Collectors.toList;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.JsonNode;
-
-import javax.validation.ValidationException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestedCaseUnassignment;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -31,6 +18,15 @@ import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
+import javax.validation.ValidationException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 @Service
 public class CaseAssignmentService {
 
@@ -195,8 +191,7 @@ public class CaseAssignmentService {
     }
 
     private CaseDetails getCase(CaseAssignment input) {
-        Optional<CaseDetails> caseOptional = dataStoreRepository.findCaseBy(input.getCaseTypeId(), input.getCaseId());
-        return caseOptional.orElseThrow(() -> new CaseCouldNotBeFetchedException(CASE_COULD_NOT_BE_FETCHED));
+        return dataStoreRepository.findCaseByCaseIdExternalApi(input.getCaseId());
     }
 
     private List<String> findInvokerOrgPolicyRoles(CaseDetails caseDetails, String organisation) {

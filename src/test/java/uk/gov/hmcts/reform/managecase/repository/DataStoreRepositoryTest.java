@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +32,6 @@ import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import static feign.Request.Body.empty;
-import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;

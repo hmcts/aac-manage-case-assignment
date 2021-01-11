@@ -8,6 +8,9 @@ management:
       show-details: "always"
       cache:
         time-to-live: 10s
+      group:
+        readiness:
+          include: ping, refreshScope
   endpoints:
     web:
       base-path: /

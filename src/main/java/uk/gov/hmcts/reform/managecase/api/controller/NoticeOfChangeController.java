@@ -52,10 +52,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHALLENGE_QUESTION_ANSWERS_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_DECISION_EVENT_UNIDENTIFIABLE;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService.MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION;
 
 @RestController
 @Validated
@@ -224,6 +226,16 @@ public class NoticeOfChangeController {
                         + "    \"message\": \"The answers did not match those for any litigant\",\n"
                         + "    \"errors\": []\n"
                         + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 404,
+            message = "Case could not be found",
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\"message\": \"Case could not be found\","
+                        + " \"status\": \"NOT_FOUND\" }",
                     mediaType = APPLICATION_JSON_VALUE)
             })
         ),
@@ -408,9 +420,12 @@ public class NoticeOfChangeController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
+                + "- Any of the `400` errors returned by the `Verify Notice of Change answers` operation\n"
                 + "\n1) " + CASE_ID_INVALID
                 + "\n2) " + CASE_ID_INVALID_LENGTH
-                + "\n3) " + CASE_ID_EMPTY,
+                + "\n3) " + CASE_ID_EMPTY
+                + "\n4) " + CHALLENGE_QUESTION_ANSWERS_EMPTY
+                + "\n5) " + MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION,
             response = ApiError.class,
             examples = @Example({
                 @ExampleProperty(
@@ -419,6 +434,16 @@ public class NoticeOfChangeController {
                         + "   \"message\": \"" + CASE_ID_EMPTY + "\",\n"
                         + "   \"errors\": [ ]\n"
                         + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 404,
+            message = "Case could not be found",
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\"message\": \"Case could not be found\","
+                        + " \"status\": \"NOT_FOUND\" }",
                     mediaType = APPLICATION_JSON_VALUE)
             })
         ),

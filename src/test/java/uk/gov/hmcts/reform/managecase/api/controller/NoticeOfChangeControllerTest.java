@@ -234,7 +234,7 @@ public class NoticeOfChangeControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath(
                         "$.message",
-                        containsString("getNoticeOfChangeQuestions.caseId: case_id must not be empty")
+                        containsString("getNoticeOfChangeQuestions.caseId: Case ID can not be empty")
                     ));
             }
 

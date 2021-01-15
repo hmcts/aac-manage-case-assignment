@@ -36,7 +36,7 @@ import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 @Service
 public class RequestNoticeOfChangeService {
 
-    static final String MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION
+    public static final String MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION
         = "Missing ChangeOrganisationRequest.CaseRoleID %s in the case definition";
     private static final String ZERO = "0";
     private static final String USER_ID = ZERO;

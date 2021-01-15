@@ -25,12 +25,5 @@
       "OrgPolicyCaseAssignedRole": "PUBLIC",
       "Organisation": "[[ANY_NULLABLE]]"
     }
-  },
-
-  "changeOrganisationRequestField" : {
-    "classification" : "PUBLIC",
-    "value" : {
-      "ApprovalStatus" : "PUBLIC"
-    }
   }
 }

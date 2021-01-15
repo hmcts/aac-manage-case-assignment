@@ -22,10 +22,6 @@
     "Organisation": {
       "OrganisationID": ""
     }
-  },
-
-  "changeOrganisationRequestField": {
-    "ApprovalStatus": null
   }
 
 }

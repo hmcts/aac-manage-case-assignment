@@ -57,7 +57,7 @@ function generatePrdUsersFileFromTemplate() {
 
 # The template files contain the BEFTA users defined in the actors list below
 # https://tools.hmcts.net/confluence/display/RCCD/MCA+BEFTA+Actors+list
-generatePrdUsersFileFromTemplate "prd_users_template.json" "prd_users.json"
-generatePrdUsersFileFromTemplate "prd_users_template_Org-Two.json" "prd_users_Org-Two.json"
+generatePrdUsersFileFromTemplate "prd_users_template_organisation_01.json" "prd_users_organisation_01.json"
+generatePrdUsersFileFromTemplate "prd_users_template_organisation_02.json" "prd_users_organisation_02.json"
 
 echo -e "${RED}${BOLD}*** Please restart your aca-wiremock docker container for changes to take effect ***${NORMAL}"

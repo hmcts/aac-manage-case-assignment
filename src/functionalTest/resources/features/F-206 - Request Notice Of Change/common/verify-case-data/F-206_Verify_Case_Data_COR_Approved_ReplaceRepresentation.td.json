@@ -1,0 +1,31 @@
+{
+  "_guid_": "F-206_Verify_Case_Data_COR_Approved_ReplaceRepresentation",
+  "_extends_": "F-206_Verify_Case_Data_COR_Approved__Base",
+
+  "expectedResponse": {
+    "body" : {
+
+      "data": {
+        "respondentOrganisationPolicy" : {
+          "PreviousOrganisations": [
+            {
+              "id": "[[ANY_STRING_NOT_NULLABLE]]",
+              "value": {
+                "ToTimestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+                "FromTimestamp" : "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][respondentOrganisationPolicy][PreviousOrganisations][0][value][ToTimestamp]}",
+                "OrganisationName" : "Org2Name",
+                "OrganisationAddress" : {
+                  "_extends_": "Organisation_Address_Organisation_02"
+                }
+              }
+            },
+            {
+              "id": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][respondentOrganisationPolicy][PreviousOrganisations][0][id]}",
+              "value": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][respondentOrganisationPolicy][PreviousOrganisations][0][value]}"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

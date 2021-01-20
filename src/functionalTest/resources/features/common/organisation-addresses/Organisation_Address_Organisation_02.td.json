@@ -1,0 +1,12 @@
+{
+  "_guid_": "Organisation_Address_Organisation_02",
+
+  "AddressLine1" : "Org 2 Line 1",
+  "AddressLine2" : "Org 2 Line 2",
+  "AddressLine3" : "Org 2 Line 3",
+  "PostTown" : "London",
+  "County" : "Kent",
+  "PostCode" : "DA15 7LN",
+  "Country" : "UK"
+
+}

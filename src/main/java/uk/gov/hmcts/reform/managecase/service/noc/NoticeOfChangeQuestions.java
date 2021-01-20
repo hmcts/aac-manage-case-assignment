@@ -118,13 +118,13 @@ public class NoticeOfChangeQuestions {
     private void validateUserRoles(String jurisdiction, UserInfo userInfo) {
         List<String> roles = userInfo.getRoles();
         if (!roles.contains(PUI_ROLE)
-            && !isActingAsSolicitor(roles, jurisdiction)) {
+            && !isActingAsSolicitor(roles)) {
             throw new ValidationException(INSUFFICIENT_PRIVILEGE);
         }
     }
 
-    private boolean isActingAsSolicitor(List<String> roles, String jurisdiction) {
-        return securityUtils.hasSolicitorRole(roles, jurisdiction);
+    private boolean isActingAsSolicitor(List<String> roles) {
+        return securityUtils.hasSolicitorRole(roles);
     }
 
     private UserInfo getUserInfo() {

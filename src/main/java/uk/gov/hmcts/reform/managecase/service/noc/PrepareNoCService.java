@@ -92,7 +92,7 @@ public class PrepareNoCService {
     private List<String> prepareCaseRoles(String jurisdiction, List<OrganisationPolicy> orgPolicies) {
         List<String> caseRoles;
 
-        if (isInvokingUserSolicitor(jurisdiction)) {
+        if (isInvokingUserSolicitor()) {
             // Prepare the list of CaseRoles on the case for which the user might wish to choose to cease representation
             String organisationIdentifier = findTheOrganisationIdOfTheInvokerUsingPrd();
             caseRoles = findInvokerOrgPolicyRoles(orgPolicies, organisationIdentifier);
@@ -183,11 +183,9 @@ public class PrepareNoCService {
             .collect(toList());
     }
 
-    private boolean isInvokingUserSolicitor(String jurisdiction) {
+    private boolean isInvokingUserSolicitor() {
         UserInfo userInfo = securityUtils.getUserInfo();
-        List<String> roles = userInfo.getRoles();
-
-        return securityUtils.hasSolicitorRole(roles, jurisdiction);
+        return securityUtils.hasSolicitorRole(userInfo.getRoles());
     }
 
     private void validate(boolean condition, String errorMessage) {

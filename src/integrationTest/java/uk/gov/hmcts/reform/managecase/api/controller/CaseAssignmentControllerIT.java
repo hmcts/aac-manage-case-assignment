@@ -138,8 +138,8 @@ public class CaseAssignmentControllerIT {
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST1-SoLiciToR"));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE))));
@@ -156,8 +156,8 @@ public class CaseAssignmentControllerIT {
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "CASEWORKER-AUTOTEST1-SOLICITOR"));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE))));
@@ -191,8 +191,8 @@ public class CaseAssignmentControllerIT {
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicitor-role"));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath(
                     "$.message",
@@ -210,8 +210,8 @@ public class CaseAssignmentControllerIT {
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicit"));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath(
                     "$.message",

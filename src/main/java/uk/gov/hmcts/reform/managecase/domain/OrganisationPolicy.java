@@ -20,6 +20,6 @@ public class OrganisationPolicy {
     @JsonProperty("OrgPolicyCaseAssignedRole")
     private String orgPolicyCaseAssignedRole;
     @JsonProperty("PreviousOrganisations")
-    private List<PreviousOrganisation> previousOrganisations;
+    private List<PreviousOrganisationCollectionItem> previousOrganisations;
 
 }

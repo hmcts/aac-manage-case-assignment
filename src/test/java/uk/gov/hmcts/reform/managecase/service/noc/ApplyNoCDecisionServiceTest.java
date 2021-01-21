@@ -17,6 +17,8 @@ import java.time.Month;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,8 +36,9 @@ import uk.gov.hmcts.reform.managecase.client.prd.ContactInformation;
 import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
-import uk.gov.hmcts.reform.managecase.domain.OrganisationAddress;
+import uk.gov.hmcts.reform.managecase.domain.AddressUK;
 import uk.gov.hmcts.reform.managecase.domain.PreviousOrganisation;
+import uk.gov.hmcts.reform.managecase.domain.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequest;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
@@ -733,8 +736,8 @@ class ApplyNoCDecisionServiceTest {
         Map<String, JsonNode> result = applyNoCDecisionService.applyNoCDecision(request);
 
         JsonNode prevOrgsNode = result.get(ORG_POLICY_2_FIELD).findValue(PREVIOUS_ORGANISATIONS);
-        List<PreviousOrganisation> previousOrganisations = mapper
-            .readerFor(new TypeReference<List<PreviousOrganisation>>() {}).readValue(prevOrgsNode);
+        List<PreviousOrganisationCollectionItem> previousOrganisations = mapper
+            .readerFor(new TypeReference<List<PreviousOrganisationCollectionItem>>() {}).readValue(prevOrgsNode);
         LocalDate localDate = LocalDate.now();
 
         assertAll(
@@ -744,11 +747,11 @@ class ApplyNoCDecisionServiceTest {
                                                   ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
             () -> assertNotNull(previousOrganisations),
             () -> assertThat(previousOrganisations.size(), is(3)),
-            () -> assertNotNull(previousOrganisations.get(0).getFromTimestamp()),
-            () -> assertNotNull(previousOrganisations.get(0).getToTimestamp()),
-            () -> assertNotNull(previousOrganisations.get(0).getOrganisationAddresses()),
-            () -> assertThat(previousOrganisations.get(0).getFromTimestamp().getDayOfMonth(), is(3)),
-            () -> assertThat(previousOrganisations.get(0).getToTimestamp().getDayOfMonth(),
+            () -> assertNotNull(previousOrganisations.get(0).getValue().getFromTimestamp()),
+            () -> assertNotNull(previousOrganisations.get(0).getValue().getToTimestamp()),
+            () -> assertNotNull(previousOrganisations.get(0).getValue().getOrganisationAddress()),
+            () -> assertThat(previousOrganisations.get(0).getValue().getFromTimestamp().getDayOfMonth(), is(3)),
+            () -> assertThat(previousOrganisations.get(0).getValue().getToTimestamp().getDayOfMonth(),
                              is(localDate.getDayOfMonth()))
         );
     }
@@ -764,8 +767,8 @@ class ApplyNoCDecisionServiceTest {
             .build();
     }
 
-    private OrganisationAddress organisationAddress() {
-        return OrganisationAddress.builder()
+    private AddressUK organisationAddress() {
+        return AddressUK.builder()
             .addressLine1("Address 1")
             .addressLine2("Line 2")
             .addressLine3("Line 3")
@@ -780,7 +783,7 @@ class ApplyNoCDecisionServiceTest {
             .fromTimestamp(LocalDateTime.of(fromDate, LocalTime.now()))
             .toTimestamp(LocalDateTime.of(toDate, LocalTime.now()))
             .organisationName(ORG_2_NAME)
-            .organisationAddresses(Lists.newArrayList(organisationAddress()))
+            .organisationAddress(organisationAddress())
             .build();
     }
 
@@ -792,7 +795,7 @@ class ApplyNoCDecisionServiceTest {
                                                     String organisationName,
                                                     String orgPolicyReference,
                                                     String orgPolicyCaseAssignedRole,
-                                                    List<PreviousOrganisation> previousOrganisations) {
+                                                    List<PreviousOrganisationCollectionItem> previousOrganisations) {
         return String.format("{\"Organisation\":%s,\"OrgPolicyReference\":%s,\"OrgPolicyCaseAssignedRole\":%s, "
                                  + "\"PreviousOrganisations\":%s}",
                              organisationAsString(organisationId, organisationName),
@@ -801,7 +804,7 @@ class ApplyNoCDecisionServiceTest {
                              listValueAsJson(previousOrganisations));
     }
 
-    private String listValueAsJson(List<PreviousOrganisation> previousOrganisations) {
+    private String listValueAsJson(List<PreviousOrganisationCollectionItem> previousOrganisations) {
         try {
             return mapper.writeValueAsString(previousOrganisations);
         } catch (JsonProcessingException e) {
@@ -885,13 +888,19 @@ class ApplyNoCDecisionServiceTest {
 
     private Map<String, JsonNode> createPreviousOrgData(List<PreviousOrganisation> previousOrganisations)
         throws JsonProcessingException {
+
+        List<PreviousOrganisationCollectionItem> previousOrganisationsCollection = previousOrganisations
+            .stream()
+            .map(org -> new PreviousOrganisationCollectionItem(UUID.randomUUID().toString(), org))
+            .collect(Collectors.toList());
+
         return createData(orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
-                          orgPolicyAsStringWithPreviousOrg(ORG_2_ID, ORG_2_NAME,
-                                                           ORG_POLICY_2_REF,
-                                                           ORG_POLICY_2_ROLE,
-                                                           previousOrganisations),
-                          organisationAsString(null, null),
-                          organisationAsString(ORG_2_ID, ORG_2_NAME));
+                      orgPolicyAsStringWithPreviousOrg(ORG_2_ID, ORG_2_NAME,
+                                                       ORG_POLICY_2_REF,
+                                                       ORG_POLICY_2_ROLE,
+                                                       previousOrganisationsCollection),
+                      organisationAsString(null, null),
+                      organisationAsString(ORG_2_ID, ORG_2_NAME));
     }
 
     private Map<String, JsonNode> createAddOrgData()

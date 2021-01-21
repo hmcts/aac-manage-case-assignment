@@ -24,16 +24,17 @@ public class DefaultDefinitionStoreRepository implements DefinitionStoreReposito
     }
 
     @Override
-    @Cacheable(value = "challengeQuestions", key = "#caseTypeId + #root.target.versions[#caseTypeId]",
-        condition = "#root.target.getLatestVersion(#caseTypeId) == #root.target.versions[#caseTypeId]")
+    //    @Cacheable(value = "challengeQuestions", key = "#caseTypeId + #root.target.versions[#caseTypeId]",
+    //        condition = "#root.target.getLatestVersion(#caseTypeId) == #root.target.versions[#caseTypeId]")
     public ChallengeQuestionsResult challengeQuestions(String caseTypeId, String challengeQuestionId) {
         versions.put(caseTypeId, getLatestVersion(caseTypeId));
         return definitionStoreApiClient.challengeQuestions(caseTypeId, challengeQuestionId);
     }
 
     @Override
-    @Cacheable(value = "caseRoles", key = "#caseTypeId + #root.target.versions[#caseTypeId]",
-        condition = "#root.target.getLatestVersion(#caseTypeId) == #root.target.versions[#caseTypeId]")
+    //    @Cacheable(value = "caseRoles", key = "#caseTypeId + #root.target.versions[#caseTypeId]",
+    //        condition = "#root.target.getLatestVersion(#caseTypeId) == #root.target.versions[#caseTypeId]")
+    @Cacheable(value = "caseRoles", key = "#caseTypeId")
     public List<CaseRole> caseRoles(String userId, String jurisdiction, String caseTypeId) {
         versions.put(caseTypeId, getLatestVersion(caseTypeId));
         return definitionStoreApiClient.caseRoles(userId, jurisdiction, caseTypeId);

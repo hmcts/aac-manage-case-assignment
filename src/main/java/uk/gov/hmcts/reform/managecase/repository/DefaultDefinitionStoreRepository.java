@@ -32,7 +32,7 @@ public class DefaultDefinitionStoreRepository implements DefinitionStoreReposito
     }
 
     @Override
-    @Cacheable(value = "caseRoles", key = "#caseTypeId",
+    @Cacheable(value = "caseRoles",
         condition = "#root.target.getLatestVersion(#caseTypeId) == #root.target.versions[#caseTypeId]")
     public List<CaseRole> caseRoles(String userId, String jurisdiction, String caseTypeId) {
         versions.put(caseTypeId, getLatestVersion(caseTypeId));

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.DefinitionStoreApiClient;
@@ -24,7 +25,7 @@ public class DefaultDefinitionStoreRepository implements DefinitionStoreReposito
     }
 
     @Override
-    @Cacheable(value = "challengeQuestions",
+    @Cacheable(value = "challengeQuestions",  key="#caseTypeId + #root.target.versions[#caseTypeId]",
         condition = "#root.target.getLatestVersion(#caseTypeId) == #root.target.versions[#caseTypeId]")
     public ChallengeQuestionsResult challengeQuestions(String caseTypeId, String challengeQuestionId) {
         versions.put(caseTypeId, getLatestVersion(caseTypeId));
@@ -32,7 +33,7 @@ public class DefaultDefinitionStoreRepository implements DefinitionStoreReposito
     }
 
     @Override
-    @Cacheable(value = "caseRoles",
+    @Cacheable(value = "caseRoles", key="#caseTypeId + #root.target.versions[#caseTypeId]",
         condition = "#root.target.getLatestVersion(#caseTypeId) == #root.target.versions[#caseTypeId]")
     public List<CaseRole> caseRoles(String userId, String jurisdiction, String caseTypeId) {
         versions.put(caseTypeId, getLatestVersion(caseTypeId));

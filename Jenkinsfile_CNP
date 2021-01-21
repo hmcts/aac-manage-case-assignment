@@ -48,8 +48,8 @@ def secrets = [
    'aac-${env}': [
       secret('idam-mca-system-user-username', 'BEFTA_IDAM_CAA_USERNAME'),
       secret('idam-mca-system-user-password', 'BEFTA_IDAM_CAA_PASSWORD'),
-      secret('idam-mca-noc-approver-username', 'BEFTA_IDAM_NOC_APPROVER_USERNAME'),
-      secret('idam-mca-noc-approver-password', 'BEFTA_IDAM_NOC_APPROVER_PASSWORD')
+      secret('idam-noc-approver-username', 'BEFTA_IDAM_NOC_APPROVER_USERNAME'),
+      secret('idam-noc-approver-password', 'BEFTA_IDAM_NOC_APPROVER_PASSWORD')
     ]
 ]
 

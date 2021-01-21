@@ -52,10 +52,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHALLENGE_QUESTION_ANSWERS_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_DECISION_EVENT_UNIDENTIFIABLE;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
+import static uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService.MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION;
 
 @RestController
 @Validated
@@ -139,22 +141,28 @@ public class NoticeOfChangeController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:\n"
-                + "1. " + "case_id must not be empty" + ", \n"
-                + "2. " + "ongoing NoC request in progress, \n"
-                + "3. " + "no NoC events available for this case id, \n",
+                + "1. " + "Case ID can not be empty" + ", \n"
+                + "2. " + "Case ID has to be a valid 16-digit Luhn number" + ", \n"
+                + "3. " + "No NoC events available for this case type" + ", \n"
+                + "4. " + "Multiple NoC Request events found for the user" + ", \n"
+                + "5. " + "More than one change request found on the case" + ", \n"
+                + "6. " + "Ongoing NoC request in progress \n"
+                + "7. " + "Insufficient privileges for notice of change request \n"
+                + "8. " + "No Organisation Policy for one or more of the roles available"
+                + " for the notice of change request \n",
             examples = @Example({
                 @ExampleProperty(
-                    value = "{\"message\": \"case_id must not be empty\","
+                    value = "{\"message\": \"Case ID can not be empty\","
                         + " \"status\": \"BAD_REQUEST\" }",
                     mediaType = APPLICATION_JSON_VALUE)
             })
         ),
         @ApiResponse(
             code = 404,
-            message = "case_id not found",
+            message = "Case could not be found",
             examples = @Example({
                 @ExampleProperty(
-                    value = "{\"message\": \"case_id not found\","
+                    value = "{\"message\": \"Case could not be found\","
                         + " \"status\": \"NOT_FOUND\" }",
                     mediaType = APPLICATION_JSON_VALUE)
             })
@@ -169,8 +177,8 @@ public class NoticeOfChangeController {
         )
     })
     public ChallengeQuestionsResult getNoticeOfChangeQuestions(@RequestParam("case_id")
-                                                               @Valid @NotEmpty(message = "case_id must "
-        + "not be empty") String caseId) {
+                                                               @Valid @NotEmpty(message = CASE_ID_EMPTY)
+                                                                       String caseId) {
         validateCaseIds(caseId);
         return noticeOfChangeQuestions.getChallengeQuestions(caseId);
     }
@@ -202,12 +210,15 @@ public class NoticeOfChangeController {
             code = 400,
             message = "One or more of the following reasons:\n"
                 + "- Any of the `400` errors returned by the `Get Notice of Change questions` operation\n"
-                + "- The number of submitted answers does not match the number of questions\n"
-                + "- No answer has been provided for an expected question ID\n"
-                + "- The submitted answers do not match any litigant\n"
-                + "- The submitted answers do not uniquely identify a litigant\n"
-                + "- No organisation policy exists on the case for the identified case role\n"
-                + "- The submitted answers identify a litigant that the requestor is already representing\n",
+                + "- Challenge question answers can not be empty \n"
+                + "- The number of provided answers must match the number of questions - "
+                + "expected %s answers, received %s\n"
+                + "- The answers did not match those for any litigant \n"
+                + "- The answers did not uniquely identify a litigant \n"
+                + "- No answer has been provided for question ID '%s' \n"
+                + "- No OrganisationPolicy exists on the case for the case role '%s' \n"
+                + "- The requestor has answered questions uniquely identifying a litigant that"
+                + " they are already representing \n",
             examples = @Example({
                 @ExampleProperty(
                     value = "{\n"
@@ -215,6 +226,16 @@ public class NoticeOfChangeController {
                         + "    \"message\": \"The answers did not match those for any litigant\",\n"
                         + "    \"errors\": []\n"
                         + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 404,
+            message = "Case could not be found",
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\"message\": \"Case could not be found\","
+                        + " \"status\": \"NOT_FOUND\" }",
                     mediaType = APPLICATION_JSON_VALUE)
             })
         ),
@@ -399,9 +420,12 @@ public class NoticeOfChangeController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
+                + "- Any of the `400` errors returned by the `Verify Notice of Change answers` operation\n"
                 + "\n1) " + CASE_ID_INVALID
                 + "\n2) " + CASE_ID_INVALID_LENGTH
-                + "\n3) " + CASE_ID_EMPTY,
+                + "\n3) " + CASE_ID_EMPTY
+                + "\n4) " + CHALLENGE_QUESTION_ANSWERS_EMPTY
+                + "\n5) " + MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION,
             response = ApiError.class,
             examples = @Example({
                 @ExampleProperty(
@@ -410,6 +434,16 @@ public class NoticeOfChangeController {
                         + "   \"message\": \"" + CASE_ID_EMPTY + "\",\n"
                         + "   \"errors\": [ ]\n"
                         + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })
+        ),
+        @ApiResponse(
+            code = 404,
+            message = "Case could not be found",
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\"message\": \"Case could not be found\","
+                        + " \"status\": \"NOT_FOUND\" }",
                     mediaType = APPLICATION_JSON_VALUE)
             })
         ),

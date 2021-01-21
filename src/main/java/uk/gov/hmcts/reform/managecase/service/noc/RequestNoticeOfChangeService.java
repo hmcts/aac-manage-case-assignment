@@ -1,11 +1,17 @@
 package uk.gov.hmcts.reform.managecase.service.noc;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
@@ -20,13 +26,6 @@ import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import javax.validation.ValidationException;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
@@ -37,7 +36,7 @@ import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 @Service
 public class RequestNoticeOfChangeService {
 
-    static final String MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION
+    public static final String MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION
         = "Missing ChangeOrganisationRequest.CaseRoleID %s in the case definition";
     private static final String ZERO = "0";
     private static final String USER_ID = ZERO;

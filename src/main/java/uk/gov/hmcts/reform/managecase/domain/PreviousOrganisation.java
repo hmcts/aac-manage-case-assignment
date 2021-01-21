@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.managecase.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,5 +20,5 @@ public class PreviousOrganisation {
     @JsonProperty("ToTimestamp")
     private LocalDateTime toTimestamp;
     @JsonProperty("OrganisationAddress")
-    private List<OrganisationAddress> organisationAddresses;
+    private AddressUK organisationAddress;
 }

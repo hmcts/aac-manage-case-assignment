@@ -10,20 +10,20 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrganisationAddress {
+public class AddressUK {
 
-    @JsonProperty("addressLine1")
+    @JsonProperty("AddressLine1")
     private String addressLine1;
-    @JsonProperty("addressLine2")
+    @JsonProperty("AddressLine2")
     private String addressLine2;
-    @JsonProperty("addressLine3")
+    @JsonProperty("AddressLine3")
     private String addressLine3;
-    @JsonProperty("townCity")
-    private String townCity;
-    @JsonProperty("county")
+    @JsonProperty("PostTown")
+    private String postTown;
+    @JsonProperty("County")
     private String county;
-    @JsonProperty("country")
+    @JsonProperty("Country")
     private String country;
-    @JsonProperty("postCode")
+    @JsonProperty("PostCode")
     private String postCode;
 }

@@ -1,0 +1,43 @@
+{
+  "_guid_": "Get_Organisation_Details__Prerequisite",
+
+  "title": "Retrieve an orgganisations details from PRD",
+
+  "productName": "RD Professional API",
+  "operationName": "Retrieves the details of an organisation",
+
+  "method": "GET",
+  "uri": "{{RD_PROFESSIONAL_API_BASE_URL}}/refdata/internal/v1/organisations",
+
+  "s2sClientId": "aac_manage_case_assignment",
+
+  "specs": [
+    "As a prerequisite"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_NOC_Approver"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "id": "${[scenarioContext][siblingContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Type": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "contactInformation": "[[ANYTHING_PRESENT]]",
+      "organisationIdentifier": "[[ANYTHING_PRESENT]]",
+      "name": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

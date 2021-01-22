@@ -17,7 +17,7 @@ Scenario: (Happy Path) Solicitor requests NoC to replace representation - no aut
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Dil's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [15] seconds [to allow for the cache to refresh],
 
-  When a request is prepared with appropriate values,
+     When a request is prepared with appropriate values,
       And the request [is made by Dil to place an NOC Request for C1],
       And the request [contains all correct answers in the correct format],
       And the request [contains answers identifying case role R2],
@@ -40,7 +40,7 @@ Scenario: (Happy Path) Solicitor requests NoC for a non-represented litigant - n
       And a successful call [by Mario to create a case C1, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Dil's organisation, R2 & R3 which are both not assigned to any organisation] as in [F-206_NoC_Case_Creation_By_Mario_With_Assigned_R1_Org_Policy],
       And a wait time of [15] seconds [to allow for the cache to refresh],
 
-  When a request is prepared with appropriate values,
+     When a request is prepared with appropriate values,
       And the request [is made by Dil to place an NOC Request for C1],
       And the request [contains all correct answers in the correct format],
       And the request [contains answers identifying case role R2],
@@ -64,7 +64,7 @@ Scenario: (Happy Path) CAA requests NoC to replace representation - no auto-appr
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Matt's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [15] seconds [to allow for the cache to refresh],
 
-  When a request is prepared with appropriate values,
+     When a request is prepared with appropriate values,
       And the request [is made by Matt to place an NOC Request for C1],
       And the request [contains all correct answers in the correct format],
       And the request [contains answers identifying case role R2],
@@ -87,7 +87,7 @@ Scenario: (Happy Path) CAA requests NoC for a non-represented litigant - no auto
       And a successful call [by Mario to create a case C1, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Matt's organisation, R2 & R3 which are both not assigned to any organisation] as in [F-206_NoC_Case_Creation_By_Mario_With_Assigned_R1_Org_Policy],
       And a wait time of [15] seconds [to allow for the cache to refresh],
 
-  When a request is prepared with appropriate values,
+     When a request is prepared with appropriate values,
       And the request [is made by Matt to place an NOC Request for C1],
       And the request [contains all correct answers in the correct format],
       And the request [contains answers identifying case role R2],
@@ -111,7 +111,7 @@ Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) reque
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Alice's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
       And a wait time of [15] seconds [to allow for the cache to refresh],
 
-  When a request is prepared with appropriate values,
+     When a request is prepared with appropriate values,
       And the request [is made by Alice to place an NOC Request for C1],
       And the request [contains all correct answers in the correct format],
       And the request [contains answers identifying case role R2],
@@ -134,7 +134,7 @@ Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) reque
       And a successful call [by Mario to create a case C1, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Alice's organisation, R2 & R3 which are both not assigned to any organisation] as in [F-206_NoC_Case_Creation_By_Mario_With_Assigned_R1_Org_Policy],
       And a wait time of [15] seconds [to allow for the cache to refresh],
 
-    When a request is prepared with appropriate values,
+     When a request is prepared with appropriate values,
       And the request [is made by Alice to place an NOC Request for C1],
       And the request [contains all correct answers in the correct format],
       And the request [contains answers identifying case role R2],

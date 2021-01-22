@@ -26,7 +26,9 @@ spring:
   cache:
     cache-names: userInfoCache,usersByOrganisationExternal,usersByOrganisationInternal,organisationAddressById,systemUserAccessTokenCache,caaAccessTokenCache,nocApproverAccessTokenCache,caseRoles,challengeQuestions
     caffeine:
-      spec: expireAfterAccess=15s
+      # 15 second expiration allows BEFTA tests to run successfully
+      # Override the value for CAFFEINE_CACHE_SPEC in Flux config
+      spec: ${CAFFEINE_CACHE_SPEC:expireAfterAccess=15s}
   security:
     oauth2:
       client:

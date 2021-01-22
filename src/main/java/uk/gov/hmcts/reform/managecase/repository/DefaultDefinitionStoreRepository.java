@@ -24,7 +24,7 @@ public class DefaultDefinitionStoreRepository implements DefinitionStoreReposito
     }
 
     @Override
-    @Cacheable(value = "challengeQuestions", key = "#caseTypeId",
+    @Cacheable(value = "challengeQuestions",
         condition = "#root.target.getLatestVersion(#caseTypeId) == #root.target.versions[#caseTypeId]")
     public ChallengeQuestionsResult challengeQuestions(String caseTypeId, String challengeQuestionId) {
         versions.put(caseTypeId, getLatestVersion(caseTypeId));

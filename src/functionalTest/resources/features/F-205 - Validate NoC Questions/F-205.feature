@@ -16,8 +16,9 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
+      And a wait time of [15] seconds [to allow for the cache to refresh],
 
-     When a request is prepared with appropriate values,
+    When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
       And the request [contains all correct answers]
       And it is submitted to call the [ValidateNoCQuestions] operation of [Case Assignment Microservice],
@@ -28,15 +29,16 @@ Feature: F-205 Validate Notice of Change Answers
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-205.2
   Scenario: NoC Answers successfully validated for a CAA
- 
+
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Matt - with a pui-CAA within a different organisation from Richard],
       And [the configuration for the case type of Case C1 is such that there is a NoCRequest event available to users with the IDAM ID Caseworker-CAA when the case is in the state established following case creation] in the context of the scenario
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
+      And a wait time of [15] seconds [to allow for the cache to refresh],
 
-     When a request is prepared with appropriate values,
+    When a request is prepared with appropriate values,
       And the request [is made by Matt to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
       And the request [contains all correct answers]
       And it is submitted to call the [ValidateNoCQuestions] operation of [Case Assignment Microservice],
@@ -54,8 +56,9 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
+      And a wait time of [15] seconds [to allow for the cache to refresh],
 
-     When a request is prepared with appropriate values,
+    When a request is prepared with appropriate values,
       And the request [is made by Alice to raise a NoC request and intends to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
       And the request [contains all correct answers]
       And it is submitted to call the [ValidateNoCQuestions] operation of [Case Assignment Microservice],
@@ -183,8 +186,9 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [205.12_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy so Dil's organisation is representing] as in [205.12_Update_Org_Policies],
+      And a wait time of [15] seconds [to allow for the cache to refresh],
 
-     When a request is prepared with appropriate values,
+    When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
       And the request [contains all correct answers],
       And it is submitted to call the [ValidateNoCQuestions] operation of [Case Assignment Microservice],
@@ -201,8 +205,9 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies_With_Missing_Policy],
+      And a wait time of [15] seconds [to allow for the cache to refresh],
 
-     When a request is prepared with appropriate values,
+    When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
       And the request [contains answers that do not match a case role in the case to be represented],
       And it is submitted to call the [ValidateNoCQuestions] operation of [Case Assignment Microservice],
@@ -219,8 +224,9 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [205.14_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [205.14_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [205.14_update_applicant_org_policy],
+      And a wait time of [15] seconds [to allow for the cache to refresh],
 
-     When a request is prepared with appropriate values,
+    When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
       And the request [contains a set of answers that match more than one corresponding case roles for representation],
       And it is submitted to call the [ValidateNoCQuestions] operation of [Case Assignment Microservice],
@@ -280,8 +286,9 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
+      And a wait time of [15] seconds [to allow for the cache to refresh],
 
-     When a request is prepared with appropriate values,
+    When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
       And the request [has answers with extra whitespaces, apostrophes, hyphens and casing that expected],
       And it is submitted to call the [ValidateNoCQuestions] operation of [Case Assignment Microservice],
@@ -298,8 +305,9 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [205.11.5_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [205.11.5_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [205.11.5_Update_Org_Policies],
+      And a wait time of [15] seconds [to allow for the cache to refresh],
 
-     When a request is prepared with appropriate values,
+    When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
       And the request [has one null and one non-null answer as expected],
       And it is submitted to call the [ValidateNoCQuestions] operation of [Case Assignment Microservice],

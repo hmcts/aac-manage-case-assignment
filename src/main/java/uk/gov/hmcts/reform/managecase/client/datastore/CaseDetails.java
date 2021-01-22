@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,6 +39,7 @@ public class CaseDetails {
     public static final String ORG_POLICY_REFERENCE = "OrgPolicyReference";
     public static final String ORG_ID = "OrganisationID";
     public static final String ORG_NAME = "OrganisationName";
+    public static final String PREVIOUS_ORGANISATIONS = "PreviousOrganisations";
 
     @JsonProperty("id")
     @JsonAlias("reference") // alias to match with data-store elasticSearch api response
@@ -56,6 +58,8 @@ public class CaseDetails {
 
     @JsonProperty("case_data")
     private Map<String, JsonNode> data;
+    @JsonProperty("created_date")
+    private LocalDateTime createdDate;
     @JsonProperty("security_classification")
     private SecurityClassification securityClassification;
     @JsonProperty("data_classification")

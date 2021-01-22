@@ -1,9 +1,21 @@
 package uk.gov.hmcts.reform.managecase.service.noc;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
 import feign.FeignException;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.validation.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,21 +25,19 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
+import uk.gov.hmcts.reform.managecase.client.prd.ContactInformation;
+import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationAddress;
+import uk.gov.hmcts.reform.managecase.domain.PreviousOrganisation;
 import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequest;
 import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequestStatus;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.service.NotifyService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
-
-import javax.validation.ValidationException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.singletonList;
@@ -42,12 +52,14 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CASE_R
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_ADD;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_REMOVE;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.PREVIOUS_ORGANISATIONS;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.REJECTED;
 
 @Service
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.PrematureDeclaration", "PMD.ExcessiveImports"})
+@Slf4j
 public class ApplyNoCDecisionService {
 
     private static final String JSON_PATH_SEPARATOR = "/";
@@ -119,6 +131,8 @@ public class ApplyNoCDecisionService {
             applyAddOrReplaceRepresentationDecision(existingCaseAssignments, caseRoleId, orgPolicyNode,
                     organisationToAddNode, organisationToAdd, organisationToRemove, caseDetails.getId());
         }
+
+        setOrgPolicyPreviousOrganisations(caseDetails, organisationToAdd, organisationToRemove, orgPolicyNode);
     }
 
     private void validateCorFieldOrganisations(JsonNode changeOrganisationRequestField) {
@@ -265,5 +279,87 @@ public class ApplyNoCDecisionService {
         });
 
         return new ImmutablePair<>(caseUserRolesIntersection, professionalUsersIntersection);
+    }
+
+    private void setOrgPolicyPreviousOrganisations(final CaseDetails caseDetails,
+                                                   final Organisation organisationToAdd,
+                                                   final Organisation organisationToRemove,
+                                                   final JsonNode orgPolicyNode) {
+        if (organisationToRemove != null && !isNullOrEmpty(organisationToRemove.getOrganisationID())) {
+
+            FindOrganisationResponse response = prdRepository
+                .findOrganisationAddress(organisationToRemove.getOrganisationID());
+
+            if (response.getContactInformation().size() > 0) {
+                PreviousOrganisation previousOrganisation = createPreviousOrganisation(
+                    caseDetails,
+                    orgPolicyNode,
+                    response);
+                insertPreviousOrgNode(orgPolicyNode, previousOrganisation);
+            }
+        } else if (organisationToAdd != null && !isNullOrEmpty(organisationToAdd.getOrganisationID())) {
+            PreviousOrganisation previousOrganisation = PreviousOrganisation
+                .builder()
+                .fromTimestamp(getFromTimeStamp(caseDetails, orgPolicyNode))
+                .toTimestamp(LocalDateTime.now())
+                .build();
+            insertPreviousOrgNode(orgPolicyNode, previousOrganisation);
+        }
+    }
+
+    private void insertPreviousOrgNode(JsonNode orgPolicyNode, PreviousOrganisation previousOrganisation) {
+        ((ArrayNode) orgPolicyNode
+            .withArray(PREVIOUS_ORGANISATIONS))
+            .insert(0, objectMapper.valueToTree(previousOrganisation));
+    }
+
+    private PreviousOrganisation createPreviousOrganisation(final CaseDetails caseDetails,
+                                                            final JsonNode orgPolicyNode,
+                                                            final FindOrganisationResponse response) {
+        if (response.getContactInformation().size() > 1) {
+            log.warn("More than one address received in the response for the organisation {},"
+                         + " using first address from the list.", response.getOrganisationIdentifier());
+        }
+        OrganisationAddress organisationAddress =  createOrganisationAddress(response.getContactInformation().get(0));
+        return PreviousOrganisation
+            .builder()
+            .organisationName(response.getName())
+            .organisationAddresses(Lists.newArrayList(organisationAddress))
+            .fromTimestamp(getFromTimeStamp(caseDetails, orgPolicyNode))
+            .toTimestamp(LocalDateTime.now())
+            .build();
+    }
+
+    private OrganisationAddress createOrganisationAddress(final ContactInformation contactInformation) {
+        return OrganisationAddress.builder()
+            .addressLine1(contactInformation.getAddressLine1())
+            .addressLine2(contactInformation.getAddressLine2())
+            .addressLine3(contactInformation.getAddressLine3())
+            .country(contactInformation.getCountry())
+            .county(contactInformation.getCounty())
+            .postCode(contactInformation.getPostCode())
+            .townCity(contactInformation.getTownCity())
+            .build();
+    }
+
+    private LocalDateTime getFromTimeStamp(final CaseDetails caseDetails,
+                                           final JsonNode orgPolicyNode) {
+        LocalDateTime caseCreatedDate = caseDetails.getCreatedDate();
+        try {
+            JsonNode prevOrgsNode = orgPolicyNode.get(PREVIOUS_ORGANISATIONS);
+
+            if (prevOrgsNode == null) {
+                return caseCreatedDate;
+            }
+            List<PreviousOrganisation> previousOrganisations = objectMapper
+                .readerFor(new TypeReference<List<PreviousOrganisation>>() {}).readValue(prevOrgsNode);
+            if (previousOrganisations.size() == 0) {
+                return caseCreatedDate;
+            }
+            previousOrganisations.sort(Comparator.comparing(PreviousOrganisation::getToTimestamp));
+            return previousOrganisations.get(previousOrganisations.size() - 1).getToTimestamp();
+        } catch (IOException ie) {
+            return caseCreatedDate;
+        }
     }
 }

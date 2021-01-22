@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -113,7 +114,8 @@ class RequestNoticeOfChangeServiceTest {
         caseViewResource.setCaseType(caseViewType);
         incumbentOrganisation = Organisation.builder().organisationID(INCUMBENT_ORGANISATION_ID).build();
         OrganisationPolicy organisationPolicy = new OrganisationPolicy(incumbentOrganisation,
-                                                                       ORG_POLICY_REFERENCE, CASE_ASSIGNED_ROLE);
+                                                                       ORG_POLICY_REFERENCE, CASE_ASSIGNED_ROLE,
+                                                                       Lists.newArrayList());
 
         noCRequestDetails = NoCRequestDetails.builder()
             .caseViewResource(caseViewResource)
@@ -141,7 +143,7 @@ class RequestNoticeOfChangeServiceTest {
     void testGenerateNocRequestWithOutIncumbentOrganisation() {
         noCRequestDetails.setOrganisationPolicy(new OrganisationPolicy(null,
                                                                        ORG_POLICY_REFERENCE,
-                                                                       CASE_ASSIGNED_ROLE));
+                                                                       CASE_ASSIGNED_ROLE, Lists.newArrayList()));
         final Organisation nullIncumbentOrganisation = null;
         service.requestNoticeOfChange(noCRequestDetails);
 
@@ -255,7 +257,8 @@ class RequestNoticeOfChangeServiceTest {
             Organisation.builder().organisationID(INVOKERS_ORGANISATION_IDENTIFIER).build();
         OrganisationPolicy invokersOrganisationPolicy = new OrganisationPolicy(invokersOrganisation,
                                                                                ORG_POLICY_REFERENCE,
-                                                                               CASE_ASSIGNED_ROLE);
+                                                                               CASE_ASSIGNED_ROLE,
+                                                                               Lists.newArrayList());
 
         updateCaseDetailsData(caseDetails, ORGANISATION_POLICY_KEY, invokersOrganisationPolicy);
 
@@ -344,7 +347,7 @@ class RequestNoticeOfChangeServiceTest {
             Organisation organisation = Organisation.builder().organisationID("OrganisationId").build();
             OrganisationPolicy organisationPolicy =
                 new OrganisationPolicy(organisation, ORG_POLICY_REFERENCE,
-                                       "CaseRole" + loopCounter);
+                                       "CaseRole" + loopCounter, Lists.newArrayList());
             organisationPolicies.add(organisationPolicy);
             updateCaseDetailsData(caseDetails, "OrganisationPolicy" + loopCounter, organisationPolicy);
         }

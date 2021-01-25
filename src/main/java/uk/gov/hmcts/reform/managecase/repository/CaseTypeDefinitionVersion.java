@@ -2,8 +2,12 @@ package uk.gov.hmcts.reform.managecase.repository;
 
 import java.io.Serializable;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+@Getter
+@Setter
 public class CaseTypeDefinitionVersion implements Serializable {
 
     private static final long serialVersionUID = 3792842101045258030L;
@@ -11,14 +15,6 @@ public class CaseTypeDefinitionVersion implements Serializable {
     private Integer version;
 
     public CaseTypeDefinitionVersion() {
-    }
-
-    public Integer getVersion() {
-        return version;
-    }
-
-    public void setVersion(Integer version) {
-        this.version = version;
     }
 
     @Override

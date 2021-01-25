@@ -127,7 +127,6 @@ public class NoticeOfChangeControllerIT {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
-
     void setUp() throws JsonProcessingException {
         mapper.registerModule(new JavaTimeModule());
         CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();

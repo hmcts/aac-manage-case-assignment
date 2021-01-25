@@ -41,9 +41,6 @@ class DefinitionStoreRepositoryTest {
     @BeforeEach
     void setUp() {
         initMocks(this);
-        CaseTypeDefinitionVersion caseTypeDefinitionVersion = new CaseTypeDefinitionVersion();
-        caseTypeDefinitionVersion.setVersion(1);
-        given(definitionStoreApiClient.getLatestVersion(anyString())).willReturn(caseTypeDefinitionVersion);
     }
 
     @Test
@@ -73,10 +70,8 @@ class DefinitionStoreRepositoryTest {
 
         // ASSERT
         assertThat(result).isEqualTo(challengeQuestionsResult);
-        assertThat(repository.versions.get(CASE_TYPE_ID)).isEqualTo(1);
 
         verify(definitionStoreApiClient).challengeQuestions(eq(CASE_TYPE_ID), eq(CASE_ID));
-        verify(definitionStoreApiClient).getLatestVersion(eq(CASE_TYPE_ID));
     }
 
     @Test
@@ -93,9 +88,7 @@ class DefinitionStoreRepositoryTest {
         List<CaseRole> result = repository.caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID);
 
         assertThat(result).isEqualTo(caseRoles);
-        assertThat(repository.versions.get(CASE_TYPE_ID)).isEqualTo(1);
 
         verify(definitionStoreApiClient).caseRoles(eq(USER_ID), eq(JURISDICTION), eq(CASE_TYPE_ID));
-        verify(definitionStoreApiClient).getLatestVersion(eq(CASE_TYPE_ID));
     }
 }

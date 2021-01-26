@@ -21,7 +21,7 @@ public class DefaultDefinitionStoreRepository implements DefinitionStoreReposito
 
     @Override
     @Cacheable(value = "challengeQuestions",
-        key = "{#caseTypeId, #root.target.getLatestVersion(#caseTypeId)}")
+        key = "{#caseTypeId, #challengeQuestionId, #root.target.getLatestVersion(#caseTypeId)}")
     public ChallengeQuestionsResult challengeQuestions(String caseTypeId, String challengeQuestionId) {
         return definitionStoreApiClient.challengeQuestions(caseTypeId, challengeQuestionId);
     }

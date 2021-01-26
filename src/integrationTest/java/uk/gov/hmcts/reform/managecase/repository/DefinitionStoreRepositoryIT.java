@@ -9,7 +9,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.DefinitionStoreApiClient;
@@ -28,7 +27,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class DefinitionStoreRepositoryIT {
 
     @Configuration

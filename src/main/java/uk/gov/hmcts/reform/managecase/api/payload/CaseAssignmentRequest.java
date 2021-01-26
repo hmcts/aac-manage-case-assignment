@@ -9,11 +9,13 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.LuhnCheck;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @ApiModel("Case Assignment Request")
 public class CaseAssignmentRequest {
 

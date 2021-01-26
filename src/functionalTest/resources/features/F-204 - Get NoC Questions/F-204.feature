@@ -144,7 +144,6 @@ Feature: F-204 Get Notice of Change Questions
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies_With_Missing_Policy],
       And [The challenge questions have answers that resolve to three distinct case roles (1,2,3)] in the context of the scenario
       And [The configuration of the case creation event only establishes organisation policies containing case roles 1 and 2] in the context of the scenario
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to return the questions that need answering in order to become Mario's representative on C1],

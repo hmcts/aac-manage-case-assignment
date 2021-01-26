@@ -15,7 +15,6 @@ Scenario: (Happy Path) Solicitor requests NoC to replace representation - no aut
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
       And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Dil's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to place an NOC Request for C1],
@@ -38,7 +37,6 @@ Scenario: (Happy Path) Solicitor requests NoC for a non-represented litigant - n
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application],
       And a user [Dil - with a solicitor role for the same jurisdiction as that of a case initiated by Mario],
       And a successful call [by Mario to create a case C1, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Dil's organisation, R2 & R3 which are both not assigned to any organisation] as in [F-206_NoC_Case_Creation_By_Mario_With_Assigned_R1_Org_Policy],
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to place an NOC Request for C1],
@@ -62,7 +60,6 @@ Scenario: (Happy Path) CAA requests NoC to replace representation - no auto-appr
       And a user [Matt - with a pui-caa role, within a different organisation from Richard's],
       And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Matt's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
      When a request is prepared with appropriate values,
       And the request [is made by Matt to place an NOC Request for C1],
@@ -85,7 +82,6 @@ Scenario: (Happy Path) CAA requests NoC for a non-represented litigant - no auto
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application],
       And a user [Matt - with a pui-caa role],
       And a successful call [by Mario to create a case C1, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Matt's organisation, R2 & R3 which are both not assigned to any organisation] as in [F-206_NoC_Case_Creation_By_Mario_With_Assigned_R1_Org_Policy],
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
      When a request is prepared with appropriate values,
       And the request [is made by Matt to place an NOC Request for C1],
@@ -109,7 +105,6 @@ Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) reque
       And a user [Alice - with a pui-caa role and a solicitor role for a different jurisdiction, within a different organisation from Richard's],
       And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
       And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Alice's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies],
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
      When a request is prepared with appropriate values,
       And the request [is made by Alice to place an NOC Request for C1],
@@ -132,7 +127,6 @@ Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) reque
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application],
       And a user [Alice - with a pui-caa role and a solicitor role for a different jurisdiction as that of a case initiated by Mario],
       And a successful call [by Mario to create a case C1, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Alice's organisation, R2 & R3 which are both not assigned to any organisation] as in [F-206_NoC_Case_Creation_By_Mario_With_Assigned_R1_Org_Policy],
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
      When a request is prepared with appropriate values,
       And the request [is made by Alice to place an NOC Request for C1],
@@ -387,7 +381,6 @@ Scenario: Must return an error response for a missing Case ID
 Scenario: Must return an error response when a NoC request is currently pending on a case
 
     Given an appropriate test context as detailed in the test data source,
-      And a wait time of [15] seconds [to allow for the cache to refresh],
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
       And a user [Emma - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
@@ -414,7 +407,6 @@ Scenario: Must return an error response when a NoC request is currently pending 
 Scenario: Must return an error if there is not an Organisation Policy field containing a case role for each set of answers
 
     Given an appropriate test context as detailed in the test data source,
-      And a wait time of [15] seconds [to allow for the cache to refresh],
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
       And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
@@ -543,7 +535,6 @@ Scenario: Must return an error response for an invalid/incorrect answer (wrong n
 Scenario: Must return an error response when the the invoking user's organisation is already representing the litigant identified by the answers
 
     Given an appropriate test context as detailed in the test data source,
-      And a wait time of [15] seconds [to allow for the cache to refresh],
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
       And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
@@ -586,7 +577,6 @@ Scenario: Must return an error when answers do not match a case role in the case
 Scenario: Must return an error when the set of answers match more than one corresponding case roles for representation
 
     Given an appropriate test context as detailed in the test data source,
-      And a wait time of [15] seconds [to allow for the cache to refresh],
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
       And [a citizen Mario, on behalf of whom Richard will create a case] in the context,

@@ -94,44 +94,25 @@ public class DefinitionStoreRepositoryIT {
     private static final String USER_ID = ZERO;
 
     @Test
-    public void verifyCache() {
-        // Verify the cache is empty after initial call
-        repository.challengeQuestions(CASE_TYPE_ID, CASE_ID);
-        assertEquals(cacheManager.getCache("challengeQuestions").getNativeCache().toString(), "{}");
-
-        // Verify the cache is populated for caseRoles as latest case type version matches version stored
-        repository.caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID);
-        assertNotNull(cacheManager.getCache("caseRoles").getNativeCache());
-
-        // Verify the cache is populated for challengeQuestions as latest case type version matches version stored
+    public void verifyChallengeQuestionsCache() {
         repository.challengeQuestions(CASE_TYPE_ID, CASE_ID);
         assertNotNull(cacheManager.getCache("challengeQuestions").getNativeCache());
 
-        // Clear cache and verify values for each key is empty
-        cacheManager.getCache("caseRoles").clear();
         cacheManager.getCache("challengeQuestions").clear();
         assertEquals(cacheManager.getCache("challengeQuestions").getNativeCache().toString(), "{}");
-        assertEquals(cacheManager.getCache("caseRoles").getNativeCache().toString(), "{}");
-    }
 
-    @Test
-    public void verifyChallengeQuestionsCache() {
-        // Verify the cache is empty after initial call
-        repository.challengeQuestions(CASE_TYPE_ID, CASE_ID);
-        assertEquals(cacheManager.getCache("challengeQuestions").getNativeCache().toString(), "{}");
-
-        // Verify the cache has been populated after second call
         repository.challengeQuestions(CASE_TYPE_ID, CASE_ID);
         assertNotNull(cacheManager.getCache("challengeQuestions").getNativeCache());
     }
 
     @Test
     public void verifyCaseRolesCache() {
-        // Verify the cache is empty after initial call
         repository.caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID);
+        assertNotNull(cacheManager.getCache("caseRoles").getNativeCache());
+
+        cacheManager.getCache("caseRoles").clear();
         assertEquals(cacheManager.getCache("caseRoles").getNativeCache().toString(), "{}");
 
-        // Verify the cache has been populated after second call
         repository.caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID);
         assertNotNull(cacheManager.getCache("caseRoles").getNativeCache());
     }

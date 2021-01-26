@@ -16,7 +16,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -36,7 +35,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
      When a request is prepared with appropriate values,
       And the request [is made by Matt to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -56,7 +54,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
      When a request is prepared with appropriate values,
       And the request [is made by Alice to raise a NoC request and intends to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -186,7 +183,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [205.12_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy so Dil's organisation is representing] as in [205.12_Update_Org_Policies],
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -205,7 +201,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies_With_Missing_Policy],
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -224,7 +219,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [205.14_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [205.14_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [205.14_update_applicant_org_policy],
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -286,7 +280,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [204_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
     When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
@@ -305,7 +298,6 @@ Feature: F-205 Validate Notice of Change Answers
       And a case [created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation] created as in [205.11.5_Case_Creation],
       And a successful call [to get the update org policy event trigger] as in [205.11.5_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [205.11.5_Update_Org_Policies],
-      And a wait time of [15] seconds [to allow for the cache to refresh],
 
      When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],

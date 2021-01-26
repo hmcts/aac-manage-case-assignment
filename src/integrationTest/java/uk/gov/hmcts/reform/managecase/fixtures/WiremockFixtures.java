@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 
@@ -292,6 +293,16 @@ public class WiremockFixtures {
                                     .withStatus(caseDetails == null ? HTTP_NOT_FOUND : HTTP_OK)
                                     .withBody(getJsonString(caseDetails))
                                     .withHeader("Content-Type", "application/json")));
+    }
+
+    public static void stubGetLatestVersion(String caseTypeId, CaseTypeDefinitionVersion caseTypeDefinitionVersion) {
+
+        stubFor(WireMock.get(urlPathEqualTo("/api/data/case-type/" + caseTypeId + "/version"))
+            .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+            .willReturn(aResponse()
+                .withStatus(HTTP_OK).withBody(getJsonString(caseTypeDefinitionVersion))
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     @SuppressWarnings({"PMD.AvoidThrowingRawExceptionTypes", "squid:S112"})

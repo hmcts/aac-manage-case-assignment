@@ -21,6 +21,8 @@ public class DefaultDefinitionStoreRepository implements DefinitionStoreReposito
     }
 
     @Override
+    @Cacheable(value = "challengeQuestions",
+        key = "{#caseTypeId, #challengeQuestionId, #root.target.getLatestVersion(#caseTypeId)}")
     public ChallengeQuestionsResult challengeQuestions(String caseTypeId, String challengeQuestionId) {
         return definitionStoreApiClient.challengeQuestions(caseTypeId, challengeQuestionId);
     }
@@ -29,5 +31,9 @@ public class DefaultDefinitionStoreRepository implements DefinitionStoreReposito
     @Cacheable(value = "caseRoles", key = "#caseTypeId")
     public List<CaseRole> caseRoles(String userId, String jurisdiction, String caseTypeId) {
         return definitionStoreApiClient.caseRoles(userId, jurisdiction, caseTypeId);
+    }
+
+    public Integer getLatestVersion(String caseTypeId) {
+        return definitionStoreApiClient.getLatestVersion(caseTypeId).getVersion();
     }
 }

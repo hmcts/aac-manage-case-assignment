@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdictio
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
@@ -99,6 +100,7 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCa
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetChallengeQuestions;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetExternalStartEventTrigger;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetExternalStartEventTriggerAsApprover;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetLatestVersion;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetStartEventTrigger;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisationInternal;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSubmitEventForCase;
@@ -167,6 +169,9 @@ public class NoticeOfChangeControllerIT {
             CaseRole.builder().id("[OTHER]").name("Other").description("Other").build()
         );
         stubGetCaseRoles("0", JURISDICTION, CASE_TYPE_ID, caseRoleList);
+
+        CaseTypeDefinitionVersion caseTypeDefinitionVersion = new CaseTypeDefinitionVersion(3);
+        stubGetLatestVersion(CASE_TYPE_ID, caseTypeDefinitionVersion);
 
         Organisation organisationToAdd = Organisation.builder().organisationID("QUK822N").build();
         ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()

@@ -30,6 +30,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
@@ -87,12 +88,12 @@ public class CasesAssignmentControllerProviderTest {
 
     }
 
-    @State({"A Case and an assignee exists"})
+    @State({"A Case ID 12345678 with an assignee exists"})
     public void toRegisterNewOrganisation() throws IOException {
 
         given(prdRepository.findUsersByOrganisation())
             .willReturn(usersByOrganisation(user(ASSIGNEE_ID)));
-        given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
+        given(dataStoreRepository.findCaseByCaseIdExternalApi(anyString()))
             .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
 
         given(securityUtils.hasSolicitorRole(anyList())).willReturn(true);

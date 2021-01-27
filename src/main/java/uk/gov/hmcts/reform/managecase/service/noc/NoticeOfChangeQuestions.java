@@ -66,10 +66,6 @@ public class NoticeOfChangeQuestions {
         ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId).getChallengeQuestionsResult();
 
         List<ChallengeQuestion> challengeQuestionsResponse = challengeQuestionsResult.getQuestions().stream()
-            .map(challengeQuestion -> {
-                challengeQuestion.setAnswerField(null);
-                return challengeQuestion;
-            })
             .collect(toList());
 
 

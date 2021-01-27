@@ -38,7 +38,7 @@ public class ContractConfig {
     }
 
     public CaseAssignmentService caseAssignmentService() {
-
-        return new CaseAssignmentService(prdRepository, dataStoreRepository, idamRepository, jacksonUtils, securityUtils);
+        return new CaseAssignmentService(prdRepository, dataStoreRepository,
+            idamRepository, jacksonUtils, securityUtils);
     }
 }

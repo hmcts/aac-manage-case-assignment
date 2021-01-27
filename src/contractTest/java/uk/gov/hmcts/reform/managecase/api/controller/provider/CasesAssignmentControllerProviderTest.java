@@ -88,8 +88,8 @@ public class CasesAssignmentControllerProviderTest {
 
     }
 
-    @State({"A Case ID 12345678 with an assignee exists"})
-    public void toRegisterNewOrganisation() throws IOException {
+    @State({"Assign a user to a case"})
+    public void toAssignUserToCase() throws IOException {
 
         given(prdRepository.findUsersByOrganisation())
             .willReturn(usersByOrganisation(user(ASSIGNEE_ID)));

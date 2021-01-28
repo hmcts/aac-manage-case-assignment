@@ -181,7 +181,6 @@ class NoticeOfChangeQuestionsTest {
             assertThat(challengeQuestionsResult.getQuestions().get(0).getQuestionText()).isEqualTo(QUESTION_TEXT);
             assertThat(challengeQuestionsResult.getQuestions().get(0).getChallengeQuestionId())
                 .isEqualTo(CHALLENGE_QUESTION);
-            assertThat(challengeQuestionsResult.getQuestions().get(0).getAnswers().size()).isEqualTo(1);
 
         }
 

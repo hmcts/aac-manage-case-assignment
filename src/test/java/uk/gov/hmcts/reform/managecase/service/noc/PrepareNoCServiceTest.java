@@ -377,13 +377,13 @@ class PrepareNoCServiceTest {
         private void mockUserCaseRolesForSolicitor() {
             UserInfo userInfo = new UserInfo("", "", "", "", "", emptyList());
             given(securityUtils.getUserInfo()).willReturn(userInfo);
-            given(securityUtils.hasSolicitorRole(emptyList(), JURISDICTION)).willReturn(true);
+            given(securityUtils.hasSolicitorRole(emptyList())).willReturn(true);
         }
 
         private void mockUserCaseRolesForCaseworker() {
             UserInfo userInfo = new UserInfo("", "", "", "", "", emptyList());
             given(securityUtils.getUserInfo()).willReturn(userInfo);
-            given(securityUtils.hasSolicitorRole(emptyList(), JURISDICTION)).willReturn(false);
+            given(securityUtils.hasSolicitorRole(emptyList())).willReturn(false);
         }
 
         private OrganisationPolicy createOrganisationPolicy(String caseAssignedRole,

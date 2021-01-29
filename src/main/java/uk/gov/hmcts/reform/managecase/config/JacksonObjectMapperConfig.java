@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.config;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -26,6 +27,7 @@ public class JacksonObjectMapperConfig {
             .registerModule(new Jdk8Module())
             .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
             .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
     }
 

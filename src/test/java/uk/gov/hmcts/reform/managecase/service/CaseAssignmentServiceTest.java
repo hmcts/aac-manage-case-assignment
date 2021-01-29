@@ -32,7 +32,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
@@ -108,7 +107,7 @@ class CaseAssignmentServiceTest {
         @DisplayName("should assign case in the organisation")
         void shouldAssignCaseAccess() {
 
-            given(securityUtils.hasSolicitorRole(anyList(), anyString())).willReturn(true);
+            given(securityUtils.hasSolicitorRole(anyList())).willReturn(true);
             given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
                 .willReturn(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
 

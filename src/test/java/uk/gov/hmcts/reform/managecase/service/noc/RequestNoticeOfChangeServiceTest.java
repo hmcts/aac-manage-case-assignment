@@ -337,7 +337,7 @@ class RequestNoticeOfChangeServiceTest {
                                          "familyName",
                                          roles);
         given(securityUtils.getUserInfo()).willReturn(userInfo);
-        given(securityUtils.hasSolicitorRole(any(), any())).willReturn(actAsAnAdminOrSolicitor);
+        given(securityUtils.hasSolicitorRole(any())).willReturn(actAsAnAdminOrSolicitor);
     }
 
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")

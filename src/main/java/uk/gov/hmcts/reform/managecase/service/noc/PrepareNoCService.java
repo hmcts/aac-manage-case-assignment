@@ -80,7 +80,7 @@ public class PrepareNoCService {
         // check that there isn't an ongoing NoCRequest - if so this new NoCRequest must be rejected
         validate(hasCaseRoleId(data, changeOfRequestFieldName), NOC_REQUEST_ONGOING);
 
-        List<String> caseRoles = prepareCaseRoles(jurisdiction, orgPolicies);
+        List<String> caseRoles = prepareCaseRoles(orgPolicies);
         List<CaseRole> caseRolesDefinition = getCaseRolesDefinitions(jurisdiction, caseTypeId, caseRoles);
 
         updateChangeOrganisationRequestCaseRoleId(data, caseRolesDefinition, changeOfRequestFieldName);
@@ -89,10 +89,10 @@ public class PrepareNoCService {
         return data;
     }
 
-    private List<String> prepareCaseRoles(String jurisdiction, List<OrganisationPolicy> orgPolicies) {
+    private List<String> prepareCaseRoles(List<OrganisationPolicy> orgPolicies) {
         List<String> caseRoles;
 
-        if (isInvokingUserSolicitor(jurisdiction)) {
+        if (isInvokingUserSolicitor()) {
             // Prepare the list of CaseRoles on the case for which the user might wish to choose to cease representation
             String organisationIdentifier = findTheOrganisationIdOfTheInvokerUsingPrd();
             caseRoles = findInvokerOrgPolicyRoles(orgPolicies, organisationIdentifier);
@@ -183,11 +183,11 @@ public class PrepareNoCService {
             .collect(toList());
     }
 
-    private boolean isInvokingUserSolicitor(String jurisdiction) {
+    private boolean isInvokingUserSolicitor() {
         UserInfo userInfo = securityUtils.getUserInfo();
         List<String> roles = userInfo.getRoles();
 
-        return securityUtils.hasSolicitorRole(roles, jurisdiction);
+        return securityUtils.hasSolicitorRole(roles);
     }
 
     private void validate(boolean condition, String errorMessage) {

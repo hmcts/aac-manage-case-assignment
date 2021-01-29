@@ -87,10 +87,10 @@ Feature: F-201: Assign Access within Organisation
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-201.6
-  Scenario: must return an error response for an assignee user who doesn't have a valid solicitor role
+  Scenario: Must return an error response for an assignee user who doesn't have a solicitor role for the jurisdiction of the case
 
     Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
-      And a user [S2 - who does not have a solicitor role but works within the same organisation as S1],
+      And a user [S2 - who does not have a solicitor role for the jurisdiction of C1 but works within the same organisation as S1],
       And a case [C1, which S1 has just] created as in [F-201_Prerequisite_Case_Creation_C1],
 
      When a request is prepared with appropriate values,

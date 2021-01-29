@@ -67,8 +67,8 @@ public class CaseAssignmentControllerIT {
     private static final String ANOTHER_USER = "vcd345cvs-816a-4eea-b714-6654d022fcef";
     private static final String CASE_ID = "1588234985453946";
     private static final String CASE_ID2 = "1598630369818638";
-    private static final String ORG_POLICY_ROLE = "caseworker-probate";
-    private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";
+    private static final String ORG_POLICY_ROLE = "caseworker-probate-solicitor";
+    private static final String ORG_POLICY_ROLE2 = "caseworker-probate2-solicitor";
 
     private static final List<String> NULL_CASE_ROLES = null;
 

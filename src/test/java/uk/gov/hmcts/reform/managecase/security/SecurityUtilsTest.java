@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SecurityUtilsTest {
 
     private static final String CASEWORKER_BEFTA_JURISDICTION_SOLICITOR = "caseworker-befta_jurisdiction-solicitor";
+    private static final String JURISDICTION = "befta_jurisdiction";
 
     @Mock
     private AuthTokenGenerator authTokenGenerator;
@@ -38,30 +39,30 @@ class SecurityUtilsTest {
 
     @Test
     void hasSolicitorRoleReturnsFalseWhenRolesEmpty() {
-        assertFalse(securityUtils.hasSolicitorRole(roles));
+        assertFalse(securityUtils.hasSolicitorRoleForJurisdiction(roles, ""));
     }
 
     @Test
     void hasSolicitorRoleReturnsTrueWhenRoleEndsWithSolicitor() {
         roles.add(CASEWORKER_BEFTA_JURISDICTION_SOLICITOR);
-        assertTrue(securityUtils.hasSolicitorRole(roles));
+        assertTrue(securityUtils.hasSolicitorRoleForJurisdiction(roles, JURISDICTION));
     }
 
     @Test
     void hasSolicitorRoleReturnsTrueWithMixedCase() {
         roles.add("caseworker-ia-SoliciTor");
-        assertTrue(securityUtils.hasSolicitorRole(roles));
+        assertTrue(securityUtils.hasSolicitorRoleForJurisdiction(roles, "ia"));
     }
 
     @Test
     void hasSolicitorRoleReturnsFalseWithInvalidSuffix() {
         roles.add("caseworker-befta_jurisdiction-barrister");
-        assertFalse(securityUtils.hasSolicitorRole(roles));
+        assertFalse(securityUtils.hasSolicitorRoleForJurisdiction(roles, JURISDICTION));
     }
 
     @Test
     void hasSolicitorRoleReturnsFalseWithAdditionalSuffixAppended() {
         roles.add("caseworker-befta_jurisdiction-solicitorsurname-solicitor-role");
-        assertFalse(securityUtils.hasSolicitorRole(roles));
+        assertFalse(securityUtils.hasSolicitorRoleForJurisdiction(roles, JURISDICTION));
     }
 }

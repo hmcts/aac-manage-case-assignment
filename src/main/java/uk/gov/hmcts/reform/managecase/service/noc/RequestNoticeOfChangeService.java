@@ -10,6 +10,7 @@ import javax.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -26,7 +27,6 @@ import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
@@ -36,8 +36,6 @@ import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 @Service
 public class RequestNoticeOfChangeService {
 
-    public static final String MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION
-        = "Missing ChangeOrganisationRequest.CaseRoleID %s in the case definition";
     private static final String ZERO = "0";
     private static final String USER_ID = ZERO;
     private static final String JURISDICTION = ZERO;
@@ -186,7 +184,9 @@ public class RequestNoticeOfChangeService {
             .filter(cr -> caseRoleLowerCase.equalsIgnoreCase(cr.getId().toLowerCase()))
             .findFirst()
             .orElseThrow(
-                () -> new ValidationException(format(MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION, caseRole))
+                () -> new NoCException((String.format(
+                    "Missing ChangeOrganisationRequest.CaseRoleID %s in the case definition", caseRole)),
+                                       "missing-cor-case-role-id")
             );
     }
 

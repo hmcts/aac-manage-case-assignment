@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
@@ -10,7 +11,6 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQues
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 
-import javax.validation.ValidationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,11 +48,12 @@ public class ChallengeAnswerValidator {
             .collect(toList());
 
         if (matchingCaseRoleIds.isEmpty()) {
-            throw new ValidationException("The answers did not match those for any litigant");
+            throw new NoCException("The answers did not match those for any litigant",
+                                   "answers-not-matched-any-litigant");
         }
 
         if (matchingCaseRoleIds.size() > 1) {
-            throw new ValidationException("The answers did not uniquely identify a litigant");
+            throw new NoCException("The answers did not uniquely identify a litigant", "answers-not-identify-litigant");
         }
 
         return matchingCaseRoleIds.get(0);
@@ -96,9 +97,9 @@ public class ChallengeAnswerValidator {
         int noOfQuestions = challengeQuestions.getQuestions().size();
         int noOfProvidedAnswers = answers.size();
         if (noOfQuestions != noOfProvidedAnswers) {
-            throw new ValidationException(String.format(
+            throw new NoCException((String.format(
                 "The number of provided answers must match the number of questions - expected %s answers, received %s",
-                noOfQuestions, noOfProvidedAnswers));
+                noOfQuestions, noOfProvidedAnswers)),"answers-mismatch-questions");
         }
     }
 
@@ -107,8 +108,8 @@ public class ChallengeAnswerValidator {
         return answers.stream()
             .filter(answer -> answer.getQuestionId().equals(questionId))
             .findFirst()
-            .orElseThrow(() -> new ValidationException(String.format(
-                "No answer has been provided for question ID '%s'", questionId)));
+            .orElseThrow(() -> new NoCException((String.format(
+                "No answer has been provided for question ID '%s'", questionId)),"no-answer-provided-for-question"));
     }
 
     private boolean isEqualAnswer(String expectedAnswer, String actualAnswer, FieldType fieldType) {

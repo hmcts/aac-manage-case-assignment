@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
@@ -10,7 +11,6 @@ import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import javax.validation.ValidationException;
 import java.util.Optional;
 
 @Service
@@ -41,12 +41,13 @@ public class VerifyNoCAnswersService {
                 verifyNoCAnswersRequest.getAnswers(), caseDetails);
 
         OrganisationPolicy organisationPolicy = findPolicy(caseDetails, caseRoleId)
-            .orElseThrow(() -> new ValidationException(String.format(
-                "No OrganisationPolicy exists on the case for the case role '%s'", caseRoleId)));
+            .orElseThrow(() -> new NoCException((String.format("No OrganisationPolicy exists on the case for "
+                                                                   + "the case role '%s'",
+                                                               caseRoleId)), "no-org-policy-case"));
 
         if (organisationEqualsRequestingUsers(organisationPolicy.getOrganisation())) {
-            throw new ValidationException("The requestor has answered questions uniquely identifying"
-                + " a litigant that they are already representing");
+            throw new NoCException("The requestor has answered questions uniquely identifying"
+                + " a litigant that they are already representing", "has-represented");
         }
 
         noCRequestDetails.setOrganisationPolicy(organisationPolicy);

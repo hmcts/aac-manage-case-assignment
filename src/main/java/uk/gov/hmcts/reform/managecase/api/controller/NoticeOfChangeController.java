@@ -57,7 +57,6 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_DECISION_EVENT_UNIDENTIFIABLE;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
-import static uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService.MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION;
 
 @RestController
 @Validated
@@ -425,7 +424,7 @@ public class NoticeOfChangeController {
                 + "\n2) " + CASE_ID_INVALID_LENGTH
                 + "\n3) " + CASE_ID_EMPTY
                 + "\n4) " + CHALLENGE_QUESTION_ANSWERS_EMPTY
-                + "\n5) " + MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION,
+                + "\n5) " + "Missing ChangeOrganisationRequest.CaseRoleID %s in the case definition",
             response = ApiError.class,
             examples = @Example({
                 @ExampleProperty(

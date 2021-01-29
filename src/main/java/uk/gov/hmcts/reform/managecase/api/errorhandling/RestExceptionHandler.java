@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCApiError;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 
 import javax.validation.ValidationException;
 import java.util.List;
@@ -53,6 +55,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return toResponseEntity(HttpStatus.NOT_FOUND, ex.getLocalizedMessage());
     }
 
+    @ExceptionHandler(NoCException.class)
+    public ResponseEntity<Object> handleNoCException(NoCException ex) {
+        log.debug("NoC Validation exception: {}", ex.getMessage(), ex);
+        return toNoCResponseEntity(HttpStatus.BAD_REQUEST, ex.errorMessage, ex.errorCode);
+    }
+
     @ExceptionHandler(CaseIdLuhnException.class)
     public ResponseEntity<Object> handleCaseIdLuhnException(CaseIdLuhnException ex) {
         log.error("Data Store errors: {}", ex.getMessage(), ex);
@@ -73,6 +81,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> toResponseEntity(HttpStatus status, String errorMessage, String... errors) {
         ApiError apiError = new ApiError(status, errorMessage, errors == null ? null : List.of(errors));
+        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+    }
+
+    private ResponseEntity<Object> toNoCResponseEntity(HttpStatus status, String errorMessage, String errorCode,
+                                                       String... errors) {
+        NoCApiError apiError = new NoCApiError(status, errorMessage, errorCode, errors == null ? null : List.of(errors)
+        );
         return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
     }
 }

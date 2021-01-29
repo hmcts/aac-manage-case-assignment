@@ -52,7 +52,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
-import static uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService.MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap",
     "PMD.AvoidDuplicateLiterals",
@@ -325,7 +324,8 @@ class RequestNoticeOfChangeServiceTest {
             () -> service.requestNoticeOfChange(noCRequestDetails)
         );
         assertThat(exception.getMessage()).isEqualTo(
-            String.format(MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION, CASE_ASSIGNED_ROLE));
+            String.format("Missing ChangeOrganisationRequest.CaseRoleID %s in the case definition",
+                          CASE_ASSIGNED_ROLE));
     }
 
     private void setInvokerToActAsAnAdminOrSolicitor(boolean actAsAnAdminOrSolicitor) {

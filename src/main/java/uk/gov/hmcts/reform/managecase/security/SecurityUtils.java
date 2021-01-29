@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 public class SecurityUtils {
 
     private static final Pattern SOLICITOR_ROLE = Pattern.compile(".+-solicitor$", Pattern.CASE_INSENSITIVE);
+    private static final String CASEWORKER_JURISDICTION = "caseworker-%s";
 
     public static final String BEARER = "Bearer ";
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
@@ -65,8 +66,10 @@ public class SecurityUtils {
         return token.startsWith(BEARER) ? token.substring(BEARER.length()) : token;
     }
 
-    public boolean hasSolicitorRole(List<String> roles) {
-        return roles.stream().anyMatch(role -> SOLICITOR_ROLE.matcher(role).matches());
+    public boolean hasSolicitorRoleForJurisdiction(List<String> roles, String jurisdiction) {
+        final String jurisdictionRole = String.format(CASEWORKER_JURISDICTION, jurisdiction).toLowerCase();
+        return roles.stream().anyMatch(role -> SOLICITOR_ROLE.matcher(role).matches()
+            && role.toLowerCase().startsWith(jurisdictionRole));
     }
 
 }

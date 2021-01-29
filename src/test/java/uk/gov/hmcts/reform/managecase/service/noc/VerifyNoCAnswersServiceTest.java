@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -20,7 +21,6 @@ import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import javax.validation.ValidationException;
 import java.util.Map;
 
 import static java.util.Collections.emptyList;
@@ -109,7 +109,7 @@ class VerifyNoCAnswersServiceTest {
 
         VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest("1", emptyList());
 
-        ValidationException exception = assertThrows(ValidationException.class, () ->
+        NoCException exception = assertThrows(NoCException.class, () ->
             verifyNoCAnswersService.verifyNoCAnswers(request));
 
         assertAll(
@@ -126,7 +126,7 @@ class VerifyNoCAnswersServiceTest {
 
         VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest("1", emptyList());
 
-        ValidationException exception = assertThrows(ValidationException.class, () ->
+        NoCException exception = assertThrows(NoCException.class, () ->
             verifyNoCAnswersService.verifyNoCAnswers(request));
 
         assertAll(

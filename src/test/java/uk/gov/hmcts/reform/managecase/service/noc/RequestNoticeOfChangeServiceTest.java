@@ -11,6 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -319,8 +320,8 @@ class RequestNoticeOfChangeServiceTest {
         + "present in definition store")
     void testThrowsValidationErrorIfCaseRoleIdNotPresentInDefinitionStore() {
         given(definitionStoreRepository.caseRoles(anyString(), anyString(), anyString())).willReturn(emptyList());
-        ValidationException exception = assertThrows(
-            ValidationException.class,
+        NoCException exception = assertThrows(
+            NoCException.class,
             () -> service.requestNoticeOfChange(noCRequestDetails)
         );
         assertThat(exception.getMessage()).isEqualTo(

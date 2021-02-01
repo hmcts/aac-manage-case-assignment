@@ -89,13 +89,7 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.SET_ORGANISATION_TO_REMOVE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS_MESSAGE;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_DETAILS_REQUIRED;
-
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHALLENGE_QUESTION_ANSWERS_EMPTY;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.*;
 
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
 public class NoticeOfChangeControllerTest {
@@ -328,7 +322,7 @@ public class NoticeOfChangeControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(2)))
                 .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID_LENGTH)))
-                .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID)));
+                .andExpect(jsonPath("$.errors", hasItem(NOC_CASE_ID_INVALID)));
         }
 
         @DisplayName("should fail with 400 bad request when no challenge answers are provided")
@@ -421,7 +415,7 @@ public class NoticeOfChangeControllerTest {
         @Test
         void shouldFailWithBadRequestForInvalidCaseId() throws Exception {
             requestNoticeOfChangeRequest = new RequestNoticeOfChangeRequest("1nva1l1d3", submittedAnswerList);
-            postCallShouldReturnBadRequestWithErrorMessage(requestNoticeOfChangeRequest, CASE_ID_INVALID);
+            postCallShouldReturnBadRequestWithErrorMessage(requestNoticeOfChangeRequest, NOC_CASE_ID_INVALID);
         }
 
         @DisplayName("should error if request NoC case id is invalid length")

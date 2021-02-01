@@ -28,7 +28,7 @@ public class DefaultDefinitionStoreRepository implements DefinitionStoreReposito
 
     @Override
     @Cacheable(value = "caseRoles",
-        key = "{#caseTypeId, #userId, #jurisdiction, #root.target.getLatestVersion(#caseTypeId)}")
+        key = "{#caseTypeId, #root.target.getLatestVersion(#caseTypeId)}")
     public List<CaseRole> caseRoles(String userId, String jurisdiction, String caseTypeId) {
         return definitionStoreApiClient.caseRoles(userId, jurisdiction, caseTypeId);
     }

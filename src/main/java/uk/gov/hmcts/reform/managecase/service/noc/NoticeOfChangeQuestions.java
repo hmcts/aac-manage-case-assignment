@@ -66,18 +66,8 @@ public class NoticeOfChangeQuestions {
         ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId).getChallengeQuestionsResult();
 
         List<ChallengeQuestion> challengeQuestionsResponse = challengeQuestionsResult.getQuestions().stream()
-            .map(challengeQuestion -> ChallengeQuestion.builder()
-                .caseTypeId(challengeQuestion.getCaseTypeId())
-                .order(challengeQuestion.getOrder())
-                .questionText(challengeQuestion.getQuestionText())
-                .answerFieldType(challengeQuestion.getAnswerFieldType())
-                .displayContextParameter(challengeQuestion.getDisplayContextParameter())
-                .challengeQuestionId(challengeQuestion.getChallengeQuestionId())
-                .questionId(challengeQuestion.getQuestionId())
-                .build()
-            )
+            .map(challengeQuestion -> challengeQuestion.cloneWithoutAnswers(challengeQuestion))
             .collect(toList());
-
 
         return ChallengeQuestionsResult.builder().questions(challengeQuestionsResponse).build();
     }

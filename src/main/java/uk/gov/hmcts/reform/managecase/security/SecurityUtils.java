@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 
 import javax.inject.Named;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 @Named
@@ -66,8 +65,16 @@ public class SecurityUtils {
         return token.startsWith(BEARER) ? token.substring(BEARER.length()) : token;
     }
 
-    public boolean hasSolicitorRoleForJurisdiction(List<String> roles, String jurisdiction) {
-        return roles.stream().anyMatch(role -> SOLICITOR_ROLE.matcher(role).matches()
-            && role.toLowerCase(Locale.getDefault()).contains(jurisdiction.toLowerCase(Locale.getDefault())));
+    public boolean hasSolicitorRole(List<String> roles) {
+        return roles.stream().anyMatch(role -> SOLICITOR_ROLE.matcher(role).matches());
+    }
+
+    public boolean hasJurisdictionRole(List<String> roles, String jurisdictionId) {
+        String jurisdictionRole = "caseworker-" + jurisdictionId;
+        return roles.stream().anyMatch(jurisdictionRole::equalsIgnoreCase);
+    }
+
+    public boolean hasSolicitorRoleForJurisdiction(List<String> roles, String jurisdictionId) {
+        return hasSolicitorRole(roles) && hasJurisdictionRole(roles, jurisdictionId);
     }
 }

@@ -67,8 +67,8 @@ public class CaseAssignmentControllerIT {
     private static final String ANOTHER_USER = "vcd345cvs-816a-4eea-b714-6654d022fcef";
     private static final String CASE_ID = "1588234985453946";
     private static final String CASE_ID2 = "1598630369818638";
-    private static final String IDAM_USER_ROLE = "caseworker-probate-solicitor";
-    private static final String IDAM_USER_ROLE2 = "caseworker-probate2-solicitor";
+    private static final String ORG_POLICY_ROLE = "[CaseRole1]";
+    private static final String ORG_POLICY_ROLE2 = "[CaseRole2]";
 
     private static final List<String> NULL_CASE_ROLES = null;
 
@@ -89,9 +89,11 @@ public class CaseAssignmentControllerIT {
             request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, ASSIGNEE_ID);
             // Positive stub mappings - individual tests override again for a specific scenario.
             stubGetUsersByOrganisation(usersByOrganisation(user(ASSIGNEE_ID), user(ANOTHER_USER)));
-            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor"));
-            stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, caseDetails(ORGANIZATION_ID, IDAM_USER_ROLE));
-            stubAssignCase(CASE_ID, ASSIGNEE_ID, IDAM_USER_ROLE);
+            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID,
+                                                         "caseworker-AUTOTEST1-solicitor",
+                                                         "caseworker-AUTOTEST1"));
+            stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
+            stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE);
         }
 
         @DisplayName("Invoker successfully sharing case access with another solicitor in their org")
@@ -103,7 +105,7 @@ public class CaseAssignmentControllerIT {
                                      .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, IDAM_USER_ROLE))));
+                .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE))));
 
             verify(postRequestedFor(urlEqualTo(CASE_USERS)));
         }
@@ -113,8 +115,8 @@ public class CaseAssignmentControllerIT {
         void shouldAssignCaseAccess_withMultipleOrganisationRoles() throws Exception {
 
             stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID,
-                                                     caseDetails(ORGANIZATION_ID, IDAM_USER_ROLE, IDAM_USER_ROLE2));
-            stubAssignCase(CASE_ID, ASSIGNEE_ID, IDAM_USER_ROLE, IDAM_USER_ROLE2);
+                                                     caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
+            stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2);
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -123,7 +125,7 @@ public class CaseAssignmentControllerIT {
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(String.format(
                     ASSIGN_ACCESS_MESSAGE,
-                    StringUtils.join(List.of(IDAM_USER_ROLE, IDAM_USER_ROLE2), ',')
+                    StringUtils.join(List.of(ORG_POLICY_ROLE, ORG_POLICY_ROLE2), ',')
                 ))));
 
             verify(postRequestedFor(urlEqualTo(CASE_USERS)));
@@ -135,14 +137,16 @@ public class CaseAssignmentControllerIT {
         void shouldAssignCaseAccess_whenInvokerSuccessfullyShareACaseWithMixedCaseJurisdictionRole()
             throws Exception {
 
-            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST1-SoLiciToR"));
+            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID,
+                                                         "caseworker-AUTOTEST1-SoLiciToR",
+                                                         "caseworker-AUTOTEST1"));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, IDAM_USER_ROLE))));
+                .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE))));
 
             verify(postRequestedFor(urlEqualTo(CASE_USERS)));
         }
@@ -153,14 +157,16 @@ public class CaseAssignmentControllerIT {
         void shouldAssignCaseAccess_whenInvokerSuccessfullyShareACaseWithUpperCaseJurisdictionRole()
             throws Exception {
 
-            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "CASEWORKER-AUTOTEST1-SOLICITOR"));
+            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID,
+                                                         "CASEWORKER-AUTOTEST1-SOLICITOR",
+                                                         "CASEWORKER-AUTOTEST1"));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, IDAM_USER_ROLE))));
+                .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE))));
 
             verify(postRequestedFor(urlEqualTo(CASE_USERS)));
         }
@@ -223,7 +229,7 @@ public class CaseAssignmentControllerIT {
             + " in the case data organisation policies")
         @Test
         void shouldReturn400_whenInvokersOrgIsNotPresentInCaseData() throws Exception {
-            stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, caseDetails("ANOTHER_ORGANIZATION_ID", IDAM_USER_ROLE));
+            stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, caseDetails("ANOTHER_ORGANIZATION_ID", ORG_POLICY_ROLE));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
                                      .contentType(MediaType.APPLICATION_JSON)

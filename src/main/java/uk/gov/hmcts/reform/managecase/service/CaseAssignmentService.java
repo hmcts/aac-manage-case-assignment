@@ -66,7 +66,7 @@ public class CaseAssignmentService {
 
         List<String> assigneeRoles = getAssigneeRoles(assignment.getAssigneeId());
 
-        if (!securityUtils.hasSolicitorRoleForJurisdiction(assigneeRoles, caseDetails.getJurisdiction())) {
+        if (!securityUtils.hasSolicitorAndJurisdictionRoles(assigneeRoles, caseDetails.getJurisdiction())) {
             throw new ValidationException(ValidationError.ASSIGNEE_ROLE_ERROR);
         }
 

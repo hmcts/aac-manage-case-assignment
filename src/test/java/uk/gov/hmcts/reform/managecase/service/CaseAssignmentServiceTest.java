@@ -109,7 +109,7 @@ class CaseAssignmentServiceTest {
         @DisplayName("should assign case in the organisation")
         void shouldAssignCaseAccess() {
 
-            given(securityUtils.hasSolicitorRoleForJurisdiction(anyList(), anyString())).willReturn(true);
+            given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), anyString())).willReturn(true);
             given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
                 .willReturn(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
 

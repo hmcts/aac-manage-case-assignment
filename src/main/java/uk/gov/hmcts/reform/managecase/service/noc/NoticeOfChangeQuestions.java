@@ -24,10 +24,11 @@ import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 
+import javax.validation.ValidationException;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.CASE_ID_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.CHANGE_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.INSUFFICIENT_PRIVILEGE;
@@ -139,7 +140,7 @@ public class NoticeOfChangeQuestions {
             if (HttpStatus.NOT_FOUND.value() == e.status()) {
                 throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
             } else if (HttpStatus.BAD_REQUEST.value() == e.status()) {
-                throw new NoCException(CASE_ID_INVALID);
+                throw new ValidationException(NOC_CASE_ID_INVALID);
             }
         }
         return caseViewResource;

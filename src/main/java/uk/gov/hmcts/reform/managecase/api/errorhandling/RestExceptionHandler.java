@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import javax.validation.ValidationException;
 import java.util.List;
 
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.CASE_ID_INVALID;
+
 @RestControllerAdvice
 @Slf4j
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -40,7 +42,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<Object> handleValidationException(Exception ex) {
         log.debug("Validation exception:", ex);
-        return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
+        return toNewResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(CaseCouldNotBeFetchedException.class)
@@ -87,6 +89,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private ResponseEntity<Object> toNoCResponseEntity(HttpStatus status, String errorMessage, String errorCode,
                                                        String... errors) {
         NoCApiError apiError = new NoCApiError(status, errorMessage, errorCode, errors == null ? null : List.of(errors)
+        );
+        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+    }
+
+    private ResponseEntity<Object> toNewResponseEntity(HttpStatus status, String... errors) {
+        NoCApiError apiError = new NoCApiError(status, CASE_ID_INVALID.getErrorMessage(),
+                                               CASE_ID_INVALID.getErrorCode(), errors == null ? null : List.of(errors)
         );
         return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
     }

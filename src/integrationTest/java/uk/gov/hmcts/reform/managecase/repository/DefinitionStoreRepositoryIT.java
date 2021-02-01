@@ -12,6 +12,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.DefinitionStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
@@ -35,18 +36,57 @@ public class DefinitionStoreRepositoryIT {
     @TestConfiguration
     @EnableCaching
     static class CacheConfig {
+
+        @Mock
+        private DefinitionStoreApiClient definitionStoreApiClient;
+
         @Bean
         CacheManager cacheManager() {
             return new ConcurrentMapCacheManager("challengeQuestions", "caseRoles");
         }
+
+        @Bean
+        DefinitionStoreRepository definitionStoreRepository() {
+            initMocks(this);
+            FieldType fieldType = FieldType.builder()
+                .regularExpression("regular expression")
+                .max(null)
+                .min(null)
+                .id("Number")
+                .type("Number")
+                .build();
+            ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+                .caseTypeId(CASE_TYPE_ID)
+                .challengeQuestionId("NoC")
+                .questionText("questionText")
+                .answerFieldType(fieldType)
+                .answerField(ANSWER_FIELD_APPLICANT)
+                .questionId("QuestionId1")
+                .order(1).build();
+            ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
+                Arrays.asList(challengeQuestion));
+            when(definitionStoreApiClient.challengeQuestions(CASE_TYPE_ID, CASE_ID))
+                .thenReturn(challengeQuestionsResult);
+
+            List<CaseRole> caseRoleList = Arrays.asList(
+                CaseRole.builder().id("APPLICANT").name("Applicant").build());
+
+            when(definitionStoreApiClient.caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID)).thenReturn(caseRoleList);
+
+            CaseTypeDefinitionVersion caseTypeDefinitionVersion = new CaseTypeDefinitionVersion();
+            caseTypeDefinitionVersion.setVersion(123);
+            when(definitionStoreApiClient.getLatestVersion(CASE_TYPE_ID)).thenReturn(caseTypeDefinitionVersion);
+
+            return new DefaultDefinitionStoreRepository(definitionStoreApiClient);
+        }
     }
 
     @Autowired
+    private DefinitionStoreRepository repository;
+    @Autowired
     private CacheManager cacheManager;
 
-    @Mock
     private DefinitionStoreApiClient definitionStoreApiClient;
-    private DefinitionStoreRepository repository;
 
     private static final String ANSWER_FIELD_APPLICANT = "${applicant.individual.fullname}|${applicant.company.name}|"
         + "${applicant.soletrader.name}|${OrganisationPolicy1"
@@ -59,54 +99,30 @@ public class DefinitionStoreRepositoryIT {
 
     @Before
     public void setUp() {
-        initMocks(this);
-        FieldType fieldType = FieldType.builder()
-            .regularExpression("regular expression")
-            .max(null)
-            .min(null)
-            .id("Number")
-            .type("Number")
-            .build();
-        ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
-            .caseTypeId(CASE_TYPE_ID)
-            .challengeQuestionId("NoC")
-            .questionText("questionText")
-            .answerFieldType(fieldType)
-            .answerField(ANSWER_FIELD_APPLICANT)
-            .questionId("QuestionId1")
-            .order(1).build();
-        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
-            Arrays.asList(challengeQuestion));
-        when(definitionStoreApiClient.challengeQuestions(CASE_TYPE_ID, CASE_ID))
-            .thenReturn(challengeQuestionsResult);
-
-        List<CaseRole> caseRoleList = Arrays.asList(
-            CaseRole.builder().id("APPLICANT").name("Applicant").build());
-
-        when(definitionStoreApiClient.caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID)).thenReturn(caseRoleList);
-
-        CaseTypeDefinitionVersion caseTypeDefinitionVersion = new CaseTypeDefinitionVersion();
-        caseTypeDefinitionVersion.setVersion(123);
-        when(definitionStoreApiClient.getLatestVersion(CASE_TYPE_ID)).thenReturn(caseTypeDefinitionVersion);
-
-        repository = new DefaultDefinitionStoreRepository(definitionStoreApiClient);
+        definitionStoreApiClient =
+            (DefinitionStoreApiClient) ReflectionTestUtils.getField(repository, "definitionStoreApiClient");
     }
 
     @Test
-    public void verifyChallengeQuestionsCache() {
+    public void verifyChallengeQuestionsCacheContents() {
         repository.challengeQuestions(CASE_TYPE_ID, CASE_ID);
         assertNotNull(cacheManager.getCache("challengeQuestions").getNativeCache());
 
         cacheManager.getCache("challengeQuestions").clear();
         assertEquals(cacheManager.getCache("challengeQuestions").getNativeCache().toString(), "{}");
-
-        repository.challengeQuestions(CASE_TYPE_ID, CASE_ID);
-        assertNotNull(cacheManager.getCache("challengeQuestions").getNativeCache());
-        verify(definitionStoreApiClient, times(1)).challengeQuestions();
     }
 
     @Test
-    public void verifyCaseRolesCache() {
+    public void verifyChallengeQuestionsCache() {
+        repository.challengeQuestions(CASE_TYPE_ID, CASE_ID);
+        repository.challengeQuestions(CASE_TYPE_ID, CASE_ID);
+        repository.challengeQuestions(CASE_TYPE_ID, CASE_ID);
+        repository.challengeQuestions(CASE_TYPE_ID, CASE_ID);
+        verify(definitionStoreApiClient, times(1)).challengeQuestions(CASE_TYPE_ID, CASE_ID);
+    }
+
+    @Test
+    public void verifyCaseRolesCacheContents() {
         repository.caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID);
         assertNotNull(cacheManager.getCache("caseRoles").getNativeCache());
 
@@ -115,6 +131,14 @@ public class DefinitionStoreRepositoryIT {
 
         repository.caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID);
         assertNotNull(cacheManager.getCache("caseRoles").getNativeCache());
-        verify(definitionStoreApiClient, times(1)).caseRoles();
+    }
+
+    @Test
+    public void verifyCaseRolesCache() {
+        repository.caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID);
+        repository.caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID);
+        repository.caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID);
+        repository.caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID);
+        verify(definitionStoreApiClient, times(1)).caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID);
     }
 }

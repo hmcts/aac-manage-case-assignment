@@ -55,6 +55,19 @@ class SecurityUtilsTest {
     }
 
     @Test
+    void hasSolicitorRoleReturnsTrueWhenRoleEndsWithSolicitorAndContainsJurisdiction() {
+        roles.add("caseworker-ia-legalrep-solicitor");
+        assertTrue(securityUtils.hasSolicitorRoleForJurisdiction(roles, "ia"));
+    }
+
+    @Test
+    void hasSolicitorRoleReturnsTrueWhenRoleEndsWithSolicitorAndContainsJurisdictionWithMixedCase() {
+        roles.add("caseworker-Ia-legalrep-SoliciTor");
+        assertTrue(securityUtils.hasSolicitorRoleForJurisdiction(roles, "ia"));
+    }
+
+
+    @Test
     void hasSolicitorRoleReturnsFalseWithInvalidSuffix() {
         roles.add("caseworker-befta_jurisdiction-barrister");
         assertFalse(securityUtils.hasSolicitorRoleForJurisdiction(roles, JURISDICTION));

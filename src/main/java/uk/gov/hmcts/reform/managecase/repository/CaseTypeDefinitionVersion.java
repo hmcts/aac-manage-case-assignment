@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.managecase.repository;
 import java.io.Serializable;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 public class CaseTypeDefinitionVersion implements Serializable {

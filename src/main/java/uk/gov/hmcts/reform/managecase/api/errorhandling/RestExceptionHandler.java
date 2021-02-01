@@ -82,7 +82,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> toResponseEntity(HttpStatus status, String errorMessage, String... errors) {
-        if (errorMessage.equals(ValidationError.NOC_CASE_ID_INVALID)) {
+        if (errorMessage != null && errorMessage.equals(ValidationError.NOC_CASE_ID_INVALID)) {
             NoCApiError apiError = new NoCApiError(status, CASE_ID_INVALID.getErrorMessage(),
                                                    CASE_ID_INVALID.getErrorCode(),
                                                    errors == null ? null : List.of(errors)

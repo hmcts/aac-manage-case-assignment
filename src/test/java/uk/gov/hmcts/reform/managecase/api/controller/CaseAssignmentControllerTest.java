@@ -41,6 +41,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -263,7 +264,7 @@ public class CaseAssignmentControllerTest {
                 .andExpect(status().isBadRequest());
         }
 
-        /*@DisplayName("should fail with 400 bad request when caseIds is empty")
+        @DisplayName("should fail with 400 bad request when caseIds is empty")
         @Test
         void shouldFailWithBadRequestWhenCaseIdsInGetAssignmentsIsEmpty() throws Exception {
 
@@ -284,7 +285,7 @@ public class CaseAssignmentControllerTest {
                                      .queryParam("case_ids", "121324,%12345"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is("Case ID should contain digits only")));
-        }*/
+        }
     }
 
     @Nested

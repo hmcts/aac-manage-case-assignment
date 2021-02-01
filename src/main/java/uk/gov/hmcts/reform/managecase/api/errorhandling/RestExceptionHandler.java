@@ -42,7 +42,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<Object> handleValidationException(Exception ex) {
         log.debug("Validation exception:", ex);
-        return toNewResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
+        return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(CaseCouldNotBeFetchedException.class)
@@ -82,20 +82,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> toResponseEntity(HttpStatus status, String errorMessage, String... errors) {
-        ApiError apiError = new ApiError(status, errorMessage, errors == null ? null : List.of(errors));
-        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+        if (errorMessage.equals(ValidationError.NOC_CASE_ID_INVALID)) {
+            NoCApiError apiError = new NoCApiError(status, CASE_ID_INVALID.getErrorMessage(),
+                                                   CASE_ID_INVALID.getErrorCode(),
+                                                   errors == null ? null : List.of(errors)
+
+            );
+            return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+        } else {
+            ApiError apiError = new ApiError(status, errorMessage, errors == null ? null : List.of(errors));
+            return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+
+        }
     }
 
     private ResponseEntity<Object> toNoCResponseEntity(HttpStatus status, String errorMessage, String errorCode,
                                                        String... errors) {
         NoCApiError apiError = new NoCApiError(status, errorMessage, errorCode, errors == null ? null : List.of(errors)
-        );
-        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
-    }
-
-    private ResponseEntity<Object> toNewResponseEntity(HttpStatus status, String... errors) {
-        NoCApiError apiError = new NoCApiError(status, CASE_ID_INVALID.getErrorMessage(),
-                                               CASE_ID_INVALID.getErrorCode(), errors == null ? null : List.of(errors)
         );
         return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
     }

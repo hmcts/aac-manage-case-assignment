@@ -53,6 +53,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Collections.emptyList;
@@ -61,6 +62,7 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -93,6 +95,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHALLENGE_QUESTION_ANSWERS_EMPTY;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
 
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
 public class NoticeOfChangeControllerTest {
@@ -222,7 +225,7 @@ public class NoticeOfChangeControllerTest {
                     .andExpect(status().isBadRequest());
             }
 
-            /*@DisplayName("should fail with 400 bad request when caseIds is empty")
+            @DisplayName("should fail with 400 bad request when caseIds is empty")
             @Test
             void shouldFailWithBadRequestWhenCaseIdsInGetAssignmentsIsEmpty() throws Exception {
 
@@ -243,7 +246,7 @@ public class NoticeOfChangeControllerTest {
                                          .queryParam("case_id", "121324,%12345"))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.message", is("Case ID should contain digits only")));
-            }*/
+            }
         }
     }
 
@@ -600,7 +603,7 @@ public class NoticeOfChangeControllerTest {
                 .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID)));
         }
 
-        /*@DisplayName("should error if changeOrganisationRequestField not found in Case Details")
+        @DisplayName("should error if changeOrganisationRequestField not found in Case Details")
         @Test
         void shouldFailIfChangeOrganisationRequestFieldNotFound() throws Exception {
             caseDetails = defaultCaseDetails().build();
@@ -624,7 +627,7 @@ public class NoticeOfChangeControllerTest {
                                      .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
-        }*/
+        }
     }
 
     @Nested
@@ -776,7 +779,7 @@ public class NoticeOfChangeControllerTest {
                 .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID)));
         }
 
-        /*@DisplayName("should error if changeOrganisationRequestField not found in Case Details")
+        @DisplayName("should error if changeOrganisationRequestField not found in Case Details")
         @Test
         void shouldFailIfChangeOrganisationRequestFieldNotFound() throws Exception {
             caseDetails = defaultCaseDetails().data(Map.of()).build();
@@ -815,7 +818,7 @@ public class NoticeOfChangeControllerTest {
                                      .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
-        }*/
+        }
     }
 
     @Nested

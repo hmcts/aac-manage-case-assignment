@@ -25,7 +25,7 @@ public class VerifyNoCAnswersRequest {
     @JsonProperty("case_id")
     @NotEmpty(message = ValidationError.CASE_ID_EMPTY)
     @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID_LENGTH)
-    @LuhnCheck(message = ValidationError.CASE_ID_INVALID)
+    @LuhnCheck(message = ValidationError.NOC_CASE_ID_INVALID)
     @ApiModelProperty(value = "Case ID to verify NoC challengeAnswers for", required = true,
         example = "1583841721773828")
     private String caseId;

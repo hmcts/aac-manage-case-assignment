@@ -40,55 +40,55 @@ class SecurityUtilsTest {
 
     @Test
     void hasSolicitorRoleReturnsFalseWhenRolesEmpty() {
-        assertFalse(securityUtils.hasSolicitorRoleForJurisdiction(roles, ""));
+        assertFalse(securityUtils.hasSolicitorAndJurisdictionRoles(roles, ""));
     }
 
     @Test
     void hasSolicitorRoleForJurisdictionReturnsTrueWhenRoleEndsWithSolicitorAndValidCaseWorkerJurisdictionRole() {
         roles.add(CASEWORKER_BEFTA_JURISDICTION_SOLICITOR);
         roles.add(CASEWORKER_BEFTA_JURISDICTION);
-        assertTrue(securityUtils.hasSolicitorRoleForJurisdiction(roles, JURISDICTION));
+        assertTrue(securityUtils.hasSolicitorAndJurisdictionRoles(roles, JURISDICTION));
     }
 
     @Test
     void hasSolicitorRoleForJurisdictionReturnsTrueWhenRoleEndsWithSolicitorAndContainsJurisdiction() {
         roles.add("caseworker-ia-legalrep-solicitor");
         roles.add("caseworker-ia");
-        assertTrue(securityUtils.hasSolicitorRoleForJurisdiction(roles, "ia"));
+        assertTrue(securityUtils.hasSolicitorAndJurisdictionRoles(roles, "ia"));
     }
 
     @Test
     void hasSolicitorRoleForJurisdictionReturnsTrueWithMixedCaseRoles() {
         roles.add("caseworker-ia-SoliciTor");
         roles.add("caSewOrker-iA");
-        assertTrue(securityUtils.hasSolicitorRoleForJurisdiction(roles, "ia"));
+        assertTrue(securityUtils.hasSolicitorAndJurisdictionRoles(roles, "ia"));
     }
 
     @Test
     void hasSolicitorRoleForJurisdictionReturnsFalseWithInvalidSolicitorSuffix() {
         roles.add("caseworker-befta_jurisdiction-barrister");
         roles.add(CASEWORKER_BEFTA_JURISDICTION);
-        assertFalse(securityUtils.hasSolicitorRoleForJurisdiction(roles, JURISDICTION));
+        assertFalse(securityUtils.hasSolicitorAndJurisdictionRoles(roles, JURISDICTION));
     }
 
     @Test
     void hasSolicitorRoleForJurisdictionReturnsFalseWithInvalidAdditionalSuffixAppended() {
         roles.add("caseworker-befta_jurisdiction-solicitorsurname-solicitor-role");
         roles.add(CASEWORKER_BEFTA_JURISDICTION);
-        assertFalse(securityUtils.hasSolicitorRoleForJurisdiction(roles, JURISDICTION));
+        assertFalse(securityUtils.hasSolicitorAndJurisdictionRoles(roles, JURISDICTION));
     }
 
     @Test
     void hasSolicitorRoleForJurisdictionReturnsFalseWhenJurisdictionInRoleDoesNotMatch() {
         roles.add("caseworker-ia-legalrep-solicitor");
         roles.add("caseworker-divorce");
-        assertFalse(securityUtils.hasSolicitorRoleForJurisdiction(roles, "ia"));
+        assertFalse(securityUtils.hasSolicitorAndJurisdictionRoles(roles, "ia"));
     }
 
     @Test
     void hasSolicitorRoleForJurisdictionReturnsFalseWhenJurisdictionSuppliedDoesNotMatch() {
         roles.add("caseworker-ia-legalrep-solicitor");
         roles.add("caseworker-ia");
-        assertFalse(securityUtils.hasSolicitorRoleForJurisdiction(roles, "divorce"));
+        assertFalse(securityUtils.hasSolicitorAndJurisdictionRoles(roles, "divorce"));
     }
 }

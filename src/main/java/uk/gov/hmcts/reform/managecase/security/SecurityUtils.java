@@ -74,7 +74,7 @@ public class SecurityUtils {
         return roles.stream().anyMatch(jurisdictionRole::equalsIgnoreCase);
     }
 
-    public boolean hasSolicitorRoleForJurisdiction(List<String> roles, String jurisdictionId) {
+    public boolean hasSolicitorAndJurisdictionRoles(List<String> roles, String jurisdictionId) {
         return hasSolicitorRole(roles) && hasJurisdictionRole(roles, jurisdictionId);
     }
 }

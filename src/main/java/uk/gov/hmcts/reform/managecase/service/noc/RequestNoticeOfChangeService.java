@@ -127,7 +127,7 @@ public class RequestNoticeOfChangeService {
     }
 
     private boolean isActingAsSolicitor(List<String> roles, String jurisdiction) {
-        return securityUtils.hasSolicitorRoleForJurisdiction(roles, jurisdiction);
+        return securityUtils.hasSolicitorAndJurisdictionRoles(roles, jurisdiction);
     }
 
     private CaseDetails getCaseViaExternalApi(String caseId) {

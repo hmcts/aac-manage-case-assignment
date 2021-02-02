@@ -187,7 +187,7 @@ public class PrepareNoCService {
         UserInfo userInfo = securityUtils.getUserInfo();
         List<String> roles = userInfo.getRoles();
 
-        return securityUtils.hasSolicitorRole(roles, jurisdiction);
+        return securityUtils.hasSolicitorAndJurisdictionRoles(roles, jurisdiction);
     }
 
     private void validate(boolean condition, String errorMessage) {

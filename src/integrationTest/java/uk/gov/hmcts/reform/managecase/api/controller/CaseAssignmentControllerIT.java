@@ -67,8 +67,8 @@ public class CaseAssignmentControllerIT {
     private static final String ANOTHER_USER = "vcd345cvs-816a-4eea-b714-6654d022fcef";
     private static final String CASE_ID = "1588234985453946";
     private static final String CASE_ID2 = "1598630369818638";
-    private static final String ORG_POLICY_ROLE = "caseworker-probate";
-    private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";
+    private static final String ORG_POLICY_ROLE = "[CaseRole1]";
+    private static final String ORG_POLICY_ROLE2 = "[CaseRole2]";
 
     private static final List<String> NULL_CASE_ROLES = null;
 
@@ -89,7 +89,9 @@ public class CaseAssignmentControllerIT {
             request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, ASSIGNEE_ID);
             // Positive stub mappings - individual tests override again for a specific scenario.
             stubGetUsersByOrganisationExternal(usersByOrganisation(user(ASSIGNEE_ID), user(ANOTHER_USER)));
-            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST1-solicitor"));
+            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID,
+                                                         "caseworker-AUTOTEST1-solicitor",
+                                                         "caseworker-AUTOTEST1"));
             stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
             stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE);
         }
@@ -135,11 +137,13 @@ public class CaseAssignmentControllerIT {
         void shouldAssignCaseAccess_whenInvokerSuccessfullyShareACaseWithMixedCaseJurisdictionRole()
             throws Exception {
 
-            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST1-SoLiciToR"));
+            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID,
+                                                         "caseworker-AUTOTEST1-SoLiciToR",
+                                                         "caseworker-AUTOTEST1"));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE))));
@@ -153,11 +157,13 @@ public class CaseAssignmentControllerIT {
         void shouldAssignCaseAccess_whenInvokerSuccessfullyShareACaseWithUpperCaseJurisdictionRole()
             throws Exception {
 
-            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "CASEWORKER-AUTOTEST1-SOLICITOR"));
+            stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID,
+                                                         "CASEWORKER-AUTOTEST1-SOLICITOR",
+                                                         "CASEWORKER-AUTOTEST1"));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE))));
@@ -191,8 +197,8 @@ public class CaseAssignmentControllerIT {
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicitor-role"));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath(
                     "$.message",
@@ -210,8 +216,8 @@ public class CaseAssignmentControllerIT {
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicit"));
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath(
                     "$.message",

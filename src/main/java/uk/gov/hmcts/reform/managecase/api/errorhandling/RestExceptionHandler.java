@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 
 import javax.validation.ValidationException;
+import java.util.Arrays;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.CASE_ID_INVALID;
@@ -82,7 +83,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> toResponseEntity(HttpStatus status, String errorMessage, String... errors) {
-        if (errorMessage != null && errorMessage.equals(ValidationError.NOC_CASE_ID_INVALID)) {
+        Boolean match = Arrays.stream(errors).anyMatch(error -> error.equals(ValidationError.NOC_CASE_ID_INVALID));
+        if (match) {
             NoCApiError apiError = new NoCApiError(status, CASE_ID_INVALID.getErrorMessage(),
                                                    CASE_ID_INVALID.getErrorCode(),
                                                    errors == null ? null : List.of(errors)

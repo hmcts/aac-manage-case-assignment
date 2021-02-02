@@ -16,11 +16,15 @@ public enum NoCValidationError {
                     "case-id-invalid"),
     CASE_ID_EMPTY("Case ID can not be empty", "case-id-empty"),
     CHALLENGE_QUESTION_ANSWERS_EMPTY("Challenge question answers can not be empty",
-                                     "answers-empty");
+                                     "answers-empty"),
+    INVALID_CASE_ROLE_FIELD("CaseRole field within ChangeOrganisationRequest "
+        + "matched none or more than one OrganisationPolicy on the case", "invalid-case-role"),
+    CASE_ID_INVALID_LENGTH("Case ID has to be 16-digits long", "case-id-invalid-length");
 
-
-
-
+    public static final String NOC_CASE_ID_INVALID = "Noc Case ID has to be a valid 16-digit Luhn number";
+    public static final String NOC_CASE_ID_INVALID_LENGTH = "Noc Case ID has to be 16-digits long";
+    public static final String NOC_CASE_ID_EMPTY = "Noc Case ID can not be empty";
+    public static final String NOC_CHALLENGE_QUESTION_ANSWERS_EMPTY = "Noc Challenge question answers can not be empty";
 
     private final String errorMessage;
     private final String errorCode;
@@ -36,6 +40,15 @@ public enum NoCValidationError {
 
     public String getErrorCode() {
         return errorCode;
+    }
+
+    public static String getCodeFromMessage(String message) {
+        for (NoCValidationError e : NoCValidationError.values()) {
+            if (e.getErrorMessage().equalsIgnoreCase(message)) {
+                return e.getErrorCode();
+            }
+        }
+        return null;
     }
 
 }

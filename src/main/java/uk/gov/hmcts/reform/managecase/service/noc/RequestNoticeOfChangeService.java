@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
@@ -110,7 +109,7 @@ public class RequestNoticeOfChangeService {
                 .collect(toList());
 
         if (matchingOrganisationPolicyNodes.size() != 1) {
-            throw new ValidationException(INVALID_CASE_ROLE_FIELD);
+            throw new NoCException(INVALID_CASE_ROLE_FIELD);
         }
 
         changeOrganisationRequest

@@ -43,7 +43,7 @@ public class VerifyNoCAnswersService {
         OrganisationPolicy organisationPolicy = findPolicy(caseDetails, caseRoleId)
             .orElseThrow(() -> new NoCException((String.format("No OrganisationPolicy exists on the case for "
                                                                    + "the case role '%s'",
-                                                               caseRoleId)), "no-org-policy-case"));
+                                                               caseRoleId)), "no-org-policy"));
 
         if (organisationEqualsRequestingUsers(organisationPolicy.getOrganisation())) {
             throw new NoCException("The requestor has answered questions uniquely identifying"

@@ -13,12 +13,12 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
 
 import javax.validation.ValidationException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.CASE_ID_INVALID;
 
 @RestControllerAdvice
 @Slf4j
@@ -82,20 +82,43 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
     }
 
-    private ResponseEntity<Object> toResponseEntity(HttpStatus status, String errorMessage, String... errors) {
-        Boolean match = Arrays.stream(errors).anyMatch(error -> error.equals(ValidationError.NOC_CASE_ID_INVALID));
-        if (match) {
-            NoCApiError apiError = new NoCApiError(status, CASE_ID_INVALID.getErrorMessage(),
-                                                   CASE_ID_INVALID.getErrorCode(),
-                                                   errors == null ? null : List.of(errors)
+    private List<String> noCExceptions = new ArrayList<>(Arrays.asList(
+        NoCValidationError.NOC_CASE_ID_EMPTY,
+        NoCValidationError.NOC_CASE_ID_INVALID,
+        NoCValidationError.NOC_CASE_ID_INVALID_LENGTH,
+        NoCValidationError.NOC_CHALLENGE_QUESTION_ANSWERS_EMPTY
+    ));
 
-            );
-            return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
-        } else {
-            ApiError apiError = new ApiError(status, errorMessage, errors == null ? null : List.of(errors));
-            return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
-
+    private String[] hello(String[] errors) {
+        List<String> er = Arrays.asList(errors);
+        for (String ex : errors) {
+            for (String ux : noCExceptions) {
+                if (ex.equals(ux)) {
+                    String message = ux.substring(4);
+                    int hi = er.indexOf(ux);
+                    er.set(hi, message);
+                }
+            }
         }
+        return er.toArray(new String[0]);
+    }
+
+
+    private ResponseEntity<Object> toResponseEntity(HttpStatus status, String errorMessage, String... errors) {
+        String[] hey = hello(errors);
+        for (String ex : errors) {
+            for (String ux : noCExceptions) {
+                if (ex.equals(ux)) {
+                    String message = ux.substring(4);
+                    String errorCode = NoCValidationError.getCodeFromMessage(message);
+                    NoCApiError apiError = new NoCApiError(status, message, errorCode, List.of(hey)
+                    );
+                    return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+                }
+            }
+        }
+        ApiError apiError = new ApiError(status, errorMessage, errors == null ? null : List.of(errors));
+        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
     }
 
     private ResponseEntity<Object> toNoCResponseEntity(HttpStatus status, String errorMessage, String errorCode,

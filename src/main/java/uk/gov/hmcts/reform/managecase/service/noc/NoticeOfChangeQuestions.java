@@ -24,11 +24,9 @@ import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 
-import javax.validation.ValidationException;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.CHANGE_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.INSUFFICIENT_PRIVILEGE;
@@ -36,6 +34,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidation
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.NOC_EVENT_NOT_AVAILABLE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.NOC_REQUEST_ONGOING;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.NO_ORG_POLICY_WITH_ROLE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.CASE_ID_INVALID;
 
 @Service
 public class NoticeOfChangeQuestions {
@@ -140,7 +139,7 @@ public class NoticeOfChangeQuestions {
             if (HttpStatus.NOT_FOUND.value() == e.status()) {
                 throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
             } else if (HttpStatus.BAD_REQUEST.value() == e.status()) {
-                throw new ValidationException(NOC_CASE_ID_INVALID);
+                throw new NoCException(CASE_ID_INVALID);
             }
         }
         return caseViewResource;

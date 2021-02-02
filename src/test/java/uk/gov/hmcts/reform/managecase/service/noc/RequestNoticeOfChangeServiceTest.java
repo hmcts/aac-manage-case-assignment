@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.validation.ValidationException;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -458,8 +457,8 @@ class RequestNoticeOfChangeServiceTest {
             given(jacksonUtils.convertValue(any(), eq(OrganisationPolicy.class)))
                 .willReturn(organisationPolicy);
 
-            ValidationException exception = assertThrows(
-                ValidationException.class,
+            NoCException exception = assertThrows(
+                NoCException.class,
                 () -> service.setOrganisationToRemove(callbackCaseDetails,
                                                       changeOrganisationRequestBefore,
                                                       "ChangeOrganisationRequestField"));
@@ -485,8 +484,8 @@ class RequestNoticeOfChangeServiceTest {
             given(jacksonUtils.convertValue(any(), eq(OrganisationPolicy.class)))
                 .willReturn(organisationPolicy);
 
-            ValidationException exception = assertThrows(
-                ValidationException.class,
+            NoCException exception = assertThrows(
+                NoCException.class,
                 () -> service.setOrganisationToRemove(callbackCaseDetails,
                                                       changeOrganisationRequestBefore,
                                                       "ChangeOrganisationRequestField"));

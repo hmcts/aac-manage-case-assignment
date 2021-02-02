@@ -8,7 +8,6 @@ public final class ValidationError {
     public static final String ASSIGNEE_ID_EMPTY = "IDAM Assignee ID can not be empty";
     public static final String CASE_ID_EMPTY = "Case ID can not be empty";
     public static final String CASE_ID_INVALID = "Case ID has to be a valid 16-digit Luhn number";
-    public static final String NOC_CASE_ID_INVALID = "NoC Case ID has to be a valid 16-digit Luhn number";
     public static final String CASE_ID_INVALID_LENGTH = "Case ID has to be 16-digits long";
     public static final String CASE_ROLE_FORMAT_INVALID = "Case role name format is invalid";
     public static final String CASE_TYPE_ID_EMPTY = "Case type ID can not be empty";

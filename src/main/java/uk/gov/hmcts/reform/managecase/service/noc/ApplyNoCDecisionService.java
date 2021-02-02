@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
 import feign.FeignException;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -29,9 +28,10 @@ import uk.gov.hmcts.reform.managecase.client.prd.ContactInformation;
 import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
+import uk.gov.hmcts.reform.managecase.domain.AddressUK;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
-import uk.gov.hmcts.reform.managecase.domain.OrganisationAddress;
 import uk.gov.hmcts.reform.managecase.domain.PreviousOrganisation;
+import uk.gov.hmcts.reform.managecase.domain.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequest;
 import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequestStatus;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
@@ -213,7 +213,7 @@ public class ApplyNoCDecisionService {
     }
 
     private String getNonNullStringValue(JsonNode node, String field) {
-        String path = JSON_PATH_SEPARATOR + field.replaceAll("\\.", JSON_PATH_SEPARATOR);
+        String path = JSON_PATH_SEPARATOR + field.replace(".", JSON_PATH_SEPARATOR);
         JsonNode nodeAtPath = node.at(path);
         if (nodeAtPath.isMissingNode() || nodeAtPath.isNull()) {
             throw new ValidationException(String.format("A value is expected for '%s'", field));
@@ -290,7 +290,7 @@ public class ApplyNoCDecisionService {
             FindOrganisationResponse response = prdRepository
                 .findOrganisationAddress(organisationToRemove.getOrganisationID());
 
-            if (response.getContactInformation().size() > 0) {
+            if (!response.getContactInformation().isEmpty()) {
                 PreviousOrganisation previousOrganisation = createPreviousOrganisation(
                     caseDetails,
                     orgPolicyNode,
@@ -308,9 +308,12 @@ public class ApplyNoCDecisionService {
     }
 
     private void insertPreviousOrgNode(JsonNode orgPolicyNode, PreviousOrganisation previousOrganisation) {
+        PreviousOrganisationCollectionItem previousOrganisationCollectionItem =
+            new PreviousOrganisationCollectionItem(null, previousOrganisation);
+
         ((ArrayNode) orgPolicyNode
             .withArray(PREVIOUS_ORGANISATIONS))
-            .insert(0, objectMapper.valueToTree(previousOrganisation));
+            .insert(0, objectMapper.valueToTree(previousOrganisationCollectionItem));
     }
 
     private PreviousOrganisation createPreviousOrganisation(final CaseDetails caseDetails,
@@ -320,25 +323,25 @@ public class ApplyNoCDecisionService {
             log.warn("More than one address received in the response for the organisation {},"
                          + " using first address from the list.", response.getOrganisationIdentifier());
         }
-        OrganisationAddress organisationAddress =  createOrganisationAddress(response.getContactInformation().get(0));
+        AddressUK organisationAddress =  createOrganisationAddress(response.getContactInformation().get(0));
         return PreviousOrganisation
             .builder()
             .organisationName(response.getName())
-            .organisationAddresses(Lists.newArrayList(organisationAddress))
+            .organisationAddress(organisationAddress)
             .fromTimestamp(getFromTimeStamp(caseDetails, orgPolicyNode))
             .toTimestamp(LocalDateTime.now())
             .build();
     }
 
-    private OrganisationAddress createOrganisationAddress(final ContactInformation contactInformation) {
-        return OrganisationAddress.builder()
+    private AddressUK createOrganisationAddress(final ContactInformation contactInformation) {
+        return AddressUK.builder()
             .addressLine1(contactInformation.getAddressLine1())
             .addressLine2(contactInformation.getAddressLine2())
             .addressLine3(contactInformation.getAddressLine3())
             .country(contactInformation.getCountry())
             .county(contactInformation.getCounty())
             .postCode(contactInformation.getPostCode())
-            .townCity(contactInformation.getTownCity())
+            .postTown(contactInformation.getTownCity())
             .build();
     }
 
@@ -351,14 +354,16 @@ public class ApplyNoCDecisionService {
             if (prevOrgsNode == null) {
                 return caseCreatedDate;
             }
-            List<PreviousOrganisation> previousOrganisations = objectMapper
-                .readerFor(new TypeReference<List<PreviousOrganisation>>() {}).readValue(prevOrgsNode);
-            if (previousOrganisations.size() == 0) {
+            List<PreviousOrganisationCollectionItem> previousOrganisations = objectMapper
+                .readerFor(new TypeReference<List<PreviousOrganisationCollectionItem>>() {}).readValue(prevOrgsNode);
+            if (previousOrganisations.isEmpty()) {
                 return caseCreatedDate;
             }
-            previousOrganisations.sort(Comparator.comparing(PreviousOrganisation::getToTimestamp));
-            return previousOrganisations.get(previousOrganisations.size() - 1).getToTimestamp();
+            previousOrganisations.sort(
+                Comparator.comparing(prevOrgCollectionItem -> prevOrgCollectionItem.getValue().getToTimestamp()));
+            return previousOrganisations.get(previousOrganisations.size() - 1).getValue().getToTimestamp();
         } catch (IOException ie) {
+            log.warn("Error encountered while reading PreviousOrganisations from an OrganisationPolicy: ", ie);
             return caseCreatedDate;
         }
     }

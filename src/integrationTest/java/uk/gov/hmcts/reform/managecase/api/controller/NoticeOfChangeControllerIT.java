@@ -374,11 +374,11 @@ public class NoticeOfChangeControllerIT {
                 .andExpect(jsonPath("$.data.OrganisationPolicyField1.OrgPolicyCaseAssignedRole", is(ORG_POLICY_1_ROLE)))
                 .andExpect(jsonPath("$.data.OrganisationPolicyField2.Organisation.OrganisationID").isEmpty())
                 .andExpect(jsonPath("$.data.OrganisationPolicyField2.Organisation.OrganisationName").isEmpty())
-                .andExpect(jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].OrganisationName",
+                .andExpect(jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].value.OrganisationName",
                                     is(ORG_2_NAME)))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].FromTimestamp")
+                .andExpect(jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].value.FromTimestamp")
                                .isNotEmpty())
-                .andExpect(jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].ToTimestamp")
+                .andExpect(jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].value.ToTimestamp")
                                .isNotEmpty())
                 .andExpect(jsonPath("$.data.OrganisationPolicyField2.OrgPolicyReference", is(ORG_POLICY_2_REF)))
                 .andExpect(jsonPath("$.data.OrganisationPolicyField2.OrgPolicyCaseAssignedRole", is(ORG_POLICY_2_ROLE)))

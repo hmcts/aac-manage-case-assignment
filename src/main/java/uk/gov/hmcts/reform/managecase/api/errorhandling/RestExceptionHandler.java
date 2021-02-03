@@ -82,48 +82,48 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
     }
 
-    private List<String> noCExceptions = new ArrayList<>(Arrays.asList(
+    private final List<String> noCConstraintErrors = new ArrayList<>(Arrays.asList(
         NoCValidationError.NOC_CASE_ID_EMPTY,
         NoCValidationError.NOC_CASE_ID_INVALID,
         NoCValidationError.NOC_CASE_ID_INVALID_LENGTH,
         NoCValidationError.NOC_CHALLENGE_QUESTION_ANSWERS_EMPTY
     ));
 
-    private String[] hello(String[] errors) {
-        List<String> er = Arrays.asList(errors);
-        for (String ex : errors) {
-            for (String ux : noCExceptions) {
-                if (ex.equals(ux)) {
-                    String message = ux.substring(4);
-                    int hi = er.indexOf(ux);
-                    er.set(hi, message);
+    private String[] convertNoCErrors(String[] errors) {
+        List<String> errorList = Arrays.asList(errors);
+        for (String error : errors) {
+            for (String exception : noCConstraintErrors) {
+                if (error.equals(exception)) {
+                    String message = exception.substring(4);
+                    int hi = errorList.indexOf(exception);
+                    errorList.set(hi, message);
                 }
             }
         }
-        return er.toArray(new String[0]);
+        return errorList.toArray(new String[0]);
     }
 
 
-    private ResponseEntity<Object> toResponseEntity(HttpStatus status, String errorMessage, String... errors) {
-        String[] hey = hello(errors);
-        for (String ex : errors) {
-            for (String ux : noCExceptions) {
-                if (ex.equals(ux)) {
-                    String message = ux.substring(4);
-                    String errorCode = NoCValidationError.getCodeFromMessage(message);
-                    NoCApiError apiError = new NoCApiError(status, message, errorCode, List.of(hey)
-                    );
+    private ResponseEntity<Object> toResponseEntity(HttpStatus status, String message, String... errors) {
+        for (String error : errors) {
+            for (String exception : noCConstraintErrors) {
+                if (error.equals(exception)) {
+                    message = exception.substring(4);
+                    String code = NoCValidationError.getCodeFromMessage(message);
+                    convertNoCErrors(errors);
+                    NoCApiError apiError = new NoCApiError(status, message, code, errors == null ? null :
+                        List.of(errors));
                     return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
                 }
             }
         }
-        ApiError apiError = new ApiError(status, errorMessage, errors == null ? null : List.of(errors));
+        ApiError apiError = new ApiError(status, message, errors == null ? null : List.of(errors));
         return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
     }
 
-    private ResponseEntity<Object> toNoCResponseEntity(HttpStatus status, String errorMessage, String errorCode,
+    private ResponseEntity<Object> toNoCResponseEntity(HttpStatus status, String message, String code,
                                                        String... errors) {
-        NoCApiError apiError = new NoCApiError(status, errorMessage, errorCode, errors == null ? null : List.of(errors)
+        NoCApiError apiError = new NoCApiError(status, message, code, errors == null ? null : List.of(errors)
         );
         return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
     }

@@ -19,6 +19,8 @@ import static com.google.common.base.CharMatcher.anyOf;
 import static com.google.common.base.CharMatcher.whitespace;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.ANSWERS_NOT_IDENTIFY_LITIGANT;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.ANSWERS_NOT_MATCH_LITIGANT;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.TEXT;
 
 @Component
@@ -48,12 +50,11 @@ public class ChallengeAnswerValidator {
             .collect(toList());
 
         if (matchingCaseRoleIds.isEmpty()) {
-            throw new NoCException("The answers did not match those for any litigant",
-                                   "answers-not-matched-any-litigant");
+            throw new NoCException(ANSWERS_NOT_MATCH_LITIGANT);
         }
 
         if (matchingCaseRoleIds.size() > 1) {
-            throw new NoCException("The answers did not uniquely identify a litigant", "answers-not-identify-litigant");
+            throw new NoCException(ANSWERS_NOT_IDENTIFY_LITIGANT);
         }
 
         return matchingCaseRoleIds.get(0);

@@ -19,6 +19,11 @@ public enum NoCValidationError {
                                      "answers-empty"),
     INVALID_CASE_ROLE_FIELD("CaseRole field within ChangeOrganisationRequest "
         + "matched none or more than one OrganisationPolicy on the case", "invalid-case-role"),
+    REQUESTOR_ALREADY_REPRESENTS("The requestor has answered questions uniquely identifying"
+        + " a litigant that they are already representing", "has-represented"),
+    ANSWERS_NOT_MATCH_LITIGANT("The answers did not match those for any litigant",
+                  "answers-not-matched-any-litigant"),
+    ANSWERS_NOT_IDENTIFY_LITIGANT("The answers did not uniquely identify a litigant", "answers-not-identify-litigant"),
     CASE_ID_INVALID_LENGTH("Case ID has to be 16-digits long", "case-id-invalid-length");
 
     public static final String NOC_CASE_ID_INVALID = "Noc Case ID has to be a valid 16-digit Luhn number";
@@ -43,9 +48,9 @@ public enum NoCValidationError {
     }
 
     public static String getCodeFromMessage(String message) {
-        for (NoCValidationError e : NoCValidationError.values()) {
-            if (e.getErrorMessage().equalsIgnoreCase(message)) {
-                return e.getErrorCode();
+        for (NoCValidationError error : NoCValidationError.values()) {
+            if (error.getErrorMessage().equalsIgnoreCase(message)) {
+                return error.getErrorCode();
             }
         }
         return null;

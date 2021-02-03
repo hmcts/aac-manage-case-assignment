@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.REQUESTOR_ALREADY_REPRESENTS;
+
 @Service
 public class VerifyNoCAnswersService {
 
@@ -46,8 +48,7 @@ public class VerifyNoCAnswersService {
                                                                caseRoleId)), "no-org-policy"));
 
         if (organisationEqualsRequestingUsers(organisationPolicy.getOrganisation())) {
-            throw new NoCException("The requestor has answered questions uniquely identifying"
-                + " a litigant that they are already representing", "has-represented");
+            throw new NoCException(REQUESTOR_ALREADY_REPRESENTS);
         }
 
         noCRequestDetails.setOrganisationPolicy(organisationPolicy);

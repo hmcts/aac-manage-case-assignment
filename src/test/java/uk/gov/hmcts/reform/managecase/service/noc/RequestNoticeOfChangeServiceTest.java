@@ -49,7 +49,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
@@ -323,6 +323,9 @@ class RequestNoticeOfChangeServiceTest {
             NoCException.class,
             () -> service.requestNoticeOfChange(noCRequestDetails)
         );
+
+        assertThat(exception.getErrorCode()).isEqualTo("missing-cor-case-role-id");
+
         assertThat(exception.getMessage()).isEqualTo(
             String.format("Missing ChangeOrganisationRequest.CaseRoleID %s in the case definition",
                           CASE_ASSIGNED_ROLE));
@@ -463,8 +466,10 @@ class RequestNoticeOfChangeServiceTest {
                                                       changeOrganisationRequestBefore,
                                                       "ChangeOrganisationRequestField"));
 
+            assertThat(exception.getErrorCode()).isEqualTo(INVALID_CASE_ROLE_FIELD.getErrorCode());
+
             assertThat(exception.getMessage())
-                .isEqualTo(INVALID_CASE_ROLE_FIELD);
+                .isEqualTo(INVALID_CASE_ROLE_FIELD.getErrorMessage());
         }
 
         @Test
@@ -490,8 +495,10 @@ class RequestNoticeOfChangeServiceTest {
                                                       changeOrganisationRequestBefore,
                                                       "ChangeOrganisationRequestField"));
 
+            assertThat(exception.getErrorCode()).isEqualTo(INVALID_CASE_ROLE_FIELD.getErrorCode());
+
             assertThat(exception.getMessage())
-                .isEqualTo(INVALID_CASE_ROLE_FIELD);
+                .isEqualTo(INVALID_CASE_ROLE_FIELD.getErrorMessage());
         }
     }
 }

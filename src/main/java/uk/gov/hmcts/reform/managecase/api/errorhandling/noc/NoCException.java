@@ -16,4 +16,8 @@ public class NoCException extends RuntimeException {
         errorCode = code;
         errorMessage = message;
     }
+
+    public String getErrorCode() {
+        return errorCode;
+    }
 }

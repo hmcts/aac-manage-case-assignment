@@ -23,6 +23,8 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.ANSWERS_NOT_IDENTIFY_LITIGANT;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.ANSWERS_NOT_MATCH_LITIGANT;
 
 @SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.DataflowAnomalyAnalysis",
     "PMD.TooManyMethods", "PMD.UseConcurrentHashMap"})
@@ -90,8 +92,11 @@ class ChallengeAnswerValidatorTest {
         NoCException exception = assertThrows(NoCException.class,
             () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails));
 
+        assertThat(exception.getErrorCode(), is("answers-mismatch-questions"));
+
         assertThat(exception.getMessage(),
             is("The number of provided answers must match the number of questions - expected 2 answers, received 3"));
+
     }
 
     @Test
@@ -112,6 +117,8 @@ class ChallengeAnswerValidatorTest {
             () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails));
 
         assertThat(exception.getMessage(), is("No answer has been provided for question ID 'OtherQuestionId1'"));
+
+        assertThat(exception.getErrorCode(), is("no-answer-provided-for-question"));
     }
 
     @Test
@@ -132,7 +139,9 @@ class ChallengeAnswerValidatorTest {
         NoCException exception = assertThrows(NoCException.class,
             () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails));
 
-        assertThat(exception.getMessage(), is("The answers did not uniquely identify a litigant"));
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_IDENTIFY_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getMessage(), is(ANSWERS_NOT_IDENTIFY_LITIGANT.getErrorMessage()));
     }
 
     @Test
@@ -152,7 +161,9 @@ class ChallengeAnswerValidatorTest {
         NoCException exception = assertThrows(NoCException.class,
             () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails));
 
-        assertThat(exception.getMessage(), is("The answers did not match those for any litigant"));
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
     }
 
     @Test
@@ -194,7 +205,9 @@ class ChallengeAnswerValidatorTest {
         NoCException exception = assertThrows(NoCException.class,
             () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails));
 
-        assertThat(exception.getMessage(), is("The answers did not match those for any litigant"));
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
     }
 
     private ChallengeQuestion challengeQuestion(String questionId, String answerField, FieldType answerFieldType) {

@@ -94,9 +94,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         for (String error : errors) {
             for (String exception : noCConstraintErrors) {
                 if (error.equals(exception)) {
-                    String message = exception.substring(4);
-                    int hi = errorList.indexOf(exception);
-                    errorList.set(hi, message);
+                    errorList.set(errorList.indexOf(exception), exception.substring(4));
                 }
             }
         }

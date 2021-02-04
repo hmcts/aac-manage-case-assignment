@@ -87,7 +87,7 @@ public class RequestNoticeOfChangeService {
 
         // Auto-assign relevant case-roles to the invoker if required
         if (isApprovalComplete
-            && isActingAsSolicitor(securityUtils.getUserInfo().getRoles())) {
+            && isActingAsSolicitor(securityUtils.getUserInfo().getRoles(), caseDetails.getJurisdiction())) {
             autoAssignCaseRoles(caseDetails, invokersOrganisation);
         }
 
@@ -126,8 +126,8 @@ public class RequestNoticeOfChangeService {
             .build();
     }
 
-    private boolean isActingAsSolicitor(List<String> roles) {
-        return securityUtils.hasSolicitorRole(roles);
+    private boolean isActingAsSolicitor(List<String> roles, String jurisdiction) {
+        return securityUtils.hasSolicitorAndJurisdictionRoles(roles, jurisdiction);
     }
 
     private CaseDetails getCaseViaExternalApi(String caseId) {

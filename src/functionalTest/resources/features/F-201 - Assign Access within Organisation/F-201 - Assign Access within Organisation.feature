@@ -86,11 +86,11 @@ Feature: F-201: Assign Access within Organisation
       And the response has all the details as expected,
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.6
-  Scenario: Must return an error response for an assignee user who doesn't have a valid solicitor role
+  @S-201.6a
+  Scenario: Must return an error response for an assignee user who doesn't have a solicitor role for the jurisdiction of the case
 
     Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
-      And a user [S2 - who does not have a solicitor role but works within the same organisation as S1],
+      And a user [S2 - who does not have a solicitor role for the jurisdiction of C1 but works within the same organisation as S1],
       And a case [C1, which S1 has just] created as in [F-201_Prerequisite_Case_Creation_C1],
 
      When a request is prepared with appropriate values,
@@ -98,6 +98,21 @@ Feature: F-201: Assign Access within Organisation
       And it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
 
      Then a negative response is received,
+      And the response has all the details as expected.
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  @S-201.6b
+  Scenario: Must return an error response for an assignee user who doesn't have a valid solicitor role for the jurisdiction of the case
+
+    Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
+      And a user [S2 - who does not have a valid solicitor role],
+      And a case [C1, which S1 has just] created as in [F-201_Prerequisite_Case_Creation_C1],
+
+    When a request is prepared with appropriate values,
+      And the request [intends to assign access within the same organisation for S2 by S1],
+      And it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
+
+    Then a negative response is received,
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -144,18 +159,3 @@ Feature: F-201: Assign Access within Organisation
 
      Then a negative response is received,
       And the response has all the details as expected.
-
-#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.10
-  Scenario: Must return an error response for an assignee user who doesn't have a valid solicitor role for the jurisdiction of the case
-
-    Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
-    And a user [S2 - who does not have a valid solicitor role],
-    And a case [C1, which S1 has just] created as in [F-201_Prerequisite_Case_Creation_C1],
-
-    When a request is prepared with appropriate values,
-    And the request [intends to assign access within the same organisation for S2 by S1],
-    And it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
-
-    Then a negative response is received,
-    And the response has all the details as expected.

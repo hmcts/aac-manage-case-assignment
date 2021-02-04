@@ -326,7 +326,7 @@ class RequestNoticeOfChangeServiceTest {
 
         assertThat(exception.getErrorCode()).isEqualTo("missing-cor-case-role-id");
 
-        assertThat(exception.getMessage()).isEqualTo(
+        assertThat(exception.getErrorMessage()).isEqualTo(
             String.format("Missing ChangeOrganisationRequest.CaseRoleID %s in the case definition",
                           CASE_ASSIGNED_ROLE));
     }
@@ -468,7 +468,7 @@ class RequestNoticeOfChangeServiceTest {
 
             assertThat(exception.getErrorCode()).isEqualTo(INVALID_CASE_ROLE_FIELD.getErrorCode());
 
-            assertThat(exception.getMessage())
+            assertThat(exception.getErrorMessage())
                 .isEqualTo(INVALID_CASE_ROLE_FIELD.getErrorMessage());
         }
 
@@ -497,7 +497,7 @@ class RequestNoticeOfChangeServiceTest {
 
             assertThat(exception.getErrorCode()).isEqualTo(INVALID_CASE_ROLE_FIELD.getErrorCode());
 
-            assertThat(exception.getMessage())
+            assertThat(exception.getErrorMessage())
                 .isEqualTo(INVALID_CASE_ROLE_FIELD.getErrorMessage());
         }
     }

@@ -114,7 +114,7 @@ class VerifyNoCAnswersServiceTest {
             verifyNoCAnswersService.verifyNoCAnswers(request));
 
         assertAll(
-            () -> assertThat(exception.getMessage(),
+            () -> assertThat(exception.getErrorMessage(),
                 is("No OrganisationPolicy exists on the case for the case role '[OtherRole]'")),
 
             () -> assertThat(exception.getErrorCode(), is("no-org-policy"))
@@ -133,7 +133,7 @@ class VerifyNoCAnswersServiceTest {
             verifyNoCAnswersService.verifyNoCAnswers(request));
 
         assertAll(
-            () -> assertThat(exception.getMessage(), is(REQUESTOR_ALREADY_REPRESENTS.getErrorMessage())),
+            () -> assertThat(exception.getErrorMessage(), is(REQUESTOR_ALREADY_REPRESENTS.getErrorMessage())),
 
             () -> assertThat(exception.getErrorCode(), is(REQUESTOR_ALREADY_REPRESENTS.getErrorCode()))
         );

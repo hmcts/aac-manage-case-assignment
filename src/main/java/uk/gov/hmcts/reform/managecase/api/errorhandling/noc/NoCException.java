@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.managecase.api.errorhandling.noc;
 
 @SuppressWarnings({"PMD.MissingSerialVersionUID"})
 public class NoCException extends RuntimeException {
-    public String errorCode;
-    public String errorMessage;
+    private final String errorCode;
+    private final String errorMessage;
 
     public NoCException(NoCValidationError message) {
         super(message.getErrorMessage());
@@ -19,5 +19,9 @@ public class NoCException extends RuntimeException {
 
     public String getErrorCode() {
         return errorCode;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
     }
 }

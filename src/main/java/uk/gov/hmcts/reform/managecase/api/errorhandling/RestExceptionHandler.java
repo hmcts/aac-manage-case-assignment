@@ -62,7 +62,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(NoCException.class)
     public ResponseEntity<Object> handleNoCException(NoCException ex) {
         log.debug("NoC Validation exception: {}", ex.getMessage(), ex);
-        return toNoCResponseEntity(HttpStatus.BAD_REQUEST, ex.errorMessage, ex.errorCode);
+        return toNoCResponseEntity(HttpStatus.BAD_REQUEST, ex.getErrorMessage(), ex.getErrorCode());
     }
 
     @ExceptionHandler(CaseIdLuhnException.class)

@@ -1,0 +1,32 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/internal/v1/organisations",
+    "queryParameters": {
+      "id": {
+        "equalTo": "LESTKK0"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "contactInformation": [
+        {
+          "addressLine1": "Org 2 Line 1",
+          "addressLine2": "Org 2 Line 2",
+          "addressLine3": null,
+          "county": null,
+          "townCity": "London",
+          "country": null,
+          "postCode": "SW1H 9GL"
+        }
+      ],
+      "organisationIdentifier": "LESTKK0",
+      "name": "BEFTA Organisation2"
+    }
+  }
+}

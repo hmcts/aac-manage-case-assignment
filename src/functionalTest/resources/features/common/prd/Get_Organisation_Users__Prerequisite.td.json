@@ -1,13 +1,13 @@
 {
-  "_guid_": "Get_Organisation_Details__Prerequisite",
+  "_guid_": "Get_Organisation_Users__Prerequisite",
 
-  "title": "Retrieve an organisations details from PRD",
+  "title": "Retrieve an organisations users from PRD",
 
   "productName": "RD Professional API",
   "operationName": "Retrieves the details of an organisation",
 
   "method": "GET",
-  "uri": "{{RD_PROFESSIONAL_API_BASE_URL}}/refdata/internal/v1/organisations",
+  "uri": "{{RD_PROFESSIONAL_API_BASE_URL}}/refdata/internal/v1/organisations/{id}/users",
 
   "s2sClientId": "aac_manage_case_assignment",
 
@@ -23,8 +23,11 @@
 
   "request": {
     "_extends_": "Common_Request",
-    "queryParams": {
+    "pathVariables": {
       "id": "${[scenarioContext][siblingContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
+    },
+    "queryParams": {
+      "returnRoles": "false"
     }
   },
 
@@ -35,9 +38,8 @@
       "Content-Type": "[[ANYTHING_PRESENT]]"
     },
     "body": {
-      "contactInformation": "[[ANYTHING_PRESENT]]",
-      "organisationIdentifier": "[[ANYTHING_PRESENT]]",
-      "name": "[[ANYTHING_PRESENT]]"
+      "users": "[[ANYTHING_PRESENT]]",
+      "organisationIdentifier": "[[ANYTHING_PRESENT]]"
     }
   }
 }

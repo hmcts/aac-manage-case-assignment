@@ -24,7 +24,9 @@
   },
 
   "prerequisites": [
-    { "case_snapshot": "F-206_Take_Case_Data_Snapshot_For_NoC_Case_Created_By_Mario" }
+    { "case_snapshot": "F-206_Take_Case_Data_Snapshot_For_NoC_Case_Created_By_Mario" },
+    { "Get_Organisation_Users": "Get_Organisation_Users__Prerequisite_Org2" },
+    { "Get_Organisation_Details": "Get_Organisation_Details__Prerequisite_Org2" }
   ],
 
   "request": {

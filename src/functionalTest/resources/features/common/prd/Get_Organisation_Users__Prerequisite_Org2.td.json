@@ -1,0 +1,11 @@
+{
+  "_guid_": "Get_Organisation_Users__Prerequisite_Org2",
+  "_extends_": "Get_Organisation_Users__Prerequisite",
+
+  "request": {
+    "pathVariables": {
+      "id": "LESTKK0"
+    }
+  }
+
+}

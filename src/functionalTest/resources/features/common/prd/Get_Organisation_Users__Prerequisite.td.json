@@ -27,6 +27,7 @@
       "id": "${[scenarioContext][siblingContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
     },
     "queryParams": {
+      "status": "Active",
       "returnRoles": "false"
     }
   },

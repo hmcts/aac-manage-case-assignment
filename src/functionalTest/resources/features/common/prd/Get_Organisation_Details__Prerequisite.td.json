@@ -24,7 +24,8 @@
   "request": {
     "_extends_": "Common_Request",
     "queryParams": {
-      "id": "${[scenarioContext][siblingContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
+      "id": "${[scenarioContext][siblingContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}",
+      "returnRoles": "false"
     }
   },
 

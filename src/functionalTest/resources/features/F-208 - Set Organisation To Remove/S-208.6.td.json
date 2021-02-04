@@ -63,6 +63,7 @@
     "body": {
       "status" : "BAD_REQUEST",
       "message": "CaseRole field within ChangeOrganisationRequest matched none or more than one OrganisationPolicy on the case",
+      "code" : "invalid-case-role",
       "errors" : [ ]
     }
   }

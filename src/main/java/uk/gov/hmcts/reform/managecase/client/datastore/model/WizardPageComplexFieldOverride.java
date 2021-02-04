@@ -18,6 +18,9 @@ public class WizardPageComplexFieldOverride implements Serializable {
     @JsonProperty("display_context")
     private String displayContext;
 
+    @JsonProperty("retain_hidden_value")
+    private Boolean retainHiddenValue;
+
     @JsonProperty("label")
     private String label;
 

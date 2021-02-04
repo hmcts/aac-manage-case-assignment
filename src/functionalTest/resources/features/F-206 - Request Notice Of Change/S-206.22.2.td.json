@@ -44,6 +44,7 @@
     "body": {
       "status" : "BAD_REQUEST",
       "message": "The number of provided answers must match the number of questions - expected 2 answers, received 3",
+      "code" : "answers-mismatch-questions",
       "errors" : [ ]
     }
   }

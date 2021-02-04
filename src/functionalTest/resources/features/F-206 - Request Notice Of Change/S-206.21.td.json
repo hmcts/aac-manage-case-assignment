@@ -36,7 +36,8 @@
     "_extends_": "ACA_400_Response",
     "body": {
       "status" : "BAD_REQUEST",
-      "message": "Insufficient privileges for notice of change request",
+      "message" : "The number of provided answers must match the number of questions - expected 2 answers, received 1",
+      "code" : "answers-mismatch-questions",
       "errors" : [ ]
     }
   }

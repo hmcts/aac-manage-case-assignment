@@ -172,7 +172,7 @@ class NoticeOfChangeQuestionsTest {
                                              Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicitor")
             );
             given(securityUtils.getUserInfo()).willReturn(userInfo);
-            given(securityUtils.hasSolicitorRole(anyList(), any())).willReturn(true);
+            given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), any())).willReturn(true);
             ChallengeQuestionsResult challengeQuestionsResult = service.getChallengeQuestions(CASE_ID);
 
             assertThat(challengeQuestionsResult).isNotNull();
@@ -192,7 +192,7 @@ class NoticeOfChangeQuestionsTest {
                                              Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicitor")
             );
             given(securityUtils.getUserInfo()).willReturn(userInfo);
-            given(securityUtils.hasSolicitorRole(anyList(), any())).willReturn(true);
+            given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), any())).willReturn(true);
             NoCRequestDetails noCRequestDetails = service.challengeQuestions(CASE_ID);
 
             assertThat(noCRequestDetails).isNotNull();
@@ -361,7 +361,7 @@ class NoticeOfChangeQuestionsTest {
                                              Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicit")
             );
             given(securityUtils.getUserInfo()).willReturn(userInfo);
-            given(securityUtils.hasSolicitorRole(anyList(), any())).willReturn(false);
+            given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), any())).willReturn(false);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(ValidationException.class)

@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/refdata/internal/v1/organisations/Org-Two/users",
+    "urlPath": "/refdata/internal/v1/organisations/LESTKK0/users",
     "queryParameters": {
       "returnRoles": {
         "equalTo": "false"

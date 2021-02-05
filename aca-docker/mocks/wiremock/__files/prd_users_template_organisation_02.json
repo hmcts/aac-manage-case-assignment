@@ -13,7 +13,14 @@
       "lastName": "Solicington",
       "email": "befta.master.solicitor.tony@gmail.com",
       "idamStatus": "ACTIVE"
+    },
+    {
+      "userIdentifier": "",
+      "firstName" : "BEFTA",
+      "lastName" : "Organisation2",
+      "email" : "befta.organisation2@gmail.com",
+      "idamStatus" : "ACTIVE"
     }
   ],
-  "organisationIdentifier": "Org-Two"
+  "organisationIdentifier": "LESTKK0"
 }

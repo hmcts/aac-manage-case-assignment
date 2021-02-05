@@ -1,4 +1,6 @@
 [
   {"email": "master.caa@gmail.com", "roles": "caseworker,caseworker-caa", "lastName": "caa", "firstName": "master"},
-  {"email": "noc.approver@gmail.com", "roles": "caseworker-approver", "lastName": "noc", "firstName": "approver"}
+  {"email": "noc.approver@gmail.com", "roles": "caseworker,caseworker-approver,prd-aac-system", "lastName": "noc", "firstName": "approver"},
+
+  {"email": "befta.organisation2@gmail.com", "roles": "caseworker", "lastName": "Organisation2", "firstName": "BEFTA"}
 ]

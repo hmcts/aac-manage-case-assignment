@@ -13,9 +13,9 @@
               "value": {
                 "ToTimestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
                 "FromTimestamp" : "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][respondentOrganisationPolicy][PreviousOrganisations][0][value][ToTimestamp]}",
-                "OrganisationName" : "Org2Name",
+                "OrganisationName" : "BEFTA Organisation2",
                 "OrganisationAddress" : {
-                  "_extends_": "Organisation_Address_Organisation_02"
+                  "_extends_": "AddressUK_Organisation_02"
                 }
               }
             },

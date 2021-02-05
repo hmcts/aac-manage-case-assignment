@@ -16,5 +16,3 @@ java:
     S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     CCD_DATA_STORE_API_BASE_URL: http://ccd-data-store-api-pr-1260.service.core-compute-preview.internal
     CCD_DEFINITION_STORE_API_BASE_URL: http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal
-    # ccd-test app-insights key - remove once testing is done
-    APPINSIGHTS_INSTRUMENTATIONKEY: 2dcb834e-768e-4429-9050-ab15af959995

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.managecase.api.errorhandling;
 
+import com.google.common.collect.ImmutableList;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -17,13 +18,19 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
 
 import javax.validation.ValidationException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @RestControllerAdvice
 @Slf4j
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+
+    private static final List<String> NOC_CONSTRAINT_ERRORS = ImmutableList.of(
+        NoCValidationError.NOC_CASE_ID_EMPTY,
+        NoCValidationError.NOC_CASE_ID_INVALID,
+        NoCValidationError.NOC_CASE_ID_INVALID_LENGTH,
+        NoCValidationError.NOC_CHALLENGE_QUESTION_ANSWERS_EMPTY
+    );
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
@@ -83,17 +90,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
     }
 
-    private final List<String> noCConstraintErrors = new ArrayList<>(Arrays.asList(
-        NoCValidationError.NOC_CASE_ID_EMPTY,
-        NoCValidationError.NOC_CASE_ID_INVALID,
-        NoCValidationError.NOC_CASE_ID_INVALID_LENGTH,
-        NoCValidationError.NOC_CHALLENGE_QUESTION_ANSWERS_EMPTY
-    ));
+
 
     private String[] convertNoCErrors(String[] errors) {
         List<String> errorList = Arrays.asList(errors);
         for (String error : errorList) {
-            for (String exception : noCConstraintErrors) {
+            for (String exception : NOC_CONSTRAINT_ERRORS) {
                 if (error.equals(exception)) {
                     errorList.set(errorList.indexOf(exception), exception.substring(4));
                     break;
@@ -106,7 +108,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private ResponseEntity<Object> handleConstraintErrors(String[] errorsToConvert, HttpStatus status) {
         List<String> errorList = Arrays.asList(errorsToConvert);
         String error = errorList.get(0);
-        for (String exception : noCConstraintErrors) {
+        for (String exception : NOC_CONSTRAINT_ERRORS) {
             if (error.equals(exception)) {
                 String message = exception.substring(4);
                 String code = NoCValidationError.getCodeFromMessage(message);
@@ -126,7 +128,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
 
     private ResponseEntity<Object> toResponseEntity(HttpStatus status, String message, String... errors) {
-        if (errors != null && Arrays.stream(errors).anyMatch(noCConstraintErrors::contains)) {
+        if (errors != null && Arrays.stream(errors).anyMatch(NOC_CONSTRAINT_ERRORS::contains)) {
             return handleConstraintErrors(errors, status);
         }
         ApiError apiError = new ApiError(status, message, errors == null ? null : List.of(errors));

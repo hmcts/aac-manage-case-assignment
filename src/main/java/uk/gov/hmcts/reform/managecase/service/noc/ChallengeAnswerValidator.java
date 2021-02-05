@@ -21,6 +21,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.ANSWERS_NOT_IDENTIFY_LITIGANT;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.ANSWERS_NOT_MATCH_LITIGANT;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.NO_ANSWER_PROVIDED;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.ANSWER_MISMATCH_QUESTIONS;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.TEXT;
 
 @Component
@@ -98,9 +100,8 @@ public class ChallengeAnswerValidator {
         int noOfQuestions = challengeQuestions.getQuestions().size();
         int noOfProvidedAnswers = answers.size();
         if (noOfQuestions != noOfProvidedAnswers) {
-            throw new NoCException((String.format(
-                "The number of provided answers must match the number of questions - expected %s answers, received %s",
-                noOfQuestions, noOfProvidedAnswers)),"answers-mismatch-questions");
+            throw new NoCException((String.format(ANSWER_MISMATCH_QUESTIONS.getErrorMessage(), noOfQuestions,
+                                                  noOfProvidedAnswers)), ANSWER_MISMATCH_QUESTIONS.getErrorCode());
         }
     }
 
@@ -110,7 +111,7 @@ public class ChallengeAnswerValidator {
             .filter(answer -> answer.getQuestionId().equals(questionId))
             .findFirst()
             .orElseThrow(() -> new NoCException((String.format(
-                "No answer has been provided for question ID '%s'", questionId)),"no-answer-provided-for-question"));
+                NO_ANSWER_PROVIDED.getErrorMessage(), questionId)),NO_ANSWER_PROVIDED.getErrorCode()));
     }
 
     private boolean isEqualAnswer(String expectedAnswer, String actualAnswer, FieldType fieldType) {

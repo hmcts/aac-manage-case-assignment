@@ -427,7 +427,7 @@ public class NoticeOfChangeController {
                 + "\n2) " + CASE_ID_INVALID_LENGTH
                 + "\n3) " + CASE_ID_EMPTY
                 + "\n4) " + CHALLENGE_QUESTION_ANSWERS_EMPTY
-                + "\n5) " + "Missing ChangeOrganisationRequest.CaseRoleID %s in the case definition",
+                + "\n5) " + "Missing ChangeOrganisationRequest.CaseRoleID [APPLICANT] in the case definition",
             response = NoCApiError.class,
             examples = @Example({
                 @ExampleProperty(

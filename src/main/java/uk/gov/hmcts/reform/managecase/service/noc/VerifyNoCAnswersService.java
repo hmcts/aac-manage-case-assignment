@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.NO_ORG_POLICY_FOR_CASE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.REQUESTOR_ALREADY_REPRESENTS;
 
 @Service
@@ -43,9 +44,8 @@ public class VerifyNoCAnswersService {
                 verifyNoCAnswersRequest.getAnswers(), caseDetails);
 
         OrganisationPolicy organisationPolicy = findPolicy(caseDetails, caseRoleId)
-            .orElseThrow(() -> new NoCException((String.format("No OrganisationPolicy exists on the case for "
-                                                                   + "the case role '%s'",
-                                                               caseRoleId)), "no-org-policy"));
+            .orElseThrow(() -> new NoCException((String.format(NO_ORG_POLICY_FOR_CASE.getErrorMessage(),
+                                                               caseRoleId)), NO_ORG_POLICY_FOR_CASE.getErrorCode()));
 
         if (organisationEqualsRequestingUsers(organisationPolicy.getOrganisation())) {
             throw new NoCException(REQUESTOR_ALREADY_REPRESENTS);

@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.INVALID_CASE_ROLE_FIELD;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.MISSING_COR_CASE_ROLE;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
@@ -184,8 +185,8 @@ public class RequestNoticeOfChangeService {
             .findFirst()
             .orElseThrow(
                 () -> new NoCException((String.format(
-                    "Missing ChangeOrganisationRequest.CaseRoleID %s in the case definition", caseRole)),
-                                       "missing-cor-case-role-id")
+                    MISSING_COR_CASE_ROLE.getErrorMessage(), caseRole)),
+                                       MISSING_COR_CASE_ROLE.getErrorCode())
             );
     }
 

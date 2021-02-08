@@ -3,14 +3,10 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.ArrayUtils;
-import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseIdLuhnException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
@@ -27,8 +23,6 @@ import javax.validation.ValidationException;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
@@ -77,7 +71,7 @@ public class NoticeOfChangeQuestions {
     }
 
     public NoCRequestDetails challengeQuestions(String caseId) {
-        CaseViewResource caseViewResource = getCase(caseId);
+        CaseViewResource caseViewResource = dataStoreRepository.findCaseByCaseId(caseId);
         checkForCaseEvents(caseViewResource);
 
         CaseDetails caseDetails = dataStoreRepository.findCaseByCaseIdExternalApi(caseId);
@@ -129,20 +123,6 @@ public class NoticeOfChangeQuestions {
 
     private UserInfo getUserInfo() {
         return securityUtils.getUserInfo();
-    }
-
-    private CaseViewResource getCase(String caseId) {
-        CaseViewResource caseViewResource = new CaseViewResource();
-        try {
-            caseViewResource = dataStoreRepository.findCaseByCaseId(caseId);
-        } catch (FeignException e) {
-            if (HttpStatus.NOT_FOUND.value() == e.status()) {
-                throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
-            } else if (HttpStatus.BAD_REQUEST.value() == e.status()) {
-                throw new CaseIdLuhnException(CASE_ID_INVALID);
-            }
-        }
-        return caseViewResource;
     }
 
     private void checkCaseFields(CaseDetails caseDetails) {

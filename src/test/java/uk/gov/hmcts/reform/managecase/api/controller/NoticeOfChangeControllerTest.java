@@ -245,7 +245,11 @@ public class NoticeOfChangeControllerTest {
                 this.mockMvc.perform(get("/noc" +  GET_NOC_QUESTIONS)
                                          .queryParam("case_id", "121324,%12345"))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message", is("Case ID should contain digits only")));
+                    .andExpect(jsonPath(
+                        "$.message",
+                        containsString(
+                            "getNoticeOfChangeQuestions.caseId: Case ID has to be a valid 16-digit Luhn number")
+                    ));
             }
         }
     }

@@ -38,6 +38,7 @@
     "body": {
       "status" : "BAD_REQUEST",
       "message": "No NoC events available for this case type",
+      "code" : "noc-event-unavailable",
       "errors" : [ ]
     }
   }

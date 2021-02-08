@@ -36,7 +36,8 @@
     "_extends_": "ACA_400_Response",
     "body": {
       "status" : "BAD_REQUEST",
-      "message": "Insufficient privileges for notice of change request",
+      "message" : "Insufficient privileges for notice of change request",
+      "code" : "insufficient-privileges",
       "errors" : [ ]
     }
   }

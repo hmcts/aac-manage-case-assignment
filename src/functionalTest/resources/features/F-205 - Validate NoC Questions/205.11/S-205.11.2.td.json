@@ -22,6 +22,7 @@
 		"_extends_": "ACA_400_Response",
     "body": {
       "message" : "The number of provided answers must match the number of questions - expected 2 answers, received 1",
+      "code" : "answers-mismatch-questions",
       "errors" : [ ]
     }
   }

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
@@ -30,7 +31,6 @@ import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import javax.validation.ValidationException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -249,7 +249,7 @@ class NoticeOfChangeQuestionsTest {
             given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
-                .isInstanceOf(ValidationException.class)
+                .isInstanceOf(NoCException.class)
                 .hasMessageContaining(NOC_REQUEST_ONGOING);
         }
 
@@ -277,7 +277,7 @@ class NoticeOfChangeQuestionsTest {
             given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
-                .isInstanceOf(ValidationException.class)
+                .isInstanceOf(NoCException.class)
                 .hasMessageContaining(CHANGE_REQUEST);
         }
 
@@ -308,7 +308,7 @@ class NoticeOfChangeQuestionsTest {
                 .willReturn(challengeQuestionsResult);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
-                .isInstanceOf(ValidationException.class)
+                .isInstanceOf(NoCException.class)
                 .hasMessageContaining(NO_ORG_POLICY_WITH_ROLE);
         }
 
@@ -320,7 +320,7 @@ class NoticeOfChangeQuestionsTest {
                 .willReturn(caseViewResource);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
-                .isInstanceOf(ValidationException.class)
+                .isInstanceOf(NoCException.class)
                 .hasMessageContaining(NOC_EVENT_NOT_AVAILABLE);
         }
 
@@ -336,7 +336,7 @@ class NoticeOfChangeQuestionsTest {
                 .willReturn(caseViewResource);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
-                .isInstanceOf(ValidationException.class)
+                .isInstanceOf(NoCException.class)
                 .hasMessageContaining(MULTIPLE_NOC_REQUEST_EVENTS);
         }
 
@@ -350,7 +350,7 @@ class NoticeOfChangeQuestionsTest {
             given(securityUtils.getUserInfo()).willReturn(userInfo);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
-                .isInstanceOf(ValidationException.class)
+                .isInstanceOf(NoCException.class)
                 .hasMessageContaining(INSUFFICIENT_PRIVILEGE);
         }
 
@@ -364,7 +364,7 @@ class NoticeOfChangeQuestionsTest {
             given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), any())).willReturn(false);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
-                .isInstanceOf(ValidationException.class)
+                .isInstanceOf(NoCException.class)
                 .hasMessageContaining(INSUFFICIENT_PRIVILEGE);
         }
     }

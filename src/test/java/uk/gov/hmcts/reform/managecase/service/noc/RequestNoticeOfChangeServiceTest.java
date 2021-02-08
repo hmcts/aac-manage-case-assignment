@@ -11,6 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -36,7 +37,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.validation.ValidationException;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,10 +49,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
-import static uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService.MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap",
     "PMD.AvoidDuplicateLiterals",
@@ -320,12 +319,16 @@ class RequestNoticeOfChangeServiceTest {
         + "present in definition store")
     void testThrowsValidationErrorIfCaseRoleIdNotPresentInDefinitionStore() {
         given(definitionStoreRepository.caseRoles(anyString(), anyString(), anyString())).willReturn(emptyList());
-        ValidationException exception = assertThrows(
-            ValidationException.class,
+        NoCException exception = assertThrows(
+            NoCException.class,
             () -> service.requestNoticeOfChange(noCRequestDetails)
         );
-        assertThat(exception.getMessage()).isEqualTo(
-            String.format(MISSING_COR_CASE_ROLE_ID_IN_CASE_DEFINITION, CASE_ASSIGNED_ROLE));
+
+        assertThat(exception.getErrorCode()).isEqualTo("missing-cor-case-role-id");
+
+        assertThat(exception.getErrorMessage()).isEqualTo(
+            String.format("Missing ChangeOrganisationRequest.CaseRoleID %s in the case definition",
+                          CASE_ASSIGNED_ROLE));
     }
 
     private void setInvokerToActAsAnAdminOrSolicitor(boolean actAsAnAdminOrSolicitor) {
@@ -457,14 +460,16 @@ class RequestNoticeOfChangeServiceTest {
             given(jacksonUtils.convertValue(any(), eq(OrganisationPolicy.class)))
                 .willReturn(organisationPolicy);
 
-            ValidationException exception = assertThrows(
-                ValidationException.class,
+            NoCException exception = assertThrows(
+                NoCException.class,
                 () -> service.setOrganisationToRemove(callbackCaseDetails,
                                                       changeOrganisationRequestBefore,
                                                       "ChangeOrganisationRequestField"));
 
-            assertThat(exception.getMessage())
-                .isEqualTo(INVALID_CASE_ROLE_FIELD);
+            assertThat(exception.getErrorCode()).isEqualTo(INVALID_CASE_ROLE_FIELD.getErrorCode());
+
+            assertThat(exception.getErrorMessage())
+                .isEqualTo(INVALID_CASE_ROLE_FIELD.getErrorMessage());
         }
 
         @Test
@@ -484,14 +489,16 @@ class RequestNoticeOfChangeServiceTest {
             given(jacksonUtils.convertValue(any(), eq(OrganisationPolicy.class)))
                 .willReturn(organisationPolicy);
 
-            ValidationException exception = assertThrows(
-                ValidationException.class,
+            NoCException exception = assertThrows(
+                NoCException.class,
                 () -> service.setOrganisationToRemove(callbackCaseDetails,
                                                       changeOrganisationRequestBefore,
                                                       "ChangeOrganisationRequestField"));
 
-            assertThat(exception.getMessage())
-                .isEqualTo(INVALID_CASE_ROLE_FIELD);
+            assertThat(exception.getErrorCode()).isEqualTo(INVALID_CASE_ROLE_FIELD.getErrorCode());
+
+            assertThat(exception.getErrorMessage())
+                .isEqualTo(INVALID_CASE_ROLE_FIELD.getErrorMessage());
         }
     }
 }

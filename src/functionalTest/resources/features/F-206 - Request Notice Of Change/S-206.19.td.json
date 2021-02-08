@@ -40,6 +40,7 @@
     "body": {
       "status" : "BAD_REQUEST",
       "message": "No Organisation Policy for one or more of the roles available for the notice of change request",
+      "code" : "no-org-policy",
       "errors" : [ ]
     }
   }

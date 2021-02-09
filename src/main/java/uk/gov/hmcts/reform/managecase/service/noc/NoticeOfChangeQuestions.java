@@ -66,12 +66,8 @@ public class NoticeOfChangeQuestions {
         ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId).getChallengeQuestionsResult();
 
         List<ChallengeQuestion> challengeQuestionsResponse = challengeQuestionsResult.getQuestions().stream()
-            .map(challengeQuestion -> {
-                challengeQuestion.setAnswerField(null);
-                return challengeQuestion;
-            })
+            .map(challengeQuestion -> challengeQuestion.cloneWithoutAnswers(challengeQuestion))
             .collect(toList());
-
 
         return ChallengeQuestionsResult.builder().questions(challengeQuestionsResponse).build();
     }

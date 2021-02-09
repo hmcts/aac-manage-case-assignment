@@ -49,4 +49,16 @@ public class ChallengeQuestion {
                 .forEach(answer -> answers.add(new ChallengeAnswer(answer)));
         }
     }
+
+    public ChallengeQuestion cloneWithoutAnswers(ChallengeQuestion challengeQuestion) {
+        return ChallengeQuestion.builder()
+            .caseTypeId(challengeQuestion.getCaseTypeId())
+            .order(challengeQuestion.getOrder())
+            .questionText(challengeQuestion.getQuestionText())
+            .answerFieldType(challengeQuestion.getAnswerFieldType())
+            .displayContextParameter(challengeQuestion.getDisplayContextParameter())
+            .challengeQuestionId(challengeQuestion.getChallengeQuestionId())
+            .questionId(challengeQuestion.getQuestionId())
+            .build();
+    }
 }

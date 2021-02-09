@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
+import uk.gov.hmcts.reform.managecase.repository.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 
 import java.time.LocalDateTime;
@@ -97,6 +98,7 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCa
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseRoles;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseViaExternalApi;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetChallengeQuestions;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetLatestVersion;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetExternalStartEventTrigger;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetExternalStartEventTriggerAsApprover;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetStartEventTrigger;
@@ -125,7 +127,6 @@ public class NoticeOfChangeControllerIT {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
-
     void setUp() throws JsonProcessingException {
         mapper.registerModule(new JavaTimeModule());
         CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
@@ -160,6 +161,10 @@ public class NoticeOfChangeControllerIT {
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
             Arrays.asList(challengeQuestion));
         stubGetChallengeQuestions(CASE_TYPE_ID, "NoCChallenge", challengeQuestionsResult);
+
+        CaseTypeDefinitionVersion caseTypeDefinitionVersion = new CaseTypeDefinitionVersion();
+        caseTypeDefinitionVersion.setVersion(3);
+        stubGetLatestVersion(CASE_TYPE_ID, caseTypeDefinitionVersion);
 
         List<CaseRole> caseRoleList = Arrays.asList(
             CaseRole.builder().id("[CLAIMANT]").name("Claimant").description("Claimant").build(),

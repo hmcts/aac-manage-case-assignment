@@ -42,6 +42,7 @@
     "_extends_": "ACA_400_Response",
     "body" : {
       "message" : "The answers did not uniquely identify a litigant",
+      "code" : "answers-not-identify-litigant",
       "errors" : [ ]
     }
   }

@@ -35,6 +35,7 @@
     "_extends_": "ACA_400_Response",
     "body": {
       "message" : "No NoC events available for this case type",
+      "code" : "noc-event-unavailable",
       "errors" : [ ]
     }
   }

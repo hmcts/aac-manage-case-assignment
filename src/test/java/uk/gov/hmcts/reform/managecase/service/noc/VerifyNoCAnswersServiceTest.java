@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -20,7 +21,6 @@ import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import javax.validation.ValidationException;
 import java.util.Map;
 
 import static java.util.Collections.emptyList;
@@ -32,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.REQUESTOR_ALREADY_REPRESENTS;
 
 @SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.DataflowAnomalyAnalysis",
     "PMD.UseConcurrentHashMap"})
@@ -109,12 +110,14 @@ class VerifyNoCAnswersServiceTest {
 
         VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest("1", emptyList());
 
-        ValidationException exception = assertThrows(ValidationException.class, () ->
+        NoCException exception = assertThrows(NoCException.class, () ->
             verifyNoCAnswersService.verifyNoCAnswers(request));
 
         assertAll(
-            () -> assertThat(exception.getMessage(),
-                is("No OrganisationPolicy exists on the case for the case role '[OtherRole]'"))
+            () -> assertThat(exception.getErrorMessage(),
+                is("No OrganisationPolicy exists on the case for the case role '[OtherRole]'")),
+
+            () -> assertThat(exception.getErrorCode(), is("no-org-policy"))
         );
     }
 
@@ -126,12 +129,13 @@ class VerifyNoCAnswersServiceTest {
 
         VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest("1", emptyList());
 
-        ValidationException exception = assertThrows(ValidationException.class, () ->
+        NoCException exception = assertThrows(NoCException.class, () ->
             verifyNoCAnswersService.verifyNoCAnswers(request));
 
         assertAll(
-            () -> assertThat(exception.getMessage(), is("The requestor has answered questions uniquely identifying"
-                + " a litigant that they are already representing"))
+            () -> assertThat(exception.getErrorMessage(), is(REQUESTOR_ALREADY_REPRESENTS.getErrorMessage())),
+
+            () -> assertThat(exception.getErrorCode(), is(REQUESTOR_ALREADY_REPRESENTS.getErrorCode()))
         );
     }
 

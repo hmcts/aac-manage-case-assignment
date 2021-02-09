@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.hibernate.validator.constraints.LuhnCheck;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 
 import javax.validation.Valid;
@@ -23,14 +23,14 @@ import static com.fasterxml.jackson.annotation.Nulls.AS_EMPTY;
 @ApiModel("Request Notice Of Change Request")
 public class RequestNoticeOfChangeRequest {
     @JsonProperty("case_id")
-    @NotEmpty(message = ValidationError.CASE_ID_EMPTY)
-    @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID_LENGTH)
-    @LuhnCheck(message = ValidationError.CASE_ID_INVALID, ignoreNonDigitCharacters = false)
+    @NotEmpty(message = NoCValidationError.NOC_CASE_ID_EMPTY)
+    @Size(min = 16, max = 16, message = NoCValidationError.NOC_CASE_ID_INVALID_LENGTH)
+    @LuhnCheck(message = NoCValidationError.NOC_CASE_ID_INVALID, ignoreNonDigitCharacters = false)
     @ApiModelProperty(value = "Case ID to Assign Access To", required = true, example = "1583841721773828")
     private String caseId;
 
     @JsonSetter(nulls = AS_EMPTY)
-    @NotEmpty(message = ValidationError.CHALLENGE_QUESTION_ANSWERS_EMPTY)
+    @NotEmpty(message = NoCValidationError.NOC_CHALLENGE_QUESTION_ANSWERS_EMPTY)
     @ApiModelProperty(value = "Submitted challenge question answers", required = true)
     private List<@Valid SubmittedChallengeAnswer> answers;
 }

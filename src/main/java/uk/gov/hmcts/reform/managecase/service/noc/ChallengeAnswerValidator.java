@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
@@ -10,7 +11,6 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQues
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
 
-import javax.validation.ValidationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +19,10 @@ import static com.google.common.base.CharMatcher.anyOf;
 import static com.google.common.base.CharMatcher.whitespace;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.ANSWERS_NOT_IDENTIFY_LITIGANT;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.ANSWERS_NOT_MATCH_LITIGANT;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.NO_ANSWER_PROVIDED;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.ANSWER_MISMATCH_QUESTIONS;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.TEXT;
 
 @Component
@@ -48,11 +52,11 @@ public class ChallengeAnswerValidator {
             .collect(toList());
 
         if (matchingCaseRoleIds.isEmpty()) {
-            throw new ValidationException("The answers did not match those for any litigant");
+            throw new NoCException(ANSWERS_NOT_MATCH_LITIGANT);
         }
 
         if (matchingCaseRoleIds.size() > 1) {
-            throw new ValidationException("The answers did not uniquely identify a litigant");
+            throw new NoCException(ANSWERS_NOT_IDENTIFY_LITIGANT);
         }
 
         return matchingCaseRoleIds.get(0);
@@ -96,9 +100,8 @@ public class ChallengeAnswerValidator {
         int noOfQuestions = challengeQuestions.getQuestions().size();
         int noOfProvidedAnswers = answers.size();
         if (noOfQuestions != noOfProvidedAnswers) {
-            throw new ValidationException(String.format(
-                "The number of provided answers must match the number of questions - expected %s answers, received %s",
-                noOfQuestions, noOfProvidedAnswers));
+            throw new NoCException((String.format(ANSWER_MISMATCH_QUESTIONS.getErrorMessage(), noOfQuestions,
+                                                  noOfProvidedAnswers)), ANSWER_MISMATCH_QUESTIONS.getErrorCode());
         }
     }
 
@@ -107,8 +110,8 @@ public class ChallengeAnswerValidator {
         return answers.stream()
             .filter(answer -> answer.getQuestionId().equals(questionId))
             .findFirst()
-            .orElseThrow(() -> new ValidationException(String.format(
-                "No answer has been provided for question ID '%s'", questionId)));
+            .orElseThrow(() -> new NoCException((String.format(
+                NO_ANSWER_PROVIDED.getErrorMessage(), questionId)),NO_ANSWER_PROVIDED.getErrorCode()));
     }
 
     private boolean isEqualAnswer(String expectedAnswer, String actualAnswer, FieldType fieldType) {

@@ -91,5 +91,4 @@ class DefinitionStoreRepositoryTest {
 
         verify(definitionStoreApiClient).caseRoles(eq(USER_ID), eq(JURISDICTION), eq(CASE_TYPE_ID));
     }
-
 }

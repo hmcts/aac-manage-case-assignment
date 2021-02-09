@@ -5,12 +5,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
+import uk.gov.hmcts.reform.managecase.repository.CaseTypeDefinitionVersion;
 
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.managecase.client.definitionstore.DefinitionStoreApiClientConfig.CASE_ROLES;
 import static uk.gov.hmcts.reform.managecase.client.definitionstore.DefinitionStoreApiClientConfig.CHALLENGE_QUESTIONS;
+import static uk.gov.hmcts.reform.managecase.client.definitionstore.DefinitionStoreApiClientConfig.LATEST_VERSION;
 
 @FeignClient(
     name = "definition-store-api",
@@ -37,4 +39,6 @@ public interface DefinitionStoreApiClient {
                              @PathVariable("jid") String jurisdiction,
                              @PathVariable("ctid") String caseTypeId);
 
+    @GetMapping(value = LATEST_VERSION, consumes = APPLICATION_JSON_VALUE)
+    CaseTypeDefinitionVersion getLatestVersion(@PathVariable("ctid") String caseTypeId);
 }

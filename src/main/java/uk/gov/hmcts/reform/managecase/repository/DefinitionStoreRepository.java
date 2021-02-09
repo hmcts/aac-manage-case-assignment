@@ -11,4 +11,5 @@ public interface DefinitionStoreRepository {
 
     List<CaseRole> caseRoles(String userId, String jurisdiction, String caseTypeId);
 
+    Integer getLatestVersion(String caseTypeId);
 }

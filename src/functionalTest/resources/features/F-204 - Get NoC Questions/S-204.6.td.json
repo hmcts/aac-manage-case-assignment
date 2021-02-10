@@ -28,7 +28,7 @@
   "expectedResponse": {
     "_extends_": "ACA_400_Response",
     "body": {
-      "message" : "getNoticeOfChangeQuestions.caseId: Case ID can not be empty",
+      "message" : "getNoticeOfChangeQuestions.caseId: Case ID can not be empty, getNoticeOfChangeQuestions.caseId: Case ID has to be 16-digits long, getNoticeOfChangeQuestions.caseId: Case ID has to be a valid 16-digit Luhn number",
       "errors" : [ ]
     }
   }

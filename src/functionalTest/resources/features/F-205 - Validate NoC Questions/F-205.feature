@@ -28,7 +28,7 @@ Feature: F-205 Validate Notice of Change Answers
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-205.2
   Scenario: NoC Answers successfully validated for a CAA
- 
+
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Matt - with a pui-CAA within a different organisation from Richard],
       And [the configuration for the case type of Case C1 is such that there is a NoCRequest event available to users with the IDAM ID Caseworker-CAA when the case is in the state established following case creation] in the context of the scenario
@@ -281,7 +281,7 @@ Feature: F-205 Validate Notice of Change Answers
       And a successful call [to get the update org policy event trigger] as in [204_Update_Org_Policies_Token_Creation],
       And a successful call [to update the applicant org policy] as in [204_Update_Org_Policies],
 
-     When a request is prepared with appropriate values,
+    When a request is prepared with appropriate values,
       And the request [is made by Dil to validate the answers provided to the NoC questions in order to become the representative for Mario on C1],
       And the request [has answers with extra whitespaces, apostrophes, hyphens and casing that expected],
       And it is submitted to call the [ValidateNoCQuestions] operation of [Case Assignment Microservice],

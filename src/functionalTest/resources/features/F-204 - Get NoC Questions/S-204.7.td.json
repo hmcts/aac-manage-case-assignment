@@ -37,6 +37,7 @@
     "_extends_": "ACA_400_Response",
     "body": {
       "message" : "Ongoing NoC request in progress",
+      "code" : "noc-in-progress",
       "errors" : [ ]
     }
   }

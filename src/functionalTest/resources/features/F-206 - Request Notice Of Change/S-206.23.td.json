@@ -37,6 +37,7 @@
     "body": {
       "status" : "BAD_REQUEST",
       "message": "The requestor has answered questions uniquely identifying a litigant that they are already representing",
+      "code" : "has-represented",
       "errors" : [ ]
     }
   }

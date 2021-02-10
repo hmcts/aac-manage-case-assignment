@@ -30,6 +30,7 @@
   "expectedResponse": {
     "_extends_": "ACA_400_Response",
     "body" : {
+      "code": "case-id-invalid",
       "errors" : [ "Case ID has to be a valid 16-digit Luhn number" ]
     }
   }

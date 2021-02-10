@@ -44,9 +44,10 @@
   "expectedResponse": {
     "_extends_": "ACA_400_Response",
     "body": {
-      "status" : "BAD_REQUEST",
+      "status": "BAD_REQUEST",
+      "code": "no-answer-provided-for-question",
       "message": "No answer has been provided for question ID 'NoC_Challenge_Name'",
-      "errors" : [ ]
+      "errors": []
     }
   }
 }

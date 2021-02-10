@@ -17,6 +17,7 @@
   "expectedResponse": {
 		"_extends_": "ACA_400_Response",
     "body" : {
+      "code" : "answers-empty",
       "errors" : [ "Challenge question answers can not be empty" ]
     }
 

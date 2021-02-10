@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
@@ -19,16 +20,16 @@ import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import javax.validation.ValidationException;
+
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_EVENT_NOT_AVAILABLE;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_REQUEST_ONGOING;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NO_ORG_POLICY_WITH_ROLE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.CHANGE_REQUEST;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.INSUFFICIENT_PRIVILEGE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.NOC_EVENT_NOT_AVAILABLE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.NOC_REQUEST_ONGOING;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.NO_ORG_POLICY_WITH_ROLE;
 
 @Service
 public class NoticeOfChangeQuestions {
@@ -60,12 +61,8 @@ public class NoticeOfChangeQuestions {
         ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId).getChallengeQuestionsResult();
 
         List<ChallengeQuestion> challengeQuestionsResponse = challengeQuestionsResult.getQuestions().stream()
-            .map(challengeQuestion -> {
-                challengeQuestion.setAnswerField(null);
-                return challengeQuestion;
-            })
+            .map(challengeQuestion -> challengeQuestion.cloneWithoutAnswers(challengeQuestion))
             .collect(toList());
-
 
         return ChallengeQuestionsResult.builder().questions(challengeQuestionsResponse).build();
     }
@@ -93,13 +90,13 @@ public class NoticeOfChangeQuestions {
     private void checkOrgPoliciesForRoles(ChallengeQuestionsResult challengeQuestionsResult,
                                           List<OrganisationPolicy> organisationPolicies) {
         if (organisationPolicies.isEmpty()) {
-            throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
+            throw new NoCException(NO_ORG_POLICY_WITH_ROLE);
         }
         challengeQuestionsResult.getQuestions().forEach(challengeQuestion -> {
             boolean missingRole = challengeQuestion.getAnswers().stream()
                 .anyMatch(answer -> !isRoleInOrganisationPolicies(organisationPolicies, answer.getCaseRoleId()));
             if (missingRole) {
-                throw new ValidationException(NO_ORG_POLICY_WITH_ROLE);
+                throw new NoCException(NO_ORG_POLICY_WITH_ROLE);
             }
         });
     }
@@ -113,7 +110,7 @@ public class NoticeOfChangeQuestions {
         List<String> roles = userInfo.getRoles();
         if (!roles.contains(PUI_ROLE)
             && !isActingAsSolicitor(roles, jurisdiction)) {
-            throw new ValidationException(INSUFFICIENT_PRIVILEGE);
+            throw new NoCException(INSUFFICIENT_PRIVILEGE);
         }
     }
 
@@ -128,20 +125,20 @@ public class NoticeOfChangeQuestions {
     private void checkCaseFields(CaseDetails caseDetails) {
 
         if (caseDetails.findCorNodes().size() > 1) {
-            throw new ValidationException(CHANGE_REQUEST);
+            throw new NoCException(CHANGE_REQUEST);
         }
 
         if (caseDetails.hasCaseRoleId()) {
-            throw new ValidationException(NOC_REQUEST_ONGOING);
+            throw new NoCException(NOC_REQUEST_ONGOING);
         }
     }
 
     private void checkForCaseEvents(CaseViewResource caseViewResource) {
         if (caseViewResource.getCaseViewActionableEvents() == null
             || ArrayUtils.isEmpty(caseViewResource.getCaseViewActionableEvents())) {
-            throw new ValidationException(NOC_EVENT_NOT_AVAILABLE);
+            throw new NoCException(NOC_EVENT_NOT_AVAILABLE);
         } else if (caseViewResource.getCaseViewActionableEvents().length != 1) {
-            throw new ValidationException(MULTIPLE_NOC_REQUEST_EVENTS);
+            throw new NoCException(MULTIPLE_NOC_REQUEST_EVENTS);
         }
     }
 

@@ -12,7 +12,6 @@ import java.util.List;
 @Repository
 public class DefaultDefinitionStoreRepository implements DefinitionStoreRepository {
 
-
     private final DefinitionStoreApiClient definitionStoreApiClient;
 
     @Autowired
@@ -21,13 +20,21 @@ public class DefaultDefinitionStoreRepository implements DefinitionStoreReposito
     }
 
     @Override
+    @Cacheable(value = "challengeQuestions",
+        key = "{#caseTypeId, #challengeQuestionId, #root.target.getLatestVersion(#caseTypeId)}")
     public ChallengeQuestionsResult challengeQuestions(String caseTypeId, String challengeQuestionId) {
         return definitionStoreApiClient.challengeQuestions(caseTypeId, challengeQuestionId);
     }
 
     @Override
-    @Cacheable(value = "caseRoles", key = "#caseTypeId")
+    @Cacheable(value = "caseRoles",
+        key = "{#caseTypeId, #root.target.getLatestVersion(#caseTypeId)}")
     public List<CaseRole> caseRoles(String userId, String jurisdiction, String caseTypeId) {
         return definitionStoreApiClient.caseRoles(userId, jurisdiction, caseTypeId);
+    }
+
+    @Override
+    public Integer getLatestVersion(String caseTypeId) {
+        return definitionStoreApiClient.getLatestVersion(caseTypeId).getVersion();
     }
 }

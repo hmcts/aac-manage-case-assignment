@@ -267,7 +267,7 @@ class DataStoreRepositoryTest {
 
         assertThatThrownBy(() -> repository.submitEventForCase(CASE_ID, CaseEventCreationPayload.builder().build()))
             .isInstanceOf(RuntimeException.class)
-            .as(CALLBACK_FAILED_ERRORS_MESSAGE);
+            .hasMessage(CALLBACK_FAILED_ERRORS_MESSAGE);
     }
 
     @Test
@@ -462,6 +462,6 @@ class DataStoreRepositoryTest {
         assertThatThrownBy(() ->
             repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build()))
             .isInstanceOf(RuntimeException.class)
-            .as(CALLBACK_FAILED_ERRORS_MESSAGE);
+            .hasMessage(CALLBACK_FAILED_ERRORS_MESSAGE);
     }
 }

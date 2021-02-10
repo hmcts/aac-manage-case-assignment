@@ -18,7 +18,7 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "ACA_400_Response",
+		"_extends_": "ACA_404_Response",
 		"body": {
 			"message": "Case could not be found",
 			"errors": []

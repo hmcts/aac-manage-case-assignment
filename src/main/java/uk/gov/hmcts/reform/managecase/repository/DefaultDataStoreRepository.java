@@ -59,6 +59,9 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         + "}";
 
     public static final String CHANGE_ORGANISATION_REQUEST = "ChangeOrganisationRequest";
+    public static final String INCOMPLETE_CALLBACK = "INCOMPLETE_CALLBACK";
+    public static final String CALLBACK_FAILED_ERRORS_MESSAGE =
+        "Submitted callback failed. Please check data-store-api logs";
 
     private final DataStoreApiClient dataStoreApi;
     private final JacksonUtils jacksonUtils;
@@ -77,11 +80,11 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     public CaseViewResource findCaseByCaseId(String caseId) {
         try {
             return dataStoreApi.getCaseDetailsByCaseId(getUserAuthToken(), caseId);
-        } catch (FeignException e) {
-            if (HttpStatus.NOT_FOUND.value() == e.status()) {
+        } catch (FeignException ex) {
+            if (HttpStatus.NOT_FOUND.value() == ex.status()) {
                 throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
             }
-            throw e;
+            throw ex;
         }
     }
 
@@ -132,7 +135,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     @Override
     public CaseDetails submitEventForCase(String caseId, CaseEventCreationPayload caseEventCreationPayload) {
         String userAuthToken = getUserAuthToken();
-        return dataStoreApi.submitEventForCase(userAuthToken, caseId, caseEventCreationPayload);
+        return submitEvent(caseId, caseEventCreationPayload, userAuthToken);
     }
 
     @Override
@@ -173,7 +176,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                     .data(getCaseDataContentData(caseFieldId, changeOrganisationRequest, caseData))
                     .build();
 
-                caseDetails = dataStoreApi.submitEventForCase(userAuthToken, caseId, caseEventCreationPayload);
+                caseDetails = submitEvent(caseId, caseEventCreationPayload, userAuthToken);
             } else {
                 throw new IllegalStateException(CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID);
             }
@@ -226,4 +229,14 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         JacksonUtils.merge(caseDetailsData, data);
         return data;
     }
+
+    private CaseDetails submitEvent(String caseId, CaseEventCreationPayload caseEventCreationPayload,
+                                    String userAuthToken) {
+        CaseDetails caseDetails = dataStoreApi.submitEventForCase(userAuthToken, caseId, caseEventCreationPayload);
+        if (INCOMPLETE_CALLBACK.equalsIgnoreCase(caseDetails.getCallbackResponseStatus())) {
+            throw new RuntimeException(CALLBACK_FAILED_ERRORS_MESSAGE);
+        }
+        return caseDetails;
+    }
+
 }

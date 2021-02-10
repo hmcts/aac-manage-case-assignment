@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -107,9 +106,13 @@ class PrepareNoCServiceTest {
             Map<String, JsonNode> caseData = new HashMap<>();
             orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
             caseData.put(COR_FIELD_NAME, changeOrganisationRequestToJsonNode(changeOrganisationRequest()));
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData,
-                                                      LocalDateTime.now(),
-                                                      securityClassification, dataClassification);
+
+            CaseDetails caseDetails = CaseDetails.builder()
+                .id(REFERENCE)
+                .jurisdiction(JURISDICTION)
+                .caseTypeId(CASE_TYPE)
+                .data(caseData)
+                .build();
 
             Map<String, JsonNode> result = prepareNoCService.prepareNoCRequest(caseDetails);
 
@@ -134,9 +137,12 @@ class PrepareNoCServiceTest {
             orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
             caseData.put(COR_FIELD_NAME, changeOrganisationRequestToJsonNode(changeOrganisationRequest()));
 
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData,
-                                                      LocalDateTime.now(),
-                                                      securityClassification, dataClassification);
+            CaseDetails caseDetails = CaseDetails.builder()
+                .id(REFERENCE)
+                .jurisdiction(JURISDICTION)
+                .caseTypeId(CASE_TYPE)
+                .data(caseData)
+                .build();
 
             Map<String, JsonNode> result = prepareNoCService.prepareNoCRequest(caseDetails);
 
@@ -159,9 +165,12 @@ class PrepareNoCServiceTest {
             Map<String, JsonNode> caseData = new HashMap<>();
             caseData.put(COR_FIELD_NAME, changeOrganisationRequestToJsonNode(changeOrganisationRequest()));
 
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData,
-                                                      LocalDateTime.now(),
-                                                      securityClassification, dataClassification);
+            CaseDetails caseDetails = CaseDetails.builder()
+                .id(REFERENCE)
+                .jurisdiction(JURISDICTION)
+                .caseTypeId(CASE_TYPE)
+                .data(caseData)
+                .build();
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -180,9 +189,12 @@ class PrepareNoCServiceTest {
             orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
             caseData.put(COR_FIELD_NAME, changeOrganisationRequestToJsonNode(changeOrganisationRequest()));
 
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData,
-                                                      LocalDateTime.now(),
-                                                      securityClassification, dataClassification);
+            CaseDetails caseDetails = CaseDetails.builder()
+                .id(REFERENCE)
+                .jurisdiction(JURISDICTION)
+                .caseTypeId(CASE_TYPE)
+                .data(caseData)
+                .build();
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -200,9 +212,12 @@ class PrepareNoCServiceTest {
             orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
             caseData.put(COR_FIELD_NAME, changeOrganisationRequestToJsonNode(ongoingChangeOrganisationRequest()));
 
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData,
-                                                      LocalDateTime.now(),
-                                                      securityClassification, dataClassification);
+            CaseDetails caseDetails = CaseDetails.builder()
+                .id(REFERENCE)
+                .jurisdiction(JURISDICTION)
+                .caseTypeId(CASE_TYPE)
+                .data(caseData)
+                .build();
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -214,9 +229,11 @@ class PrepareNoCServiceTest {
         @Test
         @DisplayName("should error when Jurisdiction is missing")
         void shouldErrorWhenMissingJurisdiction() {
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, null, "", CASE_TYPE, new HashMap<>(),
-                                                      LocalDateTime.now(),
-                                                      securityClassification, dataClassification);
+            CaseDetails caseDetails = CaseDetails.builder()
+                .id(REFERENCE)
+                .jurisdiction(null)
+                .caseTypeId(CASE_TYPE)
+                .build();
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -229,9 +246,10 @@ class PrepareNoCServiceTest {
         @DisplayName("should error when CaseType is missing")
         void shouldErrorWhenMissingCaseType() {
 
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", null, new HashMap<>(),
-                                                      LocalDateTime.now(),
-                                                      securityClassification, dataClassification);
+            CaseDetails caseDetails = CaseDetails.builder()
+                .id(REFERENCE)
+                .jurisdiction(JURISDICTION)
+                .build();
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -248,9 +266,12 @@ class PrepareNoCServiceTest {
             Map<String, JsonNode> caseData = new HashMap<>();
             orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
 
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData,
-                                                      LocalDateTime.now(),
-                                                      securityClassification, dataClassification);
+            CaseDetails caseDetails = CaseDetails.builder()
+                .id(REFERENCE)
+                .jurisdiction(JURISDICTION)
+                .caseTypeId(CASE_TYPE)
+                .data(caseData)
+                .build();
 
             ValidationException exception = assertThrows(
                 ValidationException.class,
@@ -268,9 +289,12 @@ class PrepareNoCServiceTest {
             orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
             caseData.put(COR_FIELD_NAME, corWithMissingCaseRoleId());
 
-            CaseDetails caseDetails = new CaseDetails(REFERENCE, JURISDICTION, "", CASE_TYPE, caseData,
-                                                      LocalDateTime.now(),
-                                                      securityClassification, dataClassification);
+            CaseDetails caseDetails = CaseDetails.builder()
+                .id(REFERENCE)
+                .jurisdiction(JURISDICTION)
+                .caseTypeId(CASE_TYPE)
+                .data(caseData)
+                .build();
 
             ValidationException exception = assertThrows(
                 ValidationException.class,

@@ -27,9 +27,10 @@
 
   "expectedResponse": {
     "_extends_": "ACA_400_Response",
-    "body": {
+    "body" : {
       "message" : "[[ANY_STRING_NOT_NULLABLE]]",
-      "errors" : [ ]
+      "code" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "errors" : [ "Case ID has to be 16-digits long", "Case ID has to be a valid 16-digit Luhn number", "Case ID can not be empty" ]
     }
   }
 }

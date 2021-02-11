@@ -28,8 +28,8 @@
   "expectedResponse": {
     "_extends_": "ACA_400_Response",
     "body": {
-      "message" : "getNoticeOfChangeQuestions.caseId: Case ID has to be a valid 16-digit Luhn number",
-      "errors" : [ ]
+      "code" : "case-id-invalid",
+      "errors" : ["Case ID has to be a valid 16-digit Luhn number"]
     }
   }
 }

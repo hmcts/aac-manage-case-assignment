@@ -53,7 +53,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Collections.emptyList;
@@ -62,8 +61,9 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.oneOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
@@ -231,10 +231,9 @@ public class NoticeOfChangeControllerTest {
                 this.mockMvc.perform(get("/noc" +  GET_NOC_QUESTIONS)
                                          .queryParam("case_id", ""))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath(
-                        "$.message",
-                        containsString("getNoticeOfChangeQuestions.caseId: Case ID can not be empty")
-                    ));
+                    .andExpect(jsonPath("$.code",
+                        oneOf("case-id-empty", "case-id-invalid", "case-id-invalid-length")))
+                    .andExpect(jsonPath("$.errors", hasItems("Case ID can not be empty")));
             }
 
             @DisplayName("should fail with 400 bad request when caseIds is malformed or invalid")
@@ -244,10 +243,10 @@ public class NoticeOfChangeControllerTest {
                 this.mockMvc.perform(get("/noc" +  GET_NOC_QUESTIONS)
                                          .queryParam("case_id", "121324,%12345"))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath(
-                        "$.message",
-                        containsString(
-                            "getNoticeOfChangeQuestions.caseId: Case ID has to be a valid 16-digit Luhn number")
+                    .andExpect(jsonPath("$.code",
+                        oneOf("case-id-invalid", "case-id-invalid-length")))
+                    .andExpect(jsonPath("$.errors",
+                        hasItems("Case ID has to be 16-digits long", "Case ID has to be a valid 16-digit Luhn number")
                     ));
             }
         }

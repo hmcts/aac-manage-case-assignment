@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 import java.util.Arrays;
 import java.util.List;
@@ -42,14 +43,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return toResponseEntity(status, null, errors);
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+        log.debug("ConstraintViolationException exception:", ex);
+        String[] errors = ex.getConstraintViolations().stream()
+            .map(cv -> cv.getMessage())
+            .toArray(String[]::new);
+        return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Object> handleAccessDeniedException(Exception ex) {
+    public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
         log.warn("Access denied due to:", ex);
         return toResponseEntity(HttpStatus.FORBIDDEN, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<Object> handleValidationException(Exception ex) {
+    public ResponseEntity<Object> handleValidationException(ValidationException ex) {
         log.debug("Validation exception:", ex);
         return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
     }

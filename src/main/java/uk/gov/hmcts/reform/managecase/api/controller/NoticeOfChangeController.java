@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCApiError;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
@@ -181,10 +182,11 @@ public class NoticeOfChangeController {
     })
     public ChallengeQuestionsResult getNoticeOfChangeQuestions(@RequestParam("case_id")
                                                                @Valid
-                                                               @NotEmpty(message = CASE_ID_EMPTY)
+                                                               @NotEmpty(message = NoCValidationError.NOC_CASE_ID_EMPTY)
                                                                @Size(min = 16, max = 16, message =
-                                                                   ValidationError.CASE_ID_INVALID_LENGTH)
-                                                               @LuhnCheck(message = ValidationError.CASE_ID_INVALID,
+                                                                   NoCValidationError.NOC_CASE_ID_INVALID_LENGTH)
+                                                               @LuhnCheck(message =
+                                                                   NoCValidationError.NOC_CASE_ID_INVALID,
                                                                    ignoreNonDigitCharacters = false)
                                                                    String caseId) {
         return noticeOfChangeQuestions.getChallengeQuestions(caseId);

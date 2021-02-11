@@ -54,12 +54,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
     }
 
-    @ExceptionHandler(CaseCouldNotBeFetchedException.class)
-    public ResponseEntity<Object> handleCaseCouldNotBeFetchedException(CaseCouldNotBeFetchedException ex) {
-        log.error("Data Store errors: {}", ex.getMessage(), ex);
-        return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
-    }
-
     @ExceptionHandler(CaseCouldNotBeFoundException.class)
     public ResponseEntity<Object> handleCaseCouldNotBeFoundException(CaseCouldNotBeFoundException ex) {
         log.error("Data Store errors: {}", ex.getMessage(), ex);
@@ -70,12 +64,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleNoCException(NoCException ex) {
         log.debug("NoC Validation exception: {}", ex.getMessage(), ex);
         return toNoCResponseEntity(HttpStatus.BAD_REQUEST, ex.getErrorMessage(), ex.getErrorCode());
-    }
-
-    @ExceptionHandler(CaseIdLuhnException.class)
-    public ResponseEntity<Object> handleCaseIdLuhnException(CaseIdLuhnException ex) {
-        log.error("Data Store errors: {}", ex.getMessage(), ex);
-        return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(FeignException.class)

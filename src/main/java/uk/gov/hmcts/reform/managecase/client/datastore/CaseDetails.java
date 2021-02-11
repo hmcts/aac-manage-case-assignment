@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.LuhnCheck;
@@ -25,7 +24,6 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.model.CaseFieldPat
 
 @Data
 @Builder
-@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CaseDetails {
 
@@ -66,6 +64,9 @@ public class CaseDetails {
     @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "
         + "as field's value.")
     private Map<String, JsonNode> dataClassification;
+
+    @JsonProperty("callback_response_status")
+    private String callbackResponseStatus;
 
     public Optional<String> findChangeOrganisationRequestFieldName() {
         Optional<JsonNode> first = getData().values().stream()

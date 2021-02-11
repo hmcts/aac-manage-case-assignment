@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestedCaseUnassignment;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
@@ -39,7 +39,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
@@ -125,15 +125,15 @@ class CaseAssignmentServiceTest {
         }
 
         @Test
-        @DisplayName("should throw case could not be fetched error when case is not found")
+        @DisplayName("should throw case could not be found error when case is not found")
         void shouldThrowCaseCouldNotBeFetchedException_whenCaseNotFound() {
 
             given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
-                .willThrow(new CaseCouldNotBeFetchedException(CASE_COULD_NOT_BE_FETCHED));
+                .willThrow(new CaseCouldNotBeFoundException(CASE_NOT_FOUND));
 
             assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
-                .isInstanceOf(CaseCouldNotBeFetchedException.class)
-                .hasMessageContaining(CASE_COULD_NOT_BE_FETCHED);
+                .isInstanceOf(CaseCouldNotBeFoundException.class)
+                .hasMessageContaining(CASE_NOT_FOUND);
         }
 
         @Test

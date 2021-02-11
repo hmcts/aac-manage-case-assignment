@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -46,7 +47,9 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFix
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getCaseViewFields;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getWizardPages;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CALLBACK_FAILED_ERRORS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.INCOMPLETE_CALLBACK;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOC_REQUEST_DESCRIPTION;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT;
 
@@ -253,6 +256,21 @@ class DataStoreRepositoryTest {
     }
 
     @Test
+    @DisplayName("submitEventForCase throws exception if there are callback errors in the data-store response")
+    void shouldThrowRuntimeExceptionWhenEventSubmissionFailsWithCallbackError() {
+        CaseDetails caseDetails = CaseDetails.builder()
+            .callbackResponseStatus(INCOMPLETE_CALLBACK)
+            .build();
+
+        given(dataStoreApi.submitEventForCase(eq(USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
+            .willReturn(caseDetails);
+
+        assertThatThrownBy(() -> repository.submitEventForCase(CASE_ID, CaseEventCreationPayload.builder().build()))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage(CALLBACK_FAILED_ERRORS_MESSAGE);
+    }
+
+    @Test
     @DisplayName("submitEventForCaseOnly returns successfully a CaseDetails")
     void shouldReturnCaseDetailsWhenEventSubmissionSucceeds() {
         CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder().build();
@@ -265,20 +283,6 @@ class DataStoreRepositoryTest {
             = repository.submitEventForCase(CASE_ID, caseEventCreationPayload);
 
         assertThat(returnedCaseDetails).isEqualTo(caseDetails);
-    }
-
-    @Test
-    @DisplayName("submitEventForCaseOnly returns null")
-    void shouldReturnNullCaseResourceOnEventSubmission() {
-        CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder().build();
-
-        given(dataStoreApi.submitEventForCase(eq(USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
-            .willReturn(null);
-
-        CaseDetails caseDetails
-            = repository.submitEventForCase(CASE_ID, caseEventCreationPayload);
-
-        assertThat(caseDetails).isNull();
     }
 
     @Test
@@ -431,5 +435,33 @@ class DataStoreRepositoryTest {
 
         // ASSERT
         assertThat(PENDING.getValue()).isEqualTo(corCaptor.getValue().getApprovalStatus());
+    }
+
+    @Test
+    @DisplayName("submitEventForCase throws exception if there are callback errors in the data-store response")
+    void shouldThrowRuntimeExceptionWhenSubmissionEventFailsWithCallbackError() {
+
+        CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
+            .wizardPages(CaseUpdateViewEventFixture.getWizardPages())
+            .eventToken(EVENT_TOKEN)
+            .caseFields(getCaseViewFields())
+            .build();
+
+        given(dataStoreApi.getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID)).willReturn(caseUpdateViewEvent);
+
+        StartEventResource startEventResource = StartEventResource.builder()
+            .caseDetails(CaseDetails.builder().data(new HashMap<>()).build())
+            .build();
+        given(dataStoreApi.getExternalStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID)).willReturn(startEventResource);
+
+        given(dataStoreApi.submitEventForCase(any(String.class), any(String.class),any(CaseEventCreationPayload.class)))
+            .willReturn(CaseDetails.builder()
+                .callbackResponseStatus(INCOMPLETE_CALLBACK)
+                .build());
+
+        assertThatThrownBy(() ->
+            repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build()))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage(CALLBACK_FAILED_ERRORS_MESSAGE);
     }
 }

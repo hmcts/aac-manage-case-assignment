@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCApiConstraintError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
@@ -111,14 +110,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 String message = exception.substring(4);
                 String code = NoCValidationError.getCodeFromMessage(message);
                 String[] errors = convertNoCErrors(errorsToConvert);
-                if ((errorsToConvert.length > 1)) {
-                    NoCApiError apiError = new NoCApiError(status, message, code, List.of(errors));
-                    return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
-                } else {
-                    NoCApiConstraintError apiError = new NoCApiConstraintError(status, code, List.of(errors)
-                    );
-                    return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
-                }
+                NoCApiError apiError = new NoCApiError(status, message, code, List.of(errors));
+                return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
             }
         }
         return null;

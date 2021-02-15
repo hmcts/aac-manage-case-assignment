@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -77,8 +78,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<Object> handleFeignStatusException(FeignException ex) {
-        log.error("Downstream service errors: {}", ex.getMessage(), ex);
-        return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
+        String errorMessage = ex.responseBody()
+            .map(res -> new String(res.array(), Charset.forName("UTF-8")))
+            .orElse(ex.getMessage());
+        log.error("Downstream service errors: {}", errorMessage, ex);
+        return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
     }
 
     @ExceptionHandler(Exception.class)

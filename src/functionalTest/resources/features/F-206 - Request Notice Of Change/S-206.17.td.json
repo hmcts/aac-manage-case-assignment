@@ -31,6 +31,7 @@
     "_extends_": "ACA_400_Response",
     "body": {
       "status" : "BAD_REQUEST",
+      "message" : "Case ID can not be empty",
       "code": "case-id-empty",
       "errors": [ "Case ID can not be empty" ]
     }

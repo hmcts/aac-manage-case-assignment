@@ -23,29 +23,14 @@
     "body": {
       "auditEvents": [
         {
+          "_extends_": "Data_Store_Audit_Event__Base",
           "id": "ApplyNoCDecision",
           "event_name": "Apply NoC Decision",
           "summary": "Apply NocDecision Event",
           "description": "Apply NocDecision Event",
-          "created_date": "[[ANYTHING_PRESENT]]",
-          "user_id": "[[ANYTHING_PRESENT]]",
-          "user_last_name": "[[ANYTHING_PRESENT]]",
-          "user_first_name": "[[ANYTHING_PRESENT]]",
-          "case_type_id": "[[ANYTHING_PRESENT]]",
-          "case_type_version": "[[ANYTHING_PRESENT]]",
-          "state_id": "[[ANYTHING_PRESENT]]",
-          "state_name": "[[ANYTHING_PRESENT]]",
-          "data": "[[ANYTHING_PRESENT]]",
-          "data_classification": "[[ANYTHING_PRESENT]]",
-          "security_classification": "[[ANYTHING_PRESENT]]",
-          "security_classifications": "[[ANYTHING_PRESENT]]",
-          "significant_item": null,
-          "proxied_by" : "[[ANY_NULLABLE]]",
-          "proxied_by_last_name" : "[[ANY_NULLABLE]]",
-          "proxied_by_first_name" : "[[ANY_NULLABLE]]"
+          "user_id": "${[scenarioContext][testData][users][invokingUser][id]}"
         }
       ]
     }
   }
 }
-

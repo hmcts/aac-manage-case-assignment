@@ -20,7 +20,7 @@ public class OrganisationPolicy {
     @JsonProperty("OrgPolicyCaseAssignedRole")
     private String orgPolicyCaseAssignedRole;
     @JsonProperty("PrepopulateToUsersOrganisation")
-    private String prepopulateToUsersOrganisation;
+    private Boolean prepopulateToUsersOrganisation;
     @JsonProperty("PreviousOrganisations")
     private List<PreviousOrganisationCollectionItem> previousOrganisations;
 

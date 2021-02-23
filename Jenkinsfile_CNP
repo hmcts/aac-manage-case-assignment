@@ -1,4 +1,5 @@
 #!groovy
+import uk.gov.hmcts.contino.AppPipelineDsl
 
 @Library("Infrastructure")
 
@@ -73,6 +74,9 @@ def prsToUseAaat             = "PR-148,PR-161,PR-167" // Set this value to a PR 
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
 env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${dataStoreApiDevelopPr}.service.core-compute-preview.internal".toLowerCase()
 
+// Vars for Kubernetes
+env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
+
 withPipeline("java", product, component) {
   after('test') {
     builder.gradle('integration')
@@ -84,6 +88,9 @@ withPipeline("java", product, component) {
   }
   onMaster {
     enableSlackNotifications('#ccd-master-builds')
+    enablePactAs([
+            AppPipelineDsl.PactRoles.CONSUMER
+    ])
   }
 
   onDemo {

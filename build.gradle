@@ -177,13 +177,20 @@ runProviderPactVerification.dependsOn contract
 
 runProviderPactVerification.finalizedBy pactVerify
 
+project.ext {
+  pactVersion = getCheckedOutGitCommitHash()
+}
+
+def getCheckedOutGitCommitHash() {
+  'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
+
 pact {
   publish {
     pactDirectory = 'pacts'
-    //pactBrokerUrl = 'http://localhost:9292'
-    pactBrokerUrl = 'https://pact-broker.platform.hmcts.net'
-    tags = ['Dev']
-    version = "2.3"
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    tags = [System.getenv("PACT_BRANCH_NAME") ?:'Dev']
+    version = project.pactVersion
   }
 }
 

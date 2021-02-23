@@ -160,18 +160,11 @@ task contract(type: Test) {
   systemProperty 'pact.rootDir', "pacts"
 }
 
-task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
-  // Nothing to do here
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
-}
-
 task runProviderPactVerification(type: Test) {
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
 }
 
-runAndPublishConsumerPactTests.finalizedBy pactPublish
 
 runProviderPactVerification.dependsOn contract
 

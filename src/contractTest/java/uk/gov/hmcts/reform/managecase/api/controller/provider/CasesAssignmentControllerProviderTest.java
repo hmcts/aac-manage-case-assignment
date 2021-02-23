@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.api.controller.provider;
 
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
+import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
@@ -44,6 +45,7 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixtur
     port = "${PACT_BROKER_PORT:80}",
     consumerVersionSelectors = {@VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
+@IgnoreNoPactsToVerify
 public class CasesAssignmentControllerProviderTest {
 
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
@@ -76,7 +78,9 @@ public class CasesAssignmentControllerProviderTest {
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void pactVerificationTestTemplate(PactVerificationContext context) {
-        context.verifyInteraction();
+        if (context != null) {
+            context.verifyInteraction();
+        }
     }
 
     @BeforeEach
@@ -84,8 +88,9 @@ public class CasesAssignmentControllerProviderTest {
         System.getProperties().setProperty("pact.verifier.publishResults", "true");
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         testTarget.setControllers(caseAssignmentController);
-        context.setTarget(testTarget);
-
+        if (context != null) {
+            context.setTarget(testTarget);
+        }
     }
 
     @State({"Assign a user to a case"})

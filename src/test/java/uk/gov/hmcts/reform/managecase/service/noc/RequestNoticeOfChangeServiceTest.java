@@ -67,7 +67,7 @@ class RequestNoticeOfChangeServiceTest {
     private static final String INVOKERS_ORGANISATION_IDENTIFIER = "PRD_ORG_IDENTIFIER";
     private static final String ORG_POLICY_REFERENCE = "orgPolicyReference";
     private static final String CHANGE_ORGANISATION_REQUEST_KEY = "ChangeOrganisationRequest";
-    private static final Boolean PREPOPULATE_TO_USERS_ORGANISATION = null;
+    private static final String PREPOPULATE_TO_USERS_ORGANISATION = null;
     private static final String ORGANISATION_POLICY_KEY = "OrganisationPolicy";
     private static final String JURISDICTION_ONE = "JURISDICTION_1";
     private static final String SOLICITOR_ROLE = "caseworker-" + JURISDICTION_ONE + "-solicitor";

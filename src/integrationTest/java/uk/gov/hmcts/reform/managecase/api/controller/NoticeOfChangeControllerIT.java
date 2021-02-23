@@ -114,7 +114,7 @@ public class NoticeOfChangeControllerIT {
     private static final String CASE_ID = "1588234985453946";
     private static final String CASE_TYPE_ID = "caseType";
     private static final String JURISDICTION = "Jurisdiction";
-    private static final Boolean PREPOPULATE_TO_USERS_ORGANISATION = null;
+    private static final String PREPOPULATE_TO_USERS_ORGANISATION = null;
     private static final String QUESTION_ID_1 = "QuestionId1";
     private static final String ORGANISATION_ID = "QUK822N";
     private static final String ORGANISATION_NAME = "CCD Solicitors Limited";

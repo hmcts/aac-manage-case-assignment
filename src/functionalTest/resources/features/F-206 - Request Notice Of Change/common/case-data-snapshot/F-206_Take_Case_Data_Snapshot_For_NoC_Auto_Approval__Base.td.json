@@ -1,0 +1,25 @@
+{
+  "_guid_": "F-206_Take_Case_Data_Snapshot_For_NoC_Auto_Approval__Base",
+  "_extends_": "F-206_Take_Case_Data_Snapshot__Base",
+
+  "expectedResponse": {
+    "body" : {
+      "data": {
+        "respondentOrganisationPolicy": {
+          "PreviousOrganisations": "[[ANY_NULLABLE]]"
+        }
+      },
+
+      "data_classification": {
+        "_extends_": "NoC_Case_Data_Classification_With_Org_Policies",
+
+        "respondentOrganisationPolicy": {
+          "value": {
+            "PreviousOrganisations": "[[ANY_NULLABLE]]"
+          }
+        }
+      }
+
+    }
+  }
+}

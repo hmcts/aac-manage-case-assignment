@@ -31,12 +31,12 @@
         },
         "respondentOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "Org-Two"
+            "OrganisationID": "LESTKK0"
           }
         },
         "otherPartyOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "Org-Two"
+            "OrganisationID": "LESTKK0"
           }
         }
       }
@@ -53,12 +53,12 @@
         },
         "respondentOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "Org-Two"
+            "OrganisationID": "LESTKK0"
           }
         },
         "otherPartyOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "Org-Two"
+            "OrganisationID": "LESTKK0"
           }
         }
       }

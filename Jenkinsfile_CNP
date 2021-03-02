@@ -120,7 +120,7 @@ withPipeline("java", product, component) {
       }
       env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
       env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
-      env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
+      env.MCA_API_BASE_URL = env.TEST_URL
   }
 
   echo "FTA will use Definition Store: ${env.DEFINITION_STORE_HOST}"

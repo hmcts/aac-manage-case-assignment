@@ -17,5 +17,5 @@
   "significant_item": "[[ANY_NULLABLE]]",
   "proxied_by" : "[[ANY_NULLABLE]]",
   "proxied_by_last_name" : "[[ANY_NULLABLE]]",
-  "proxied_by_first_name" : "[[ANY_NULLABLE]]",
+  "proxied_by_first_name" : "[[ANY_NULLABLE]]"
 }

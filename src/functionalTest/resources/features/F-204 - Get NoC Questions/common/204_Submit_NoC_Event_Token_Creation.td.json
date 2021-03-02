@@ -1,0 +1,20 @@
+{
+  "_guid_": "204_Submit_NoC_Event_Token_Creation",
+  "_extends_": "Event_Creation_Token_Creation",
+
+  "specs" : [
+    "to get the NoC request event trigger"
+  ],
+
+  "user": {
+    "_extends_": "ACA_Users_Caseworker_CAA"
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][204_Case_Creation][testData][actualResponse][body][id]}",
+      "etid": "nocRequest"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "_guid_" : "205.14_Case_Creation",
+  "_extends_" : "204_Case_Creation",
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][siblingContexts][205.14_Case_Creation_Token_Creation][testData][actualResponse][body][token]}",
+      "data": {
+        "applicant": {
+          "individual": {
+            "LastName": "MATCHING-NAME"
+          },
+          "dob": "2010-10-10"
+        },
+        "respondent": {
+          "company": {
+            "Name": "MATCHING-NAME"
+          },
+          "incorporationDate" : "2010-10-10"
+        },
+        "otherParty": {
+          "soletrader": {
+            "Name": "MATCHING-NAME"
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "applicant": {
+          "individual": {
+            "LastName": "MATCHING-NAME"
+          },
+          "dob": "2010-10-10"
+        },
+        "respondent": {
+          "company": {
+            "Name": "MATCHING-NAME"
+          },
+          "incorporationDate" : "2010-10-10"
+        },
+        "otherParty": {
+          "soletrader": {
+            "Name": "MATCHING-NAME"
+          }
+        }
+      }
+    }
+  }
+
+}

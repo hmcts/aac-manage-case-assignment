@@ -1,0 +1,31 @@
+{
+  "_guid_": "F-206_Request_NoC_By_Emma",
+  "_extends_": "Request_NoC__Base",
+
+  "specs": [
+    "by Emma to raise a NoC request to become a representative for Mario on C1"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Emma"
+    }
+  },
+
+  "request": {
+    "body": {
+      "_extends_": "NoC_Valid_Answers_For_Case_Role_R2",
+
+      "case_id": "${[scenarioContext][siblingContexts][F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "status_message": "The Notice of Change request has been successfully submitted.",
+      "case_role": "[RespondentSolicitor]",
+      "approval_status": "PENDING"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-206_Take_Case_Data_Snapshot_For_NoC_Case_Created_By_Mario",
+  "_extends_": "F-206_Take_Case_Data_Snapshot__Base",
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][parentContext][childContexts][F-206_NoC_Case_Creation_By_Mario_With_Assigned_R1_Org_Policy][testData][actualResponse][body][id]}"
+    }
+  }
+}

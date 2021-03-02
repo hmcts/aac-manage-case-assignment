@@ -1,0 +1,38 @@
+{
+  "_guid_": "S-206.17",
+  "_extends_": "Request_NoC__Base",
+
+  "title": "Must return an error response for a missing Case ID",
+
+  "specs": [
+    "Jane - with a solicitor and a pui-caa role",
+
+    "does not contain a case ID",
+    "contains all correct answers in the correct format",
+
+    "is made by Jane to place a NOC Request for a case"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Jane"
+    }
+  },
+
+  "request": {
+    "body": {
+      "_extends_": "NoC_Auto_Approval_Valid_Answers_For_Case_Role_R2",
+
+      "case_id": null
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "status" : "BAD_REQUEST",
+      "code": "case-id-empty",
+      "errors": [ "Case ID can not be empty" ]
+    }
+  }
+}

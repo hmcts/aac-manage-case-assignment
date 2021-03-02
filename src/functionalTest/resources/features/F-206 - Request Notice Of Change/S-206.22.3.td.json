@@ -1,0 +1,41 @@
+{
+  "_guid_": "S-206.22.3",
+  "_extends_": "Request_NoC__Base",
+
+  "title": "Must return an error response for an invalid/incorrect answer (no answers supplied)",
+
+  "specs": [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's",
+    "a citizen Mario, on behalf of whom Richard will create a case",
+
+    "contains a valid case ID for C1",
+    "contains any invalid/incorrect answer(s) to any of the question(s) - (no answers supplied)",
+
+    "is made by Dil to place a NOC Request for C1"
+  ],
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "request": {
+    "body": {
+      "case_id": "${[scenarioContext][childContexts][F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "status" : "BAD_REQUEST",
+      "code" : "answers-empty",
+      "errors" : [ "Challenge question answers can not be empty" ]
+    }
+  }
+}

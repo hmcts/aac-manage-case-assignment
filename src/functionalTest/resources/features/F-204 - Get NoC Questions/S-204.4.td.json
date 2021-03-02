@@ -1,0 +1,36 @@
+{
+  "_guid_" : "S-204.4",
+  "_extends_" : "S-204_Test_Data_Base",
+
+  "title": "NoC questions must return an error response for a malformed Case ID",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Jane"
+    }
+  },
+
+  "specs" : [
+    "Jane - with a solicitor and a pui-caseworker role",
+
+    "is made by Jane to return the questions that need answering in order to become a representative of a litigant on the case",
+    "contains a malformed case ID for C1",
+    "contains a valid IDAM token for Jane"
+  ],
+
+  "request": {
+    "queryParams": {
+      "case_id": "1602585999999999"
+    },
+    "_extends_": "Common_Request"
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "message" : "Case ID has to be a valid 16-digit Luhn number",
+      "code" : "case-id-invalid",
+      "errors" : [ ]
+    }
+  }
+}

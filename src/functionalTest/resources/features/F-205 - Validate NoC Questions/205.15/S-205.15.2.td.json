@@ -1,0 +1,29 @@
+{
+  "_guid_": "S-205.15.2",
+  "_extends_": "S-205.15_Test_Data_Base",
+
+  "title": "NoC Answers must return an positive response for various correct answers",
+
+  "specs": [
+    "has one null and one non-null answer as expected"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "case_id": "${[scenarioContext][childContexts][205.11.5_Case_Creation][testData][actualResponse][body][id]}",
+
+      "answers": [
+        {
+          "question_id": "NoC_Challenge_Name",
+          "value": "N o'r-on Ha"
+        },
+        {
+          "question_id": "NoC_Challenge_Name2",
+          "value": null
+        }
+      ]
+    }
+  }
+
+}

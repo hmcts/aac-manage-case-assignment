@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestedCaseUnassignment;
@@ -27,14 +28,11 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 @Service
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 public class CaseAssignmentService {
 
-    public static final String SOLICITOR_ROLE = "caseworker-%s-solicitor";
-
     public static final String CASE_COULD_NOT_BE_FETCHED = "Case could not be fetched";
-
 
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
@@ -44,8 +42,9 @@ public class CaseAssignmentService {
 
     @Autowired
     public CaseAssignmentService(PrdRepository prdRepository,
-                                 DataStoreRepository dataStoreRepository,
-                                 IdamRepository idamRepository, JacksonUtils jacksonUtils,
+                                 @Qualifier("defaultDataStoreRepository") DataStoreRepository dataStoreRepository,
+                                 IdamRepository idamRepository,
+                                 JacksonUtils jacksonUtils,
                                  SecurityUtils securityUtils) {
         this.dataStoreRepository = dataStoreRepository;
         this.prdRepository = prdRepository;
@@ -66,7 +65,7 @@ public class CaseAssignmentService {
 
         List<String> assigneeRoles = getAssigneeRoles(assignment.getAssigneeId());
 
-        if (!securityUtils.hasSolicitorRole(assigneeRoles)) {
+        if (!securityUtils.hasSolicitorAndJurisdictionRoles(assigneeRoles, caseDetails.getJurisdiction())) {
             throw new ValidationException(ValidationError.ASSIGNEE_ROLE_ERROR);
         }
 
@@ -220,7 +219,7 @@ public class CaseAssignmentService {
     }
 
     private List<String> getAssigneeRoles(String assigneeId) {
-        String systemUserToken = idamRepository.getSystemUserAccessToken();
+        String systemUserToken = idamRepository.getCaaSystemUserAccessToken();
         return idamRepository.getUserByUserId(assigneeId, systemUserToken).getRoles();
     }
 }

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @Named
+@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 public class SecurityUtils {
 
     private static final Pattern SOLICITOR_ROLE = Pattern.compile(".+-solicitor$", Pattern.CASE_INSENSITIVE);
@@ -33,17 +34,25 @@ public class SecurityUtils {
         return authTokenGenerator.generate();
     }
 
-    public String getSystemUserToken() {
-        return idamRepository.getSystemUserAccessToken();
+    public String getCaaSystemUserToken() {
+        return idamRepository.getCaaSystemUserAccessToken();
+    }
+
+    public String getNocApproverSystemUserAccessToken() {
+        return idamRepository.getNocApproverSystemUserAccessToken();
     }
 
     public String getUserToken() {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return BEARER + jwt.getTokenValue();
+        return jwt.getTokenValue();
+    }
+
+    public String getUserBearerToken() {
+        return BEARER + getUserToken();
     }
 
     public UserInfo getUserInfo() {
-        return idamRepository.getUserInfo(getUserToken());
+        return idamRepository.getUserInfo(getUserBearerToken());
     }
 
     public String getServiceNameFromS2SToken(String serviceAuthenticationToken) {
@@ -60,4 +69,12 @@ public class SecurityUtils {
         return roles.stream().anyMatch(role -> SOLICITOR_ROLE.matcher(role).matches());
     }
 
+    public boolean hasJurisdictionRole(List<String> roles, String jurisdictionId) {
+        String jurisdictionRole = "caseworker-" + jurisdictionId;
+        return roles.stream().anyMatch(jurisdictionRole::equalsIgnoreCase);
+    }
+
+    public boolean hasSolicitorAndJurisdictionRoles(List<String> roles, String jurisdictionId) {
+        return hasSolicitorRole(roles) && hasJurisdictionRole(roles, jurisdictionId);
+    }
 }

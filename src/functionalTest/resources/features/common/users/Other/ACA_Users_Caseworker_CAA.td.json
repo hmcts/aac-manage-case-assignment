@@ -1,0 +1,6 @@
+{
+  "_guid_": "ACA_Users_Caseworker_CAA",
+
+  "username": "[[$BEFTA_IDAM_CAA_USERNAME]]",
+  "password": "[[$BEFTA_IDAM_CAA_PASSWORD]]"
+}

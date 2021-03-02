@@ -25,9 +25,14 @@ public class IdamRepository {
         return idamClient.getUserInfo(bearerToken);
     }
 
-    @Cacheable("systemUserAccessTokenCache")
-    public String getSystemUserAccessToken() {
-        return idamClient.getAccessToken(appParams.getIdamSystemUserId(), appParams.getIdamSystemUserPassword());
+    @Cacheable("caaAccessTokenCache")
+    public String getCaaSystemUserAccessToken() {
+        return idamClient.getAccessToken(appParams.getCaaSystemUserId(), appParams.getCaaSystemUserPassword());
+    }
+
+    @Cacheable("nocApproverAccessTokenCache")
+    public String getNocApproverSystemUserAccessToken() {
+        return idamClient.getAccessToken(appParams.getNocApproverSystemUserId(), appParams.getNocApproverPassword());
     }
 
     public UserDetails getUserByUserId(String userId, String bearerToken) {

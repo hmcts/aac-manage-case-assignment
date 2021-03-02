@@ -1,0 +1,25 @@
+{
+	"_guid_": "NoC_Case_Creation_Token_Creation__Base",
+	"_extends_": "Case_Creation_Token_Creation",
+
+	"request": {
+		"pathVariables": {
+			"jid": "BEFTA_MASTER",
+			"ctid": "FT_NoCCaseType",
+			"etid": "createCase"
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"token": "[[ANY_STRING_NOT_NULLABLE]]",
+			"case_details": {
+				"jurisdiction": "BEFTA_MASTER",
+				"case_type_id": "FT_NoCCaseType",
+				"supplementary_data" : null
+			},
+			"event_id": "createCase"
+		}
+	}
+}
+

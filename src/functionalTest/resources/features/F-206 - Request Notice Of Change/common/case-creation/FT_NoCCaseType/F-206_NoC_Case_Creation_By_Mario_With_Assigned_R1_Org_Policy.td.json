@@ -1,0 +1,52 @@
+{
+  "_guid_": "F-206_NoC_Case_Creation_By_Mario_With_Assigned_R1_Org_Policy",
+  "_extends_": "NoC_Case_Creation_With_Org_Policies__Base",
+
+	"method": "POST",
+  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+
+  "specs": [
+    "by Mario to create a case C1, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Dil's organisation, R2 & R3 which are both not assigned to any organisation",
+    "by Mario to create a case C1, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Matt's organisation, R2 & R3 which are both not assigned to any organisation",
+    "by Mario to create a case C1, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Alice's organisation, R2 & R3 which are both not assigned to any organisation"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Mario"
+    }
+  },
+
+  "prerequisites": [
+    {
+      "Token_Creation": "F-206_NoC_Case_Creation_By_Mario_Token_Creation",
+      "Get_Organisation_Identifier": "Get_Organisation_Identifier_For_Any_Org1_User__Prerequisite"
+    }
+  ],
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+
+      "data": {
+        "applicantOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "applicantOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
+          }
+        }
+      }
+    }
+  }
+}

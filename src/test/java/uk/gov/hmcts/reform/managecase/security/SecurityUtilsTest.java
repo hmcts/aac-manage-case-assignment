@@ -18,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SecurityUtilsTest {
 
     private static final String CASEWORKER_BEFTA_JURISDICTION_SOLICITOR = "caseworker-befta_jurisdiction-solicitor";
+    private static final String CASEWORKER_BEFTA_JURISDICTION = "caseworker-befta_jurisdiction";
+    private static final String JURISDICTION = "befta_jurisdiction";
 
     @Mock
     private AuthTokenGenerator authTokenGenerator;
@@ -37,31 +39,56 @@ class SecurityUtilsTest {
     }
 
     @Test
-    void hasSolicitorRoleReturnsFalseWhenRolesEmpty() {
-        assertFalse(securityUtils.hasSolicitorRole(roles));
+    void hasSolicitorAndJurisdictionRolesReturnsFalseWhenRolesEmpty() {
+        assertFalse(securityUtils.hasSolicitorAndJurisdictionRoles(roles, ""));
     }
 
     @Test
-    void hasSolicitorRoleReturnsTrueWhenRoleEndsWithSolicitor() {
+    void hasSolicitorAndJurisdictionRolesReturnsTrueWhenRoleEndsWithSolicitorAndValidCaseWorkerJurisdictionRole() {
         roles.add(CASEWORKER_BEFTA_JURISDICTION_SOLICITOR);
-        assertTrue(securityUtils.hasSolicitorRole(roles));
+        roles.add(CASEWORKER_BEFTA_JURISDICTION);
+        assertTrue(securityUtils.hasSolicitorAndJurisdictionRoles(roles, JURISDICTION));
     }
 
     @Test
-    void hasSolicitorRoleReturnsTrueWithMixedCase() {
+    void hasSolicitorAndJurisdictionRolesReturnsTrueWhenRoleEndsWithSolicitorAndContainsJurisdiction() {
+        roles.add("caseworker-ia-legalrep-solicitor");
+        roles.add("caseworker-ia");
+        assertTrue(securityUtils.hasSolicitorAndJurisdictionRoles(roles, "ia"));
+    }
+
+    @Test
+    void hasSolicitorAndJurisdictionRolesReturnsTrueWithMixedCaseRoles() {
         roles.add("caseworker-ia-SoliciTor");
-        assertTrue(securityUtils.hasSolicitorRole(roles));
+        roles.add("caSewOrker-iA");
+        assertTrue(securityUtils.hasSolicitorAndJurisdictionRoles(roles, "ia"));
     }
 
     @Test
-    void hasSolicitorRoleReturnsFalseWithInvalidSuffix() {
+    void hasSolicitorAndJurisdictionRolesReturnsFalseWithInvalidSolicitorSuffix() {
         roles.add("caseworker-befta_jurisdiction-barrister");
-        assertFalse(securityUtils.hasSolicitorRole(roles));
+        roles.add(CASEWORKER_BEFTA_JURISDICTION);
+        assertFalse(securityUtils.hasSolicitorAndJurisdictionRoles(roles, JURISDICTION));
     }
 
     @Test
-    void hasSolicitorRoleReturnsFalseWithAdditionalSuffixAppended() {
+    void hasSolicitorAndJurisdictionRolesReturnsFalseWithInvalidAdditionalSuffixAppended() {
         roles.add("caseworker-befta_jurisdiction-solicitorsurname-solicitor-role");
-        assertFalse(securityUtils.hasSolicitorRole(roles));
+        roles.add(CASEWORKER_BEFTA_JURISDICTION);
+        assertFalse(securityUtils.hasSolicitorAndJurisdictionRoles(roles, JURISDICTION));
+    }
+
+    @Test
+    void hasSolicitorAndJurisdictionRolesReturnsFalseWhenJurisdictionInRoleDoesNotMatch() {
+        roles.add("caseworker-ia-legalrep-solicitor");
+        roles.add("caseworker-divorce");
+        assertFalse(securityUtils.hasSolicitorAndJurisdictionRoles(roles, "ia"));
+    }
+
+    @Test
+    void hasSolicitorAndJurisdictionRolesReturnsFalseWhenJurisdictionSuppliedDoesNotMatch() {
+        roles.add("caseworker-ia-legalrep-solicitor");
+        roles.add("caseworker-ia");
+        assertFalse(securityUtils.hasSolicitorAndJurisdictionRoles(roles, "divorce"));
     }
 }

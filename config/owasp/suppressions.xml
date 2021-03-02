@@ -111,10 +111,7 @@
   </suppress>
 
   <suppress>
-    <notes><![CDATA[
-   file name: spring-security-core-5.3.4.RELEASE.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-core@.*$</packageUrl>
+    <notes>spring-security error; FIXME: bump to latest version > 5.4.4</notes>
     <cve>CVE-2021-22112</cve>
   </suppress>
 

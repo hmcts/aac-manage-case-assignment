@@ -62,7 +62,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CaseCouldNotBeFoundException.class)
     public ResponseEntity<Object> handleCaseCouldNotBeFoundException(CaseCouldNotBeFoundException ex) {
-        log.error("Data Store errors: {}", ex.getMessage(), ex);
+        log.error("Case could not be found: {}", ex.getMessage(), ex);
         return toResponseEntity(HttpStatus.NOT_FOUND, ex.getLocalizedMessage());
     }
 
@@ -74,7 +74,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CaseIdLuhnException.class)
     public ResponseEntity<Object> handleCaseIdLuhnException(CaseIdLuhnException ex) {
-        log.error("Data Store errors: {}", ex.getMessage(), ex);
+        log.error("Invalid caseId : {}", ex.getMessage(), ex);
         return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
     }
 

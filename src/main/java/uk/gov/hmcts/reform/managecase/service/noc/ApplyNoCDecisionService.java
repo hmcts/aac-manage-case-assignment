@@ -96,7 +96,7 @@ public class ApplyNoCDecisionService {
         }
 
         LOG.info("printing case data");
-        data.entrySet().forEach(e -> LOG.info(e.getKey() + "-->" + e.getValue().toPrettyString()));
+        data.entrySet().forEach(e -> LOG.info("entry: {} --> {}", e.getKey(), e.getValue().toPrettyString()));
 
         JsonNode changeOrganisationRequestField = caseDetails.findChangeOrganisationRequestNode()
             .orElseThrow(() -> new ValidationException(COR_MISSING));

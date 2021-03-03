@@ -118,15 +118,15 @@ public class ApplyNoCDecisionService {
 
         nullifyNode(changeOrganisationRequestField, CASE_ROLE_ID);
         LOG.info("printing final case data");
-        data.entrySet().forEach(e -> LOG.info(e.getKey() + "-->" + e.getValue().toPrettyString()));
+        data.entrySet().forEach(e -> LOG.info("entry: {} --> {}", e.getKey(), e.getValue().toPrettyString()));
         return data;
     }
 
     private void applyDecision(CaseDetails caseDetails, JsonNode changeOrganisationRequestField, String caseRoleId) {
         JsonNode orgPolicyNode = caseDetails.findOrganisationPolicyNodeForCaseRole(caseRoleId);
 
-        LOG.info("changeOrganisationRequestField:{}", changeOrganisationRequestField.toPrettyString());
-        LOG.info("orgPolicyNode:{}", orgPolicyNode.toPrettyString());
+        LOG.info("changeOrganisationRequestField: {}", changeOrganisationRequestField.toPrettyString());
+        LOG.info("orgPolicyNode: {}", orgPolicyNode.toPrettyString());
 
         JsonNode organisationToAddNode = changeOrganisationRequestField.get(ORGANISATION_TO_ADD);
         JsonNode organisationToRemoveNode = changeOrganisationRequestField.get(ORGANISATION_TO_REMOVE);
@@ -213,7 +213,7 @@ public class ApplyNoCDecisionService {
 
     private void setOrgPolicyOrganisation(JsonNode orgPolicyNode, JsonNode organisationToAddNode) {
         ((ObjectNode) orgPolicyNode).set(ORGANISATION, organisationToAddNode.deepCopy());
-        LOG.info("setOrgPolicyOrganisation:{}", orgPolicyNode.toPrettyString());
+        LOG.info("setOrgPolicyOrganisation: {}", orgPolicyNode.toPrettyString());
     }
 
     private void removeOrganisationUsersAccess(String caseReference,

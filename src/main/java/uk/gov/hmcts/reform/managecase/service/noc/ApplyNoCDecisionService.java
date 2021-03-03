@@ -17,8 +17,6 @@ import javax.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -64,8 +62,6 @@ import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.REJECTED;
 @Slf4j
 public class ApplyNoCDecisionService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ApplyNoCDecisionService.class);
-
     private static final String JSON_PATH_SEPARATOR = "/";
 
     private final PrdRepository prdRepository;
@@ -95,9 +91,6 @@ public class ApplyNoCDecisionService {
             throw new ValidationException(NO_DATA_PROVIDED);
         }
 
-        LOG.info("printing case data");
-        data.entrySet().forEach(e -> LOG.info("entry: {} --> {}", e.getKey(), e.getValue().toPrettyString()));
-
         JsonNode changeOrganisationRequestField = caseDetails.findChangeOrganisationRequestNode()
             .orElseThrow(() -> new ValidationException(COR_MISSING));
 
@@ -117,16 +110,11 @@ public class ApplyNoCDecisionService {
         applyDecision(caseDetails, changeOrganisationRequestField, caseRoleId);
 
         nullifyNode(changeOrganisationRequestField, CASE_ROLE_ID);
-        LOG.info("printing final case data");
-        data.entrySet().forEach(e -> LOG.info("entry: {} --> {}", e.getKey(), e.getValue().toPrettyString()));
         return data;
     }
 
     private void applyDecision(CaseDetails caseDetails, JsonNode changeOrganisationRequestField, String caseRoleId) {
         JsonNode orgPolicyNode = caseDetails.findOrganisationPolicyNodeForCaseRole(caseRoleId);
-
-        LOG.info("changeOrganisationRequestField: {}", changeOrganisationRequestField.toPrettyString());
-        LOG.info("orgPolicyNode: {}", orgPolicyNode.toPrettyString());
 
         JsonNode organisationToAddNode = changeOrganisationRequestField.get(ORGANISATION_TO_ADD);
         JsonNode organisationToRemoveNode = changeOrganisationRequestField.get(ORGANISATION_TO_REMOVE);
@@ -137,13 +125,11 @@ public class ApplyNoCDecisionService {
             .getCaseAssignments(singletonList(caseDetails.getId()), null);
 
         if (organisationToAdd == null || isNullOrEmpty(organisationToAdd.getOrganisationID())) {
-            LOG.info("inside applyRemoveRepresentationDecision");
             applyRemoveRepresentationDecision(existingCaseAssignments, orgPolicyNode, organisationToRemove,
-                caseDetails.getId());
+                                              caseDetails.getId());
         } else {
-            LOG.info("inside applyAddOrReplaceRepresentationDecision");
             applyAddOrReplaceRepresentationDecision(existingCaseAssignments, caseRoleId, orgPolicyNode,
-                    organisationToAddNode, organisationToAdd, organisationToRemove, caseDetails.getId());
+                                                    organisationToAddNode, organisationToAdd, organisationToRemove, caseDetails.getId());
         }
 
         setOrgPolicyPreviousOrganisations(caseDetails, organisationToAdd, organisationToRemove, orgPolicyNode);
@@ -151,7 +137,7 @@ public class ApplyNoCDecisionService {
 
     private void validateCorFieldOrganisations(JsonNode changeOrganisationRequestField) {
         if (!changeOrganisationRequestField.has(ORGANISATION_TO_ADD)
-                || !changeOrganisationRequestField.has(ORGANISATION_TO_REMOVE)) {
+            || !changeOrganisationRequestField.has(ORGANISATION_TO_REMOVE)) {
             throw new ValidationException(COR_MISSING_ORGANISATIONS);
         }
     }
@@ -168,11 +154,10 @@ public class ApplyNoCDecisionService {
             existingCaseAssignments, organisationToAdd, caseRoleId, caseReference);
 
         if (organisationToRemove != null && !isNullOrEmpty(organisationToRemove.getOrganisationID())) {
-            LOG.info("inside removeOrganisationUsersAccess ....");
             List<CaseUserRole> filteredCaseAssignments =
                 filterCaseAssignments(existingCaseAssignments, newAssignedUsers.getLeft());
             removeOrganisationUsersAccess(caseReference, filteredCaseAssignments,
-                organisationToRemove);
+                                          organisationToRemove);
         }
     }
 
@@ -213,7 +198,6 @@ public class ApplyNoCDecisionService {
 
     private void setOrgPolicyOrganisation(JsonNode orgPolicyNode, JsonNode organisationToAddNode) {
         ((ObjectNode) orgPolicyNode).set(ORGANISATION, organisationToAddNode.deepCopy());
-        LOG.info("setOrgPolicyOrganisation: {}", orgPolicyNode.toPrettyString());
     }
 
     private void removeOrganisationUsersAccess(String caseReference,
@@ -263,7 +247,7 @@ public class ApplyNoCDecisionService {
             String errorMessage = status == HttpStatus.NOT_FOUND
                 ? String.format("Organisation with ID '%s' can not be found.", organisationId)
                 : String.format("Error encountered while retrieving organisation users for organisation ID '%s': %s",
-                organisationId, reasonPhrase);
+                                organisationId, reasonPhrase);
 
             throw new ValidationException(errorMessage, e);
         }

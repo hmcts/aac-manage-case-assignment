@@ -17,6 +17,8 @@ import javax.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -62,6 +64,8 @@ import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.REJECTED;
 @Slf4j
 public class ApplyNoCDecisionService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ApplyNoCDecisionService.class);
+
     private static final String JSON_PATH_SEPARATOR = "/";
 
     private final PrdRepository prdRepository;
@@ -86,6 +90,9 @@ public class ApplyNoCDecisionService {
     public Map<String, JsonNode> applyNoCDecision(ApplyNoCDecisionRequest applyNoCDecisionRequest) {
         CaseDetails caseDetails = applyNoCDecisionRequest.getCaseDetails();
         Map<String, JsonNode> data = caseDetails.getData();
+
+        LOG.info("printing case data");
+        data.entrySet().forEach(e -> LOG.info(e.getKey() + "-->" + e.getValue().toPrettyString()));
 
         if (data == null) {
             throw new ValidationException(NO_DATA_PROVIDED);

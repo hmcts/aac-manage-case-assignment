@@ -117,11 +117,16 @@ public class ApplyNoCDecisionService {
         applyDecision(caseDetails, changeOrganisationRequestField, caseRoleId);
 
         nullifyNode(changeOrganisationRequestField, CASE_ROLE_ID);
+        LOG.info("printing final case data");
+        data.entrySet().forEach(e -> LOG.info(e.getKey() + "-->" + e.getValue().toPrettyString()));
         return data;
     }
 
     private void applyDecision(CaseDetails caseDetails, JsonNode changeOrganisationRequestField, String caseRoleId) {
         JsonNode orgPolicyNode = caseDetails.findOrganisationPolicyNodeForCaseRole(caseRoleId);
+
+        LOG.info("changeOrganisationRequestField:{}", changeOrganisationRequestField.toPrettyString());
+        LOG.info("orgPolicyNode:{}", orgPolicyNode.toPrettyString());
 
         JsonNode organisationToAddNode = changeOrganisationRequestField.get(ORGANISATION_TO_ADD);
         JsonNode organisationToRemoveNode = changeOrganisationRequestField.get(ORGANISATION_TO_REMOVE);
@@ -132,9 +137,11 @@ public class ApplyNoCDecisionService {
             .getCaseAssignments(singletonList(caseDetails.getId()), null);
 
         if (organisationToAdd == null || isNullOrEmpty(organisationToAdd.getOrganisationID())) {
+            LOG.info("inside applyRemoveRepresentationDecision");
             applyRemoveRepresentationDecision(existingCaseAssignments, orgPolicyNode, organisationToRemove,
                 caseDetails.getId());
         } else {
+            LOG.info("inside applyAddOrReplaceRepresentationDecision");
             applyAddOrReplaceRepresentationDecision(existingCaseAssignments, caseRoleId, orgPolicyNode,
                     organisationToAddNode, organisationToAdd, organisationToRemove, caseDetails.getId());
         }
@@ -161,6 +168,7 @@ public class ApplyNoCDecisionService {
             existingCaseAssignments, organisationToAdd, caseRoleId, caseReference);
 
         if (organisationToRemove != null && !isNullOrEmpty(organisationToRemove.getOrganisationID())) {
+            LOG.info("inside removeOrganisationUsersAccess ....");
             List<CaseUserRole> filteredCaseAssignments =
                 filterCaseAssignments(existingCaseAssignments, newAssignedUsers.getLeft());
             removeOrganisationUsersAccess(caseReference, filteredCaseAssignments,
@@ -205,6 +213,7 @@ public class ApplyNoCDecisionService {
 
     private void setOrgPolicyOrganisation(JsonNode orgPolicyNode, JsonNode organisationToAddNode) {
         ((ObjectNode) orgPolicyNode).set(ORGANISATION, organisationToAddNode.deepCopy());
+        LOG.info("setOrgPolicyOrganisation:{}", orgPolicyNode.toPrettyString());
     }
 
     private void removeOrganisationUsersAccess(String caseReference,

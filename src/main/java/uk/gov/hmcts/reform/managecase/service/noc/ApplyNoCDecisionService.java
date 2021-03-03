@@ -91,12 +91,12 @@ public class ApplyNoCDecisionService {
         CaseDetails caseDetails = applyNoCDecisionRequest.getCaseDetails();
         Map<String, JsonNode> data = caseDetails.getData();
 
-        LOG.info("printing case data");
-        data.entrySet().forEach(e -> LOG.info(e.getKey() + "-->" + e.getValue().toPrettyString()));
-
         if (data == null) {
             throw new ValidationException(NO_DATA_PROVIDED);
         }
+
+        LOG.info("printing case data");
+        data.entrySet().forEach(e -> LOG.info(e.getKey() + "-->" + e.getValue().toPrettyString()));
 
         JsonNode changeOrganisationRequestField = caseDetails.findChangeOrganisationRequestNode()
             .orElseThrow(() -> new ValidationException(COR_MISSING));

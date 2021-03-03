@@ -129,7 +129,8 @@ public class ApplyNoCDecisionService {
                                               caseDetails.getId());
         } else {
             applyAddOrReplaceRepresentationDecision(existingCaseAssignments, caseRoleId, orgPolicyNode,
-                                                    organisationToAddNode, organisationToAdd, organisationToRemove, caseDetails.getId());
+                                                    organisationToAddNode, organisationToAdd,
+                                                    organisationToRemove, caseDetails.getId());
         }
 
         setOrgPolicyPreviousOrganisations(caseDetails, organisationToAdd, organisationToRemove, orgPolicyNode);

@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -213,11 +212,9 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     private Map<String, JsonNode> getCaseDataContentData(String caseFieldId,
                                                          ChangeOrganisationRequest changeOrganisationRequest,
                                                          Map<String, JsonNode> caseDetailsData) {
-        Map<String, JsonNode> data = new HashMap<>();
 
-        data.put(caseFieldId, jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
+        caseDetailsData.put(caseFieldId, jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
 
-        JacksonUtils.merge(caseDetailsData, data);
-        return data;
+        return caseDetailsData;
     }
 }

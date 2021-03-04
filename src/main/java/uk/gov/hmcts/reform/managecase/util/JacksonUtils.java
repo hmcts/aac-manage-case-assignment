@@ -77,7 +77,7 @@ public class JacksonUtils {
             } else if (valueToBeUpdated != null && valueToBeUpdated.isObject()) {
                 merge(valueToBeUpdated, updatedValue);
             } else {
-                if (mainNode instanceof ObjectNode) {
+                if (mainNode instanceof ObjectNode && !updatedValue.isNull()) {
                     ((ObjectNode) mainNode).replace(updatedFieldName, updatedValue);
                 }
             }

@@ -46,8 +46,8 @@ public class JacksonUtils {
             }
         });
     }
-    
-    public static void merge(Map<String, JsonNode> mergeFrom, Map<String, JsonNode> mergeInto) {
+
+    public void merge(Map<String, JsonNode> mergeFrom, Map<String, JsonNode> mergeInto) {
 
         for (String key : mergeFrom.keySet()) {
             JsonNode value = mergeFrom.get(key);

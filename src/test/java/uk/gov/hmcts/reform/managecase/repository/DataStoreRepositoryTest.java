@@ -330,6 +330,7 @@ class DataStoreRepositoryTest {
 
 
         given(jacksonUtils.convertValue(any(), any())).willReturn(mapper.readTree(EXPECTED_NOC_REQUEST_DATA));
+        doNothing().when(jacksonUtils).merge(any(), eq(data));
 
         ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
             .organisationToAdd(Organisation.builder().organisationID("orgNameToAdd").build())

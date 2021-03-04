@@ -37,6 +37,7 @@ class JacksonUtilsTest {
         + "      ]\n"
         + "    },\n"
         + "    \"ApprovalStatus\": \"1\",\n"
+        + "    \"NotesReason\": null,\n"
         + "    \"RequestTimestamp\": \"2021-03-03T15:43:55.779895\",\n"
         + "    \"OrganisationToAdd\": {\n"
         + "      \"OrganisationID\": \"8P7DJ0K\"\n"

@@ -1,0 +1,69 @@
+{
+  "_guid_": "F-209.6_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies",
+  "_extends_": "NoC_Case_Creation_With_Org_Policies__Base",
+
+  "specs": [
+    "by Richard to create a case - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Richard"
+    }
+  },
+
+  "prerequisites": [
+    {
+      "Token_Creation": "F-209.6_NoC_Case_Creation_By_Richard_Token_Creation",
+      "Get_Organisation_Identifier": "Get_Organisation_Identifier_For_Any_Org1_User__Prerequisite"
+    }
+  ],
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+
+      "data": {
+        "applicantOrganisationPolicy": {
+          "Organisation": {
+            "_extends_" : "F-209_org_name_LESTKK0_only"
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "Org-Two"
+          },
+          "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]"
+        },
+        "otherPartyOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "Org-Two"
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "applicantOrganisationPolicy": {
+          "Organisation": {
+            "_extends_" : "F-209_org_name_LESTKK0_only"
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "Org-Two"
+          },
+          "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]"
+        },
+        "otherPartyOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "Org-Two"
+          }
+        }
+      }
+    }
+  }
+}

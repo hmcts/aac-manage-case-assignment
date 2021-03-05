@@ -1,0 +1,58 @@
+{
+  "_guid_" : "S-209.7",
+  "_extends_": "F-209_ApplyNoCDecision_Base",
+
+  "specs": [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Dil - with a solicitor role for the same jurisdiction within a different organisation from Richard",
+    "a citizen Mario, on behalf of whom Richard will create a case",
+    "has all fields in the ChangeOrganisationRequest nullified",
+    "contains more then OrganisationPolicy with the ChangeOrganisationRequest.CaseRole in the case record",
+    "intends to apply a NoCDecision to a case",
+    "contains the case record for C1",
+    "has an error message stating in no Org Policy with the requested NoC CaseRole",
+    "contains no OrganisationPolicy with the ChangeOrganisationRequest.CaseRole in the case record",
+    "contains an approval status of 'Approved'",
+    "has an error message stating there is more that one Org Policy with the same CaseRole",
+    "by Dil to raise a NoCRequest to become the representative for Mario on C1",
+
+    "contains all correct answers in the correct format",
+    "contains answers identifying case role R2",
+
+    "is made by Dil to place an NOC Request for C1"
+  ],
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "body": {
+      "case_details": {
+        "case_data": {
+          "_extends_" : "change_org_request_data",
+          "applicantOrganisationPolicy": {
+            "OrgPolicyCaseAssignedRole": null
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "errors" : [ "No Organisation Policy found with case role ID '[ApplicantSolicitor]'" ]
+    }
+
+  }
+
+
+
+}

@@ -14,7 +14,7 @@
     "Dil - with a solicitor role for the same jurisdiction as that of a case initiated by Mario",
     "contains an approval status of 'Approved'",
     "by Dil to raise a NoCRequest to become the representative for Mario on C1",
-
+    "to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created, And the toTimeStamp is within a couple of seconds of the LastModifiedDate of the case, And the OrganisationName And OrganisationAddress are null",
     "contains all correct answers in the correct format",
     "contains answers identifying case role R2",
 

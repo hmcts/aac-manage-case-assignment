@@ -35,7 +35,8 @@ public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutoma
         if (key.toString().startsWith("caseIdAsIntegerFrom")) {
             String childContext = key.toString().replace("caseIdAsIntegerFrom_","");
             try {
-                return (long) ReflectionUtils.deepGetFieldInObject(scenarioContext, "ParentContext.childContexts." + childContext
+                return (long) ReflectionUtils.deepGetFieldInObject(scenarioContext, "ParentContext.childContexts."
+                    + childContext
                     + ".testData.actualResponse.body.id");
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
@@ -45,7 +46,8 @@ public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutoma
             System.out.println("context: " + childContext);
             try {
                 long longRef = (long) ReflectionUtils.deepGetFieldInObject(
-                    scenarioContext,"ParentContext.childContexts." + childContext + ".testData.actualResponse.body.id");
+                    scenarioContext,"ParentContext.childContexts." + childContext
+                        + ".testData.actualResponse.body.id");
                 return Long.toString(longRef);
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
@@ -55,7 +57,8 @@ public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutoma
             //    0 - path to context holding organisationIdentifier
             //    1 - (Optional) path to context holding previous value to use (otherwise: use 0)
             //    2 - (Optional) amount to increment previous value by (otherwise: don't increment)
-            List<String> args = Arrays.asList(key.toString().replace("orgsAssignedUsers_", "").split("\\|"));
+            List<String> args = Arrays.asList(key.toString().replace("orgsAssignedUsers_", "")
+                                                  .split("\\|"));
             String organisationIdentifierContextPath = args.get(0);
             String previousValueContextPath = args.size() > 1 ? args.get(1) : null;
             int incrementBy = args.size() > 2 ? Integer.parseInt(args.get(2)) : 0;
@@ -67,7 +70,7 @@ public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutoma
         } else if (key.toString().startsWith("approximately ")) {
             try {
                 String actualSizeFromHeaderStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
-                                                                                               "testData.actualResponse.headers.Content-Length");
+                                                   "testData.actualResponse.headers.Content-Length");
                 String expectedSizeStr = key.toString().replace("approximately ", "");
 
                 int actualSize =  Integer.parseInt(actualSizeFromHeaderStr);
@@ -83,7 +86,7 @@ public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutoma
         } else if (key.toString().startsWith("contains ")) {
             try {
                 String actualValueStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
-                                                                                      "testData.actualResponse.body.__plainTextValue__");
+                                                  "testData.actualResponse.body.__plainTextValue__");
                 String expectedValueStr = key.toString().replace("contains ", "");
 
                 if (actualValueStr.contains(expectedValueStr)) {
@@ -111,7 +114,7 @@ public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutoma
 
         try {
             String organisationIdentifier = ReflectionUtils.deepGetFieldInObject(scenarioContext,
-                                                                                 organisationIdentifierFieldPath).toString();
+                                                             organisationIdentifierFieldPath).toString();
             String propertyName = "orgs_assigned_users." + organisationIdentifier;
 
             int value = 0; // default

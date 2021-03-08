@@ -10,12 +10,13 @@
     "has all fields in the ChangeOrganisationRequest nullified",
     "intends to apply a NoCDecision to a case",
     "contains the case record for C1",
+    "has data for a previous org ORG1",
     "contains an approval status of 'Approved'",
     "by Dil to raise a NoCRequest to become the representative for Mario on C1",
-
+    "to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created, And the toTimeStamp is within a couple of seconds of the LastModifiedDate of the case, And the OrganisationName And OrganisationAddress match those of Richard's Organisation",
     "contains all correct answers in the correct format",
+    "[to get the case verifies that there are 2 PreviousOrganisations field within the Organisation Policy containing the 2 previous organisation elements for ORG1 and Richards org",
     "contains answers identifying case role R2",
-
     "is made by Dil to place an NOC Request for C1"
   ],
 

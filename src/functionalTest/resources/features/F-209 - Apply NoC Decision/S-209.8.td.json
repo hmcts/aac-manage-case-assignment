@@ -1,0 +1,113 @@
+{
+  "_guid_" : "S-209.8",
+  "_extends_" : "F-209_ApplyNoCDecision_Base",
+
+
+  "specs": [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Dil - with a solicitor role for the same jurisdiction within a different organisation from Richard",
+    "a citizen Mario, on behalf of whom Richard will create a case",
+    "has all fields in the ChangeOrganisationRequest nullified",
+    "intends to apply a NoCDecision to a case",
+    "has data for a previous org ORG1",
+    "to get the case verifies that there are 2 PreviousOrganisations field within the Organisation Policy containing the 2 previous organisation elements for ORG1 and Richards org",
+    "contains the case record for C1",
+    "contains an approval status of 'Approved'",
+    "by Dil to raise a NoCRequest to become the representative for Mario on C1",
+    "to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created, And the toTimeStamp is within a couple of seconds of the LastModifiedDate of the case, And the OrganisationName And OrganisationAddress match those of Richard's Organisation",
+    "contains all correct answers in the correct format",
+    "contains answers identifying case role R2",
+
+    "is made by Dil to place an NOC Request for C1"
+  ],
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "body": {
+      "case_details": {
+        "case_data": {
+           "_extends_" : "change_org_request_data",
+          "applicantOrganisationPolicy" : {
+            "PreviousOrganisations": [
+              {
+                "id": null,
+                "value": {
+                  "OrganisationName": "ORG1",
+                  "FromTimestamp": null,
+                  "ToTimestamp": "2021-03-05T08:24:12.830964",
+                  "OrganisationAddress": {
+                    "AddressLine1": "My Org 1 Line 1",
+                    "AddressLine2": "My Org 1 Line 2",
+                    "AddressLine3": null,
+                    "PostTown": "London",
+                    "County": null,
+                    "Country": null,
+                    "PostCode": "SW1H 9GL"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "data": {
+        "_extends_": "F-209_orgPolicy_response_data_no_previous_org",
+        "applicantOrganisationPolicy" : {
+          "PreviousOrganisations": [
+            {
+              "id": null,
+              "value": {
+                "OrganisationName": "BEFTA Organisation2",
+                "FromTimestamp": "2021-03-05T08:24:12.830964",
+                "ToTimestamp": "[[ANYTHING_PRESENT]]",
+                "OrganisationAddress": {
+                  "AddressLine1": "Org 2 Line 1",
+                  "AddressLine2": "Org 2 Line 2",
+                  "AddressLine3": null,
+                  "PostTown": "London",
+                  "County": null,
+                  "Country": null,
+                  "PostCode": "SW1H 9GL"
+                }
+              }
+            },
+            {
+              "id": null,
+              "value": {
+                "OrganisationName": "ORG1",
+                "FromTimestamp": null,
+                "ToTimestamp": "2021-03-05T08:24:12.830964",
+                "OrganisationAddress": {
+                  "AddressLine1": "My Org 1 Line 1",
+                  "AddressLine2": "My Org 1 Line 2",
+                  "AddressLine3": null,
+                  "PostTown": "London",
+                  "County": null,
+                  "Country": null,
+                  "PostCode": "SW1H 9GL"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+
+
+}

@@ -19,14 +19,10 @@
   </suppress>
 
   <suppress>
-    <notes>Analysis: No fix or work around available</notes>
-    <cve>CVE-2007-1652</cve>
+    <notes>Declared as False Positive on com.nimbusds:oauth2-oidc-sdk #2866
+      https://github.com/jeremylong/DependencyCheck/issues/2866</notes>
     <cve>CVE-2007-1651</cve>
-  </suppress>
-
-  <suppress>
-    <notes>spring-security error; FIXME: bump to latest version > 5.4.4</notes>
-    <cve>CVE-2021-22112</cve>
+    <cve>CVE-2007-1652</cve>
   </suppress>
 
 </suppressions>

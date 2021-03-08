@@ -112,6 +112,8 @@
   <suppress>
     <notes>New CVEs</notes>
     <cve>CVE-2021-22112</cve>
+    <cve>CVE-2021-25122</cve>
+    <cve>CVE-2021-25329</cve>
   </suppress>
 
 </suppressions>

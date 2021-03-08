@@ -17,9 +17,6 @@
   "users": {
     "Richard": {
       "_extends_": "ACA_Users_Richard"
-    },
-    "invokingUser": {
-      "_extends_": "ACA_Users_Dil"
     }
   },
   "request": {

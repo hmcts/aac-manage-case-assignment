@@ -21,11 +21,7 @@
     "is made by Dil to place an NOC Request for C1"
   ],
 
-  "users": {
-    "invokingUser": {
-      "_extends_": "ACA_Users_Dil"
-    }
-  },
+
 
 
   "request" : {

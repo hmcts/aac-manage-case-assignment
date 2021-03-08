@@ -109,4 +109,9 @@
     <cve>CVE-2020-29244</cve>
     <cve>CVE-2020-29245</cve>
   </suppress>
+  <suppress>
+    <notes>New CVEs</notes>
+    <cve>CVE-2021-22112</cve>
+  </suppress>
+
 </suppressions>

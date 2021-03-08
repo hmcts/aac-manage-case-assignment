@@ -19,6 +19,8 @@ public class OrganisationPolicy {
     private String orgPolicyReference;
     @JsonProperty("OrgPolicyCaseAssignedRole")
     private String orgPolicyCaseAssignedRole;
+    @JsonProperty("PrepopulateToUsersOrganisation")
+    private String prepopulateToUsersOrganisation;
     @JsonProperty("PreviousOrganisations")
     private List<PreviousOrganisationCollectionItem> previousOrganisations;
 

@@ -67,6 +67,7 @@ class RequestNoticeOfChangeServiceTest {
     private static final String INVOKERS_ORGANISATION_IDENTIFIER = "PRD_ORG_IDENTIFIER";
     private static final String ORG_POLICY_REFERENCE = "orgPolicyReference";
     private static final String CHANGE_ORGANISATION_REQUEST_KEY = "ChangeOrganisationRequest";
+    private static final String PREPOPULATE_TO_USERS_ORGANISATION = null;
     private static final String ORGANISATION_POLICY_KEY = "OrganisationPolicy";
     private static final String JURISDICTION_ONE = "JURISDICTION_1";
     private static final String SOLICITOR_ROLE = "caseworker-" + JURISDICTION_ONE + "-solicitor";
@@ -114,6 +115,7 @@ class RequestNoticeOfChangeServiceTest {
         incumbentOrganisation = Organisation.builder().organisationID(INCUMBENT_ORGANISATION_ID).build();
         OrganisationPolicy organisationPolicy = new OrganisationPolicy(incumbentOrganisation,
                                                                        ORG_POLICY_REFERENCE, CASE_ASSIGNED_ROLE,
+                                                                       PREPOPULATE_TO_USERS_ORGANISATION,
                                                                        Lists.newArrayList());
 
         noCRequestDetails = NoCRequestDetails.builder()
@@ -141,8 +143,9 @@ class RequestNoticeOfChangeServiceTest {
     @DisplayName("Generate a Notice Of Change Request with no Incumbent Organisation")
     void testGenerateNocRequestWithOutIncumbentOrganisation() {
         noCRequestDetails.setOrganisationPolicy(new OrganisationPolicy(null,
-                                                                       ORG_POLICY_REFERENCE,
-                                                                       CASE_ASSIGNED_ROLE, Lists.newArrayList()));
+                                                                       ORG_POLICY_REFERENCE, CASE_ASSIGNED_ROLE,
+                                                                       PREPOPULATE_TO_USERS_ORGANISATION,
+                                                                       Lists.newArrayList()));
         final Organisation nullIncumbentOrganisation = null;
         service.requestNoticeOfChange(noCRequestDetails);
 
@@ -257,6 +260,7 @@ class RequestNoticeOfChangeServiceTest {
         OrganisationPolicy invokersOrganisationPolicy = new OrganisationPolicy(invokersOrganisation,
                                                                                ORG_POLICY_REFERENCE,
                                                                                CASE_ASSIGNED_ROLE,
+                                                                               PREPOPULATE_TO_USERS_ORGANISATION,
                                                                                Lists.newArrayList());
 
         updateCaseDetailsData(caseDetails, ORGANISATION_POLICY_KEY, invokersOrganisationPolicy);
@@ -349,8 +353,8 @@ class RequestNoticeOfChangeServiceTest {
         for (int loopCounter = 0; loopCounter < 3; loopCounter++) {
             Organisation organisation = Organisation.builder().organisationID("OrganisationId").build();
             OrganisationPolicy organisationPolicy =
-                new OrganisationPolicy(organisation, ORG_POLICY_REFERENCE,
-                                       "CaseRole" + loopCounter, Lists.newArrayList());
+                new OrganisationPolicy(organisation, ORG_POLICY_REFERENCE, "CaseRole"
+                    + loopCounter,PREPOPULATE_TO_USERS_ORGANISATION, Lists.newArrayList());
             organisationPolicies.add(organisationPolicy);
             updateCaseDetailsData(caseDetails, "OrganisationPolicy" + loopCounter, organisationPolicy);
         }

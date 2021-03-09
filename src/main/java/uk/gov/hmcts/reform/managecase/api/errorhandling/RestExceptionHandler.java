@@ -60,13 +60,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<Object> handleValidationException(ValidationException ex) {
-        log.debug("Validation exception:", ex);
+        log.error("Validation exception:", ex);
         return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(CaseCouldNotBeFoundException.class)
     public ResponseEntity<Object> handleCaseCouldNotBeFoundException(CaseCouldNotBeFoundException ex) {
-        log.error("Data Store errors: {}", ex.getMessage(), ex);
+        log.error("Case could not be found: {}", ex.getMessage(), ex);
         return toResponseEntity(HttpStatus.NOT_FOUND, ex.getLocalizedMessage());
     }
 

@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
+import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -35,8 +37,10 @@ import uk.gov.hmcts.reform.managecase.domain.UserDetails;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -254,6 +258,25 @@ public class CaseAssignmentControllerTest {
                 .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles", hasSize(2)))
                 .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles[0]", is(TestFixtures.CASE_ROLE)))
                 .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles[1]", is(TestFixtures.CASE_ROLE2)));
+        }
+
+        @DisplayName("should return 500 when downstream throws FeignException for get case assignments")
+        @Test
+        void shouldReturn500ErrorWhenDownstreamCallFailed() throws Exception {
+            String caseIds = "1588234985453946";
+            Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null,
+                                             Charset.defaultCharset(), null
+            );
+            given(service.getCaseAssignments(List.of(caseIds)))
+                .willThrow(new FeignException.NotFound("404", request, "data store failure".getBytes()));
+
+            this.mockMvc.perform(get(CASE_ASSIGNMENTS_PATH)
+                                     .queryParam("case_ids", caseIds))
+                .andExpect(status().is5xxServerError())
+                .andExpect(jsonPath(
+                    "$.message",
+                    containsString("data store failure")
+                ));
         }
 
         @DisplayName("should fail with 400 bad request when caseIds query param is not passed")

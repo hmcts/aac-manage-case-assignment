@@ -3,10 +3,15 @@ package uk.gov.hmcts.reform.managecase.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import feign.FeignException;
+import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
@@ -46,6 +52,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.CHANGE_ORGANISATION_REQUEST_FIELD;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getCaseViewFields;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getWizardPages;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CALLBACK_FAILED_ERRORS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID;
@@ -125,6 +132,24 @@ class DataStoreRepositoryTest {
         // ASSERT
         assertThat(result).isNull();
         verify(dataStoreApi).getCaseDetailsByCaseIdViaExternalApi(eq(CASE_ID));
+    }
+
+    @Test
+    @DisplayName("find case by id using external facing API throws CaseCouldNotBeFetchedException")
+    void shouldThrowCaseCouldNotBeFetchedExceptionForFindCaseByIdUsingExternalApi() {
+        // ARRANGE
+        given(dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(CASE_ID))
+            .willThrow(new FeignException.NotFound("404",
+                                                   Request.create(Request.HttpMethod.GET, "someUrl", Map.of(),
+                                                                  null, Charset.defaultCharset(),
+                                                                  null
+                                                   ), null
+            ));
+
+        // ACT & ASSERT
+        assertThatThrownBy(() -> repository.findCaseByCaseIdExternalApi(CASE_ID))
+            .isInstanceOf(CaseCouldNotBeFoundException.class)
+            .hasMessageContaining(CASE_NOT_FOUND);
     }
 
     @Test
@@ -227,6 +252,39 @@ class DataStoreRepositoryTest {
 
         // ASSERT
         assertThat(result).isEqualTo(caseViewResource);
+    }
+
+    @Test
+    @DisplayName("Should throw CaseNotFoundException  when Find case by caseId")
+    void shouldThrowCaseNotFoundExceptionForFindCaseByCaseId() {
+        // ARRANGE
+        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null, Charset.defaultCharset(),
+                                         null
+        );
+        given(dataStoreApi.getCaseDetailsByCaseId(anyString(), anyString()))
+            .willThrow(new FeignException.NotFound("404", request, null));
+
+        // ACT & ASSERT
+        assertThatThrownBy(() -> repository.findCaseByCaseId(CASE_ID))
+            .isInstanceOf(CaseCouldNotBeFoundException.class)
+            .hasMessageContaining(CASE_NOT_FOUND);
+
+    }
+
+    @Test
+    @DisplayName("Should throw FeignException  when Find case by caseId")
+    void shouldThrowCFeignExceptionForFindCaseByCaseId() {
+        // ARRANGE
+        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null, Charset.defaultCharset(),
+                                         null
+        );
+        given(dataStoreApi.getCaseDetailsByCaseId(anyString(), anyString()))
+            .willThrow(new FeignException.InternalServerError("500", request, null));
+
+        // ACT & ASSERT
+        assertThatThrownBy(() -> repository.findCaseByCaseId(CASE_ID))
+            .isInstanceOf(FeignException.class);
+
     }
 
     @Test

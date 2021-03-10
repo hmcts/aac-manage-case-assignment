@@ -16,9 +16,10 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
         log.debug("ConstraintViolationException exception:", ex);
         String[] errors = ex.getConstraintViolations().stream()
-            .map(cv -> cv.getMessage())
+            .map(ConstraintViolation::getMessage)
             .toArray(String[]::new);
         return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
     }
@@ -79,7 +80,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<Object> handleFeignStatusException(FeignException ex) {
         String errorMessage = ex.responseBody()
-            .map(res -> new String(res.array(), Charset.forName("UTF-8")))
+            .map(res -> new String(res.array(), StandardCharsets.UTF_8))
             .orElse(ex.getMessage());
         log.error("Downstream service errors: {}", errorMessage, ex);
         return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);

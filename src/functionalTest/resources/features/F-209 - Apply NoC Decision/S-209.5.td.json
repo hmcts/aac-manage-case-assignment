@@ -17,7 +17,9 @@
     "contains all correct answers in the correct format",
     "contains answers identifying case role R2",
     "Matt - with a pui-caa role for the same jurisdiction within a different organisation from Richard",
-
+    "to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created",
+    "toTimeStamp is within a couple of seconds of the LastModifiedDate of the case",
+    "OrganisationName And OrganisationAddress match those of Richard's Organisation",
     "is made by Dil to place an NOC Request for C1"
   ],
 

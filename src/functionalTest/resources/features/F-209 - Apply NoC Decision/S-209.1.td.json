@@ -17,7 +17,11 @@
     "contains all correct answers in the correct format",
     "[to get the case verifies that there are 2 PreviousOrganisations field within the Organisation Policy containing the 2 previous organisation elements for ORG1 and Richards org",
     "contains answers identifying case role R2",
-    "is made by Dil to place an NOC Request for C1"
+    "is made by Dil to place an NOC Request for C1",
+    "to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created",
+    "previous organisation has the toTimeStamp within a couple of seconds of the LastModifiedDate of the case",
+    "OrganisationName And OrganisationAddress match those of Richard's Organisation"
+
   ],
 
   "users": {

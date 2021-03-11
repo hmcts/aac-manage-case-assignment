@@ -100,10 +100,6 @@ public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutoma
         return super.calculateCustomValue(scenarioContext, key);
     }
 
-    private boolean elasticSearchFunctionalTestsEnabled() {
-        return ofNullable(System.getenv("ELASTIC_SEARCH_ENABLED")).map(Boolean::valueOf).orElse(false);
-    }
-
     private Map<String, Object> calculateOrganisationsAssignedUsersPropertyWithValue(
         BackEndFunctionalTestScenarioContext scenarioContext,
         String organisationIdentifierContextPath,

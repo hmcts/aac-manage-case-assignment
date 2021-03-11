@@ -25,7 +25,9 @@ Feature:
     And a wait time of [5] seconds [to allow for Logstash to re-index the case],
     And a call [to verify that the supplementary counter has been adjusted to reflect the reduction in the number of users who have access to the case in Richard's organisation] will get the expected response as in [F_209_Search_Case_ES_0_users],
     And the response [has all fields in the ChangeOrganisationRequest nullified],
-    And the response [to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created, And the toTimeStamp is within a couple of seconds of the LastModifiedDate of the case, And the OrganisationName And OrganisationAddress match those of Richard's Organisation].
+    And the response [to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created]
+    And the response [previous organisation has the toTimeStamp within a couple of seconds of the LastModifiedDate of the case]
+    And the response [OrganisationName And OrganisationAddress match those of Richard's Organisation].
 
 
   @S-209.2
@@ -82,7 +84,9 @@ Feature:
     Then a positive response is received,
     And the response has all the details as expected,
     And the response [has all fields in the ChangeOrganisationRequest nullified],
-    And the response [to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created, And the toTimeStamp is within a couple of seconds of the LastModifiedDate of the case, And the OrganisationName And OrganisationAddress are null].
+    And the response [to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created]
+    And the response [toTimeStamp is within a couple of seconds of the LastModifiedDate of the case]
+    And the response [OrganisationName And OrganisationAddress are null].
 
 
 
@@ -106,7 +110,9 @@ Feature:
     And a call [to verify that Richard and anyone else in Richard's organisation has had their access removed] will get the expected response as in [F_209_get_case_users_richard_not_assigned],
     And a call [to verify that the supplementary counter has been adjusted to reflect the reduction in the number of users who have access to the case in Richard's organisation] will get the expected response as in [F_209_Search_Case_ES_0_users],
     And the response [has all fields in the ChangeOrganisationRequest nullified],
-    And the response [to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created, And the toTimeStamp is within a couple of seconds of the LastModifiedDate of the case, And the OrganisationName And OrganisationAddress match those of Richard's Organisation].
+    And the response [to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created]
+    And the response [toTimeStamp is within a couple of seconds of the LastModifiedDate of the case]
+    And the response [OrganisationName And OrganisationAddress match those of Richard's Organisation].
 
 
   @S-209.6
@@ -194,5 +200,7 @@ Feature:
     And a call [to verify that Richard and anyone else in Richard's organisation has had their access removed] will get the expected response as in [F_209_get_case_users_richard_not_assigned],
     And a call [to verify that the supplementary counter has been adjusted to reflect the reduction in the number of users who have access to the case in Richard's organisation] will get the expected response as in [F_209_Search_Case_ES_0_users],
     And the response [has all fields in the ChangeOrganisationRequest nullified],
-    And the response [to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created, And the toTimeStamp is within a couple of seconds of the LastModifiedDate of the case, And the OrganisationName And OrganisationAddress match those of Richard's Organisation].
+    And the response [to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created]
+    And the response [toTimeStamp is within a couple of seconds of the LastModifiedDate of the case]
+    And the response [OrganisationName And OrganisationAddress match those of Richard's Organisation].
     And the response [to get the case verifies that there are 2 PreviousOrganisations field within the Organisation Policy containing the 2 previous organisation elements for ORG1 and Richards org].

@@ -17,7 +17,9 @@
     "to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created, And the toTimeStamp is within a couple of seconds of the LastModifiedDate of the case, And the OrganisationName And OrganisationAddress are null",
     "contains all correct answers in the correct format",
     "contains answers identifying case role R2",
-
+    "to get the case verifies that the PreviousOrganisations field within the Organisation Policy contains a single previous organisation element in which the FromTimeStamp matches the timestamp of When the case was created",
+    "toTimeStamp is within a couple of seconds of the LastModifiedDate of the case",
+    "OrganisationName And OrganisationAddress are null",
     "is made by Dil to place an NOC Request for C1"
   ],
 

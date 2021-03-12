@@ -46,8 +46,8 @@ public class JacksonUtils {
             }
         });
     }
-    
-    public static void merge(Map<String, JsonNode> mergeFrom, Map<String, JsonNode> mergeInto) {
+
+    public void merge(Map<String, JsonNode> mergeFrom, Map<String, JsonNode> mergeInto) {
 
         for (String key : mergeFrom.keySet()) {
             JsonNode value = mergeFrom.get(key);
@@ -77,7 +77,7 @@ public class JacksonUtils {
             } else if (valueToBeUpdated != null && valueToBeUpdated.isObject()) {
                 merge(valueToBeUpdated, updatedValue);
             } else {
-                if (mainNode instanceof ObjectNode) {
+                if (mainNode instanceof ObjectNode && !updatedValue.isNull()) {
                     ((ObjectNode) mainNode).replace(updatedFieldName, updatedValue);
                 }
             }

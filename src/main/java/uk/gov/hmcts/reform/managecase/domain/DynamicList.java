@@ -10,9 +10,9 @@ import java.util.List;
 @Builder
 public class DynamicList {
     public static final String LIST_ITEMS = "list_items";
-    public static final String VALUE = "value";
+    public static final String VALUE_PARAM = "value";
 
-    @JsonProperty(VALUE)
+    @JsonProperty(VALUE_PARAM)
     private DynamicListElement value;
 
     @JsonProperty(LIST_ITEMS)

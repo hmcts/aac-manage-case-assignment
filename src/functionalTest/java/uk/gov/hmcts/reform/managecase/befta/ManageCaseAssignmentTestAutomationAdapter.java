@@ -13,8 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Optional.ofNullable;
-
 public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
     private final TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);

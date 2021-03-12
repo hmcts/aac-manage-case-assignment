@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class DynamicListElement {
-    public static final String CODE_PARAM = "code";
-    public static final String LABEL_PARAM = "label";
+    public static final String CODE_PROP = "code";
+    public static final String LABEL_PROP = "label";
 
     private String code;
     private String label;

@@ -171,7 +171,7 @@ dependencyManagement {
       entry 'log4j-api'
     }
     // CVE-2020-11996, CVE-2020-13934
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.40') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.43') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'

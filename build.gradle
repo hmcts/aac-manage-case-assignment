@@ -140,7 +140,7 @@ sonarqube {
     property "sonar.projectKey", "uk.gov.hmcts.reform:manage-case-assignment"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/client/datastore/model/*.java,**/client/datastore/model/elasticsearch/*.java,**/client/definitionstore/model/*.java"
-    property "sonar.exclusions","**/client/datastore/model/CaseFieldDefinition.java"
+    property "sonar.exclusions","**/client/datastore/model/CaseFieldDefinition.java,**/config/SecurityConfiguration.java"
   }
 }
 

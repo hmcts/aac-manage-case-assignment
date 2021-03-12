@@ -186,22 +186,22 @@ class JacksonUtilsTest {
             );
 
             assertAll(
-                () -> assertEquals("[Creator]", dynamicList.get(DynamicList.VALUE)
-                    .get(DynamicListElement.CODE).textValue()),
-                () -> assertEquals("Creator", dynamicList.get(DynamicList.VALUE)
-                    .get(DynamicListElement.LABEL).textValue()),
+                () -> assertEquals("[Creator]", dynamicList.get(DynamicList.VALUE_PROP)
+                    .get(DynamicListElement.CODE_PROP).textValue()),
+                () -> assertEquals("Creator", dynamicList.get(DynamicList.VALUE_PROP)
+                    .get(DynamicListElement.LABEL_PROP).textValue()),
                 () -> assertEquals("[Creator]", dynamicList.get(DynamicList.LIST_ITEMS).get(0)
-                                       .get(DynamicListElement.CODE).textValue()),
+                                       .get(DynamicListElement.CODE_PROP).textValue()),
                 () -> assertEquals("Creator", dynamicList.get(DynamicList.LIST_ITEMS).get(0)
-                    .get(DynamicListElement.LABEL).textValue()),
+                    .get(DynamicListElement.LABEL_PROP).textValue()),
                 () -> assertEquals("[Debtor]", dynamicList.get(DynamicList.LIST_ITEMS).get(1)
-                    .get(DynamicListElement.CODE).textValue()),
+                    .get(DynamicListElement.CODE_PROP).textValue()),
                 () -> assertEquals("Debtor", dynamicList.get(DynamicList.LIST_ITEMS).get(1)
-                    .get(DynamicListElement.LABEL).textValue()),
+                    .get(DynamicListElement.LABEL_PROP).textValue()),
                 () -> assertEquals("[Litigant]", dynamicList.get(DynamicList.LIST_ITEMS).get(2)
-                    .get(DynamicListElement.CODE).textValue()),
+                    .get(DynamicListElement.CODE_PROP).textValue()),
                 () -> assertEquals("Litigant", dynamicList.get(DynamicList.LIST_ITEMS)
-                    .get(2).get(DynamicListElement.LABEL).textValue())
+                    .get(2).get(DynamicListElement.LABEL_PROP).textValue())
             );
         }
     }

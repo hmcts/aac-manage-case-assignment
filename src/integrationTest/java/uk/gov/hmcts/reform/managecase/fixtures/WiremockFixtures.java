@@ -58,6 +58,11 @@ public class WiremockFixtures {
         .modules(new Jdk8Module())
         .build();
 
+    private static final String INTERNAL_CASES = "/internal/cases/";
+    private static final String EVENT_TRIGGERS = "/event-triggers/";
+    private static final String CASES = "/cases/";
+
+
     private WiremockFixtures() {
     }
 
@@ -161,7 +166,7 @@ public class WiremockFixtures {
 
     public static void stubGetCaseInternal(String caseId, CaseViewResource caseViewResource) {
 
-        stubFor(WireMock.get(urlPathEqualTo("/internal/cases/" + caseId))
+        stubFor(WireMock.get(urlPathEqualTo(INTERNAL_CASES + caseId))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
@@ -216,7 +221,7 @@ public class WiremockFixtures {
     public static void stubGetStartEventTrigger(String caseId,
                                                 String eventId,
                                                 CaseUpdateViewEvent caseUpdateViewEvent) {
-        stubFor(WireMock.get(urlPathEqualTo("/internal/cases/" + caseId + "/event-triggers/" + eventId))
+        stubFor(WireMock.get(urlPathEqualTo(INTERNAL_CASES + caseId + EVENT_TRIGGERS + eventId))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
@@ -226,7 +231,7 @@ public class WiremockFixtures {
     }
 
     public static void stubGetCaseViaExternalApi(String caseId, CaseDetails caseDetails) {
-        stubFor(WireMock.get(urlPathEqualTo("/cases/" + caseId))
+        stubFor(WireMock.get(urlPathEqualTo(CASES + caseId))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
@@ -238,7 +243,7 @@ public class WiremockFixtures {
     // APPROVER INTERCEPTORS BELOW
     public static void stubGetCaseInternalAsApprover(String caseId, CaseViewResource caseViewResource) {
 
-        stubFor(WireMock.get(urlPathEqualTo("/internal/cases/" + caseId))
+        stubFor(WireMock.get(urlPathEqualTo(INTERNAL_CASES + caseId))
                     .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
@@ -249,7 +254,7 @@ public class WiremockFixtures {
     public static void stubGetExternalStartEventTrigger(String caseId,
                                                                   String eventId,
                                                                   StartEventResource startEventResource) {
-        stubFor(WireMock.get(urlPathEqualTo("/cases/" + caseId + "/event-triggers/" + eventId))
+        stubFor(WireMock.get(urlPathEqualTo(CASES + caseId + EVENT_TRIGGERS + eventId))
             .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
             .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
             .willReturn(aResponse()
@@ -261,7 +266,7 @@ public class WiremockFixtures {
     public static void stubGetExternalStartEventTriggerAsApprover(String caseId,
                                                           String eventId,
                                                           StartEventResource startEventResource) {
-        stubFor(WireMock.get(urlPathEqualTo("/cases/" + caseId + "/event-triggers/" + eventId))
+        stubFor(WireMock.get(urlPathEqualTo(CASES + caseId + EVENT_TRIGGERS + eventId))
             .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
             .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
             .willReturn(aResponse()
@@ -273,7 +278,7 @@ public class WiremockFixtures {
     public static void stubSubmitEventForCase(String caseId,
                                               CaseEventCreationPayload caseEventCreationPayload,
                                               CaseDetails caseDetails) throws JsonProcessingException {
-        stubFor(WireMock.post(urlPathEqualTo("/cases/" + caseId + "/events"))
+        stubFor(WireMock.post(urlPathEqualTo(CASES + caseId + "/events"))
                     .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .withRequestBody(equalToJson(
@@ -287,7 +292,7 @@ public class WiremockFixtures {
 
     public static void stubSubmitEventForCase(String caseID,
                                               CaseDetails caseDetails) {
-        stubFor(WireMock.post(urlEqualTo("/cases/" + caseID + "/events"))
+        stubFor(WireMock.post(urlEqualTo(CASES + caseID + "/events"))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
@@ -296,7 +301,7 @@ public class WiremockFixtures {
     }
 
     public static void stubGetCaseDetailsByCaseIdViaExternalApi(String caseId, CaseDetails caseDetails) {
-        stubFor(WireMock.get(urlEqualTo("/cases/" + caseId))
+        stubFor(WireMock.get(urlEqualTo(CASES + caseId))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()

@@ -457,5 +457,26 @@ class DataStoreRepositoryTest {
 
         // ASSERT
         assertThat(PENDING.getValue()).isEqualTo(corCaptor.getValue().getApprovalStatus());
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put(CHANGE_ORGANISATION_REQUEST_FIELD, mapper.readTree("{}"));
+
+        startEventResource = StartEventResource.builder()
+            .caseDetails(CaseDetails.builder().data(data).build())
+            .build();
+
+        given(dataStoreApi.submitEventForCase(any(String.class),
+                                              any(String.class),
+                                              any(CaseEventCreationPayload.class)))
+            .willReturn(CaseDetails.builder().data(data).build());
+
+        given(dataStoreApi.getExternalStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID)).willReturn(startEventResource);
+
+        // ACT
+        repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build());
+
+        // ASSERT
+        assertThat(PENDING.getValue()).isEqualTo(corCaptor.getValue().getApprovalStatus());
     }
 }

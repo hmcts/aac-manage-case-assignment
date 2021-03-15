@@ -154,6 +154,31 @@ class JacksonUtilsTest {
                                 COR_STRING, LENIENT);
     }
 
+    @Test
+    void shouldNotMergeWhenTopLevelNodeIsArrayNode() throws JsonProcessingException {
+        Map<String, JsonNode> cordData = newHashMap(
+            "listItems",
+            objectMapper.readTree(COR_STRING)
+        );
+
+        JsonNode caseNodes = objectMapper.readTree(" [\n"
+            + "            {\n"
+            + "                \"code\": \"[Defendant]\",\n"
+            + "                \"label\": \"Defendant\"\n"
+            + "            },\n"
+            + "            {\n"
+            + "                \"code\": \"[Claimant]\",\n"
+            + "                \"label\": \"Claimant\"\n"
+            + "            }\n"
+            + "        ]\n");
+        Map<String, JsonNode> caseData = newHashMap("listItems", caseNodes);
+
+        jacksonUtils.merge(cordData, caseData);
+
+        JSONAssert.assertEquals(caseData.get("listItems").toString(),
+                                caseNodes.toString(), LENIENT);
+    }
+
     @Nested
     @DisplayName("JacksonUtils")
     class JacksonUtilsDynamicList {

@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseIdLuhnException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
@@ -368,19 +369,32 @@ class NoticeOfChangeQuestionsTest {
                 .hasMessageContaining(INSUFFICIENT_PRIVILEGE);
         }
 
-
         @Test
-        @DisplayName("Must return an error response for invalid case id")
+        @DisplayName("Must return an error response for case id which does not exist")
         void shouldThrowErrorInvalidCaseId() {
             UserInfo userInfo = new UserInfo("", "", "", "", "",
                                              Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicit")
             );
             given(securityUtils.getUserInfo()).willReturn(userInfo);
             given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), any())).willReturn(true);
-            given(dataStoreRepository.findCaseByCaseId(CASE_ID + "$%^"))
+            given(dataStoreRepository.findCaseByCaseId(CASE_ID))
                 .willThrow(CaseCouldNotBeFoundException.class);
-            assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID + "$%^"))
+            assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(CaseCouldNotBeFoundException.class);
+        }
+
+        @Test
+        @DisplayName("Must return an error response for case id with invalid Luhn id")
+        void shouldThrowErrorInvalidCaseLuhnId() {
+            UserInfo userInfo = new UserInfo("", "", "", "", "",
+                                             Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicit")
+            );
+            given(securityUtils.getUserInfo()).willReturn(userInfo);
+            given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), any())).willReturn(true);
+            given(dataStoreRepository.findCaseByCaseId(CASE_ID + "$%^"))
+                .willThrow(CaseIdLuhnException.class);
+            assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID + "$%^"))
+                .isInstanceOf(CaseIdLuhnException.class);
         }
     }
 }

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
@@ -268,7 +269,7 @@ class NoticeOfChangeQuestionsTest {
                 .build();
 
             JsonNode corNode = new ObjectMapper().convertValue(cor, JsonNode.class);
-            Map<String, JsonNode> data = ImmutableMap.of("COR1", corNode,"COR2", corNode);
+            Map<String, JsonNode> data = ImmutableMap.of("COR1", corNode, "COR2", corNode);
 
             CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).data(data).build();
 
@@ -365,6 +366,21 @@ class NoticeOfChangeQuestionsTest {
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(NoCException.class)
                 .hasMessageContaining(INSUFFICIENT_PRIVILEGE);
+        }
+
+
+        @Test
+        @DisplayName("Must return an error response for invalid case id")
+        void shouldThrowErrorInvalidCaseId() {
+            UserInfo userInfo = new UserInfo("", "", "", "", "",
+                                             Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicit")
+            );
+            given(securityUtils.getUserInfo()).willReturn(userInfo);
+            given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), any())).willReturn(true);
+            given(dataStoreRepository.findCaseByCaseId(CASE_ID + "$%^"))
+                .willThrow(CaseCouldNotBeFoundException.class);
+            assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID + "$%^"))
+                .isInstanceOf(CaseCouldNotBeFoundException.class);
         }
     }
 }

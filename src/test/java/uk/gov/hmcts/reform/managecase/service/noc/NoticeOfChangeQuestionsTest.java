@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import feign.FeignException;
+import feign.Request;
+import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -11,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseIdLuhnException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
@@ -33,6 +36,7 @@ import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +51,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicyJsonNode;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
@@ -378,9 +383,26 @@ class NoticeOfChangeQuestionsTest {
             given(securityUtils.getUserInfo()).willReturn(userInfo);
             given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), any())).willReturn(true);
             given(dataStoreRepository.findCaseByCaseId(CASE_ID))
-                .willThrow(CaseCouldNotBeFoundException.class);
+                .willThrow(createFeignNotFoundException(HttpStatus.SC_NOT_FOUND));
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
-                .isInstanceOf(CaseCouldNotBeFoundException.class);
+                .isInstanceOf(CaseCouldNotBeFoundException.class)
+                .hasMessageContaining(ValidationError.CASE_NOT_FOUND);
+        }
+
+        private FeignException createFeignNotFoundException(int httpStatus) {
+            Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(),
+                                             null, Charset.defaultCharset(), null);
+            String httpStatusString = Integer.toString(httpStatus);
+            FeignException returnValue = null;
+            switch (httpStatus) {
+                case HttpStatus.SC_NOT_FOUND:
+                    returnValue = new FeignException.NotFound(httpStatusString, request, null);
+                    break;
+                case HttpStatus.SC_BAD_REQUEST:
+                    returnValue = new FeignException.BadRequest(httpStatusString, request, null);
+                    break;
+            }
+            return returnValue;
         }
 
         @Test
@@ -392,9 +414,10 @@ class NoticeOfChangeQuestionsTest {
             given(securityUtils.getUserInfo()).willReturn(userInfo);
             given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), any())).willReturn(true);
             given(dataStoreRepository.findCaseByCaseId(CASE_ID + "$%^"))
-                .willThrow(CaseIdLuhnException.class);
+                .willThrow(createFeignNotFoundException(HttpStatus.SC_BAD_REQUEST));
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID + "$%^"))
-                .isInstanceOf(CaseIdLuhnException.class);
+                .isInstanceOf(NoCException.class)
+                .hasMessageContaining(CASE_ID_INVALID);
         }
     }
 }

@@ -1,0 +1,31 @@
+{
+  "_guid_": "F-209_assign_access_to_case",
+  "_extends_": "F-209_Assign_Access_Base",
+
+
+  "specs": [
+    "to assign access for Richard to the previously created case",
+    "to assign users to the case"
+  ],
+
+  "users": {
+    "S1": {
+      "_extends_": "ACA_Users_Richard"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][ParentContext][childContexts][F-209_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}",
+          "case_role": "[ApplicantSolicitor]",
+          "user_id": "${[scenarioContext][testData][users][S1][id]}",
+          "organisation_id" : "LESTKK0"
+        }
+      ]
+    }
+  }
+
+}

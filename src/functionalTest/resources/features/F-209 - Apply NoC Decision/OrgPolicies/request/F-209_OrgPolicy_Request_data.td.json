@@ -1,0 +1,27 @@
+{
+  "_guid_" : "org_policy_request_data",
+  "applicantOrganisationPolicy": {
+    "Organisation": {
+      "OrganisationID": "LESTKK0",
+      "OrganisationName": null
+    },
+    "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
+    "OrgPolicyReference": "ApplicantPolicy"
+  },
+  "respondentOrganisationPolicy": {
+    "Organisation": {
+      "OrganisationID": null,
+      "OrganisationName": null
+    },
+    "OrgPolicyCaseAssignedRole": "[RespondentSolicitor]",
+    "OrgPolicyReference": "RespondentPolicy"
+  },
+  "otherPartyOrganisationPolicy": {
+    "Organisation": {
+      "OrganisationID": null,
+      "OrganisationName": null
+    },
+    "OrgPolicyCaseAssignedRole": "[OtherPartySolicitor]",
+    "OrgPolicyReference": "OtherPartyPolicy"
+  }
+}

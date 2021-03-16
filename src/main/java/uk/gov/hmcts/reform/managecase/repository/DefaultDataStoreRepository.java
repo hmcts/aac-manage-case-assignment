@@ -217,7 +217,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
         data.put(caseFieldId, jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
 
-        JacksonUtils.merge(caseDetailsData, data);
-        return data;
+        jacksonUtils.merge(data, caseDetailsData);
+        return caseDetailsData;
     }
 }

@@ -72,12 +72,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return toNoCResponseEntity(HttpStatus.BAD_REQUEST, ex.getErrorMessage(), ex.getErrorCode());
     }
 
-    @ExceptionHandler(CaseIdLuhnException.class)
-    public ResponseEntity<Object> handleCaseIdLuhnException(CaseIdLuhnException ex) {
-        log.error("Invalid caseId : {}", ex.getMessage(), ex);
-        return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
-    }
-
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<Object> handleFeignStatusException(FeignException ex) {
         log.error("Downstream service errors: {}", ex.getMessage(), ex);

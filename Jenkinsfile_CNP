@@ -1,7 +1,7 @@
 #!groovy
 import uk.gov.hmcts.contino.AppPipelineDsl
 
-@Library("Infrastructure@TA-471_PactCanIDeploy")
+@Library("Infrastructure")
 
 import uk.gov.hmcts.contino.GradleBuilder
 

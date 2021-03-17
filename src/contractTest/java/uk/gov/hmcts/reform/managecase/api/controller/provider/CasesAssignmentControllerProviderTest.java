@@ -102,10 +102,12 @@ public class CasesAssignmentControllerProviderTest {
             .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
 
         given(securityUtils.hasSolicitorRole(anyList())).willReturn(true);
+        given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), anyString())).willReturn(true);
 
         UserDetails userDetails = UserDetails.builder()
             .id(ASSIGNEE_ID).roles(List.of("caseworker-AUTOTEST1-solicitor")).build();
-        given(idamRepository.getSystemUserAccessToken()).willReturn(BEAR_TOKEN);
+        given(idamRepository.getCaaSystemUserAccessToken()).willReturn(BEAR_TOKEN);
+        given(idamRepository.getNocApproverSystemUserAccessToken()).willReturn(BEAR_TOKEN);
         given(idamRepository.getUserByUserId(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
 
         given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))

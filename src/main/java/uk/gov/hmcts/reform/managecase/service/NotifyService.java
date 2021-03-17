@@ -33,7 +33,7 @@ public class NotifyService {
         this.appParams = appParams;
     }
 
-    public List<EmailNotificationRequestStatus> senEmail(final List<EmailNotificationRequest> notificationRequests) {
+    public List<EmailNotificationRequestStatus> sendEmail(final List<EmailNotificationRequest> notificationRequests) {
         if (notificationRequests == null || notificationRequests.isEmpty()) {
             throw new ValidationException("At least one email notification request is required to send notification");
         }

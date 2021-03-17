@@ -30,6 +30,20 @@
     },
     {
       "userIdentifier": "",
+      "firstName": "Jane",
+      "lastName": "Solicington",
+      "email": "befta.master.solicitor.jane@gmail.com",
+      "idamStatus": "ACTIVE"
+    },
+    {
+      "userIdentifier": "",
+      "firstName": "Alice",
+      "lastName": "Solicington",
+      "email": "befta.jurisdiction.3.solicitor.alice@gmail.com",
+      "idamStatus": "ACTIVE"
+    },
+    {
+      "userIdentifier": "",
       "firstName": "David",
       "lastName": "Solicington",
       "email": "befta.master.solicitor.david@gmail.com",

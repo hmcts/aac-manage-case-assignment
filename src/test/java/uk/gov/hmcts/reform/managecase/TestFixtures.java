@@ -6,9 +6,15 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.assertj.core.util.Maps;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPage;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPageComplexFieldOverride;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.WizardPageField;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignedUsers;
+import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.UserDetails;
@@ -18,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST;
 
 public class TestFixtures {
 
@@ -62,35 +70,53 @@ public class TestFixtures {
         private CaseDetailsFixture() {
         }
 
-        public static CaseDetails caseDetails(String organizationId, String... orgPolicyRoles) {
-            Map<String, JsonNode> jsonNodeMap = Stream.of(orgPolicyRoles)
-                    .collect(Collectors.toMap(role -> "Field_" + role, role -> jsonNode(organizationId, role),
-                        (v1, v2) -> v1, LinkedHashMap::new));
-            return defaultCaseDetails().data(jsonNodeMap).build();
-        }
-
         public static CaseDetails caseDetails() {
             return defaultCaseDetails().build();
         }
 
+        public static CaseDetails caseDetails(ChangeOrganisationRequest changeOrganisationRequest) {
+            return defaultCaseDetails()
+                .data(Map.of("changeOrganisationRequestField",
+                             OBJECT_MAPPER.convertValue(changeOrganisationRequest, JsonNode.class)))
+                .build();
+        }
+
+        public static CaseDetails caseDetails(ChangeOrganisationRequest changeOrganisationRequest,
+                                              OrganisationPolicy organisationPolicy) {
+            return defaultCaseDetails()
+                .data(Map.of("changeOrganisationRequestField",
+                             OBJECT_MAPPER.convertValue(changeOrganisationRequest, JsonNode.class),
+                             "organisationPolicyField",
+                             OBJECT_MAPPER.convertValue(organisationPolicy, JsonNode.class)))
+                .build();
+        }
+
+        public static CaseDetails caseDetails(String organizationId, String... orgPolicyRoles) {
+            Map<String, JsonNode> jsonNodeMap = Stream.of(orgPolicyRoles)
+                    .collect(Collectors.toMap(role -> "Field_" + role,
+                        role -> organisationPolicyJsonNode(organizationId, role),
+                        (v1, v2) -> v1, LinkedHashMap::new));
+            return defaultCaseDetails().data(jsonNodeMap).build();
+        }
+
         public static CaseDetails.CaseDetailsBuilder defaultCaseDetails() {
             return CaseDetails.builder()
-                    .caseTypeId(CASE_TYPE_ID)
-                    .reference(CASE_ID)
-                    .jurisdiction(JURISDICTION)
-                    .state(null)
-                    .data(Maps.newHashMap("OrganisationPolicy1", jsonNode(ORGANIZATION_ID, CASE_ROLE)));
+                .caseTypeId(CASE_TYPE_ID)
+                .id(CASE_ID)
+                .jurisdiction(JURISDICTION)
+                .state(null)
+                .data(Maps.newHashMap("OrganisationPolicy1", organisationPolicyJsonNode(ORGANIZATION_ID, CASE_ROLE)));
         }
 
         public static OrganisationPolicy organisationPolicy(String organizationId, String orgPolicyRole) {
             return OrganisationPolicy.builder()
                     .orgPolicyCaseAssignedRole(orgPolicyRole)
                     .orgPolicyReference(null)
-                    .organisation(new Organisation(organizationId, organizationId))
+                    .organisation(Organisation.builder().organisationID(organizationId).build())
                     .build();
         }
 
-        private static JsonNode jsonNode(String organizationId, String orgPolicyRole) {
+        public static JsonNode organisationPolicyJsonNode(String organizationId, String orgPolicyRole) {
             return OBJECT_MAPPER.convertValue(organisationPolicy(organizationId, orgPolicyRole), JsonNode.class);
         }
     }
@@ -139,4 +165,36 @@ public class TestFixtures {
         }
     }
 
+    public static class CaseUpdateViewEventFixture {
+
+        public static final String CHANGE_ORGANISATION_REQUEST_FIELD = "changeOrganisationRequestField";
+
+        public static List<CaseViewField> getCaseViewFields() {
+            FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+            fieldTypeDefinition.setId(CHANGE_ORGANISATION_REQUEST);
+
+            CaseViewField caseViewFields = new CaseViewField();
+            caseViewFields.setId(CHANGE_ORGANISATION_REQUEST_FIELD);
+            caseViewFields.setFieldTypeDefinition(fieldTypeDefinition);
+            return List.of(caseViewFields);
+        }
+
+        public static List<WizardPage> getWizardPages() {
+            return getWizardPages(CHANGE_ORGANISATION_REQUEST_FIELD);
+        }
+
+        public static List<WizardPage> getWizardPages(String caseFieldId) {
+            WizardPageField wizardPageField = new WizardPageField();
+
+            WizardPageComplexFieldOverride wizardPageComplexFieldOverride = new WizardPageComplexFieldOverride();
+            wizardPageComplexFieldOverride.setComplexFieldElementId(caseFieldId + ".ApprovalStatus");
+            wizardPageComplexFieldOverride.setDefaultValue(caseFieldId);
+            wizardPageField.setCaseFieldId(caseFieldId);
+            wizardPageField.setComplexFieldOverrides(List.of(wizardPageComplexFieldOverride));
+
+            WizardPage wizardPage =  new WizardPage();
+            wizardPage.setWizardPageFields(List.of(wizardPageField));
+            return List.of(wizardPage);
+        }
+    }
 }

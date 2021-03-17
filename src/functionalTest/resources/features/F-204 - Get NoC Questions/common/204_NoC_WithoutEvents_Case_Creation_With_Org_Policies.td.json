@@ -1,0 +1,18 @@
+{
+  "_guid_": "204_NoC_WithoutEvents_Case_Creation_With_Org_Policies",
+	"_extends_": "NoC_WithoutEvents_Case_Creation_With_Org_Policies__Base",
+
+  "specs": [
+    "created by Richard - C1 - on behalf of Mario as the applicant which is auto-assigned to Richard's organisation"
+  ],
+
+  "user": {
+    "_extends_": "ACA_Users_Richard"
+  },
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][siblingContexts][204_NoC_WithoutEvents_Case_Creation_With_Org_Policies_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}

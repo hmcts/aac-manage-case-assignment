@@ -1,13 +1,16 @@
 package uk.gov.hmcts.reform.managecase.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class OrganisationPolicy {
 
     @JsonProperty("Organisation")
@@ -16,5 +19,7 @@ public class OrganisationPolicy {
     private String orgPolicyReference;
     @JsonProperty("OrgPolicyCaseAssignedRole")
     private String orgPolicyCaseAssignedRole;
+    @JsonProperty("PreviousOrganisations")
+    private List<PreviousOrganisationCollectionItem> previousOrganisations;
 
 }

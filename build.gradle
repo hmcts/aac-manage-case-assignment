@@ -1,7 +1,5 @@
 plugins {
   id 'application'
-  id 'checkstyle'
-  id 'pmd'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.9.RELEASE'
   id 'org.springframework.boot' version '2.3.4.RELEASE'
@@ -12,7 +10,7 @@ plugins {
   id 'au.com.dius.pact' version '4.1.7'
 }
 
-ext['spring-security.version'] = '5.3.4.RELEASE'
+ext['spring-security.version'] = '5.3.8.RELEASE'
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
@@ -118,24 +116,17 @@ task functional(type: Test) {
     javaexec {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-      args = ['--plugin', "json:${cucumberReports.outputDir}/cucumber.json", '--tags', 'not @Ignore', '--glue',
-              'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features']
+      args = ['--threads', '5',
+              '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
+              '--tags', 'not @Ignore',
+              '--glue', 'uk.gov.hmcts.befta.player',
+              'src/functionalTest/resources/features']
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
     }
   }
 
   outputs.upToDateWhen { false }
-}
-
-pmd {
-  toolVersion = "6.24.0"
-  maxFailures = 1
-  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest]
-  reportsDir = file("$project.buildDir/reports/pmd")
-  // https://github.com/pmd/pmd/issues/876
-  ruleSets = []
-  ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
 compileJava {
@@ -194,6 +185,8 @@ sonarqube {
     property "sonar.projectName", "Reform::manage-case-assignment"
     property "sonar.projectKey", "uk.gov.hmcts.reform:manage-case-assignment"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
+    property "sonar.coverage.exclusions", "**/client/datastore/model/*.java,**/client/datastore/model/elasticsearch/*.java,**/client/definitionstore/model/*.java"
+    property "sonar.exclusions","**/client/datastore/model/CaseFieldDefinition.java,**/config/SecurityConfiguration.java"
   }
 }
 
@@ -209,7 +202,6 @@ dependencyUpdates {
   }
 }
 
-// https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
   suppressionFile = 'config/owasp/suppressions.xml'
 }
@@ -226,7 +218,7 @@ dependencyManagement {
       entry 'log4j-api'
     }
     // CVE-2020-11996, CVE-2020-13934
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.40') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.43') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
@@ -281,12 +273,15 @@ ext.libraries = [
 ]
 
 dependencies {
+  implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas'
+
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
   implementation group: 'io.springfox', name: 'springfox-boot-starter', version: versions.springfoxSwagger
@@ -303,10 +298,10 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.5.5'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.3.RELEASE'
 
-  implementation "org.springframework.security:spring-security-web"
-  implementation "org.springframework.security:spring-security-config"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+  implementation "org.springframework.security:spring-security-web:5.3.8.RELEASE"
+  implementation "org.springframework.security:spring-security-config:5.3.8.RELEASE"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.3.8.RELEASE"
   implementation "com.nimbusds:nimbus-jose-jwt:7.9"
   implementation "net.minidev:json-smart:2.3"
   implementation "io.github.openfeign:feign-httpclient:11.0"
@@ -339,7 +334,7 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.16.1'
+  testImplementation group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.2.0'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath

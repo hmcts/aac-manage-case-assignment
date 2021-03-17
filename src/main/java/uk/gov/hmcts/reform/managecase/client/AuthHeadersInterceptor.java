@@ -18,7 +18,7 @@ public class AuthHeadersInterceptor implements RequestInterceptor {
     @Override
     public void apply(RequestTemplate template) {
         if (!template.headers().containsKey(AUTHORIZATION)) {
-            template.header(AUTHORIZATION, securityUtils.getUserToken());
+            template.header(AUTHORIZATION, securityUtils.getUserBearerToken());
         }
         if (!template.headers().containsKey(SERVICE_AUTHORIZATION)) {
             template.header(SERVICE_AUTHORIZATION, securityUtils.getS2SToken());

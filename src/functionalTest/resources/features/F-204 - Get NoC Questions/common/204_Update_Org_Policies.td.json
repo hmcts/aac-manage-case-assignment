@@ -1,0 +1,22 @@
+{
+  "_guid_" : "204_Update_Org_Policies",
+  "_extends_": "Submit_ManageOrgs_Event",
+
+  "specs" : [
+    "to update the applicant org policy"
+  ],
+
+  "user": {
+    "_extends_": "ACA_Users_Richard"
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][204_Case_Creation][testData][actualResponse][body][id]}"
+    },
+    "body":{
+      "event_token": "${[scenarioContext][siblingContexts][204_Update_Org_Policies_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+
+}

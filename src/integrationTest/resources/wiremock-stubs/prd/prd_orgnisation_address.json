@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/refdata/internal/v1/organisations?id=Org2Id"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "contactInformation": [
+        {
+          "addressLine1": "Line 1",
+          "addressLine2": "Line 2",
+          "addressLine3": "Line 3",
+          "county": "Kent",
+          "townCity": "London",
+          "country": "UK",
+          "postCode": "DA15 7LN"
+        }
+      ],
+      "organisationIdentifier": "Org2Id",
+      "name": "Org2Name"
+    }
+  }
+}

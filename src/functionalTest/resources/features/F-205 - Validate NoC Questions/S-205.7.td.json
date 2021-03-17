@@ -1,0 +1,53 @@
+{
+  "_guid_": "S-205.7",
+  "_extends_": "S-205_Test_Data_Base",
+
+  "title": "NoC Answers must return an error response when a NoC request is currently pending on a case",
+
+  "specs" : [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Dil - with a solicitor role for the jurisdiction of C1 below",
+    "System user - with caseworker-caa role",
+    "Mutlu - with a solicitor role for the same jurisdiction within a different organisation from Richard",
+
+    "the configuration of the NoC request event has no auto-approval",
+    "No user has approved or rejected the NoC request from Mutlu",
+
+    "is made by Dil to validate the answers in order to become Mario's representative on C1",
+    "contains a valid case ID",
+    "contains a structurally valid set of answers",
+    "contains a valid IDAM token for Dil"
+  ],
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    },
+    "systemUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    },
+    "Mutlu": {
+      "_extends_": "ACA_Users_Mutlu"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "_extends_": "NoC_Valid_Answers_For_Case_Role_R1"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body" : {
+      "message" : "Ongoing NoC request in progress",
+      "code" : "noc-in-progress",
+      "errors" : [ ]
+    }
+  }
+
+}

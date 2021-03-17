@@ -155,6 +155,40 @@ class JacksonUtilsTest {
     }
 
     @Test
+    void shouldMergeWhenCaseDataHasNoValueNode() throws JsonProcessingException {
+        Map<String, JsonNode> cordData = newHashMap(
+            CHANGE_ORGANISATION_REQUEST_FIELD,
+            objectMapper.readTree("{\n"
+                + "    \"CaseRoleId\": {\n"
+               + "      \"list_items\": [\n"
+                + "        {\n"
+                + "          \"code\": \"[LEGALREPRESENTATIVE]\",\n"
+                + "          \"label\": \"Legal Representative\"\n"
+                + "        }\n"
+                + "      ]\n"
+                + "    },\n"
+                + "    \"ApprovalStatus\": \"1\",\n"
+                + "    \"NotesReason\": null,\n"
+                + "    \"RequestTimestamp\": \"2021-03-03T15:43:55.779895\",\n"
+                + "    \"OrganisationToAdd\": {\n"
+                + "      \"OrganisationID\": \"8P7DJ0K\"\n"
+                + "    },\n"
+                + "    \"OrganisationToRemove\": {\n"
+                + "      \"OrganisationID\": \"7V6U9KC\"\n"
+                + "    }\n"
+                + "  }")
+        );
+
+        JsonNode caseNodes = objectMapper.readTree(NULL_COR_NODE);
+        Map<String, JsonNode> caseData = newHashMap(CHANGE_ORGANISATION_REQUEST_FIELD, caseNodes);
+
+        jacksonUtils.merge(cordData, caseData);
+
+        JSONAssert.assertEquals(caseData.get(CHANGE_ORGANISATION_REQUEST_FIELD).toString(),
+                                COR_STRING, LENIENT);
+    }
+
+    @Test
     void shouldNotMergeWhenTopLevelNodeIsArrayNode() throws JsonProcessingException {
         Map<String, JsonNode> cordData = newHashMap(
             "listItems",

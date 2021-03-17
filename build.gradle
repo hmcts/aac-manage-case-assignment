@@ -148,16 +148,13 @@ task contract(type: Test) {
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
   include "uk/gov/hmcts/reform/managecase/api/controller/provider/**"
-  systemProperty 'pact.rootDir', "pacts"
+
 }
 
 task runProviderPactVerification(type: Test) {
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
 }
-
-
-runProviderPactVerification.dependsOn contract
 
 runProviderPactVerification.finalizedBy pactVerify
 

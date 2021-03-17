@@ -96,23 +96,6 @@ public class RestExceptionHandlerTest {
 
     }
 
-    @Test
-    public void handleException_shouldReturnCaseIdLuhnResponse() throws Exception {
-
-        // ARRANGE
-        String myUniqueExceptionMessage = "Invalid caseId";
-        // any runtime exception (that is not an ApiException)
-        CaseIdLuhnException expectedException =
-            new CaseIdLuhnException(myUniqueExceptionMessage);
-
-        setupMockServiceToThrowException(expectedException);
-        ResultActions result =  this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
-                                                         .queryParam("case_id", CASE_ID));
-
-        assertHttpErrorResponse(result, expectedException);
-
-    }
-
     private void setupMockServiceToThrowException(Exception expectedException) {
         // configure chosen mock service to throw exception when controller is run
         when(service.getChallengeQuestions(CASE_ID)).thenThrow(expectedException);

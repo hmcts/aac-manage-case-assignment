@@ -1,4 +1,6 @@
 #!groovy
+import uk.gov.hmcts.contino.AppPipelineDsl
+
 @Library("Infrastructure")
 
 import uk.gov.hmcts.contino.GradleBuilder
@@ -88,7 +90,8 @@ env.BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP = "profile openid roles manage-use
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
 env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${dataStoreApiDevelopPr}.service.core-compute-preview.internal".toLowerCase()
-
+// Vars for Kubernetes
+env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 
 withPipeline("java", product, component) {
   after('test') {
@@ -99,9 +102,11 @@ withPipeline("java", product, component) {
 
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
   }
-  // Vars for Kubernetes
   onMaster {
     enableSlackNotifications('#ccd-master-builds')
+    enablePactAs([
+            AppPipelineDsl.PactRoles.PROVIDER
+    ])
   }
 x
   onDemo {
@@ -109,6 +114,9 @@ x
   }
   onPR {
     enableSlackNotifications('#ccd-pr-builds')
+    enablePactAs([
+            AppPipelineDsl.PactRoles.PROVIDER
+    ])
   }
 
   // Check if the build should be wired to an environment higher than 'preview'.

@@ -1,5 +1,4 @@
 #!groovy
-import uk.gov.hmcts.contino.AppPipelineDsl
 
 @Library("Infrastructure")
 
@@ -13,7 +12,7 @@ GradleBuilder builder = new GradleBuilder(this, product)
 // Variables to switch pipeline logic and wiring per type of build
 def definitionStoreDevelopPr = "PR-575"  // This doesn't change frequently, but when it does, only change this value.
 def dataStoreApiDevelopPr    = "PR-1260" // This doesn't change frequently, but when it does, only change this value.
-def prsToUseAat             = "PR-148,PR-161,PR-167,PR-259" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
+def prsToUseAat             = "PR-148,PR-161,PR-167" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
 def secrets = [
   'rpx-${env}': [
@@ -69,6 +68,7 @@ def vaultOverrides = [
 // Assume a feature build branched off 'develop', with dependencies develop-to-develop.
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
 env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${dataStoreApiDevelopPr}.service.core-compute-preview.internal".toLowerCase()
+env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${env.BRANCH_NAME}.service.core-compute-preview.internal".toLowerCase()
 
 // Other env variables needed for BEFTA.
 env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
@@ -90,8 +90,6 @@ env.BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP = "profile openid roles manage-use
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
 env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${dataStoreApiDevelopPr}.service.core-compute-preview.internal".toLowerCase()
-// Vars for Kubernetes
-env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 
 withPipeline("java", product, component) {
   after('test') {
@@ -104,19 +102,13 @@ withPipeline("java", product, component) {
   }
   onMaster {
     enableSlackNotifications('#ccd-master-builds')
-    enablePactAs([
-            AppPipelineDsl.PactRoles.PROVIDER
-    ])
   }
-x
+
   onDemo {
     enableSlackNotifications('#ccd-demo-builds')
   }
   onPR {
     enableSlackNotifications('#ccd-pr-builds')
-    enablePactAs([
-            AppPipelineDsl.PactRoles.PROVIDER
-    ])
   }
 
   // Check if the build should be wired to an environment higher than 'preview'.
@@ -128,25 +120,17 @@ x
       }
       env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
       env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
+      env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
   }
 
   echo "FTA will use Definition Store: ${env.DEFINITION_STORE_HOST}"
+  echo "   ... published with MCA URL: ${env.MCA_API_BASE_URL}"
 
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
 
   enableAksStagingDeployment()
   disableLegacyDeployment()
-
-  before('smoketest:preview') {
-    env.MCA_API_BASE_URL = env.TEST_URL.replace("https", "http")
-    echo "   ... published with MCA URL: ${env.MCA_API_BASE_URL}"
-  }
-
-  before('smoketest:aat') {
-    env.MCA_API_BASE_URL = env.TEST_URL.replace("https", "http")
-    echo "   ... published with MCA URL: ${env.MCA_API_BASE_URL}"
-  }
 
   after('smoketest:preview') {
     copyIgnore('./build/reports/tests/befta/smoke/cucumber-html-reports', './BEFTA Report for Smoke Tests/')

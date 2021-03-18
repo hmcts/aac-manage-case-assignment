@@ -3,6 +3,7 @@
 @Library("Infrastructure")
 
 import uk.gov.hmcts.contino.GradleBuilder
+import uk.gov.hmcts.contino.AppPipelineDsl
 
 def product = "aac"
 def component = "manage-case-assignment"
@@ -102,6 +103,7 @@ withPipeline("java", product, component) {
   }
   onMaster {
     enableSlackNotifications('#ccd-master-builds')
+    enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
   }
 
   onDemo {

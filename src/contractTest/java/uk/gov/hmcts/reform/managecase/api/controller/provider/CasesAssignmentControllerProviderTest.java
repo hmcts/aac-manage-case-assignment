@@ -86,6 +86,7 @@ public class CasesAssignmentControllerProviderTest {
     @BeforeEach
     void before(PactVerificationContext context) {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
+        //System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(caseAssignmentController);
         if (context != null) {
             context.setTarget(testTarget);

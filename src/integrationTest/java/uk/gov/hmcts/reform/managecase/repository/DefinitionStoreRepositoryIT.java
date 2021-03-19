@@ -33,6 +33,9 @@ import static org.mockito.MockitoAnnotations.initMocks;
 @ContextConfiguration
 public class DefinitionStoreRepositoryIT {
 
+    private static final String CHALLENGE_QUESTIONS = "challengeQuestions";
+    private static final String CASE_ROLES = "caseRoles";
+
     @TestConfiguration
     @EnableCaching
     static class CacheConfig {
@@ -42,7 +45,7 @@ public class DefinitionStoreRepositoryIT {
 
         @Bean
         CacheManager cacheManager() {
-            return new ConcurrentMapCacheManager("challengeQuestions", "caseRoles");
+            return new ConcurrentMapCacheManager(CHALLENGE_QUESTIONS, CASE_ROLES);
         }
 
         @Bean
@@ -106,10 +109,10 @@ public class DefinitionStoreRepositoryIT {
     @Test
     public void verifyChallengeQuestionsCacheContents() {
         repository.challengeQuestions(CASE_TYPE_ID, CASE_ID);
-        assertNotNull(cacheManager.getCache("challengeQuestions").getNativeCache());
+        assertNotNull(cacheManager.getCache(CHALLENGE_QUESTIONS).getNativeCache());
 
-        cacheManager.getCache("challengeQuestions").clear();
-        assertEquals(cacheManager.getCache("challengeQuestions").getNativeCache().toString(), "{}");
+        cacheManager.getCache(CHALLENGE_QUESTIONS).clear();
+        assertEquals(cacheManager.getCache(CHALLENGE_QUESTIONS).getNativeCache().toString(), "{}");
     }
 
     @Test
@@ -124,13 +127,13 @@ public class DefinitionStoreRepositoryIT {
     @Test
     public void verifyCaseRolesCacheContents() {
         repository.caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID);
-        assertNotNull(cacheManager.getCache("caseRoles").getNativeCache());
+        assertNotNull(cacheManager.getCache(CASE_ROLES).getNativeCache());
 
-        cacheManager.getCache("caseRoles").clear();
-        assertEquals(cacheManager.getCache("caseRoles").getNativeCache().toString(), "{}");
+        cacheManager.getCache(CASE_ROLES).clear();
+        assertEquals(cacheManager.getCache(CASE_ROLES).getNativeCache().toString(), "{}");
 
         repository.caseRoles(USER_ID, JURISDICTION, CASE_TYPE_ID);
-        assertNotNull(cacheManager.getCache("caseRoles").getNativeCache());
+        assertNotNull(cacheManager.getCache(CASE_ROLES).getNativeCache());
     }
 
     @Test

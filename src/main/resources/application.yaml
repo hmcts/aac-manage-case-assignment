@@ -78,7 +78,7 @@ zuul:
       sensitiveHeaders: Cookie,Set-Cookie
       url: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
 prd:
-  host: ${PRD_HOST:http://localhost:4455}
+  host: ${PRD_HOST:http://localhost:5544}
 mca:
   conditional-apis:
     case-assignments:

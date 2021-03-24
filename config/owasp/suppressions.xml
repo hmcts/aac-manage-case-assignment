@@ -22,7 +22,8 @@
     <cve>CVE-2021-22112</cve>
     <cve>CVE-2021-25122</cve>
     <cve>CVE-2021-25329</cve>
-
+  </suppress>
+  
   <suppress until="2021-03-23">
     <notes>Declared as False Positive on com.nimbusds:oauth2-oidc-sdk #2866
       https://github.com/jeremylong/DependencyCheck/issues/2866</notes>

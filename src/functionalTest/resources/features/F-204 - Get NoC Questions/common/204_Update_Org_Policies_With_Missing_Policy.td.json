@@ -1,0 +1,43 @@
+{
+  "_guid_" : "204_Update_Org_Policies_With_Missing_Policy",
+  "_extends_": "Event_Creation",
+
+  "specs" : [
+    "to update the applicant org policy"
+  ],
+
+  "user": {
+    "_extends_": "ACA_Users_Richard"
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][204_Case_Creation][testData][actualResponse][body][id]}"
+    },
+    "body":{
+      "data": {
+        "respondentOrganisationPolicy": {
+          "OrgPolicyCaseAssignedRole": "[RespondentSolicitor]",
+          "OrgPolicyReference": "RespondentPolicy",
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "applicantOrganisationPolicy": {
+          "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
+          "OrgPolicyReference": "ApplicantPolicy",
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        }
+      },
+      "event": {
+        "id": "manageAllOrgPolicies"
+      },
+      "event_token": "${[scenarioContext][siblingContexts][204_Update_Org_Policies_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+
+}

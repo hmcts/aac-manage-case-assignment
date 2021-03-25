@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
+import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import javax.validation.ValidationException;
@@ -30,17 +31,19 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.usersByOrganisation;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
 
 @SuppressWarnings({"PMD.MethodNamingConventions",
     "PMD.JUnitAssertionsShouldIncludeMessage",
@@ -72,6 +75,8 @@ class CaseAssignmentServiceTest {
     private IdamRepository idamRepository;
     @Mock
     private JacksonUtils jacksonUtils;
+    @Mock
+    private SecurityUtils securityUtils;
 
     @BeforeEach
     void setUp() {
@@ -95,7 +100,7 @@ class CaseAssignmentServiceTest {
 
             UserDetails userDetails = UserDetails.builder()
                 .id(ASSIGNEE_ID).roles(List.of("caseworker-AUTOTEST1-solicitor")).build();
-            given(idamRepository.getSystemUserAccessToken()).willReturn(BEAR_TOKEN);
+            given(idamRepository.getCaaSystemUserAccessToken()).willReturn(BEAR_TOKEN);
             given(idamRepository.getUserByUserId(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
         }
 
@@ -103,6 +108,7 @@ class CaseAssignmentServiceTest {
         @DisplayName("should assign case in the organisation")
         void shouldAssignCaseAccess() {
 
+            given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), anyString())).willReturn(true);
             given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
                 .willReturn(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
 

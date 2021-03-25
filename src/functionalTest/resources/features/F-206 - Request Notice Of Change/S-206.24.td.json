@@ -1,0 +1,53 @@
+{
+  "_guid_": "S-206.24",
+  "_extends_": "Request_NoC__Base",
+
+  "title": "Must return an error when answers do not match a case role in the case to be represented",
+
+  "specs": [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's",
+    "a citizen Mario, on behalf of whom Richard will create a case",
+
+    "contains a valid case ID for C1",
+    "contains answers that do not match a case role in the case to be represented",
+
+    "is made by Dil to place a NOC Request for C1"
+  ],
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "request": {
+    "body": {
+      "case_id": "${[scenarioContext][childContexts][F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}",
+
+      "answers": [
+        {
+          "question_id": "NoC_Challenge_Name",
+          "value": "Incorrect-Answer"
+        },
+        {
+          "question_id": "NoC_Challenge_Name2",
+          "value": "01-01-2000"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "status" : "BAD_REQUEST",
+      "message": "The answers did not match those for any litigant",
+      "code" : "answers-not-matched-any-litigant",
+      "errors" : [ ]
+    }
+  }
+}

@@ -16,12 +16,18 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.CaseSearchResponse;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
+import uk.gov.hmcts.reform.managecase.repository.CaseTypeDefinitionVersion;
 
 import java.util.List;
 
@@ -33,24 +39,29 @@ import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static org.assertj.core.util.Lists.list;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.CASE_USERS;
-import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClientConfig.SEARCH_CASES;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient.CASE_USERS;
 
-@SuppressWarnings({"PMD.ExcessiveImports"})
-public final class WiremockFixtures {
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
+public class WiremockFixtures {
 
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     public static final String SYS_USER_TOKEN = "Bearer eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9aa";
+    public static final String APPROVER_USER_TOKEN = "Bearer eyJzdWIiOiJjY6ShZ3ciLCJleHAiOlD1OEM0NDUyOTd7co";
     public static final String S2S_TOKEN = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9"
-            + ".WWRzROlKxLQCJw5h0h0dHb9hHfbBhF2Idwv1z4L4FnqSw3VZ38ZRLuDmwr3tj-8oOv6EfLAxV0dJAPtUT203Iw";
+        + ".WWRzROlKxLQCJw5h0h0dHb9hHfbBhF2Idwv1z4L4FnqSw3VZ38ZRLuDmwr3tj-8oOv6EfLAxV0dJAPtUT203Iw";
 
     private static final ObjectMapper OBJECT_MAPPER = new Jackson2ObjectMapperBuilder()
         .modules(new Jdk8Module())
         .build();
+
+    private static final String INTERNAL_CASES = "/internal/cases/";
+    private static final String EVENT_TRIGGERS = "/event-triggers/";
+    private static final String CASES = "/cases/";
+
 
     private WiremockFixtures() {
     }
@@ -67,27 +78,33 @@ public final class WiremockFixtures {
         public ResponseDefinition transform(Request request, ResponseDefinition responseDefinition,
                                             FileSource files, Parameters parameters) {
             return ResponseDefinitionBuilder.like(responseDefinition)
-                    .withHeader(HttpHeaders.CONNECTION, "close")
-                    .build();
+                .withHeader(HttpHeaders.CONNECTION, "close")
+                .build();
         }
     }
 
-    public static void stubGetUsersByOrganisation(FindUsersByOrganisationResponse response) {
+    public static void stubGetUsersByOrganisationExternal(FindUsersByOrganisationResponse response) {
         stubFor(WireMock.get(urlEqualTo("/refdata/external/v1/organisations/users?status=Active&returnRoles=false"))
-                .willReturn(okForJson(response)));
+                    .willReturn(okForJson(response)));
+    }
+
+    public static void stubGetUsersByOrganisationInternal(FindUsersByOrganisationResponse response, String orgId) {
+        stubFor(WireMock.get(urlEqualTo(String.format("/refdata/internal/v1/organisations/%s/users?returnRoles=false",
+            orgId))).willReturn(okForJson(response)));
     }
 
     public static void stubSearchCaseWithPrefix(String caseTypeId, String searchQuery,
                                                 CaseDetails caseDetails, String prefix) {
-        stubFor(WireMock.post(urlEqualTo(prefix + SEARCH_CASES + "?ctid=" + caseTypeId))
-            .withRequestBody(equalToJson(searchQuery))
-            .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-            .willReturn(aResponse()
-                .withStatus(HTTP_OK)
-                    .withBody(getJsonString(
-                        caseDetails == null ? new CaseSearchResponse() : new CaseSearchResponse(list(caseDetails))))
-                .withHeader("Content-Type", "application/json")));
+        stubFor(WireMock.post(urlEqualTo(prefix + "/searchCases?ctid=" + caseTypeId))
+                    .withRequestBody(equalToJson(searchQuery))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK)
+                                    .withBody("{"
+                                            + "\"cases\":[" +  getJsonString(caseDetails)
+                                            + "]}")
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     public static void stubSearchCase(String caseTypeId, String searchQuery, CaseDetails caseDetails) {
@@ -96,14 +113,16 @@ public final class WiremockFixtures {
 
     public static void stubAssignCase(String caseId, String userId, String... caseRoles) {
         stubFor(WireMock.post(urlEqualTo(CASE_USERS))
-                .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-                .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-                .withRequestBody(matchingJsonPath("$.case_users[0].case_id", equalTo(caseId)))
-                .withRequestBody(matchingJsonPath("$.case_users[0].case_role", equalTo(caseRoles[0])))
-                .withRequestBody(matchingJsonPath("$.case_users[0].user_id", equalTo(userId)))
-                .withRequestBody(matchingJsonPath("$.case_users[0].organisation_id",
-                                                  equalTo(TestFixtures.ORGANIZATION_ID)))
-                .willReturn(aResponse().withStatus(HTTP_OK)));
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .withRequestBody(matchingJsonPath("$.case_users[0].case_id", equalTo(caseId)))
+                    .withRequestBody(matchingJsonPath("$.case_users[0].case_role", equalTo(caseRoles[0])))
+                    .withRequestBody(matchingJsonPath("$.case_users[0].user_id", equalTo(userId)))
+                    .withRequestBody(matchingJsonPath(
+                        "$.case_users[0].organisation_id",
+                        equalTo(TestFixtures.ORGANIZATION_ID)
+                    ))
+                    .willReturn(aResponse().withStatus(HTTP_OK)));
     }
 
     public static void stubUnassignCase(List<CaseUserRoleWithOrganisation> unassignments)
@@ -113,22 +132,82 @@ public final class WiremockFixtures {
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .withRequestBody(
-                        equalToJson(OBJECT_MAPPER.writeValueAsString(new CaseUserRolesRequest(unassignments)),
-                                    true,
-                                    false))
+                        equalToJson(
+                            OBJECT_MAPPER.writeValueAsString(new CaseUserRolesRequest(unassignments)),
+                            true,
+                            false
+                        ))
                     .willReturn(aResponse().withStatus(HTTP_OK)));
     }
 
     public static void stubGetCaseAssignments(List<String> caseIds, List<String> userIds,
                                               List<CaseUserRole> caseUserRoles) {
         stubFor(WireMock.get(urlPathEqualTo(CASE_USERS))
-                .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-                .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-                .withQueryParam("case_ids", equalTo(caseIds.get(0)))
-                .withQueryParam("user_ids", equalTo(userIds.get(0)))
-                .willReturn(aResponse()
-                        .withStatus(HTTP_OK).withBody(getJsonString(new CaseUserRoleResource(caseUserRoles)))
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .withQueryParam("case_ids", equalTo(caseIds.get(0)))
+                    .withQueryParam("user_ids", equalTo(userIds.get(0)))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK)
+                                    .withBody(getJsonString(new CaseUserRoleResource(caseUserRoles)))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubGetCaseAssignments(List<String> caseIds, List<CaseUserRole> caseUserRoles) {
+        stubFor(WireMock.get(urlPathEqualTo(CASE_USERS))
+            .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+            .withQueryParam("case_ids", equalTo(caseIds.get(0)))
+            .willReturn(aResponse()
+                .withStatus(HTTP_OK)
+                .withBody(getJsonString(new CaseUserRoleResource(caseUserRoles)))
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubGetCaseInternal(String caseId, CaseViewResource caseViewResource) {
+
+        stubFor(WireMock.get(urlPathEqualTo(INTERNAL_CASES + caseId))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK).withBody(getJsonString(caseViewResource))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubGetChallengeQuestions(String caseTypeId,
+                                                 String id,
+                                                 ChallengeQuestionsResult challengeQuestionsResult) {
+        stubFor(WireMock.get(urlPathEqualTo("/api/display/challenge-questions/case-type/"
+                                                + caseTypeId
+                                                + "/question-groups/"
+                                                + id))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK).withBody(getJsonString(challengeQuestionsResult))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubGetCaseRoles(String userId, String jurisdiction, String caseTypeId,
+                                        List<CaseRole> caseRoles) {
+
+        stubFor(WireMock.get(urlPathEqualTo("/api/data/caseworkers/" + userId + "/jurisdictions/"
+                                                + jurisdiction + "/case-types/" + caseTypeId + "/roles"))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK).withBody(getJsonString(caseRoles))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubGetLatestVersion(String caseTypeId, CaseTypeDefinitionVersion caseTypeDefinitionVersion) {
+
+        stubFor(WireMock.get(urlPathEqualTo("/api/data/case-type/" + caseTypeId + "/version"))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK).withBody(getJsonString(caseTypeDefinitionVersion))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     public static void stubIdamGetUserById(String userId, UserDetails user) {
@@ -139,8 +218,90 @@ public final class WiremockFixtures {
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
+    public static void stubGetStartEventTrigger(String caseId,
+                                                String eventId,
+                                                CaseUpdateViewEvent caseUpdateViewEvent) {
+        stubFor(WireMock.get(urlPathEqualTo(INTERNAL_CASES + caseId + EVENT_TRIGGERS + eventId))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK)
+                                    .withBody(getJsonString(caseUpdateViewEvent))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubGetCaseViaExternalApi(String caseId, CaseDetails caseDetails) {
+        stubFor(WireMock.get(urlPathEqualTo(CASES + caseId))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK)
+                                    .withBody(getJsonString(caseDetails))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    // APPROVER INTERCEPTORS BELOW
+    public static void stubGetCaseInternalAsApprover(String caseId, CaseViewResource caseViewResource) {
+
+        stubFor(WireMock.get(urlPathEqualTo(INTERNAL_CASES + caseId))
+                    .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK).withBody(getJsonString(caseViewResource))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubGetExternalStartEventTrigger(String caseId,
+                                                                  String eventId,
+                                                                  StartEventResource startEventResource) {
+        stubFor(WireMock.get(urlPathEqualTo(CASES + caseId + EVENT_TRIGGERS + eventId))
+            .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+            .willReturn(aResponse()
+                .withStatus(HTTP_OK)
+                .withBody(getJsonString(startEventResource))
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubGetExternalStartEventTriggerAsApprover(String caseId,
+                                                          String eventId,
+                                                          StartEventResource startEventResource) {
+        stubFor(WireMock.get(urlPathEqualTo(CASES + caseId + EVENT_TRIGGERS + eventId))
+            .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
+            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+            .willReturn(aResponse()
+                .withStatus(HTTP_OK)
+                .withBody(getJsonString(startEventResource))
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubSubmitEventForCase(String caseId,
+                                              CaseEventCreationPayload caseEventCreationPayload,
+                                              CaseDetails caseDetails) throws JsonProcessingException {
+        stubFor(WireMock.post(urlPathEqualTo(CASES + caseId + "/events"))
+                    .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .withRequestBody(equalToJson(
+                        OBJECT_MAPPER.writeValueAsString(caseEventCreationPayload)
+                    ))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_CREATED)
+                                    .withBody(getJsonString(caseDetails))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubSubmitEventForCase(String caseID,
+                                              CaseDetails caseDetails) {
+        stubFor(WireMock.post(urlEqualTo(CASES + caseID + "/events"))
+                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK).withBody(getJsonString(caseDetails))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
     public static void stubGetCaseDetailsByCaseIdViaExternalApi(String caseId, CaseDetails caseDetails) {
-        stubFor(WireMock.get(urlEqualTo("/cases/" + caseId))
+        stubFor(WireMock.get(urlEqualTo(CASES + caseId))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()

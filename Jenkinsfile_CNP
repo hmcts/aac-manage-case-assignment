@@ -9,6 +9,11 @@ def component = "manage-case-assignment"
 
 GradleBuilder builder = new GradleBuilder(this, product)
 
+// Variables to switch pipeline logic and wiring per type of build
+def definitionStoreDevelopPr = "PR-575"  // This doesn't change frequently, but when it does, only change this value.
+def dataStoreApiDevelopPr    = "PR-1260" // This doesn't change frequently, but when it does, only change this value.
+def prsToUseAat             = "PR-148,PR-161,PR-167,PR-259,PR-264" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
+
 def secrets = [
   'rpx-${env}': [
     secret('mc-idam-client-secret', 'BEFTA_OAUTH2_CLIENT_SECRET_OF_XUIWEBAPP')
@@ -24,13 +29,26 @@ def secrets = [
     secret('ccd-befta-master-solicitor2-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_2_PWD'),
     secret('ccd-befta-master-solicitor3-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_3_PWD'),
     secret('ccd-befta-master-solicitor4-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_4_PWD'),
+    secret('ccd-befta-master-solicitor5-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_5_PWD'),
+    secret('ccd-befta-master-solicitor6-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_6_PWD'),
+    secret('ccd-befta-master-solicitor-mutlu-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_MUTLU_PWD'),
+    secret('ccd-befta-master-solicitor-richard-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_RICHARD_PWD'),
+    secret('ccd-befta-master-solicitor-tony-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_TONY_PWD'),
+    secret('ccd-befta-jurisdiction3-solicitor1-pwd', 'CCD_BEFTA_JURISDICTION_3_SOLICITOR_1_PWD'),
     secret('ccd-befta-solicitor-4-pwd', 'CCD_BEFTA_SOLICITOR_4_PWD'),
+    secret('ccd-befta-citizen-2-pwd', 'CCD_BEFTA_CITIZEN_2_PWD'),
     secret('ccd-befta-pui-caa-1-pwd', 'CCD_BEFTA_PUI_CAA_1_PWD')
   ],
   's2s-${env}': [
     secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
-    secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP')
-  ]
+    secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP'),
+    secret('microservicekey-ccd-data', 'BEFTA_S2S_CLIENT_SECRET_OF_CCD_DATA'),
+    secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT')
+  ],
+   'aac-${env}': [
+      secret('idam-mca-system-user-username', 'BEFTA_IDAM_CAA_USERNAME'),
+      secret('idam-mca-system-user-password', 'BEFTA_IDAM_CAA_PASSWORD')
+    ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
@@ -47,14 +65,21 @@ def vaultOverrides = [
 ]
 
 // vars needed for functional tests
+// Assume a feature build branched off 'develop', with dependencies develop-to-develop.
+env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
+env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${dataStoreApiDevelopPr}.service.core-compute-preview.internal".toLowerCase()
+
+// Other env variables needed for BEFTA.
 env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
 env.BEFTA_S2S_CLIENT_ID = "xui_webapp"
 env.OAUTH2_CLIENT_ID = "ccd_gateway"
 env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
+env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
+env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
 env.BEFTA_OAUTH2_CLIENT_ID_OF_XUIWEBAPP = "xuiwebapp"
 env.BEFTA_OAUTH2_REDIRECT_URI_OF_XUIWEBAPP = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
 env.BEFTA_OAUTH2_ACCESS_TOKEN_TYPE_OF_XUIWEBAPP = "OIDC"
@@ -62,13 +87,6 @@ env.BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP = "profile openid roles manage-use
 
 // temporary workaround for platform changes: turn BEFTA header checks to warning mode
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
-
-
-// Variables to switch pipeline logic and wiring per type of build
-def definitionStoreDevelopPr = "PR-575" // This doesn't change frequently, but when it does, only change this value.
-def dataStoreApiDevelopPr    = "PR-1260" // This doesn't change frequently, but when it does, only change this value.
-def prsToUseAaat             = "PR-148,PR-161,PR-167" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
-
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
 env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${dataStoreApiDevelopPr}.service.core-compute-preview.internal".toLowerCase()
 
@@ -93,7 +111,7 @@ withPipeline("java", product, component) {
   }
 
   // Check if the build should be wired to an environment higher than 'preview'.
-  if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAaat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
+  if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
       environmentOfDependencies = env.BRANCH_NAME
       // use aat environment for dependencies of master and CI/CD builds.
       if (env.BRANCH_NAME.startsWith("PR") || env.BRANCH_NAME == 'master') {
@@ -103,11 +121,23 @@ withPipeline("java", product, component) {
       env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
   }
 
+  echo "FTA will use Definition Store: ${env.DEFINITION_STORE_HOST}"
+
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
 
   enableAksStagingDeployment()
   disableLegacyDeployment()
+
+  before('smoketest:preview') {
+    env.MCA_API_BASE_URL = env.TEST_URL.replace("https", "http")
+    echo "   ... published with MCA URL: ${env.MCA_API_BASE_URL}"
+  }
+
+  before('smoketest:aat') {
+    env.MCA_API_BASE_URL = env.TEST_URL.replace("https", "http")
+    echo "   ... published with MCA URL: ${env.MCA_API_BASE_URL}"
+  }
 
   after('smoketest:preview') {
     copyIgnore('./build/reports/tests/befta/smoke/cucumber-html-reports', './BEFTA Report for Smoke Tests/')

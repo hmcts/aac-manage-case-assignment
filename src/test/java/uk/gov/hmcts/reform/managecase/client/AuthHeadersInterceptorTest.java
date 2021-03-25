@@ -36,7 +36,7 @@ class AuthHeadersInterceptorTest {
     @Test
     @DisplayName("Auth headers applied if not exist")
     void shouldApplyAuthHeaders() {
-        given(securityUtils.getUserToken()).willReturn(USER_TOKEN);
+        given(securityUtils.getUserBearerToken()).willReturn(USER_TOKEN);
         given(securityUtils.getS2SToken()).willReturn(S2S_TOKEN);
 
         interceptor.apply(template);
@@ -53,7 +53,7 @@ class AuthHeadersInterceptorTest {
 
         interceptor.apply(template);
 
-        verify(securityUtils, times(0)).getUserToken();
+        verify(securityUtils, times(0)).getUserBearerToken();
         verify(securityUtils, times(0)).getS2SToken();
     }
 }

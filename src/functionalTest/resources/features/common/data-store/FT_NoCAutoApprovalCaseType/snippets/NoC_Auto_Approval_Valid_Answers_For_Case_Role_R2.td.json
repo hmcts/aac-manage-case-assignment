@@ -1,0 +1,10 @@
+{
+  "_guid_": "NoC_Auto_Approval_Valid_Answers_For_Case_Role_R2",
+
+  "answers": [ 
+    {
+      "question_id": "NoC_AutoApproval_Challenge_Name",
+      "value": "alpha innovare"
+    }
+  ]
+}

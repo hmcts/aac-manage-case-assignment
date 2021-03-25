@@ -24,7 +24,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   cache:
-    cache-names: userInfoCache,usersByOrganisation,systemUserAccessTokenCache
+    cache-names: userInfoCache,usersByOrganisationExternal,usersByOrganisationInternal,organisationAddressById,systemUserAccessTokenCache,caaAccessTokenCache,nocApproverAccessTokenCache,caseRoles,challengeQuestions
     caffeine:
       spec: expireAfterAccess=1800s
   security:
@@ -46,23 +46,31 @@ idam:
     scope: openid roles profile manage-user
     # same for all environments - not used in mca but configured as idam mandates for token generation
     redirect_uri: https://manage-case-assignment/oauth2redirect
-  system-user:
-    username: ${IDAM_SYSTEM_USER_USERNAME:master.caa@gmail.com}
-    password: ${IDAM_SYSTEM_USER_PASSWORD:Pa55word11}
+  caa:
+    username: ${IDAM_CAA_USERNAME:master.caa@gmail.com}
+    password: ${IDAM_CAA_PASSWORD:Pa55word11}
+  noc-approver:
+    username: ${IDAM_NOC_APPROVER_USERNAME:noc.approver@gmail.com}
+    password: ${IDAM_NOC_APPROVER_PASSWORD:Pa55word11}
   s2s-auth:
     microservice: aac_manage_case_assignment
     totp_secret: ${MANAGE_CASE_S2S_KEY:AAAAAAAAAAAAAAAA}
     url: ${S2S_URL:http://localhost:4502}
   s2s-authorised:
-    services: ${MANAGE_CASE_S2S_AUTHORISED_SERVICES:xui_webapp,finrem_case_orchestration}
+    services: ${MANAGE_CASE_S2S_AUTHORISED_SERVICES:xui_webapp,ccd_data,finrem_case_orchestration}
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
 ccd:
   data-store:
     host: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
-    allowed-urls: ${MCA_DS_PROXY_URLS_ALLOWED_LIST:/searchCases.*,/internal/searchCases.*}
+    allowed-urls: ${MCA_DS_PROXY_URLS_ALLOWED_LIST:/searchCases.*,/internal/searchCases.*,/internal/cases.*}
     allowed-service: xui_webapp
+  definition-store:
+    host: ${CCD_DEFINITION_STORE_API_BASE_URL:http://localhost:4451}
+    allowed-urls: ${MCA_DEF_STORE_PROXY_URLS_ALLOWED_LIST:/api/display/challenge-questions.*}
+    allowed-service: xui_webapp
+
 zuul:
   routes:
     data-store:
@@ -70,7 +78,7 @@ zuul:
       sensitiveHeaders: Cookie,Set-Cookie
       url: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
 prd:
-  host: ${PRD_HOST:http://localhost:4455}
+  host: ${PRD_HOST:http://localhost:5544}
 mca:
   conditional-apis:
     case-assignments:

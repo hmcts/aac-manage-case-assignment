@@ -1,0 +1,46 @@
+{
+  "_guid_": "NoC_Case_Data__publicFields",
+
+  "applicant": {
+    "litigantType": "INDIVIDUAL",
+    "individual": {
+      "Title": "mr",
+      "LastName": "noronha"
+    },
+    "dob": "1989-09-19"
+  },
+
+  "respondent": {
+    "litigantType": "COMPANY",
+    "company": {
+      "Name": "alpha innovare",
+      "BusinessAddress": {
+        "AddressLine1": "5A Westway",
+        "AddressLine2": null,
+        "AddressLine3": null,
+        "Country": ""
+      }
+    },
+    "incorporationDate": "2020-01-01"
+  },
+
+  "otherParty": {
+    "litigantType": "SOLETRADER",
+    "soletrader": {
+      "Name": "Bob the Builder",
+      "BusinessAddress": {
+        "AddressLine1": "7 Ardmore Avenue",
+        "AddressLine2": null,
+        "AddressLine3": null,
+        "Country": null
+      },
+      "PostalAddress": {
+        "AddressLine1": "",
+        "AddressLine2": null,
+        "AddressLine3": null,
+        "Country": null
+      }
+    },
+    "tradingStartDate": "1998-11-28"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "_guid_" : "Submit_ManageOrgs_Event",
+  "_extends_": "Event_Creation",
+
+  "request": {
+    "pathVariables": {
+      "cid": "OVERWRITE"
+    },
+    "body":{
+      "data": {
+        "respondentOrganisationPolicy": {
+          "OrgPolicyCaseAssignedRole": "[RespondentSolicitor]",
+          "OrgPolicyReference": "RespondentPolicy",
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "applicantOrganisationPolicy": {
+          "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
+          "OrgPolicyReference": "ApplicantPolicy",
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "otherPartyOrganisationPolicy": {
+          "OrgPolicyCaseAssignedRole": "[OtherPartySolicitor]",
+          "OrgPolicyReference": "OtherPartyPolicy",
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        }
+      },
+      "event": {
+        "id": "manageAllOrgPolicies"
+      },
+      "event_token": "OVERWRITE"
+    }
+  }
+
+}

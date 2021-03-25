@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.api.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
+import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
 import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
@@ -436,6 +438,44 @@ public class NoticeOfChangeControllerTest {
             requestNoticeOfChangeRequest = new RequestNoticeOfChangeRequest("12345", emptyList());
             postCallShouldReturnBadRequestWithErrorMessage(requestNoticeOfChangeRequest,
                                                            CHALLENGE_QUESTION_ANSWERS_EMPTY);
+        }
+
+        @DisplayName("should error if downstream access denied exception is thrown")
+        @Test
+        void shouldFailWithForbiddenResponseIfDownstreamThrowsAccessDenied() throws Exception {
+
+            given(requestNoticeOfChangeService.requestNoticeOfChange(noCRequestDetails))
+                    .willThrow(AccessDeniedException.class);
+
+            this.mockMvc.perform(post("/noc" + REQUEST_NOTICE_OF_CHANGE_PATH)
+                    .contentType(APPLICATION_JSON_VALUE)
+                    .content(objectMapper.writeValueAsString(requestNoticeOfChangeRequest)))
+                    .andExpect(status().isForbidden());
+        }
+
+        @DisplayName("should error if downstream service throws an exception")
+        @Test
+        void shouldFailWithInternalServerErrorIfDownstreamServiceThrowsException() throws Exception {
+
+            given(requestNoticeOfChangeService.requestNoticeOfChange(noCRequestDetails))
+                    .willThrow(FeignException.class);
+
+            this.mockMvc.perform(post("/noc" + REQUEST_NOTICE_OF_CHANGE_PATH)
+                    .contentType(APPLICATION_JSON_VALUE)
+                    .content(objectMapper.writeValueAsString(requestNoticeOfChangeRequest)))
+                    .andExpect(status().isInternalServerError());
+        }
+
+        @DisplayName("should error if Exception thrown")
+        @Test
+        void shouldFailWithInternalServerErrorIfExceptionThrown() throws Exception {
+
+            given(requestNoticeOfChangeService.requestNoticeOfChange(null));
+
+            this.mockMvc.perform(post("/noc" + REQUEST_NOTICE_OF_CHANGE_PATH)
+                    .contentType(APPLICATION_JSON_VALUE)
+                    .content(objectMapper.writeValueAsString(requestNoticeOfChangeRequest)))
+                    .andExpect(status().isInternalServerError());
         }
 
         private void postCallShouldReturnBadRequestWithErrorMessage(

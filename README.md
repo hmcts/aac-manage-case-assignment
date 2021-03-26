@@ -1,5 +1,8 @@
 # Manage Case Assignment
 
+
+[![API Docs](https://img.shields.io/badge/API%20Docs-site-e140ad.svg)](https://hmcts.github.io/reform-api-docs/swagger.html?url=https://hmcts.github.io/reform-api-docs/specs/aac-manage-case-assignment.json)
+
 This micro-service provides a set of APIs to manage case access. 
 
 **TODO**: add more description / architecture diagram etc 

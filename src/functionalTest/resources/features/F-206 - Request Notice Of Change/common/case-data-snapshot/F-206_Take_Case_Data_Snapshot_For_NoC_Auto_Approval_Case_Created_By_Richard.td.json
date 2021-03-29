@@ -1,6 +1,6 @@
 {
   "_guid_": "F-206_Take_Case_Data_Snapshot_For_NoC_Auto_Approval_Case_Created_By_Richard",
-  "_extends_": "F-206_Take_Case_Data_Snapshot__Base",
+  "_extends_": "F-206_Take_Case_Data_Snapshot_For_NoC_Auto_Approval__Base",
 
   "request": {
     "pathVariables": {

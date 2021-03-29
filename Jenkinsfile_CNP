@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@TA-471_PactCanIDeploy")
+@Library("Infrastructure")
 
 import uk.gov.hmcts.contino.GradleBuilder
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -13,7 +13,7 @@ GradleBuilder builder = new GradleBuilder(this, product)
 // Variables to switch pipeline logic and wiring per type of build
 def definitionStoreDevelopPr = "PR-575"  // This doesn't change frequently, but when it does, only change this value.
 def dataStoreApiDevelopPr    = "PR-1260" // This doesn't change frequently, but when it does, only change this value.
-def prsToUseAat             = "PR-148,PR-161,PR-167" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
+def prsToUseAat             = "PR-148,PR-161,PR-167,PR-259,PR-264" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
 def secrets = [
   'rpx-${env}': [

@@ -1,0 +1,25 @@
+{
+  "_guid_": "F-206_Verify_Case_Data_COR_Approved_AddRepresentation",
+  "_extends_": "F-206_Verify_Case_Data_COR_Approved__Base",
+
+  "expectedResponse": {
+    "body" : {
+
+      "data": {
+        "respondentOrganisationPolicy" : {
+          "PreviousOrganisations": [
+            {
+              "id": "[[ANY_STRING_NOT_NULLABLE]]",
+              "value": {
+                "ToTimestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+                "FromTimestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+                "OrganisationName" : null,
+                "OrganisationAddress" : {}
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

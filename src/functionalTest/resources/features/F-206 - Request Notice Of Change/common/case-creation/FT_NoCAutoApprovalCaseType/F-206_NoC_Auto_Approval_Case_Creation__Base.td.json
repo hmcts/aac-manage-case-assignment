@@ -1,0 +1,49 @@
+{
+  "_guid_": "F-206_NoC_Auto_Approval_Case_Creation__Base",
+  "_extends_": "NoC_Auto_Approval_Case_Creation__Base",
+
+  "request": {
+    "body": {
+
+      "data": {
+        "_extends_": "NoC_Case_Data_With_Org_Policies"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "_extends_": "NoC_Case_Data_With_Org_Policies__publicFields"
+      },
+
+      "data_classification": {
+        "_extends_": "NoC_Case_Data_Classification_With_Org_Policies",
+
+        "respondentOrganisationPolicy": {
+          "value": {
+            "Organisation": "[[ANY_NULLABLE]]",
+            "OrgPolicyReference": "PUBLIC",
+            "OrgPolicyCaseAssignedRole": "PUBLIC",
+            "PreviousOrganisations": "[[ANY_NULLABLE]]"
+          },
+          "classification" : "PUBLIC"
+        }
+      },
+
+      "security_classifications": {
+        "_extends_": "NoC_Case_Data_Classification_With_Org_Policies",
+
+        "respondentOrganisationPolicy": {
+          "value": {
+            "Organisation": "[[ANY_NULLABLE]]",
+            "OrgPolicyReference": "PUBLIC",
+            "OrgPolicyCaseAssignedRole": "PUBLIC",
+            "PreviousOrganisations": "[[ANY_NULLABLE]]"
+          },
+          "classification" : "PUBLIC"
+        }
+      }
+    }
+  }
+}

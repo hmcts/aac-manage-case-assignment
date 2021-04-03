@@ -1,0 +1,14 @@
+{
+  "_guid_": "S-207.1-CaseCreation_NoCRequest_Approved",
+  "_extends_": "F-207_Check_NoC_Auto_Approval_Case_Creation__Base",
+
+  "request": {
+    "body": {
+      "data": {
+        "changeOrganisationRequestField" : {
+          "ApprovalStatus" : "1"
+        }
+      }
+    }
+  }
+}

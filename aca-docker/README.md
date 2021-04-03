@@ -34,62 +34,62 @@ see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
 
     - To add idam client services (eg: `xuiwebapp`) :
 
-    ```bash
-      ./bin/add-idam-clients.sh
-    ```
+        ```bash
+        ./bin/add-idam-clients.sh
+        ```
 
     - To add roles required to import ccd definition:
 
-    ```bash
-      ./bin/add-roles.sh
-    ```
+        ```bash
+        ./bin/add-roles.sh
+        ```
 
     - To add users:
 
-    ```bash
-      ./bin/add-users.sh
-    ```
+        ```bash
+        ./bin/add-users.sh
+        ```
 
     - To populate wiremock PRD data with user GUIDS
 
-    ```bash
-      ./bin/findPrdUserIds.sh
-    ```
+        ```bash
+        ./bin/findPrdUserIds.sh
+        ```
 
-    This script updates placeholders in `aca-docker/mocks/wiremock/__files/prd_users.json`
+        This script updates placeholders in: 
 
-    You need to run this script every time you run `./bin/add-users.sh`, as adding users will
-    use generate new GUIDs.
+        ```
+        aca-docker/mocks/wiremock/__files/prd_users_organisation_01.json
+        aca-docker/mocks/wiremock/__files/prd_users_organisation_02.json
+        ```
 
-    The `aca-wiremock` container will need to be restarted to read in these new GUIDs
+        You need to run this script every time you run `./bin/add-users.sh`, as adding users will
+        generate new GUIDs.
 
-    ```bash
-    > cd aca-docker
-    > docker-compose -f compose/aca.yml restart aca-wiremock
-    ```
+        The `aca-wiremock` container will need to be restarted to read in these new GUIDs
+
+        ```bash
+        cd aca-docker
+        docker-compose -f compose/aca.yml restart aca-wiremock
+        ```
 
 ### Run `ccd-docker` containers
 - Install and run CCD stack as advised [here](https://github.com/hmcts/ccd-docker).
 
-    Please enable elasticsearch+logstash along with other ccd components.
+    Please enable following ccd components.
     ```bash
-    ./ccd enable backend sidam sidam-local sidam-local-ccd elasticsearch logstash
+    ./ccd enable backend sidam sidam-local sidam-local-ccd
     ```
-
-    before starting the containers, ensure the `ES_DOCKER_ENABLED` environment variable
-    (listed in `aca-docker\bin\env_variables-all` ) is set to `true`
-
-    If `ccd-docker` was running before `ES_DOCKER_ENABLED` was set, you will need to restart the
-    `definiton-store-api` and `data-store-api` containers to pick up this new environment variable
 
     *Memory and CPU allocations may need to be increased for successful execution of ccd applications altogether*
 
 ## ACA
 
 Please run aca docker as follows.
+
 ```
-> cd aca-docker
-> docker-compose -f compose/aca.yml up -d
+cd aca-docker
+docker-compose -f compose/aca.yml up -d
 ```
 
 ### Compose branches
@@ -101,8 +101,8 @@ By default, tha ACA container will be running the `latest` tag, built from the `
 To switch to a branch (e.g. `pr-126`): `set` the environment variable and update the containers:
 
 ```bash
-> export MANAGE_CASE_ASSIGNMENT_TAG=<branch>
-> docker-compose -f compose/aca.yml up -d
+export MANAGE_CASE_ASSIGNMENT_TAG=<branch>
+docker-compose -f compose/aca.yml up -d
 ```
 
 #### Revert to `master`
@@ -110,8 +110,8 @@ To switch to a branch (e.g. `pr-126`): `set` the environment variable and update
 To revert to `master`: `unset` the environment variable and update the containers:
 
 ```bash
-> unset MANAGE_CASE_ASSIGNMENT_TAG
-> docker-compose -f compose/aca.yml up -d
+unset MANAGE_CASE_ASSIGNMENT_TAG
+docker-compose -f compose/aca.yml up -d
 ```
 
 ## LICENSE

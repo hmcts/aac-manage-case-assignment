@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-206_Verify_Case_Data_COR_Approved",
+  "_guid_": "F-206_Verify_Case_Data_COR_Approved__Base",
   "_extends_": "F-206_Verify_Case_Data__Base",
 
   "specs": [
@@ -27,9 +27,7 @@
         },
 
         "changeOrganisationRequestField" : {
-          "Reason": null,
           "CaseRoleId": null,
-          "NotesReason": null,
           "ApprovalStatus": null,
           "RequestTimestamp": null,
           "OrganisationToAdd": {
@@ -37,17 +35,24 @@
           },
           "OrganisationToRemove": {
             "OrganisationID": null
-          },
-          "ApprovalRejectionTimestamp": null
+          }
         }
       },
 
       "data_classification": {
+        "respondentOrganisationPolicy": {
+          "value": {
+            "Organisation": "[[ANY_NULLABLE]]",
+            "OrgPolicyReference": "PUBLIC",
+            "OrgPolicyCaseAssignedRole": "PUBLIC",
+            "PreviousOrganisations": "[[ANY_NULLABLE]]"
+          },
+          "classification" : "PUBLIC"
+        },
+
         "changeOrganisationRequestField" : {
           "value" : {
-            "Reason" : "PUBLIC",
             "CaseRoleId" : "PUBLIC",
-            "NotesReason" : "PUBLIC",
             "ApprovalStatus" : "PUBLIC",
             "RequestTimestamp" : "PUBLIC",
             "OrganisationToAdd" : {
@@ -61,8 +66,7 @@
                 "OrganisationID" : "PUBLIC"
               },
               "classification" : "PUBLIC"
-            },
-            "ApprovalRejectionTimestamp" : "PUBLIC"
+            }
           },
           "classification" : "PUBLIC"
         }

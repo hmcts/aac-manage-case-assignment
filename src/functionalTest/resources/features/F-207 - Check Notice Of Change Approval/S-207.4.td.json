@@ -38,7 +38,7 @@
             "ApprovalStatus" : "1",
             "RequestTimestamp": "2020-02-20T06:30:00",
             "OrganisationToAdd" : {
-              "OrganisationID": "Org-Two"
+              "OrganisationID": "LESTKK0"
             },
             "OrganisationToRemove": {
               "OrganisationID": null

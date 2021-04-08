@@ -59,7 +59,6 @@ import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreReposito
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.INCOMPLETE_CALLBACK;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOC_REQUEST_DESCRIPTION;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
 
 
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})

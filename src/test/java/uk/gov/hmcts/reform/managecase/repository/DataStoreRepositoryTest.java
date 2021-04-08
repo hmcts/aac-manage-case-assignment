@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import feign.FeignException;
 import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
@@ -51,11 +52,13 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.CHANGE_ORGANISATION_REQUEST_FIELD;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getCaseViewFields;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getWizardPages;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CALLBACK_FAILED_ERRORS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.INCOMPLETE_CALLBACK;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOC_REQUEST_DESCRIPTION;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
 
 
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
@@ -145,8 +148,8 @@ class DataStoreRepositoryTest {
 
         // ACT & ASSERT
         assertThatThrownBy(() -> repository.findCaseByCaseIdExternalApi(CASE_ID))
-            .isInstanceOf(CaseCouldNotBeFetchedException.class)
-            .hasMessageContaining(CASE_COULD_NOT_BE_FETCHED);
+            .isInstanceOf(CaseCouldNotBeFoundException.class)
+            .hasMessageContaining(CASE_NOT_FOUND);
     }
 
     @Test
@@ -252,6 +255,39 @@ class DataStoreRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should throw CaseNotFoundException  when Find case by caseId")
+    void shouldThrowCaseNotFoundExceptionForFindCaseByCaseId() {
+        // ARRANGE
+        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null, Charset.defaultCharset(),
+                                         null
+        );
+        given(dataStoreApi.getCaseDetailsByCaseId(anyString(), anyString()))
+            .willThrow(new FeignException.NotFound("404", request, null));
+
+        // ACT & ASSERT
+        assertThatThrownBy(() -> repository.findCaseByCaseId(CASE_ID))
+            .isInstanceOf(CaseCouldNotBeFoundException.class)
+            .hasMessageContaining(CASE_NOT_FOUND);
+
+    }
+
+    @Test
+    @DisplayName("Should throw FeignException  when Find case by caseId")
+    void shouldThrowCFeignExceptionForFindCaseByCaseId() {
+        // ARRANGE
+        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null, Charset.defaultCharset(),
+                                         null
+        );
+        given(dataStoreApi.getCaseDetailsByCaseId(anyString(), anyString()))
+            .willThrow(new FeignException.InternalServerError("500", request, null));
+
+        // ACT & ASSERT
+        assertThatThrownBy(() -> repository.findCaseByCaseId(CASE_ID))
+            .isInstanceOf(FeignException.class);
+
+    }
+
+    @Test
     @DisplayName("getStartEventTrigger returns successfully a CaseUpdateViewEvent")
     void shouldReturnCaseUpdateViewEventWhenStartEventTriggerSucceeds() {
         CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder().build();
@@ -278,6 +314,21 @@ class DataStoreRepositoryTest {
     }
 
     @Test
+    @DisplayName("submitEventForCase throws exception if there are callback errors in the data-store response")
+    void shouldThrowRuntimeExceptionWhenEventSubmissionFailsWithCallbackError() {
+        CaseDetails caseDetails = CaseDetails.builder()
+            .callbackResponseStatus(INCOMPLETE_CALLBACK)
+            .build();
+
+        given(dataStoreApi.submitEventForCase(eq(USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
+            .willReturn(caseDetails);
+
+        assertThatThrownBy(() -> repository.submitEventForCase(CASE_ID, CaseEventCreationPayload.builder().build()))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage(CALLBACK_FAILED_ERRORS_MESSAGE);
+    }
+
+    @Test
     @DisplayName("submitEventForCaseOnly returns successfully a CaseDetails")
     void shouldReturnCaseDetailsWhenEventSubmissionSucceeds() {
         CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder().build();
@@ -290,20 +341,6 @@ class DataStoreRepositoryTest {
             = repository.submitEventForCase(CASE_ID, caseEventCreationPayload);
 
         assertThat(returnedCaseDetails).isEqualTo(caseDetails);
-    }
-
-    @Test
-    @DisplayName("submitEventForCaseOnly returns null")
-    void shouldReturnNullCaseResourceOnEventSubmission() {
-        CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder().build();
-
-        given(dataStoreApi.submitEventForCase(eq(USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
-            .willReturn(null);
-
-        CaseDetails caseDetails
-            = repository.submitEventForCase(CASE_ID, caseEventCreationPayload);
-
-        assertThat(caseDetails).isNull();
     }
 
     @Test
@@ -478,5 +515,33 @@ class DataStoreRepositoryTest {
 
         // ASSERT
         assertThat(PENDING.getValue()).isEqualTo(corCaptor.getValue().getApprovalStatus());
+    }
+
+    @Test
+    @DisplayName("submitEventForCase throws exception if there are callback errors in the data-store response")
+    void shouldThrowRuntimeExceptionWhenSubmissionEventFailsWithCallbackError() {
+
+        CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
+            .wizardPages(CaseUpdateViewEventFixture.getWizardPages())
+            .eventToken(EVENT_TOKEN)
+            .caseFields(getCaseViewFields())
+            .build();
+
+        given(dataStoreApi.getStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID)).willReturn(caseUpdateViewEvent);
+
+        StartEventResource startEventResource = StartEventResource.builder()
+            .caseDetails(CaseDetails.builder().data(new HashMap<>()).build())
+            .build();
+        given(dataStoreApi.getExternalStartEventTrigger(USER_TOKEN, CASE_ID, EVENT_ID)).willReturn(startEventResource);
+
+        given(dataStoreApi.submitEventForCase(any(String.class), any(String.class),any(CaseEventCreationPayload.class)))
+            .willReturn(CaseDetails.builder()
+                .callbackResponseStatus(INCOMPLETE_CALLBACK)
+                .build());
+
+        assertThatThrownBy(() ->
+            repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build()))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage(CALLBACK_FAILED_ERRORS_MESSAGE);
     }
 }

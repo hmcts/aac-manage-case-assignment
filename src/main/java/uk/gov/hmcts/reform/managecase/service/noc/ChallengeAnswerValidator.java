@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.managecase.service.noc;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -29,8 +27,6 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDef
 @SuppressWarnings({"PMD.AvoidLiteralsInIfCondition", "PMD.UseConcurrentHashMap"})
 public class ChallengeAnswerValidator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ChallengeAnswerValidator.class);
-
     public String getMatchingCaseRole(ChallengeQuestionsResult challengeQuestions,
                                       List<SubmittedChallengeAnswer> submittedAnswers,
                                       CaseDetails caseDetails) {
@@ -39,14 +35,11 @@ public class ChallengeAnswerValidator {
         Map<String, Integer> caseRoleCorrectAnswers =
             getCaseRoleCorrectAnswers(submittedAnswers, challengeQuestions, caseDetails);
 
-        LOG.info("caseRoleCorrectAnswers are :" + caseRoleCorrectAnswers);
         return getMatchingCaseRole(caseRoleCorrectAnswers, challengeQuestions);
     }
 
     private String getMatchingCaseRole(Map<String, Integer> caseRoleCorrectAnswers,
                                        ChallengeQuestionsResult challengeQuestions) {
-        LOG.info("challengeQuestions.getQuestions().size() :" + challengeQuestions.getQuestions().size());
-        LOG.info("caseRoleCorrectAnswers :" + caseRoleCorrectAnswers);
         List<String> matchingCaseRoleIds = caseRoleCorrectAnswers.keySet().stream()
             .filter(caseRoleId -> caseRoleCorrectAnswers.get(caseRoleId) == challengeQuestions.getQuestions().size())
             .collect(toList());
@@ -70,13 +63,11 @@ public class ChallengeAnswerValidator {
             String submittedAnswer = getSubmittedAnswerForQuestion(answers, question.getQuestionId()).getValue();
 
             question.getAnswers().forEach(answer -> {
-                LOG.info("ChallengeAnswer answer is :" + answer);
                 List<String> acceptedValues = answer.getFieldIds().stream()
                     .map(caseDetails::getFieldValue)
                     .collect(toList());
-                LOG.info("acceptedValues are :" + acceptedValues);
+
                 if (isMatchingAnswerFound(question, submittedAnswer, acceptedValues)) {
-                    LOG.info("matching found for question :{}, submittedAnswer: {} ", question, submittedAnswer);
                     incrementCorrectAnswerCount(caseRoleCorrectAnswers, answer);
                 }
             });

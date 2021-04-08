@@ -52,7 +52,6 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCa
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisationExternal;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubIdamGetUserById;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubUnassignCase;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CASE_ROLE;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CASE_ROLE2;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ORGANIZATION_ID;
@@ -238,9 +237,9 @@ public class CaseAssignmentControllerIT {
                 .andExpect(jsonPath("$.message", is(ValidationError.ORGANISATION_POLICY_ERROR)));
         }
 
-        @DisplayName("Must return 500 server error response if case could not be found")
+        @DisplayName("Must return 404 server error response if case could not be found")
         @Test
-        void shouldReturn500_whenCaseNotFound() throws Exception {
+        void shouldReturn404_whenCaseNotFound() throws Exception {
             // ARRANGE
             stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, null); // i.e. no case not found
 
@@ -248,9 +247,9 @@ public class CaseAssignmentControllerIT {
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.message", is(CASE_COULD_NOT_BE_FETCHED)));
+                .andExpect(jsonPath("$.message", is(ValidationError.CASE_NOT_FOUND)));
 
             // ASSERT
             verify(exactly(0), deleteRequestedFor(urlEqualTo(CASE_USERS)));

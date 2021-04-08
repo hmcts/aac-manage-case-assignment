@@ -97,8 +97,8 @@ public class CaseAssignmentController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         ),
         @ApiResponse(
-            code = 500,
-            message = CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED
+            code = 404,
+            message = ValidationError.CASE_NOT_FOUND
         )
     })
     public CaseAssignmentResponse assignAccessWithinOrganisation(

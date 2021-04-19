@@ -30,7 +30,7 @@
     "body": {
       "message" : "Case ID has to be a valid 16-digit Luhn number",
       "code" : "case-id-invalid",
-      "errors" : [ ]
+      "errors" : ["Case ID has to be a valid 16-digit Luhn number"]
     }
   }
 }

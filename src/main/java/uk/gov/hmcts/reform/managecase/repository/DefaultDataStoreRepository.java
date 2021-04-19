@@ -45,19 +45,6 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     static final String CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID = "Failed to create ChangeOrganisationRequest"
         + " because of missing case field id";
 
-
-    public static final String ES_QUERY = "{\n"
-        + "   \"query\":{\n"
-        + "      \"bool\":{\n"
-        + "         \"filter\":{\n"
-        + "            \"term\":{\n"
-        + "               \"reference\":%s\n"
-        + "            }\n"
-        + "         }\n"
-        + "      }\n"
-        + "   }\n"
-        + "}";
-
     public static final String CHANGE_ORGANISATION_REQUEST = "ChangeOrganisationRequest";
     public static final String INCOMPLETE_CALLBACK = "INCOMPLETE_CALLBACK";
     public static final String CALLBACK_FAILED_ERRORS_MESSAGE =
@@ -208,9 +195,22 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public CaseDetails findCaseByCaseIdExternalApi(String caseId) {
+    public CaseDetails findCaseByCaseIdUsingExternalApi(String caseId) {
+        return findCaseByCaseIdExternalApi(caseId, false);
+    }
+
+    @Override
+    public CaseDetails findCaseByCaseIdAsSystemUserUsingExternalApi(String caseId) {
+        return findCaseByCaseIdExternalApi(caseId, true);
+    }
+
+    private CaseDetails findCaseByCaseIdExternalApi(String caseId, boolean asSystemUser) {
         try {
-            return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(caseId);
+            if (asSystemUser) {
+                return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(securityUtils.getCaaSystemUserToken(), caseId);
+            } else {
+                return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(securityUtils.getUserToken(), caseId);
+            }
         } catch (FeignException e) {
             if (HttpStatus.NOT_FOUND.value() == e.status()) {
                 throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);

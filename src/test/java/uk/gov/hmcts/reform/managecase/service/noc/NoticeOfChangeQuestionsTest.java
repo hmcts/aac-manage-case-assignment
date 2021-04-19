@@ -136,7 +136,7 @@ class NoticeOfChangeQuestionsTest {
 
             CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).caseTypeId(CASE_TYPE_ID).data(data).build();
 
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
+            given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(CASE_ID)).willReturn(caseDetails);
             given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
                 .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE));
 
@@ -248,7 +248,7 @@ class NoticeOfChangeQuestionsTest {
             CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).data(data).build();
 
             // external case by id
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
+            given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(CASE_ID)).willReturn(caseDetails);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(NoCException.class)
@@ -276,7 +276,7 @@ class NoticeOfChangeQuestionsTest {
             CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).data(data).build();
 
             // external case by id
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
+            given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(CASE_ID)).willReturn(caseDetails);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(NoCException.class)

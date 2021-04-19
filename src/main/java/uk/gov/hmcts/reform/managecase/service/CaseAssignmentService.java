@@ -194,7 +194,7 @@ public class CaseAssignmentService {
     }
 
     private CaseDetails getCase(CaseAssignment input) {
-        return dataStoreRepository.findCaseByCaseIdExternalApi(input.getCaseId());
+        return dataStoreRepository.findCaseByCaseIdUsingExternalApi(input.getCaseId());
     }
 
     private List<String> findInvokerOrgPolicyRoles(CaseDetails caseDetails, String organisation) {

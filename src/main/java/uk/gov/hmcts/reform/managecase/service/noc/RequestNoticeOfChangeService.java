@@ -129,7 +129,7 @@ public class RequestNoticeOfChangeService {
     }
 
     private CaseDetails getCaseViaExternalApi(String caseId) {
-        return dataStoreRepository.findCaseByCaseIdExternalApi(caseId);
+        return dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(caseId);
     }
 
     private String getEventId(NoCRequestDetails noCRequestDetails) {

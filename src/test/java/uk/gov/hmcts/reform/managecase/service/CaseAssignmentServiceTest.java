@@ -93,7 +93,7 @@ class CaseAssignmentServiceTest {
         void setUp() {
             caseAssignment = new CaseAssignment(CASE_TYPE_ID, CASE_ID, ASSIGNEE_ID);
 
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
+            given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(CASE_ID))
                 .willReturn(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
             given(prdRepository.findUsersByOrganisation())
                 .willReturn(usersByOrganisation(user(ASSIGNEE_ID)));
@@ -109,7 +109,7 @@ class CaseAssignmentServiceTest {
         void shouldAssignCaseAccess() {
 
             given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), anyString())).willReturn(true);
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
+            given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(CASE_ID))
                 .willReturn(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
 
             given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
@@ -128,7 +128,7 @@ class CaseAssignmentServiceTest {
         @DisplayName("should throw case could not be found error when case is not found")
         void shouldThrowCaseCouldNotBeFetchedException_whenCaseNotFound() {
 
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
+            given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(CASE_ID))
                 .willThrow(new CaseCouldNotBeFoundException(CASE_NOT_FOUND));
 
             assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))

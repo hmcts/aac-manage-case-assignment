@@ -26,7 +26,7 @@
         "OrganisationPolicyField2": {
           "OrgPolicyReference": "DefendantPolicy",
           "Organisation": {
-            "OrganisationID": "Org-Two",
+            "OrganisationID": "LESTKK0",
             "OrganisationName": "CCD Solicitors Limited"
           }
         }
@@ -47,7 +47,7 @@
         "OrganisationPolicyField2": {
           "OrgPolicyReference": "DefendantPolicy",
           "Organisation": {
-            "OrganisationID": "Org-Two",
+            "OrganisationID": "LESTKK0",
             "OrganisationName": "CCD Solicitors Limited"
           }
         }

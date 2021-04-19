@@ -16,6 +16,6 @@
     "headers": {
       "Content-Type": "application/json"
     },
-    "bodyFileName": "prd_users.json"
+    "bodyFileName": "prd_users_organisation_01.json"
   }
 }

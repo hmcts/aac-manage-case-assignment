@@ -1,0 +1,46 @@
+{
+  "_guid_": "S-208.4",
+  "_extends_": "S-208_Test_Data_Base",
+
+  "title": "Must return error if the ChangeOrganisationRequest.CaseRole is null",
+
+  "specs": [
+    "system user - with caseworker-caa IdAM role",
+    "intends to set up the OrganisationToRemove in the ChangeOrganisationRequest on behalf of the user",
+    "contains a case record for which the ChangeOrganisationRequest.CaseRole is null"
+  ],
+
+  "request": {
+    "body": {
+      "event_id": "nocRequest_setOrgToRemove",
+      "case_details": {
+        "id": "4444333322221111",
+        "jurisdiction": "BEFTA_MASTER",
+        "state": "open",
+        "case_type_id": "FT_MasterCaseType",
+        "data": {
+          "changeOrganisationRequestField": {
+            "CaseRoleId": null,
+            "RequestTimestamp" : "2020-02-20T06:30:00",
+            "OrganisationToAdd": {
+              "OrganisationID": "PUBLIC"
+            },
+            "OrganisationToRemove": {
+              "OrganisationID": null
+            },
+            "ApprovalStatus": "0"
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "status" : "BAD_REQUEST",
+      "message": "ChangeOrganisationRequest field could not be found or appears invalid",
+      "errors" : [ ]
+    }
+  }
+}

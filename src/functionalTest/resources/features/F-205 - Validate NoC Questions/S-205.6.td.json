@@ -1,0 +1,39 @@
+{
+  "_guid_": "S-205.6",
+  "_extends_": "S-205_Test_Data_Base",
+
+  "title": "NoC Answers must return an error response for a missing Case ID",
+
+  "specs" : [
+    "Dil - with a solicitor and pui-caseworker role",
+
+    "is made by Dil to validate the answers to the challenge questions in order to become a representative on a valid case number for which the case does not exist",
+    "does not contain any case ID",
+    "contains a structurally valid set of answers",
+    "contains a valid IDAM token for Dil"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "_extends_": "NoC_Valid_Answers_For_Case_Role_R1",
+      "case_id": ""
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body" : {
+      "message" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "code" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "errors" : [ "Case ID has to be 16-digits long", "Case ID has to be a valid 16-digit Luhn number", "Case ID can not be empty" ]
+    }
+  }
+
+}

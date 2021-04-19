@@ -1,0 +1,14 @@
+{
+  "_guid_" : "NoC_Valid_Answers_For_Case_Role_R1",
+
+  "answers": [
+    {
+      "question_id": "NoC_Challenge_Name",
+      "value": "Noronha"
+    },
+    {
+      "question_id": "NoC_Challenge_Name2",
+      "value": "1989-09-19"
+    }
+  ]
+}

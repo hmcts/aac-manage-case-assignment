@@ -1,0 +1,63 @@
+{
+  "_guid_": "S-207.2",
+  "_extends_": "Check_NoC_Approval__Base",
+
+  "title": "(Happy Path) Successful verification that checks a NoCRequest has been auto-approved - Case has not been configured with auto-approval.",
+
+  "specs": [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "system user - with caseworker-caa role",
+
+    "contains the case record for C1",
+    "is made by the system user (caseworker-caa IdAM role) to simulate a submitted callback from a NOC Request case event that has not been auto-approved"
+  ],
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
+  "request": {
+    "body": {
+      "event_id": "nocRequest_autoApproval",
+      "case_details": {
+        "id": "${[scenarioContext][childContexts][S-207.2-CaseCreation_NoCRequest_Pending][testData][actualResponse][body][id]}",
+        "jurisdiction": "BEFTA_MASTER",
+        "data": {
+          "changeOrganisationRequestField" : {
+            "CaseRoleId" :  {
+              "value" : {
+                "code" : "[RESPONDENTSOLICITOR]",
+                "label" : "Respondent Solicitor"
+              },
+              "list_items" : [ {
+                "code" : "[RESPONDENTSOLICITOR]",
+                "label" : "Respondent Solicitor"
+              } ]
+            },
+            "ApprovalStatus" : "0",
+            "RequestTimestamp": "2020-02-20T06:30:00",
+            "OrganisationToAdd" : {
+              "OrganisationID": "LESTKK0"
+            },
+            "OrganisationToRemove": {
+              "OrganisationID": null
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "confirmation_header": "Not yet approved",
+      "confirmation_body": "Not yet approved"
+    }
+  }
+}

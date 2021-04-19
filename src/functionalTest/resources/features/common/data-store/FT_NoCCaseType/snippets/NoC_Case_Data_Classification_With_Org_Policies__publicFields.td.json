@@ -1,0 +1,29 @@
+{
+  "_guid_": "NoC_Case_Data_Classification_With_Org_Policies__publicFields",
+  "_extends_": "NoC_Case_Data_Classification__publicFields",
+
+  "applicantOrganisationPolicy": {
+    "classification": "PUBLIC",
+    "value": {
+      "OrgPolicyReference": "PUBLIC",
+      "OrgPolicyCaseAssignedRole": "PUBLIC",
+      "Organisation": "[[ANY_NULLABLE]]"
+    }
+  },
+  "respondentOrganisationPolicy": {
+    "classification": "PUBLIC",
+    "value": {
+      "OrgPolicyReference": "PUBLIC",
+      "OrgPolicyCaseAssignedRole": "PUBLIC",
+      "Organisation": "[[ANY_NULLABLE]]"
+    }
+  },
+  "otherPartyOrganisationPolicy": {
+    "classification": "PUBLIC",
+    "value": {
+      "OrgPolicyReference": "PUBLIC",
+      "OrgPolicyCaseAssignedRole": "PUBLIC",
+      "Organisation": "[[ANY_NULLABLE]]"
+    }
+  }
+}

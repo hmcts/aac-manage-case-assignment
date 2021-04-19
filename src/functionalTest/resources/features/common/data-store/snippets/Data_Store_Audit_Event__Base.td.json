@@ -1,0 +1,27 @@
+{
+  "_guid_": "Data_Store_Audit_Event__Base",
+
+  "id" : "OVERRIDE EVENT ID",
+
+  "event_name" : "[[ANYTHING_PRESENT]]",
+  "summary" : "[[ANY_NULLABLE]]",
+  "description" : "[[ANY_NULLABLE]]",
+
+  "user_id" : "OVERRIDE UID",
+
+  "user_last_name" : "[[ANYTHING_PRESENT]]",
+  "user_first_name" : "[[ANYTHING_PRESENT]]",
+  "created_date": "[[ANYTHING_PRESENT]]",
+  "case_type_id" : "[[ANYTHING_PRESENT]]",
+  "case_type_version": "[[ANYTHING_PRESENT]]",
+  "state_id": "[[ANYTHING_PRESENT]]",
+  "state_name": "[[ANYTHING_PRESENT]]",
+  "data": "[[ANY_NULLABLE]]",
+  "data_classification": "[[ANY_NULLABLE]]",
+  "security_classification": "[[ANYTHING_PRESENT]]",
+  "significant_item": "[[ANY_NULLABLE]]",
+  "proxied_by" : "[[ANY_NULLABLE]]",
+  "proxied_by_last_name" : "[[ANY_NULLABLE]]",
+  "proxied_by_first_name" : "[[ANY_NULLABLE]]",
+  "security_classifications": "[[ANY_NULLABLE]]"
+}

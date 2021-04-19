@@ -1,0 +1,17 @@
+{
+  "_guid_": "NoC_Case_Data_Classification_With_Org_Policies",
+  "_extends_": "NoC_Case_Data_Classification_With_Org_Policies__publicFields",
+
+  "applicant": {
+    "value": {
+      "individual": {
+        "value": {
+          "FirstName": "RESTRICTED",
+          "MiddleName": "PRIVATE",
+          "DateOfBirth": "RESTRICTED",
+          "NationalInsuranceNumber": "PRIVATE"
+        }
+      }
+    }
+  }
+}

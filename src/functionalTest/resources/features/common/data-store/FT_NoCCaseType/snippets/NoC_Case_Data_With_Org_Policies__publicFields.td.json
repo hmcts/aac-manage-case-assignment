@@ -1,0 +1,27 @@
+{
+  "_guid_": "NoC_Case_Data_With_Org_Policies__publicFields",
+  "_extends_": "NoC_Case_Data__publicFields",
+
+  "applicantOrganisationPolicy": {
+    "OrgPolicyReference": "ApplicantPolicy",
+    "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
+    "Organisation": {
+      "OrganisationID": ""
+    }
+  },
+  "respondentOrganisationPolicy": {
+    "OrgPolicyReference": "RespondentPolicy",
+    "OrgPolicyCaseAssignedRole": "[RespondentSolicitor]",
+    "Organisation": {
+      "OrganisationID": ""
+    }
+  },
+  "otherPartyOrganisationPolicy": {
+    "OrgPolicyReference": "OtherPartyPolicy",
+    "OrgPolicyCaseAssignedRole": "[OtherPartySolicitor]",
+    "Organisation": {
+      "OrganisationID": ""
+    }
+  }
+
+}

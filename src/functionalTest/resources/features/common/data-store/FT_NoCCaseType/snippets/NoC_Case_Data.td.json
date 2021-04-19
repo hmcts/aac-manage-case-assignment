@@ -1,0 +1,13 @@
+{
+  "_guid_": "NoC_Case_Data",
+  "_extends_": "NoC_Case_Data__publicFields",
+
+  "applicant": {
+    "individual": {
+      "FirstName": "ashley",
+      "MiddleName": "dean",
+      "DateOfBirth": "1989-09-19",
+      "NationalInsuranceNumber": null
+    }
+  }
+}

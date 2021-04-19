@@ -1,0 +1,32 @@
+{
+  "_guid_" : "S-204.2",
+  "_extends_" : "S-204_Test_Data_Base",
+
+  "title": "NoC questions successfully returned for a Case Access Adminisrator",
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Matt"
+    }
+  },
+
+  "specs" : [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Matt - with a caseworker-pui role and no Solicitor role",
+
+    "is made by Matt to return the questions that need answering in order to become Mario's representative on C1",
+    "contains a valid case ID for C1",
+    "contains a valid IDAM token for Matt"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "_extends_": "NoC_Challenge_Questions_Response"
+    }
+  }
+
+}

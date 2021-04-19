@@ -1,0 +1,36 @@
+{
+  "_guid_": "F-207_Verify_NoCDecision_Event_Not_Created",
+  "_extends_": "Retrieve_Case_Events__Base",
+
+  "specs": [
+    "to verify that the NoCDecision event has not been successfully created"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Richard"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][parentContext][testData][request][body][case_details][id]}"
+    }
+  },
+
+
+  "expectedResponse": {
+    "body": {
+      "auditEvents": [
+        {
+          "_extends_": "Data_Store_Audit_Event__Base",
+          "id": "createCase",
+          "event_name": "Create Case",
+          "summary": "",
+          "description": "",
+          "user_id": "${[scenarioContext][testData][users][invokingUser][id]}"
+        }
+      ]
+    }
+  }
+}

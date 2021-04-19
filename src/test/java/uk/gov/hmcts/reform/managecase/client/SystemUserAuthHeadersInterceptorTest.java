@@ -34,7 +34,7 @@ class SystemUserAuthHeadersInterceptorTest {
     @Test
     @DisplayName("System user auth headers should apply")
     void shouldApplyAuthHeaders() {
-        given(securityUtils.getSystemUserToken()).willReturn(SYSTEM_USER_TOKEN);
+        given(securityUtils.getCaaSystemUserToken()).willReturn(SYSTEM_USER_TOKEN);
         given(securityUtils.getS2SToken()).willReturn(S2S_TOKEN);
 
         interceptor.apply(template);

@@ -1,0 +1,40 @@
+{
+  "_guid_": "S-205.2",
+  "_extends_": "S-205_Test_Data_Base",
+
+  "title": "NoC Answers successfully validated for a CAA",
+
+  "specs" : [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
+    "Matt - with a pui-CAA within a different organisation from Richard",
+
+    "the configuration for the case type of Case C1 is such that there is a NoCRequest event available to users with the IDAM ID Caseworker-CAA when the case is in the state established following case creation",
+
+    "is made by Matt to validate the answers provided to the NoC questions in order to become the representative for Mario on C1",
+    "contains all correct answers"
+  ],
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Matt"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "_extends_": "NoC_Valid_Answers_For_Case_Role_R1"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_" : "Common_200_Response",
+    "body" : {
+      "_extends_" : "NoC_Answers_Verification"
+    }
+  }
+
+}

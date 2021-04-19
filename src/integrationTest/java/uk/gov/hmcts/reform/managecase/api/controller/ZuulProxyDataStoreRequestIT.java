@@ -52,10 +52,10 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
         this.mockMvc.perform(post(PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
                                  .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
-                                 .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
+                                 .content(ES_QUERY))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))
-            .andExpect(jsonPath("$.cases[0].reference", is(TestFixtures.CASE_ID)));
+            .andExpect(jsonPath("$.cases[0].id", is(TestFixtures.CASE_ID)));
 
         verify(postRequestedFor(urlEqualTo("/o/token"))
                    .withRequestBody(containing("username=master.caa%40gmail.com")));
@@ -78,10 +78,10 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
         this.mockMvc.perform(post(PATH_INTERNAL)
                                  .contentType(MediaType.APPLICATION_JSON)
                                  .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
-                                 .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
+                                 .content(ES_QUERY))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))
-            .andExpect(jsonPath("$.cases[0].reference", is(TestFixtures.CASE_ID)));
+            .andExpect(jsonPath("$.cases[0].id", is(TestFixtures.CASE_ID)));
 
         verify(postRequestedFor(urlEqualTo("/o/token"))
                    .withRequestBody(containing("username=master.caa%40gmail.com")));
@@ -124,7 +124,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
         this.mockMvc.perform(post(PATH)
                                  .contentType(MediaType.APPLICATION_JSON)
                                  .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
-                                 .content("{\"query\": {\"match_all\": {}},\"size\": 50}"))
+                                 .content(ES_QUERY))
             .andExpect(status().isForbidden());
     }
 

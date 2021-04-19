@@ -1,0 +1,42 @@
+{
+	"_guid_": "NoC_Case_Creation__Base",
+	"_extends_": "Case_Creation__Base",
+
+	"request": {
+		"pathVariables": {
+			"jid": "BEFTA_MASTER",
+			"ctid": "FT_NoCCaseType"
+		},
+		"body": {
+			"event": {
+				"id": "createCase",
+				"summary": "",
+				"description": ""
+			},
+
+			"data": {
+				"_extends_": "NoC_Case_Data"
+			}
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"jurisdiction": "BEFTA_MASTER",
+			"case_type_id": "FT_NoCCaseType",
+			"state": "CaseCreated",
+
+			"case_data": {
+				"_extends_": "NoC_Case_Data__publicFields"
+			},
+
+			"data_classification": {
+				"_extends_": "NoC_Case_Data_Classification"
+			},
+
+			"security_classifications": {
+				"_extends_": "NoC_Case_Data_Classification"
+			}
+		}
+	}
+}

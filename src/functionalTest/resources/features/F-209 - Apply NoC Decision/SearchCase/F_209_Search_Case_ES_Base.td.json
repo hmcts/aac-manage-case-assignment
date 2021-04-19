@@ -1,0 +1,46 @@
+{
+  "_guid_": "F_209_Search_Case_ES_base",
+  "title": "External Elastic Search Endpoint",
+  "productName": "CCD Data Store Elastic Search API",
+  "operationName": "External Elastic Search Endpoint",
+  "method": "POST",
+  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/searchCases",
+  "specs": [
+    "a valid profile",
+    "is configured to search for the previously created case",
+    "does not explicitly request supplementary_data",
+    "to verify that the supplementary counter has been adjusted to reflect the reduction in the number of users who have access to the case in Richard's organisation",
+    "contains supplementary data",
+    "to verify that the supplementary counter remains unchanged for Dil's organisation",
+    "to verify that the supplementary counter remains unchanged for Richards organisation"
+  ],
+  "user" : {
+    "_extends_": "ACA_Users_Caseworker_CAA"
+  },
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ctid": "${[scenarioContext][ParentContext][childContexts][F-209_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][case_type_id]}"
+    },
+    "body": {
+      "native_es_query" : {
+        "query": {
+          "match": {
+            "reference": "${[scenarioContext][ParentContext][childContexts][F-209_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}"
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body":{
+      "total" : 1,
+      "case_types_results" : [ {
+        "total" : 1,
+        "case_type_id" : "FT_NoCCaseType"
+      } ]
+    }
+  }
+}

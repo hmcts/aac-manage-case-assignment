@@ -51,6 +51,7 @@ public class WiremockFixtures {
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     public static final String SYS_USER_TOKEN = "Bearer eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9aa";
     public static final String APPROVER_USER_TOKEN = "Bearer eyJzdWIiOiJjY6ShZ3ciLCJleHAiOlD1OEM0NDUyOTd7co";
+    public static final String INVOKING_USER_TOKEN = "Bearer eyJzdWIiOiJjY6ShZ3ciLCJleHAiOlD1OEM0NDUyOTd9bb";
     public static final String S2S_TOKEN = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9"
         + ".WWRzROlKxLQCJw5h0h0dHb9hHfbBhF2Idwv1z4L4FnqSw3VZ38ZRLuDmwr3tj-8oOv6EfLAxV0dJAPtUT203Iw";
 
@@ -302,7 +303,6 @@ public class WiremockFixtures {
 
     public static void stubGetCaseDetailsByCaseIdViaExternalApi(String caseId, CaseDetails caseDetails) {
         stubFor(WireMock.get(urlEqualTo(CASES + caseId))
-                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
                                     .withStatus(caseDetails == null ? HTTP_NOT_FOUND : HTTP_OK)

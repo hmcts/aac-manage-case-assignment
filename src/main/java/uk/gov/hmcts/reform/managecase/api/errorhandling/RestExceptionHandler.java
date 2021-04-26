@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCApiConstraintError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,22 +44,25 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return toResponseEntity(status, null, errors);
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+        log.debug("ConstraintViolationException exception:", ex);
+        String[] errors = ex.getConstraintViolations().stream()
+            .map(ConstraintViolation::getMessage)
+            .toArray(String[]::new);
+        return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Object> handleAccessDeniedException(Exception ex) {
+    public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
         log.warn("Access denied due to:", ex);
         return toResponseEntity(HttpStatus.FORBIDDEN, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<Object> handleValidationException(Exception ex) {
+    public ResponseEntity<Object> handleValidationException(ValidationException ex) {
         log.error("Validation exception:", ex);
         return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
-    }
-
-    @ExceptionHandler(CaseCouldNotBeFetchedException.class)
-    public ResponseEntity<Object> handleCaseCouldNotBeFetchedException(CaseCouldNotBeFetchedException ex) {
-        log.error("Data Store errors: {}", ex.getMessage(), ex);
-        return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(CaseCouldNotBeFoundException.class)
@@ -74,8 +79,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<Object> handleFeignStatusException(FeignException ex) {
-        log.error("Downstream service errors: {}", ex.getMessage(), ex);
-        return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
+        String errorMessage = ex.responseBody()
+            .map(res -> new String(res.array(), StandardCharsets.UTF_8))
+            .orElse(ex.getMessage());
+        log.error("Downstream service errors: {}", errorMessage, ex);
+        return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
     }
 
     @ExceptionHandler(Exception.class)
@@ -107,14 +115,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 String message = exception.substring(4);
                 String code = NoCValidationError.getCodeFromMessage(message);
                 String[] errors = convertNoCErrors(errorsToConvert);
-                if ((errorsToConvert.length > 1)) {
-                    NoCApiError apiError = new NoCApiError(status, message, code, List.of(errors));
-                    return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
-                } else {
-                    NoCApiConstraintError apiError = new NoCApiConstraintError(status, code, List.of(errors)
-                    );
-                    return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
-                }
+                NoCApiError apiError = new NoCApiError(status, message, code, List.of(errors));
+                return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
             }
         }
         return null;

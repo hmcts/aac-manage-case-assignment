@@ -175,7 +175,7 @@ dependencyManagement {
     dependencySet(group: 'org.apache.logging.log4j', version: '2.13.2') {
       entry 'log4j-api'
     }
-    // CVE-2020-11996, CVE-2020-13934
+    // CVE-2021-25122
     dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.43') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
@@ -231,6 +231,8 @@ ext.libraries = [
 
 dependencies {
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+  implementation group: 'commons-io', name: 'commons-io', version: '2.8.0'
+
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'

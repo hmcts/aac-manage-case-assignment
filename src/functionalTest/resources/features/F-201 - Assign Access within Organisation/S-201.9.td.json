@@ -18,9 +18,9 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "ACA_500_Response",
+		"_extends_": "ACA_404_Response",
 		"body": {
-			"message": "Case could not be fetched",
+			"message": "Case could not be found",
 			"errors": []
 		}
 	}

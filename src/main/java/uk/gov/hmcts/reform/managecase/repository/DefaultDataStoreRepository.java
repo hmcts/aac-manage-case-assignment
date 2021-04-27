@@ -209,7 +209,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
             if (asSystemUser) {
                 return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(securityUtils.getCaaSystemUserToken(), caseId);
             } else {
-                return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(securityUtils.getUserToken(), caseId);
+                return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(securityUtils.getUserBearerToken(), caseId);
             }
         } catch (FeignException e) {
             if (HttpStatus.NOT_FOUND.value() == e.status()) {

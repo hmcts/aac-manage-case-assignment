@@ -111,7 +111,7 @@ class DataStoreRepositoryTest {
             .caseTypeId(CASE_TYPE_ID)
             .id(CASE_ID)
             .build();
-        given(securityUtils.getUserToken()).willReturn(USER_TOKEN);
+        given(securityUtils.getUserBearerToken()).willReturn(USER_TOKEN);
         given(dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN, CASE_ID)).willReturn(caseDetails);
 
         // ACT
@@ -126,7 +126,7 @@ class DataStoreRepositoryTest {
     @DisplayName("find case by id as an invoking user using external facing API return no cases")
     void shouldReturnNoCaseForFindCaseByCaseIdUsingExternalApi() {
         // ARRANGE
-        given(securityUtils.getUserToken()).willReturn(USER_TOKEN);
+        given(securityUtils.getUserBearerToken()).willReturn(USER_TOKEN);
         given(dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN, CASE_ID)).willReturn(null);
 
         // ACT
@@ -141,7 +141,7 @@ class DataStoreRepositoryTest {
     @DisplayName("find case by id as an invoking user using external facing API throws CaseCouldNotBeFetchedException")
     void shouldThrowCaseCouldNotBeFetchedExceptionForFindCaseByCaseIdUsingExternalApi() {
         // ARRANGE
-        given(securityUtils.getUserToken()).willReturn(USER_TOKEN);
+        given(securityUtils.getUserBearerToken()).willReturn(USER_TOKEN);
         given(dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN, CASE_ID))
             .willThrow(new FeignException.NotFound("404",
                                                    Request.create(Request.HttpMethod.GET, "someUrl", Map.of(),

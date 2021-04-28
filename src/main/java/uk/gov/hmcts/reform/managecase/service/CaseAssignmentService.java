@@ -32,8 +32,6 @@ import static java.util.stream.Collectors.toList;
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 public class CaseAssignmentService {
 
-    public static final String CASE_COULD_NOT_BE_FETCHED = "Case could not be fetched";
-
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
     private final IdamRepository idamRepository;
@@ -55,8 +53,8 @@ public class CaseAssignmentService {
 
     @SuppressWarnings("PMD")
     public List<String> assignCaseAccess(CaseAssignment assignment) {
-
-        CaseDetails caseDetails = getCase(assignment);
+        List<String> invokingUserRoles = securityUtils.getUserInfo().getRoles();
+        CaseDetails caseDetails = getCaseDetails(assignment, invokingUserRoles);
 
         FindUsersByOrganisationResponse usersByOrg = prdRepository.findUsersByOrganisation();
         if (!isAssigneePresent(usersByOrg.getUsers(), assignment.getAssigneeId())) {
@@ -193,8 +191,12 @@ public class CaseAssignmentService {
                 .build();
     }
 
-    private CaseDetails getCase(CaseAssignment input) {
-        return dataStoreRepository.findCaseByCaseIdUsingExternalApi(input.getCaseId());
+    private CaseDetails getCaseDetails(CaseAssignment assignment, List<String> userRoles) {
+        if (securityUtils.hasSolicitorRole(userRoles)) {
+            return dataStoreRepository.findCaseByCaseIdUsingExternalApi(assignment.getCaseId());
+        } else {
+            return dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(assignment.getCaseId());
+        }
     }
 
     private List<String> findInvokerOrgPolicyRoles(CaseDetails caseDetails, String organisation) {

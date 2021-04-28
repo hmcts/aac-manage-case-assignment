@@ -10,6 +10,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
@@ -39,11 +40,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.usersByOrganisation;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 
 @SuppressWarnings({"PMD.MethodNamingConventions",
     "PMD.JUnitAssertionsShouldIncludeMessage",
@@ -58,6 +59,8 @@ class CaseAssignmentServiceTest {
     private static final String CASE_ID2 = "87654321";
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
     private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";
+    private static final String PROBATE_SOLICITOR_ROLE = "caseworker-probate-solicitor";
+    private static final String PUI_CAA_ROLE = "pui-caa";
     private static final String CASE_ROLE = "[CR1]";
     private static final String CASE_ROLE2 = "[CR2]";
     private static final String ORGANIZATION_ID = "TEST_ORG";
@@ -97,6 +100,8 @@ class CaseAssignmentServiceTest {
                 .willReturn(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
             given(prdRepository.findUsersByOrganisation())
                 .willReturn(usersByOrganisation(user(ASSIGNEE_ID)));
+            given(securityUtils.getUserInfo()).willReturn(userInfoWithRole(PROBATE_SOLICITOR_ROLE));
+            given(securityUtils.hasSolicitorRole(anyList())).willReturn(true);
 
             UserDetails userDetails = UserDetails.builder()
                 .id(ASSIGNEE_ID).roles(List.of("caseworker-AUTOTEST1-solicitor")).build();
@@ -110,6 +115,28 @@ class CaseAssignmentServiceTest {
 
             given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), anyString())).willReturn(true);
             given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(CASE_ID))
+                .willReturn(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
+
+            given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
+                .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE))
+                .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE2));
+
+            List<String> roles = service.assignCaseAccess(caseAssignment);
+
+            assertThat(roles).containsExactly(ORG_POLICY_ROLE, ORG_POLICY_ROLE2);
+
+            verify(dataStoreRepository)
+                .assignCase(List.of(ORG_POLICY_ROLE, ORG_POLICY_ROLE2), CASE_ID, ASSIGNEE_ID, ORGANIZATION_ID);
+        }
+
+        @Test
+        @DisplayName("should assign case in the organisation when invoked by non solicitor user")
+        void shouldAssignCaseAccessWhenInvokedByNonSolicitorUser() {
+
+            given(securityUtils.getUserInfo()).willReturn(userInfoWithRole(PUI_CAA_ROLE));
+            given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), anyString())).willReturn(true);
+            given(securityUtils.hasSolicitorRole(anyList())).willReturn(false);
+            given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(CASE_ID))
                 .willReturn(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
 
             given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
@@ -160,6 +187,10 @@ class CaseAssignmentServiceTest {
             assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining(ValidationError.ASSIGNEE_ROLE_ERROR);
+        }
+
+        private UserInfo userInfoWithRole(String puiCaaRole) {
+            return UserInfo.builder().name("Jon").roles(List.of(puiCaaRole)).build();
         }
     }
 

@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.managecase.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ import static java.util.stream.Collectors.toList;
 @Service
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 public class CaseAssignmentService {
+    private static final Logger LOG = LoggerFactory.getLogger(CaseAssignmentService.class);
 
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
@@ -52,9 +55,8 @@ public class CaseAssignmentService {
     }
 
     @SuppressWarnings("PMD")
-    public List<String> assignCaseAccess(CaseAssignment assignment) {
-        List<String> invokingUserRoles = securityUtils.getUserInfo().getRoles();
-        CaseDetails caseDetails = getCaseDetails(assignment, invokingUserRoles);
+    public List<String> assignCaseAccess(CaseAssignment assignment, boolean useUserToken) {
+        CaseDetails caseDetails = getCaseDetails(assignment, useUserToken);
 
         FindUsersByOrganisationResponse usersByOrg = prdRepository.findUsersByOrganisation();
         if (!isAssigneePresent(usersByOrg.getUsers(), assignment.getAssigneeId())) {
@@ -191,10 +193,12 @@ public class CaseAssignmentService {
                 .build();
     }
 
-    private CaseDetails getCaseDetails(CaseAssignment assignment, List<String> userRoles) {
-        if (securityUtils.hasSolicitorRole(userRoles)) {
+    private CaseDetails getCaseDetails(CaseAssignment assignment, boolean useUserToken) {
+        if (useUserToken) {
+            LOG.debug("GET CaseDetails called using user token");
             return dataStoreRepository.findCaseByCaseIdUsingExternalApi(assignment.getCaseId());
         } else {
+            LOG.debug("GET CaseDetails called using system user");
             return dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(assignment.getCaseId());
         }
     }

@@ -23,6 +23,22 @@ Feature: F-201: Assign Access within Organisation
       And a call [by S2 to query his/her case roles granted over C1] will get the expected response as in [F-201_S2_Querying_Their_Access_Over_C1].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  @S-201.1b
+  Scenario: Solicitor successfully sharing case access with another solicitor in their org (happy path) called with use_user_token to fetch case details
+
+    Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],
+      And a user [S2 - another solicitor in the same organisation, with whom S1 will share a case with an assignment within organisation],
+      And a case [C1, which S1 has just] created as in [F-201_Prerequisite_Case_Creation_C1],
+
+     When a request is prepared with appropriate values,
+      And the request [is to be invoked by S1 to assign access over C1 for S2 within the same organisation],
+      And it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
+
+     Then a positive response is received,
+      And the response has all other details as expected,
+      And a call [by S2 to query his/her case roles granted over C1] will get the expected response as in [F-201_S2_Querying_Their_Access_Over_C1].
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-201.2
   Scenario: PUI CAA successfully sharing case access with another solicitor in their org (happy path)
 
@@ -38,6 +54,23 @@ Feature: F-201: Assign Access within Organisation
      Then a positive response is received,
       And the response has all other details as expected,
       And a call [by S2 to query his/her case roles granted over C1] will get the expected response as in [F-201_S2_Querying_Their_Access_Over_C1].
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  @S-201.2b
+  Scenario: Must return an error response if PUI CAA tries to share a case access with another solicitor in their org called with use_user_token, but has no case access
+
+    Given a user [S1 - a solicitor, to create a case under their organisation],
+      And a user [S2 - another solicitor in the same organisation, with whom a CAA will share a case with an assignment within organisation],
+      And a user [CAA - a PUI case access admin, to share a case with a solicitor in the same organisation],
+      And a case [C1, which S1 has just] created as in [F-201_Prerequisite_Case_Creation_C1],
+
+    When a request is prepared with appropriate values,
+      And the request [is to be invoked by CAA to assign access over C1 for S2 within the same organisation],
+      And it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
+
+    Then a negative response is received,
+      And the response has all the details as expected,
+      And a call [by S2 to query his/her case roles granted over C1] will get the expected response as in [F-201_S2_Querying_No_Access_Over_C1].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-201.3

@@ -261,7 +261,7 @@ dependencies {
   implementation "org.springframework.security:spring-security-config:5.3.8.RELEASE"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.3.8.RELEASE"
-  implementation "com.nimbusds:nimbus-jose-jwt:7.9"
+  implementation "com.nimbusds:nimbus-jose-jwt:9.9"
   implementation "net.minidev:json-smart:2.3"
   implementation "io.github.openfeign:feign-httpclient:11.0"
   implementation "com.github.ben-manes.caffeine:caffeine:2.7.0"

@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.managecase.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -31,8 +33,7 @@ import static java.util.stream.Collectors.toList;
 @Service
 @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 public class CaseAssignmentService {
-
-    public static final String CASE_COULD_NOT_BE_FETCHED = "Case could not be fetched";
+    private static final Logger LOG = LoggerFactory.getLogger(CaseAssignmentService.class);
 
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
@@ -54,9 +55,8 @@ public class CaseAssignmentService {
     }
 
     @SuppressWarnings("PMD")
-    public List<String> assignCaseAccess(CaseAssignment assignment) {
-
-        CaseDetails caseDetails = getCase(assignment);
+    public List<String> assignCaseAccess(CaseAssignment assignment, boolean useUserToken) {
+        CaseDetails caseDetails = getCaseDetails(assignment, useUserToken);
 
         FindUsersByOrganisationResponse usersByOrg = prdRepository.findUsersByOrganisation();
         if (!isAssigneePresent(usersByOrg.getUsers(), assignment.getAssigneeId())) {
@@ -193,8 +193,14 @@ public class CaseAssignmentService {
                 .build();
     }
 
-    private CaseDetails getCase(CaseAssignment input) {
-        return dataStoreRepository.findCaseByCaseIdExternalApi(input.getCaseId());
+    private CaseDetails getCaseDetails(CaseAssignment assignment, boolean useUserToken) {
+        if (useUserToken) {
+            LOG.debug("GET CaseDetails called using user token");
+            return dataStoreRepository.findCaseByCaseIdUsingExternalApi(assignment.getCaseId());
+        } else {
+            LOG.debug("GET CaseDetails called using system user");
+            return dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(assignment.getCaseId());
+        }
     }
 
     private List<String> findInvokerOrgPolicyRoles(CaseDetails caseDetails, String organisation) {

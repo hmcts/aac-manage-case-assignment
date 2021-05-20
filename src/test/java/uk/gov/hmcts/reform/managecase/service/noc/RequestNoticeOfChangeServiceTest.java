@@ -123,7 +123,7 @@ class RequestNoticeOfChangeServiceTest {
 
         caseDetails = CaseDetails.builder().id(CASE_ID).data(new HashMap<>()).build();
 
-        given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
+        given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(CASE_ID)).willReturn(caseDetails);
 
         List<CaseRole> caseRoles = List.of(CaseRole.builder().id(CASE_ASSIGNED_ROLE).name(DYNAMIC_LIST_LABEL).build());
         given(definitionStoreRepository.caseRoles(anyString(), anyString(), anyString())).willReturn(caseRoles);
@@ -199,7 +199,6 @@ class RequestNoticeOfChangeServiceTest {
         updateCaseDetailsData(caseDetails, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
 
         given(jacksonUtils.convertValue(any(), any())).willReturn(changeOrganisationRequest);
-        given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
 
         RequestNoticeOfChangeResponse requestNoticeOfChangeResponse =
             service.requestNoticeOfChange(noCRequestDetails);
@@ -223,8 +222,6 @@ class RequestNoticeOfChangeServiceTest {
             .willReturn(organisationPolicies.get(0))
             .willReturn(organisationPolicies.get(1))
             .willReturn(organisationPolicies.get(2));
-
-        given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
 
         RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
             = service.requestNoticeOfChange(noCRequestDetails);
@@ -269,8 +266,6 @@ class RequestNoticeOfChangeServiceTest {
             .willReturn(organisationPolicies.get(1))
             .willReturn(organisationPolicies.get(2))
             .willReturn(invokersOrganisationPolicy);
-
-        given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
     }
 
     @Test

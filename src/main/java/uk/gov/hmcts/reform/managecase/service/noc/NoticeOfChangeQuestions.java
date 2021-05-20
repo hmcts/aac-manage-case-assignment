@@ -71,7 +71,7 @@ public class NoticeOfChangeQuestions {
         CaseViewResource caseViewResource = dataStoreRepository.findCaseByCaseId(caseId);
         checkForCaseEvents(caseViewResource);
 
-        CaseDetails caseDetails = dataStoreRepository.findCaseByCaseIdExternalApi(caseId);
+        CaseDetails caseDetails = dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(caseId);
         checkCaseFields(caseDetails);
         validateUserRoles(caseDetails.getJurisdiction(), getUserInfo());
         ChallengeQuestionsResult challengeQuestionsResult =

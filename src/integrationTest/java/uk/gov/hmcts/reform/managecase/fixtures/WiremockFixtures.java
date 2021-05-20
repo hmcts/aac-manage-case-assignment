@@ -302,7 +302,6 @@ public class WiremockFixtures {
 
     public static void stubGetCaseDetailsByCaseIdViaExternalApi(String caseId, CaseDetails caseDetails) {
         stubFor(WireMock.get(urlEqualTo(CASES + caseId))
-                    .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
                     .willReturn(aResponse()
                                     .withStatus(caseDetails == null ? HTTP_NOT_FOUND : HTTP_OK)

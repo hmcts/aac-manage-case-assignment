@@ -39,11 +39,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.usersByOrganisation;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 
 @SuppressWarnings({"PMD.MethodNamingConventions",
     "PMD.JUnitAssertionsShouldIncludeMessage",
@@ -93,10 +93,11 @@ class CaseAssignmentServiceTest {
         void setUp() {
             caseAssignment = new CaseAssignment(CASE_TYPE_ID, CASE_ID, ASSIGNEE_ID);
 
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
+            given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(CASE_ID))
                 .willReturn(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
             given(prdRepository.findUsersByOrganisation())
                 .willReturn(usersByOrganisation(user(ASSIGNEE_ID)));
+            given(securityUtils.hasSolicitorRole(anyList())).willReturn(true);
 
             UserDetails userDetails = UserDetails.builder()
                 .id(ASSIGNEE_ID).roles(List.of("caseworker-AUTOTEST1-solicitor")).build();
@@ -109,29 +110,53 @@ class CaseAssignmentServiceTest {
         void shouldAssignCaseAccess() {
 
             given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), anyString())).willReturn(true);
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
+            given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(CASE_ID))
                 .willReturn(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
 
             given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
                 .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE))
                 .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE2));
 
-            List<String> roles = service.assignCaseAccess(caseAssignment);
+            List<String> roles = service.assignCaseAccess(caseAssignment, true);
 
             assertThat(roles).containsExactly(ORG_POLICY_ROLE, ORG_POLICY_ROLE2);
 
             verify(dataStoreRepository)
                 .assignCase(List.of(ORG_POLICY_ROLE, ORG_POLICY_ROLE2), CASE_ID, ASSIGNEE_ID, ORGANIZATION_ID);
+            verify(dataStoreRepository)
+                .findCaseByCaseIdUsingExternalApi(CASE_ID);
+        }
+
+        @Test
+        @DisplayName("should assign case in the organisation when invoked by non solicitor user")
+        void shouldAssignCaseAccessWhenInvokedByNonSolicitorUser() {
+
+            given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), anyString())).willReturn(true);
+            given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(CASE_ID))
+                .willReturn(caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
+
+            given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
+                .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE))
+                .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE2));
+
+            List<String> roles = service.assignCaseAccess(caseAssignment, false);
+
+            assertThat(roles).containsExactly(ORG_POLICY_ROLE, ORG_POLICY_ROLE2);
+
+            verify(dataStoreRepository)
+                .assignCase(List.of(ORG_POLICY_ROLE, ORG_POLICY_ROLE2), CASE_ID, ASSIGNEE_ID, ORGANIZATION_ID);
+            verify(dataStoreRepository)
+                .findCaseByCaseIdAsSystemUserUsingExternalApi(CASE_ID);
         }
 
         @Test
         @DisplayName("should throw case could not be found error when case is not found")
         void shouldThrowCaseCouldNotBeFetchedException_whenCaseNotFound() {
 
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID))
+            given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(CASE_ID))
                 .willThrow(new CaseCouldNotBeFoundException(CASE_NOT_FOUND));
 
-            assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
+            assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment, true))
                 .isInstanceOf(CaseCouldNotBeFoundException.class)
                 .hasMessageContaining(CASE_NOT_FOUND);
         }
@@ -143,7 +168,7 @@ class CaseAssignmentServiceTest {
             given(prdRepository.findUsersByOrganisation())
                 .willReturn(usersByOrganisation(user(ANOTHER_USER)));
 
-            assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
+            assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment, true))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining(ValidationError.ASSIGNEE_ORGANISATION_ERROR);
         }
@@ -157,7 +182,7 @@ class CaseAssignmentServiceTest {
 
             given(idamRepository.getUserByUserId(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
 
-            assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment))
+            assertThatThrownBy(() -> service.assignCaseAccess(caseAssignment, true))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining(ValidationError.ASSIGNEE_ROLE_ERROR);
         }

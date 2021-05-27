@@ -1,0 +1,33 @@
+{
+	"_guid_": "F-201-Base-useUserToken",
+	"title": "Solicitor successfully sharing case access with another solicitor in their org (happy path)",
+
+	"productName": "Manage Case Assignment Microservice",
+	"operationName": "Assign Access within Organisation",
+
+	"method": "POST",
+	"uri": "/case-assignments?use_user_token=true",
+
+	"s2sClientId": "xui_webapp",
+	"userTokenClientId": "xuiwebapp",
+
+	"users": {
+		"S1": {
+			"username": "befta.master.solicitor.becky@gmail.com",
+			"password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
+		},
+		"S2": {
+			"username": "befta.master.solicitor.benjamin@gmail.com",
+			"password": "[[$CCD_BEFTA_MASTER_SOLICITOR_2_PWD]]"
+		}
+	},
+
+	"request": {
+		"_extends_": "Common_Request",
+		"body": {
+			"case_type_id": "${[scenarioContext][childContexts][F-201_Prerequisite_Case_Creation_C1][testData][actualResponse][body][case_type_id]}",
+			"case_id": "${[scenarioContext][childContexts][F-201_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+			"assignee_id": "${[scenarioContext][testData][users][S2][id]}"
+		}
+	}
+}

@@ -30,5 +30,7 @@ public interface DataStoreRepository {
 
     CaseDetails submitEventForCase(String caseId, CaseEventCreationPayload caseEventCreationPayload);
 
-    CaseDetails findCaseByCaseIdExternalApi(String caseId);
+    CaseDetails findCaseByCaseIdUsingExternalApi(String caseId);
+
+    CaseDetails findCaseByCaseIdAsSystemUserUsingExternalApi(String caseId);
 }

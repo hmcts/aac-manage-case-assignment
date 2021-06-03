@@ -5,7 +5,7 @@ import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFetchedException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
-import static uk.gov.hmcts.reform.managecase.service.CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED;
 
 @Repository("defaultDataStoreRepository")
 @SuppressWarnings({"PMD.PreserveStackTrace", "PMD.DataflowAnomalyAnalysis",
@@ -45,20 +45,10 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     static final String CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID = "Failed to create ChangeOrganisationRequest"
         + " because of missing case field id";
 
-
-    public static final String ES_QUERY = "{\n"
-        + "   \"query\":{\n"
-        + "      \"bool\":{\n"
-        + "         \"filter\":{\n"
-        + "            \"term\":{\n"
-        + "               \"reference\":%s\n"
-        + "            }\n"
-        + "         }\n"
-        + "      }\n"
-        + "   }\n"
-        + "}";
-
     public static final String CHANGE_ORGANISATION_REQUEST = "ChangeOrganisationRequest";
+    public static final String INCOMPLETE_CALLBACK = "INCOMPLETE_CALLBACK";
+    public static final String CALLBACK_FAILED_ERRORS_MESSAGE =
+        "Submitted callback failed. Please check data-store-api logs";
 
     private final DataStoreApiClient dataStoreApi;
     private final JacksonUtils jacksonUtils;
@@ -75,7 +65,14 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
     @Override
     public CaseViewResource findCaseByCaseId(String caseId) {
-        return dataStoreApi.getCaseDetailsByCaseId(getUserAuthToken(), caseId);
+        try {
+            return dataStoreApi.getCaseDetailsByCaseId(getUserAuthToken(), caseId);
+        } catch (FeignException ex) {
+            if (HttpStatus.NOT_FOUND.value() == ex.status()) {
+                throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
+            }
+            throw ex;
+        }
     }
 
     protected String getUserAuthToken() {
@@ -125,7 +122,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     @Override
     public CaseDetails submitEventForCase(String caseId, CaseEventCreationPayload caseEventCreationPayload) {
         String userAuthToken = getUserAuthToken();
-        return dataStoreApi.submitEventForCase(userAuthToken, caseId, caseEventCreationPayload);
+        return submitEvent(caseId, caseEventCreationPayload, userAuthToken);
     }
 
     @Override
@@ -166,7 +163,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                     .data(getCaseDataContentData(caseFieldId, changeOrganisationRequest, caseData))
                     .build();
 
-                caseDetails = dataStoreApi.submitEventForCase(userAuthToken, caseId, caseEventCreationPayload);
+                caseDetails = submitEvent(caseId, caseEventCreationPayload, userAuthToken);
             } else {
                 throw new IllegalStateException(CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID);
             }
@@ -198,16 +195,28 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     }
 
     @Override
-    public CaseDetails findCaseByCaseIdExternalApi(String caseId) {
-        CaseDetails caseDetails = null;
+    public CaseDetails findCaseByCaseIdUsingExternalApi(String caseId) {
+        return findCaseByCaseIdExternalApi(caseId, false);
+    }
+
+    @Override
+    public CaseDetails findCaseByCaseIdAsSystemUserUsingExternalApi(String caseId) {
+        return findCaseByCaseIdExternalApi(caseId, true);
+    }
+
+    private CaseDetails findCaseByCaseIdExternalApi(String caseId, boolean asSystemUser) {
         try {
-            caseDetails = dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(caseId);
+            if (asSystemUser) {
+                return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(securityUtils.getCaaSystemUserToken(), caseId);
+            } else {
+                return dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(securityUtils.getUserBearerToken(), caseId);
+            }
         } catch (FeignException e) {
             if (HttpStatus.NOT_FOUND.value() == e.status()) {
-                throw new CaseCouldNotBeFetchedException(CASE_COULD_NOT_BE_FETCHED);
+                throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
             }
+            throw e;
         }
-        return caseDetails;
     }
 
     private Map<String, JsonNode> getCaseDataContentData(String caseFieldId,
@@ -220,4 +229,14 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
         jacksonUtils.merge(data, caseDetailsData);
         return caseDetailsData;
     }
+
+    private CaseDetails submitEvent(String caseId, CaseEventCreationPayload caseEventCreationPayload,
+                                    String userAuthToken) {
+        CaseDetails caseDetails = dataStoreApi.submitEventForCase(userAuthToken, caseId, caseEventCreationPayload);
+        if (INCOMPLETE_CALLBACK.equalsIgnoreCase(caseDetails.getCallbackResponseStatus())) {
+            throw new RuntimeException(CALLBACK_FAILED_ERRORS_MESSAGE);
+        }
+        return caseDetails;
+    }
+
 }

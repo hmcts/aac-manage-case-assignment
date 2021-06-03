@@ -34,6 +34,7 @@ import javax.validation.ValidationException;
 import javax.validation.constraints.NotEmpty;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -97,14 +98,15 @@ public class CaseAssignmentController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE
         ),
         @ApiResponse(
-            code = 500,
-            message = CaseAssignmentService.CASE_COULD_NOT_BE_FETCHED
+            code = 404,
+            message = ValidationError.CASE_NOT_FOUND
         )
     })
     public CaseAssignmentResponse assignAccessWithinOrganisation(
-            @Valid @RequestBody CaseAssignmentRequest requestPayload) {
+            @Valid @RequestBody CaseAssignmentRequest requestPayload,
+            @RequestParam(name = "use_user_token", required = false) Optional<Boolean> useUserToken) {
         CaseAssignment caseAssignment = mapper.map(requestPayload, CaseAssignment.class);
-        List<String> roles = caseAssignmentService.assignCaseAccess(caseAssignment);
+        List<String> roles = caseAssignmentService.assignCaseAccess(caseAssignment, useUserToken.orElse(false));
         return new CaseAssignmentResponse(String.format(ASSIGN_ACCESS_MESSAGE, StringUtils.join(roles, ',')));
     }
 

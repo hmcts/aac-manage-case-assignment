@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
+import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -35,8 +37,11 @@ import uk.gov.hmcts.reform.managecase.domain.UserDetails;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -45,6 +50,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
@@ -89,7 +96,7 @@ public class CaseAssignmentControllerTest {
     @DisplayName("POST /case-assignments")
     @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
     class AssignAccessWithinOrganisation extends BaseMvcTest {
-
+        private static final String USE_USER_TOKEN_PARAM = "use_user_token=true";
         private CaseAssignmentRequest request;
 
         @BeforeEach
@@ -102,12 +109,12 @@ public class CaseAssignmentControllerTest {
         void directCallHappyPath() { // created to avoid IDE warnings in controller class that function is never used
             // ARRANGE
             List<String> roles = List.of("Role1", "Role2");
-            given(service.assignCaseAccess(any(CaseAssignment.class))).willReturn(roles);
+            given(service.assignCaseAccess(any(CaseAssignment.class), anyBoolean())).willReturn(roles);
 
             CaseAssignmentController controller = new CaseAssignmentController(service, new ModelMapper());
 
             // ACT
-            CaseAssignmentResponse response = controller.assignAccessWithinOrganisation(request);
+            CaseAssignmentResponse response = controller.assignAccessWithinOrganisation(request, Optional.of(false));
 
             // ASSERT
             assertThat(response).isNotNull();
@@ -119,7 +126,7 @@ public class CaseAssignmentControllerTest {
         @Test
         void shouldAssignCaseAccess() throws Exception {
             List<String> roles = List.of("Role1", "Role2");
-            given(service.assignCaseAccess(any(CaseAssignment.class))).willReturn(roles);
+            given(service.assignCaseAccess(any(CaseAssignment.class), anyBoolean())).willReturn(roles);
 
             this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -139,7 +146,21 @@ public class CaseAssignmentControllerTest {
                 .andExpect(status().isCreated());
 
             ArgumentCaptor<CaseAssignment> captor = ArgumentCaptor.forClass(CaseAssignment.class);
-            verify(service).assignCaseAccess(captor.capture());
+            verify(service).assignCaseAccess(captor.capture(), eq(false));
+            assertThat(captor.getValue().getCaseId()).isEqualTo(CASE_ID);
+            assertThat(captor.getValue().getAssigneeId()).isEqualTo(ASSIGNEE_ID);
+        }
+
+        @DisplayName("should delegate to service domain for a valid request with provided use_user_token request param")
+        @Test
+        void shouldDelegateToServiceDomainWithProvidedUseUserTokenParam() throws Exception {
+            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH + "?" + USE_USER_TOKEN_PARAM)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+
+            ArgumentCaptor<CaseAssignment> captor = ArgumentCaptor.forClass(CaseAssignment.class);
+            verify(service).assignCaseAccess(captor.capture(), eq(true));
             assertThat(captor.getValue().getCaseId()).isEqualTo(CASE_ID);
             assertThat(captor.getValue().getAssigneeId()).isEqualTo(ASSIGNEE_ID);
         }
@@ -254,6 +275,25 @@ public class CaseAssignmentControllerTest {
                 .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles", hasSize(2)))
                 .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles[0]", is(TestFixtures.CASE_ROLE)))
                 .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles[1]", is(TestFixtures.CASE_ROLE2)));
+        }
+
+        @DisplayName("should return 500 when downstream throws FeignException for get case assignments")
+        @Test
+        void shouldReturn500ErrorWhenDownstreamCallFailed() throws Exception {
+            String caseIds = "1588234985453946";
+            Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null,
+                                             Charset.defaultCharset(), null
+            );
+            given(service.getCaseAssignments(List.of(caseIds)))
+                .willThrow(new FeignException.NotFound("404", request, "data store failure".getBytes()));
+
+            this.mockMvc.perform(get(CASE_ASSIGNMENTS_PATH)
+                                     .queryParam("case_ids", caseIds))
+                .andExpect(status().is5xxServerError())
+                .andExpect(jsonPath(
+                    "$.message",
+                    containsString("data store failure")
+                ));
         }
 
         @DisplayName("should fail with 400 bad request when caseIds query param is not passed")

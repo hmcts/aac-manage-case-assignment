@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
+import org.hibernate.validator.constraints.LuhnCheck;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCApiError;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
@@ -46,6 +48,7 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.util.Optional;
 
 import static java.util.Collections.singletonList;
@@ -178,9 +181,14 @@ public class NoticeOfChangeController {
         )
     })
     public ChallengeQuestionsResult getNoticeOfChangeQuestions(@RequestParam("case_id")
-                                                               @Valid @NotEmpty(message = CASE_ID_EMPTY)
-                                                                       String caseId) {
-        validateCaseIds(caseId);
+                                                               @Valid
+                                                               @NotEmpty(message = NoCValidationError.NOC_CASE_ID_EMPTY)
+                                                               @Size(min = 16, max = 16, message =
+                                                                   NoCValidationError.NOC_CASE_ID_INVALID_LENGTH)
+                                                               @LuhnCheck(message =
+                                                                   NoCValidationError.NOC_CASE_ID_INVALID,
+                                                                   ignoreNonDigitCharacters = false)
+                                                                   String caseId) {
         return noticeOfChangeQuestions.getChallengeQuestions(caseId);
     }
 
@@ -403,12 +411,6 @@ public class NoticeOfChangeController {
             .securityClassification(aboutToStartCallbackRequest.getCaseDetails().getSecurityClassification())
             .dataClassification(aboutToStartCallbackRequest.getCaseDetails().getDataClassification())
             .build();
-    }
-
-    private void validateCaseIds(String caseId) {
-        if (!StringUtils.isNumeric(caseId)) {
-            throw new ValidationException("Case ID should contain digits only");
-        }
     }
 
     @PostMapping(path = REQUEST_NOTICE_OF_CHANGE_PATH, produces = APPLICATION_JSON_VALUE)

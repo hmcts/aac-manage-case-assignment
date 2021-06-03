@@ -3,9 +3,6 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
-import feign.FeignException;
-import feign.Request;
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -36,7 +33,6 @@ import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +47,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicyJsonNode;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_REQUEST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INSUFFICIENT_PRIVILEGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
@@ -140,7 +136,7 @@ class NoticeOfChangeQuestionsTest {
 
             CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).caseTypeId(CASE_TYPE_ID).data(data).build();
 
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
+            given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(CASE_ID)).willReturn(caseDetails);
             given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
                 .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE));
 
@@ -252,7 +248,7 @@ class NoticeOfChangeQuestionsTest {
             CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).data(data).build();
 
             // external case by id
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
+            given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(CASE_ID)).willReturn(caseDetails);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(NoCException.class)
@@ -280,7 +276,7 @@ class NoticeOfChangeQuestionsTest {
             CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).data(data).build();
 
             // external case by id
-            given(dataStoreRepository.findCaseByCaseIdExternalApi(CASE_ID)).willReturn(caseDetails);
+            given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(CASE_ID)).willReturn(caseDetails);
 
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(NoCException.class)
@@ -383,41 +379,10 @@ class NoticeOfChangeQuestionsTest {
             given(securityUtils.getUserInfo()).willReturn(userInfo);
             given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), any())).willReturn(true);
             given(dataStoreRepository.findCaseByCaseId(CASE_ID))
-                .willThrow(createFeignException(HttpStatus.SC_NOT_FOUND));
+                .willThrow(new CaseCouldNotBeFoundException(CASE_NOT_FOUND));
             assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID))
                 .isInstanceOf(CaseCouldNotBeFoundException.class)
                 .hasMessageContaining(ValidationError.CASE_NOT_FOUND);
-        }
-
-        private FeignException createFeignException(int httpStatus) {
-            Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(),
-                                             null, Charset.defaultCharset(), null);
-            String httpStatusString = Integer.toString(httpStatus);
-            FeignException returnValue = null;
-            switch (httpStatus) {
-                case HttpStatus.SC_NOT_FOUND:
-                    returnValue = new FeignException.NotFound(httpStatusString, request, null);
-                    break;
-                case HttpStatus.SC_BAD_REQUEST:
-                    returnValue = new FeignException.BadRequest(httpStatusString, request, null);
-                    break;
-            }
-            return returnValue;
-        }
-
-        @Test
-        @DisplayName("Must return an error response for case id with invalid Luhn id")
-        void shouldThrowErrorInvalidCaseLuhnId() {
-            UserInfo userInfo = new UserInfo("", "", "", "", "",
-                                             Arrays.asList("caseworker-test", "caseworker-Jurisdiction-solicit")
-            );
-            given(securityUtils.getUserInfo()).willReturn(userInfo);
-            given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), any())).willReturn(true);
-            given(dataStoreRepository.findCaseByCaseId(CASE_ID + "$%^"))
-                .willThrow(createFeignException(HttpStatus.SC_BAD_REQUEST));
-            assertThatThrownBy(() -> service.getChallengeQuestions(CASE_ID + "$%^"))
-                .isInstanceOf(NoCException.class)
-                .hasMessageContaining(CASE_ID_INVALID);
         }
     }
 }

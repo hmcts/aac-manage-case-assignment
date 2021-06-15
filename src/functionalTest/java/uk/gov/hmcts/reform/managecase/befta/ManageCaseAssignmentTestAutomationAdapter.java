@@ -11,6 +11,11 @@ import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
     private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this,

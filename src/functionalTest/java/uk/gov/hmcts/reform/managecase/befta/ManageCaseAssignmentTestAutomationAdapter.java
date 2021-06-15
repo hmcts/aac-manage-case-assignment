@@ -4,18 +4,12 @@ import uk.gov.hmcts.befta.BeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultBeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
-import uk.gov.hmcts.befta.exception.FunctionalTestException;
-import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
-import uk.gov.hmcts.befta.util.ReflectionUtils;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import uk.gov.hmcts.befta.BeftaMain;
 
 public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
-    private final TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
+    private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this,
+            "uk/gov/hmcts/ccd/test_definitions/valid", BeftaMain.getConfig().getDefinitionStoreUrl());
 
     @Override
     public BeftaTestDataLoader getDataLoader() {

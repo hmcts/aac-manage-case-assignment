@@ -28,6 +28,7 @@
   <suppress>
     <notes>Temporary suppression</notes>
     <cve>CVE-2021-22112</cve>
+    <cve>CVE-2021-22118</cve>
   </suppress>
 
 </suppressions>

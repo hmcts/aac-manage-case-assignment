@@ -278,7 +278,7 @@ dependencies {
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.4.5"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.4.5"
   implementation "io.github.openfeign:feign-httpclient:11.0"
-
+  testCompile 'io.github.openfeign:feign-jackson:10.7.0'
   testCompile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
   compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
   implementation "com.github.ben-manes.caffeine:caffeine:2.7.0"

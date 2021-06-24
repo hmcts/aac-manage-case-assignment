@@ -147,7 +147,7 @@ public class NoticeOfChangeControllerTest {
     @Nested
     @DisplayName("GET /noc/noc-questions")
     @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
-    class GetNoticeOfChangeQuestions extends BaseMvcTest {
+    class GetNoticeOfChangeQuestions {
 
         @Nested
         @DisplayName("GET /noc/noc-questions")

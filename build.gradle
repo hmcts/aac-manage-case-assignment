@@ -318,10 +318,14 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.5.5'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.3.RELEASE'
 
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE"
+  implementation "com.nimbusds:nimbus-jose-jwt:7.9"
+  implementation "net.minidev:json-smart:2.3"
   implementation "org.springframework.security:spring-security-web:5.4.5"
   implementation "org.springframework.security:spring-security-config:5.4.5"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.4.5"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.4.5"
+
   implementation "io.github.openfeign:feign-httpclient:11.0"
   testCompile 'io.github.openfeign:feign-jackson:10.7.0'
   testCompile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'

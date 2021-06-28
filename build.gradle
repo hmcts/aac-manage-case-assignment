@@ -316,7 +316,7 @@ dependencies {
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.5.5'
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.3.RELEASE'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.8.RELEASE'
 
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE"
   implementation "com.nimbusds:nimbus-jose-jwt:7.9"

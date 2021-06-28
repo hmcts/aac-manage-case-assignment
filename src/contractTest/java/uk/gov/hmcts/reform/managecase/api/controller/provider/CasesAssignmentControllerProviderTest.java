@@ -98,7 +98,7 @@ public class CasesAssignmentControllerProviderTest {
 
         given(prdRepository.findUsersByOrganisation())
             .willReturn(usersByOrganisation(user(ASSIGNEE_ID)));
-        given(dataStoreRepository.findCaseByCaseIdExternalApi(anyString()))
+        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(anyString()))
             .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
 
         given(securityUtils.hasSolicitorRole(anyList())).willReturn(true);

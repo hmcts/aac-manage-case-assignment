@@ -3,6 +3,7 @@
 @Library("Infrastructure")
 
 import uk.gov.hmcts.contino.GradleBuilder
+import uk.gov.hmcts.contino.AppPipelineDsl
 
 def product = "aac"
 def component = "manage-case-assignment"
@@ -70,6 +71,7 @@ def vaultOverrides = [
 // Assume a feature build branched off 'develop', with dependencies develop-to-develop.
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
 env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${dataStoreApiDevelopPr}.service.core-compute-preview.internal".toLowerCase()
+env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${env.BRANCH_NAME}.service.core-compute-preview.internal".toLowerCase()
 
 // Other env variables needed for BEFTA.
 env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
@@ -103,6 +105,7 @@ withPipeline("java", product, component) {
   }
   onMaster {
     enableSlackNotifications('#ccd-master-builds')
+    enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
   }
 
   onDemo {
@@ -110,6 +113,7 @@ withPipeline("java", product, component) {
   }
   onPR {
     enableSlackNotifications('#ccd-pr-builds')
+    enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
   }
 
   // Check if the build should be wired to an environment higher than 'preview'.
@@ -121,25 +125,17 @@ withPipeline("java", product, component) {
       }
       env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
       env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
+      env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
   }
 
   echo "FTA will use Definition Store: ${env.DEFINITION_STORE_HOST}"
+  echo "   ... published with MCA URL: ${env.MCA_API_BASE_URL}"
 
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
 
   enableAksStagingDeployment()
   disableLegacyDeployment()
-
-  before('smoketest:preview') {
-    env.MCA_API_BASE_URL = env.TEST_URL.replace("https", "http")
-    echo "   ... published with MCA URL: ${env.MCA_API_BASE_URL}"
-  }
-
-  before('smoketest:aat') {
-    env.MCA_API_BASE_URL = env.TEST_URL.replace("https", "http")
-    echo "   ... published with MCA URL: ${env.MCA_API_BASE_URL}"
-  }
 
   after('smoketest:preview') {
     copyIgnore('./build/reports/tests/befta/smoke/cucumber-html-reports', './BEFTA Report for Smoke Tests/')

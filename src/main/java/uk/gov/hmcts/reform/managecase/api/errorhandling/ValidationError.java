@@ -62,8 +62,8 @@ public final class ValidationError {
         "Access to other user's case role assignments not granted";
 
     public static final String R_A_NOT_FOUND_FOR_CASE_AND_USER =
-        "No Role Assignments found for userIds=%s and casesIds=%s when getting from " +
-            "Role Assignment Service because of %s";
+        "No Role Assignments found for userIds=%s and casesIds=%s when getting from "
+            + "Role Assignment Service because of %s";
 
     public static final String ROLE_ASSIGNMENTS_CLIENT_ERROR =
         "Client error when getting Role Assignments from Role Assignment Service because of %s";

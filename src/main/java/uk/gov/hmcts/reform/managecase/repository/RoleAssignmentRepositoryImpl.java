@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.BadRequestException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ResourceNotFoundException;
@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.R
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ROLE_ASSIGNMENT_SERVICE_ERROR;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.R_A_NOT_FOUND_FOR_CASE_AND_USER;
 
-@Repository
+@Service
 public class RoleAssignmentRepositoryImpl implements RoleAssignmentRepository {
 
     private final RestTemplate restTemplate;

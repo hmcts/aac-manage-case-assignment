@@ -8,14 +8,15 @@ import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentAttributes;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleType;
-import uk.gov.hmcts.reform.managecase.repository.NocApprovalDataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.RoleAssignmentRepository;
+import uk.gov.hmcts.reform.managecase.service.AccessControl;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class RoleAssignmentService {
+public class RoleAssignmentService implements AccessControl {
+
     private final RoleAssignmentRepository roleAssignmentRepository;
     private final RoleAssignmentsMapper roleAssignmentsMapper;
 

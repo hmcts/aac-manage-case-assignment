@@ -56,6 +56,20 @@ public final class ValidationError {
         + "both an OrganisationToAdd and OrganisationToRemove field.";
     public static final String COR_MISSING = "No field of type ChangeOrganisationRequest found.";
 
+    public static final String EMPTY_CASE_ID_LIST = "Case ID list is empty";
+    public static final String USER_ID_INVALID = "User ID is not valid";
+    public static final String OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED =
+        "Access to other user's case role assignments not granted";
+
+    public static final String R_A_NOT_FOUND_FOR_CASE_AND_USER =
+        "No Role Assignments found for userIds=%s and casesIds=%s when getting from " +
+            "Role Assignment Service because of %s";
+
+    public static final String ROLE_ASSIGNMENTS_CLIENT_ERROR =
+        "Client error when getting Role Assignments from Role Assignment Service because of %s";
+    public static final String ROLE_ASSIGNMENT_SERVICE_ERROR =
+        "Problem getting Role Assignments from Role Assignment Service because of %s";
+
     // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     private ValidationError() {
     }

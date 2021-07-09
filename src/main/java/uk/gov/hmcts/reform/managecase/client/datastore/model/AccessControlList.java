@@ -57,7 +57,7 @@ public class AccessControlList implements Serializable {
 
     @JsonIgnore
     public AccessControlList duplicate() {
-        var dup = new AccessControlList();
+        AccessControlList dup = new AccessControlList();
         dup.setRole(role);
         dup.setCreate(create);
         dup.setRead(read);

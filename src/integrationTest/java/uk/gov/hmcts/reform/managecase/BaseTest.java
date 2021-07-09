@@ -41,7 +41,7 @@ public class BaseTest {
 
     @BeforeEach
     void init() {
-        Jwt jwt = dummyJwt();
+        var jwt = dummyJwt();
         when(authentication.getPrincipal()).thenReturn(jwt);
         SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
     }

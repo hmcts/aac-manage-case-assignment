@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoleAssignments {
-    private List<RoleAssignment> roleAssignments;
+    private List<RoleAssignment> roleAssignmentsList;
 
     @JsonIgnore
     public List<String> getJurisdictions() {
-        return roleAssignments.stream()
+        return roleAssignmentsList.stream()
             .map(RoleAssignment::getAttributes)
             .filter(Objects::nonNull)
             .map(RoleAssignmentAttributes::getJurisdiction)

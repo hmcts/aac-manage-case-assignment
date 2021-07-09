@@ -93,6 +93,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 
+
     private String[] convertNoCErrors(String[] errors) {
         List<String> errorList = Arrays.asList(errors);
         for (String error : errorList) {

@@ -18,10 +18,10 @@ public class UIDService {
      * @return A randomly generated, valid, UID.
      */
     public String generateUID() {
-        String currentTime10OfSeconds = String.valueOf(System.currentTimeMillis()).substring(0, 11);
-        StringBuilder builder = new StringBuilder(currentTime10OfSeconds);
-        for (int i = 0; i < 4; i++) {
-            int digit = random.nextInt(10);
+        var currentTime10OfSeconds = String.valueOf(System.currentTimeMillis()).substring(0, 11);
+        var builder = new StringBuilder(currentTime10OfSeconds);
+        for (var i = 0; i < 4; i++) {
+            var digit = random.nextInt(10);
             builder.append(digit);
         }
         // Do the Luhn algorithm to generate the check digit.
@@ -35,7 +35,7 @@ public class UIDService {
      * Validate a number string using Luhn algorithm.
      *
      * @param numberString number string to process
-     * @return
+     * @return true or false
      */
     public boolean validateUID(String numberString) {
         if (numberString == null || numberString.length() != 16) {
@@ -57,7 +57,7 @@ public class UIDService {
      * holder is already appended at end of the string.
      *
      * @param numberString number string to process
-     * @return
+     * @return check digit
      */
     public int checkSum(String numberString) {
         return checkSum(numberString, false);
@@ -69,19 +69,19 @@ public class UIDService {
      * @param numberString number string to process
      * @param noCheckDigit Whether check digit is present or not. True if no check Digit
      *                     is appended.
-     * @return
+     * @return chech digit
      */
     public int checkSum(String numberString, boolean noCheckDigit) {
-        int sum = 0;
-        int checkDigit = 0;
+        var sum = 0;
+        var checkDigit = 0;
 
         if (!noCheckDigit) {
             numberString = numberString.substring(0, numberString.length() - 1);
         }
 
-        boolean isDouble = true;
+        var isDouble = true;
         for (int i = numberString.length() - 1; i >= 0; i--) {
-            int k = Integer.parseInt(String.valueOf(numberString.charAt(i)));
+            var k = Integer.parseInt(String.valueOf(numberString.charAt(i)));
             sum += sumToSingleDigit((k * (isDouble ? 2 : 1)));
             isDouble = !isDouble;
         }

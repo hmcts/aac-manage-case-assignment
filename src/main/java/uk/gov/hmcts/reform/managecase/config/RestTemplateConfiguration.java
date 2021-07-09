@@ -41,9 +41,8 @@ public class RestTemplateConfiguration {
 
     @Bean(name = "restTemplate")
     public RestTemplate restTemplate() {
-        final RestTemplate restTemplate = new RestTemplate();
-        HttpComponentsClientHttpRequestFactory requestFactory =
-            new HttpComponentsClientHttpRequestFactory(getHttpClient());
+        final var restTemplate = new RestTemplate();
+        var requestFactory = new HttpComponentsClientHttpRequestFactory(getHttpClient());
         requestFactory.setReadTimeout(readTimeout);
         LOG.info("readTimeout: {}", readTimeout);
         restTemplate.setRequestFactory(requestFactory);

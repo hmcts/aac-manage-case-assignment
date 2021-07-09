@@ -107,7 +107,7 @@ public class CaseAssignedUserRolesController {
         });
 
         if (errorMessages.size() > 1) {
-            String message = String.join("\n", errorMessages);
+            var message = String.join("\n", errorMessages);
             throw new BadRequestException(message);
         }
     }

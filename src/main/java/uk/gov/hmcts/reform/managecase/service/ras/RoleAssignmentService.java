@@ -5,17 +5,14 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentAttributes;
-import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
-import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleType;
 import uk.gov.hmcts.reform.managecase.repository.RoleAssignmentRepository;
-import uk.gov.hmcts.reform.managecase.service.AccessControl;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class RoleAssignmentService implements AccessControl {
+public class RoleAssignmentService {
 
     private final RoleAssignmentRepository roleAssignmentRepository;
     private final RoleAssignmentsMapper roleAssignmentsMapper;
@@ -28,12 +25,12 @@ public class RoleAssignmentService implements AccessControl {
     }
 
     public List<CaseAssignedUserRole> findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
-        final RoleAssignmentResponse roleAssignmentResponse =
+        final var roleAssignmentResponse =
             roleAssignmentRepository.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
 
-        final RoleAssignments roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
+        final var roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
         var caseIdError = new RuntimeException(RoleAssignmentAttributes.ATTRIBUTE_NOT_DEFINED);
-        return roleAssignments.getRoleAssignments().stream()
+        return roleAssignments.getRoleAssignmentsList().stream()
             .filter(roleAssignment -> isValidRoleAssignment(roleAssignment))
             .map(roleAssignment ->
                      new CaseAssignedUserRole(

@@ -83,7 +83,7 @@ public class SecurityUtils {
     }
 
     public HttpHeaders authorizationHeaders() {
-        final HttpHeaders headers = new HttpHeaders();
+        final var headers = new HttpHeaders();
         headers.add(SERVICE_AUTHORIZATION, authTokenGenerator.generate());
         headers.add("user-id", getUserId());
         headers.add("user-roles", getUserRolesHeader());

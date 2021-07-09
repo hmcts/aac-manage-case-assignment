@@ -40,7 +40,7 @@ public class RoleAssignmentRepositoryImpl implements RoleAssignmentRepository {
     public RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
         try {
             final var roleAssignmentQuery = new RoleAssignmentQuery(caseIds, userIds);
-            final var requestEntity = new HttpEntity(roleAssignmentQuery, securityUtils.authorizationHeaders());
+            final var requestEntity = new HttpEntity<>(roleAssignmentQuery, securityUtils.authorizationHeaders());
             return restTemplate.exchange(
                 applicationParams.amQueryRoleAssignmentsURL(),
                 HttpMethod.POST,
@@ -48,7 +48,7 @@ public class RoleAssignmentRepositoryImpl implements RoleAssignmentRepository {
                 RoleAssignmentResponse.class).getBody();
 
         } catch (Exception exception) {
-            final ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(
+            final var resourceNotFoundException = new ResourceNotFoundException(
                 String.format(R_A_NOT_FOUND_FOR_CASE_AND_USER, userIds, caseIds, exception.getMessage())
             );
             throw mapException(exception, resourceNotFoundException);

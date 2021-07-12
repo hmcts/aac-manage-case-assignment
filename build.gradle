@@ -7,6 +7,7 @@ plugins {
   id 'com.github.ben-manes.versions' version '0.28.0'
   id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.23'
   id 'org.sonarqube' version '2.8'
+  id 'au.com.dius.pact' version '4.1.7'
 }
 
 ext['spring-security.version'] = '5.4.5'
@@ -37,6 +38,15 @@ sourceSets {
       srcDir file('src/integrationTest/java')
     }
     resources.srcDir file('src/integrationTest/resources')
+  }
+
+  contractTest {
+    java {
+      compileClasspath += main.output
+      runtimeClasspath += main.output
+      srcDir file('src/contractTest/java')
+    }
+    resources.srcDir file('src/contractTest/resources')
   }
 
 }
@@ -137,6 +147,41 @@ jacocoTestReport {
   }
 }
 
+project.ext {
+  pactVersion = getCheckedOutGitCommitHash()
+}
+
+task contract(type: Test) {
+  description = 'Runs the consumer Pact tests'
+  useJUnitPlatform()
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  include "uk/gov/hmcts/reform/managecase/api/controller/provider/**"
+
+}
+
+task runProviderPactVerification(type: Test) {
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
+  systemProperty 'pact.provider.version', project.pactVersion
+}
+
+runProviderPactVerification.finalizedBy pactVerify
+
+def getCheckedOutGitCommitHash() {
+  'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
+
+pact {
+  publish {
+    pactDirectory = 'pacts'
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    tags = [System.getenv("PACT_BRANCH_NAME") ?:'Dev']
+    version = project.pactVersion
+  }
+}
+
 project.tasks['sonarqube'].dependsOn jacocoTestReport
 
 sonarqube {
@@ -220,7 +265,8 @@ def versions = [
   springBoot      : springBoot.class.package.implementationVersion,
   springfoxSwagger: '3.0.0',
   restAssured    : '4.3.1',
-  lombok  : '1.18.8'
+  lombok  : '1.18.8',
+  pact_version    : '4.1.7',
 ]
 
 ext.libraries = [
@@ -248,7 +294,6 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
   implementation group: 'commons-io', name: 'commons-io', version: '2.8.0'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.1'
-
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
@@ -317,6 +362,27 @@ dependencies {
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
+
+  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
+  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
+  contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
+  contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
+  contractTestImplementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'
+
+  contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
+  contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
+  contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
+  contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.0")
+  contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.0')
+  contractTestRuntimeOnly "org.junit.platform:junit-platform-commons:1.7.0"
+  contractTestImplementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.5.5'
+  contractTestImplementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
+  contractTestImplementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  contractTestImplementation sourceSets.main.runtimeClasspath
+  contractTestImplementation sourceSets.test.runtimeClasspath
+
 
 }
 

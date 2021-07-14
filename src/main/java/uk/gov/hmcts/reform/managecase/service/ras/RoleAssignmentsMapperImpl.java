@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.managecase.service.ras;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment.RoleAssignmentBuilder;
-import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentAttributes.RoleAssignmentAttributesBuilder;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentAttributes;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentAttributes.RoleAssignmentAttributesBuilder;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentAttributesResource;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResource;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments.RoleAssignmentsBuilder;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -34,7 +33,7 @@ public class RoleAssignmentsMapperImpl implements RoleAssignmentsMapper {
 
     protected List<RoleAssignment> roleAssignmentResourceListToRoleAssignmentList(List<RoleAssignmentResource> list) {
         if (list == null) {
-            return Collections.emptyList();
+            return null;
         }
 
         List<RoleAssignment> list1 = new ArrayList<>(list.size());

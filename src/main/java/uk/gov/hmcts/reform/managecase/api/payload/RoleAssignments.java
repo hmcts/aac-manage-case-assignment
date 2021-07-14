@@ -1,15 +1,11 @@
 package uk.gov.hmcts.reform.managecase.api.payload;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Builder
 @Data
@@ -18,16 +14,4 @@ import java.util.stream.Collectors;
 public class RoleAssignments {
     private List<RoleAssignment> roleAssignmentsList;
 
-    @JsonIgnore
-    public List<String> getJurisdictions() {
-        return roleAssignmentsList.stream()
-            .map(RoleAssignment::getAttributes)
-            .filter(Objects::nonNull)
-            .map(RoleAssignmentAttributes::getJurisdiction)
-            .filter(Objects::nonNull)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .distinct()
-            .collect(Collectors.toList());
-    }
 }

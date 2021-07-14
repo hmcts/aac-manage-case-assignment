@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments.RoleAssignmentsBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -33,7 +34,7 @@ public class RoleAssignmentsMapperImpl implements RoleAssignmentsMapper {
 
     protected List<RoleAssignment> roleAssignmentResourceListToRoleAssignmentList(List<RoleAssignmentResource> list) {
         if (list == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         List<RoleAssignment> list1 = new ArrayList<>(list.size());

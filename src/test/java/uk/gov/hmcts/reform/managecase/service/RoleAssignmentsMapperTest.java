@@ -24,6 +24,7 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @DisplayName("RoleAssignmentMapperTest")
@@ -98,11 +99,7 @@ public class RoleAssignmentsMapperTest {
                 () -> assertThat(roleAssignments.get(1).getAttributes().getCaseType(),
                                  is(roleAssignment2.getAttributes().getCaseType())),
                 () -> assertThat(roleAssignments.get(1).getAttributes().getContractType(),
-                                 is(roleAssignment2.getAttributes().getContractType())),
-                () -> assertThat(roleAssignments.get(1).getAttributes().getLocation(),
-                                 is(roleAssignment2.getAttributes().getLocation())),
-                () -> assertThat(roleAssignments.get(1).getAttributes().getRegion(),
-                                 is(roleAssignment2.getAttributes().getRegion()))
+                                 is(roleAssignment2.getAttributes().getContractType()))
             );
         }
 
@@ -118,7 +115,7 @@ public class RoleAssignmentsMapperTest {
             RoleAssignments mapped = instance.toRoleAssignments(response);
 
             List<RoleAssignment> roleAssignments = mapped.getRoleAssignmentsList();
-            assertNull(roleAssignments);
+            assertEquals(0, roleAssignments.size());
         }
 
         @Test

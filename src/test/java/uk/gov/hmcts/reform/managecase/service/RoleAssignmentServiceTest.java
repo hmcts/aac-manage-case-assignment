@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
 
 class RoleAssignmentServiceTest {
@@ -61,7 +61,7 @@ class RoleAssignmentServiceTest {
         final List<CaseAssignedUserRole> caseAssignedUserRole =
             roleAssignmentService.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
 
-        assertTrue(caseAssignedUserRole.size() == 2);
+        assertEquals(2, caseAssignedUserRole.size());
         assertThat(caseAssignedUserRole.get(0).getCaseDataId(), is(CASE_ID));
     }
 

@@ -29,12 +29,12 @@ import java.util.Optional;
  *
  */
 public class  RoleAssignmentAttributesResource implements Serializable {
-    private static final long serialVersionUID = -8907666789404292869L;
+    private static final long serialVersionUID = 7106266789404292869L;
 
-    Optional<String> jurisdiction;
-    Optional<String> caseType;
-    Optional<String> caseId;
-    Optional<String> region;
-    Optional<String> location;
-    Optional<String> contractType;
+    private Optional<String> jurisdiction;
+    private Optional<String> caseType;
+    private Optional<String> caseId;
+    private Optional<String> region;
+    private Optional<String> location;
+    private Optional<String> contractType;
 }

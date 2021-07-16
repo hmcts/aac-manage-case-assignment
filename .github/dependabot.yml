@@ -1,0 +1,55 @@
+version: 2
+updates:
+- package-ecosystem: gradle
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: org.modelmapper:modelmapper
+    versions:
+    - 2.3.9
+    - 2.4.0
+    - 2.4.1
+  - dependency-name: com.nimbusds:nimbus-jose-jwt
+    versions:
+    - 9.4.2
+    - "9.5"
+    - "9.6"
+    - "9.7"
+    - "9.8"
+    - 9.8.1
+  - dependency-name: org.springframework.cloud:spring-cloud-starter-netflix-zuul
+    versions:
+    - 2.2.6.RELEASE
+    - 2.2.7.RELEASE
+  - dependency-name: org.codehaus.groovy:groovy-nio
+    versions:
+    - 3.0.7
+  - dependency-name: org.codehaus.groovy:groovy-json
+    versions:
+    - 3.0.7
+  - dependency-name: org.codehaus.groovy:groovy-xml
+    versions:
+    - 3.0.7
+  - dependency-name: org.codehaus.groovy:groovy
+    versions:
+    - 3.0.7
+  - dependency-name: org.springframework.cloud:spring-cloud-starter-contract-stub-runner
+    versions:
+    - 3.0.1
+  - dependency-name: org.apache.logging.log4j:log4j-api
+    versions:
+    - 2.14.0
+  - dependency-name: com.netflix.servo:servo-core
+    versions:
+    - 0.13.0
+  - dependency-name: org.junit.jupiter:junit-jupiter-params
+    versions:
+    - 5.7.0
+  - dependency-name: org.junit.jupiter:junit-jupiter-engine
+    versions:
+    - 5.7.0
+  - dependency-name: org.junit.jupiter:junit-jupiter-api
+    versions:
+    - 5.7.0

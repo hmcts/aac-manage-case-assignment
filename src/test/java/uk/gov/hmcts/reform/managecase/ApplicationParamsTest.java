@@ -20,4 +20,15 @@ class ApplicationParamsTest {
 
     }
 
+    @Test
+    public void shouldGetAmQueryRoleAssignmentsURL() {
+        final var roleAssignmentServiceHost = "test-value";
+        final var baseUrl = roleAssignmentServiceHost + "/am/role-assignments/query";
+
+        ReflectionTestUtils.setField(applicationParams, "roleAssignmentServiceHost", roleAssignmentServiceHost);
+
+        assertEquals(baseUrl, applicationParams.amQueryRoleAssignmentsURL());
+
+    }
+
 }

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.managecase.repository;
+package uk.gov.hmcts.reform.managecase.service.ras;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
@@ -22,15 +22,15 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.R
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.R_A_NOT_FOUND_FOR_CASE_AND_USER;
 
 @Service
-public class RoleAssignmentRepositoryImpl implements RoleAssignmentRepository {
+public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHelper {
 
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
 
-    public RoleAssignmentRepositoryImpl(@Qualifier("restTemplate") final RestTemplate restTemplate,
-                                        final ApplicationParams applicationParams,
-                                        final SecurityUtils securityUtils) {
+    public RoleAssignmentServiceHelperImpl(@Qualifier("restTemplate") final RestTemplate restTemplate,
+                                           final ApplicationParams applicationParams,
+                                           final SecurityUtils securityUtils) {
         this.restTemplate = restTemplate;
         this.applicationParams = applicationParams;
         this.securityUtils = securityUtils;

@@ -1,10 +1,10 @@
-package uk.gov.hmcts.reform.managecase.repository;
+package uk.gov.hmcts.reform.managecase.service.ras;
 
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
 
 import java.util.List;
 
-public interface RoleAssignmentRepository {
+public interface RoleAssignmentServiceHelper {
 
     RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds);
 }

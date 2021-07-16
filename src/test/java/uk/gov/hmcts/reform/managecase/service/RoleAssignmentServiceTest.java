@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentAttributes;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleType;
-import uk.gov.hmcts.reform.managecase.repository.RoleAssignmentRepository;
+import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentServiceHelper;
 import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentService;
 import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentsMapper;
 
@@ -27,7 +27,7 @@ import static org.mockito.BDDMockito.given;
 class RoleAssignmentServiceTest {
 
     @Mock
-    private RoleAssignmentRepository roleAssignmentRepository;
+    private RoleAssignmentServiceHelper roleAssignmentServiceHelper;
 
     @Mock
     private RoleAssignmentsMapper roleAssignmentsMapper;
@@ -43,16 +43,17 @@ class RoleAssignmentServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
-        roleAssignmentService = new RoleAssignmentService(roleAssignmentRepository,
-                                                          roleAssignmentsMapper);
+        roleAssignmentService = new RoleAssignmentService(
+            roleAssignmentServiceHelper,
+            roleAssignmentsMapper);
     }
 
     @Test
     public void shouldGetRoleAssignmentsByCasesAndUsers() {
 
-        given(roleAssignmentRepository.findRoleAssignmentsByCasesAndUsers(caseIds, userIds))
+        given(roleAssignmentServiceHelper.findRoleAssignmentsByCasesAndUsers(caseIds, userIds))
             .willReturn(mockedRoleAssignmentResponse);
 
         given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))

@@ -14,7 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.reform.managecase.repository.RoleAssignmentRepository;
+import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentServiceHelper;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.service.common.UIDService;
 
@@ -36,7 +36,7 @@ public abstract class BaseTest {
     protected UIDService uidService;
 
     @Inject
-    protected RoleAssignmentRepository roleAssignmentRepository;
+    protected RoleAssignmentServiceHelper roleAssignmentServiceHelper;
 
     @Inject
     protected SecurityUtils securityUtils;
@@ -52,7 +52,7 @@ public abstract class BaseTest {
     @BeforeEach
     public void initMock() throws IOException {
         MockitoAnnotations.initMocks(this);
-        ReflectionTestUtils.setField(roleAssignmentRepository, "securityUtils", securityUtils);
+        ReflectionTestUtils.setField(roleAssignmentServiceHelper, "securityUtils", securityUtils);
         setupUIDService();
 
 

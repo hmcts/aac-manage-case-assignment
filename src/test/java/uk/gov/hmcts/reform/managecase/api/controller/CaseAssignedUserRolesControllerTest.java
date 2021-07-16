@@ -7,11 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.BadRequestException;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRolesResource;
-import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.service.cau.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.reform.managecase.service.common.UIDService;
 
@@ -34,16 +32,10 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.U
 class CaseAssignedUserRolesControllerTest {
 
     @Mock
-    private ApplicationParams applicationParams;
-
-    @Mock
     private UIDService caseReferenceService;
 
     @Mock
     private CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
-
-    @Mock
-    private SecurityUtils securityUtils;
 
     private CaseAssignedUserRolesController controller;
 
@@ -52,7 +44,7 @@ class CaseAssignedUserRolesControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(caseReferenceService.validateUID(CASE_ID_GOOD)).thenReturn(true);
         when(caseReferenceService.validateUID(CASE_ID_BAD)).thenReturn(false);

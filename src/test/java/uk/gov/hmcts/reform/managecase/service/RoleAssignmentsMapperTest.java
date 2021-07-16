@@ -42,12 +42,11 @@ public class RoleAssignmentsMapperTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
     }
 
     @Nested
-    @DisplayName("toRoleAssignments()")
     class ToRoleAssignments {
 
         @Test

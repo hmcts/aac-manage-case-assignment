@@ -29,8 +29,6 @@ public class WireMockBaseTest extends BaseTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
 
-    public static final int NUMBER_OF_CASES = 19;
-
     @Value("${wiremock.server.port}")
     protected Integer wiremockPort;
 

@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentAttributes;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleType;
-import uk.gov.hmcts.reform.managecase.repository.RoleAssignmentRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,19 +13,19 @@ import java.util.stream.Collectors;
 @Service
 public class RoleAssignmentService {
 
-    private final RoleAssignmentRepository roleAssignmentRepository;
+    private final RoleAssignmentServiceHelper roleAssignmentServiceHelper;
     private final RoleAssignmentsMapper roleAssignmentsMapper;
 
     @Autowired
-    public RoleAssignmentService(RoleAssignmentRepository roleAssignmentRepository,
+    public RoleAssignmentService(RoleAssignmentServiceHelper roleAssignmentServiceHelper,
                                  RoleAssignmentsMapper roleAssignmentsMapper) {
-        this.roleAssignmentRepository = roleAssignmentRepository;
+        this.roleAssignmentServiceHelper = roleAssignmentServiceHelper;
         this.roleAssignmentsMapper = roleAssignmentsMapper;
     }
 
     public List<CaseAssignedUserRole> findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
         final var roleAssignmentResponse =
-            roleAssignmentRepository.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
+            roleAssignmentServiceHelper.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
 
         final var roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
         var caseIdError = new RuntimeException(RoleAssignmentAttributes.ATTRIBUTE_NOT_DEFINED);

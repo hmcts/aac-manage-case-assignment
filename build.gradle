@@ -216,6 +216,7 @@ dependencyManagement {
   }
   dependencies {
     dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.61'
+
     // CVE-2018-10237 - Unbounded memory allocation
     dependencySet(group: 'com.google.guava', version: '30.0-jre') {
       entry 'guava'
@@ -225,7 +226,7 @@ dependencyManagement {
       entry 'log4j-api'
     }
     // CVE-2021-25122
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.43') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.50') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
@@ -320,7 +321,8 @@ dependencies {
 
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE"
   implementation "com.nimbusds:nimbus-jose-jwt:7.9"
-  implementation "net.minidev:json-smart:2.3"
+  implementation "net.minidev:json-smart:2.4.7"
+
   implementation "org.springframework.security:spring-security-web:5.4.5"
   implementation "org.springframework.security:spring-security-config:5.4.5"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.4.5"

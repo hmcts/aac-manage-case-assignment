@@ -1,0 +1,28 @@
+package uk.gov.hmcts.reform.managecase.api.payload;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class RoleAssignmentQuery {
+
+    private List<String> actorId;
+    private List<String> roleType;
+    private List<String> roleName;
+    private List<String> classification;
+    private List<String> grantType;
+    private List<String> roleCategory;
+    private List<String> validAt;
+    private List<String> authorisations;
+    private Attributes attributes;
+
+
+    public RoleAssignmentQuery(List<String> caseIds, List<String> userIds) {
+        this.actorId = userIds;
+        this.attributes = Attributes.builder().caseId(caseIds).build();
+        this.roleType = List.of(RoleType.CASE.name());
+    }
+}

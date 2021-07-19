@@ -1,0 +1,42 @@
+{
+  "_guid_" : "F-209_orgPolicy_response_data_no_previous_org",
+    "applicantOrganisationPolicy": {
+      "Organisation": {
+        "_extends_" : "F-209_org_QUK822N"
+      },
+      "OrgPolicyCaseAssignedRole": "[ApplicantSolicitor]",
+      "OrgPolicyReference": "ApplicantPolicy"
+    },
+    "respondentOrganisationPolicy": {
+      "Organisation": {
+        "OrganisationID": null,
+        "OrganisationName": null
+      },
+      "OrgPolicyCaseAssignedRole": "[RespondentSolicitor]",
+      "OrgPolicyReference": "RespondentPolicy"
+    },
+    "otherPartyOrganisationPolicy": {
+      "Organisation": {
+        "OrganisationID": null,
+        "OrganisationName": null
+      },
+      "OrgPolicyCaseAssignedRole": "[OtherPartySolicitor]",
+      "OrgPolicyReference": "OtherPartyPolicy"
+    },
+    "changeOrganisationRequestField": {
+      "CaseRoleId": null,
+      "RequestTimestamp": null,
+      "ApprovalStatus": null,
+      "OrganisationToAdd": {
+        "OrganisationID": null,
+        "OrganisationName": null
+      },
+      "OrganisationToRemove": {
+        "OrganisationID": null,
+        "OrganisationName": null
+      },
+      "Reason": null,
+      "ApprovalRejectionTimestamp": null,
+      "NotesReason": null
+    }
+}

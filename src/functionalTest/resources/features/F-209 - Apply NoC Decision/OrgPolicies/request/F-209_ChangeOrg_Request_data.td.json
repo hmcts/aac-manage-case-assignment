@@ -1,0 +1,21 @@
+{
+  "_guid_" : "change_org_request_data",
+  "changeOrganisationRequestField": {
+    "CaseRoleId": {
+      "value": {
+        "code": "[ApplicantSolicitor]"
+      }
+    },
+    "RequestTimestamp": null,
+    "ApprovalStatus": "1",
+    "OrganisationToAdd": {
+      "_extends_" : "F-209_orgToAdd_Request_data_QUK822N"
+    },
+    "OrganisationToRemove": {
+      "_extends_" : "F-209_orgToRemove_Request_data_LESTKK0"
+    },
+    "Reason": null,
+    "ApprovalRejectionTimestamp": null,
+    "NotesReason": null
+  }
+}

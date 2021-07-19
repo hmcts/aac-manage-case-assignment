@@ -1,0 +1,18 @@
+{
+  "_guid_": "F_209_Search_Case_ES_0_users",
+  "_extends_" : "F_209_Search_Case_ES_base",
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body":{
+      "cases" : [{
+        "_extends_" : "F_209_Search_Case_response_data_base",
+        "supplementary_data" : {
+          "orgs_assigned_users" : {
+            "LESTKK0" : 0
+          }
+        }
+      }]
+    }
+  }
+}

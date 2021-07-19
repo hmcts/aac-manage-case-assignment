@@ -1,0 +1,14 @@
+{
+  "_guid_": "F_209_OrgPolicies",
+
+  "applicantOrganisationPolicy": {
+    "_extends_" : "F_209_applicant_organisation_policy"
+  },
+  "respondentOrganisationPolicy": {
+    "_extends_" : "F_209_respondent_organisation_policy"
+
+  },
+  "otherPartyOrganisationPolicy": {
+    "_extends_" : "F_209_otherparty_organisation_policy"
+  }
+}

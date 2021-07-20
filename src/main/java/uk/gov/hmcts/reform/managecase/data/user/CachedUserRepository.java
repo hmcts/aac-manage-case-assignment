@@ -50,4 +50,5 @@ public class CachedUserRepository implements UserRepository {
     public boolean anyRoleEqualsAnyOf(List<String> userRoles) {
         return userRepository.anyRoleEqualsAnyOf(userRoles);
     }
+
 }

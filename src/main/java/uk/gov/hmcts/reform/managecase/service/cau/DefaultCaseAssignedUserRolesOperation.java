@@ -9,12 +9,12 @@ import java.util.List;
 
 @Service
 @Qualifier("default")
-public class CaseAssignedUserRolesOperationImpl implements CaseAssignedUserRolesOperation  {
+public class DefaultCaseAssignedUserRolesOperation implements CaseAssignedUserRolesOperation  {
 
     private final CaseAccessOperation caseAccessOperation;
 
     @Autowired
-    public CaseAssignedUserRolesOperationImpl(CaseAccessOperation caseAccessOperation) {
+    public DefaultCaseAssignedUserRolesOperation(CaseAccessOperation caseAccessOperation) {
         this.caseAccessOperation = caseAccessOperation;
     }
 

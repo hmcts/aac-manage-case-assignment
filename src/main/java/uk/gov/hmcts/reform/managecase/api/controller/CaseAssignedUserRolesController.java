@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,8 +38,9 @@ public class CaseAssignedUserRolesController {
     private final UIDService caseReferenceService;
 
     @Autowired
-    public CaseAssignedUserRolesController(CaseAssignedUserRolesOperation caseAssignedUserRolesOperation,
-                                           UIDService caseReferenceService) {
+    public CaseAssignedUserRolesController(
+        @Qualifier("authorised") CaseAssignedUserRolesOperation caseAssignedUserRolesOperation,
+        UIDService caseReferenceService) {
         this.caseAssignedUserRolesOperation = caseAssignedUserRolesOperation;
         this.caseReferenceService = caseReferenceService;
 

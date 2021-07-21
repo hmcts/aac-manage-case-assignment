@@ -83,6 +83,12 @@ task smoke(type: Test) {
 
   generateCucumberReports.enabled = false
 
+  new File("$buildDir/test-results/test").mkdirs()
+  copy {
+    from "src/functionalTest/resources/DummyTest.xml"
+    into "$buildDir/test-results/test"
+  }
+
   doLast {
     generateCucumberReports.enabled = true
     cucumberReports.outputDir = file("${project.buildDir}/reports/tests/befta/smoke")

@@ -2,11 +2,11 @@
 @Library("Infrastructure")
 
 def type = "java"
-def product = "ccd"
+def product = "aac"
 def component = "spring-boot-template"
 
 withNightlyPipeline(type, product, component) {
-  enableFortifyScan('ccd-aat')
+  enableFortifyScan()
   after('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
   }

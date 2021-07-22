@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.managecase.WireMockBaseTest;
+import uk.gov.hmcts.reform.managecase.BaseTest;
 
 import java.net.URI;
 import java.util.List;
@@ -22,14 +22,15 @@ import java.util.concurrent.Future;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.protocol.HTTP.CONTENT_TYPE;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
 import static wiremock.com.google.common.collect.Lists.newArrayList;
@@ -41,7 +42,7 @@ import static wiremock.org.apache.http.entity.ContentType.APPLICATION_JSON;
     "http.client.seconds.idle.connection=1",
     "http.client.max.client_per_route=2",
     "http.client.validate.after.inactivity=1"})
-public class RestTemplateConfigurationTest extends WireMockBaseTest {
+public class RestTemplateConfigurationTest extends BaseTest {
 
     @Autowired
     private RestTemplate restTemplate;
@@ -95,10 +96,10 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
             }));
         }
 
-        assertThat(futures, hasSize(totalNumberOfCalls));
+        assertEquals(futures, hasSize(totalNumberOfCalls));
 
         for (Future<Integer> future: futures) {
-            assertThat(future.get(), is(SC_OK));
+            assertEquals(future.get(), is(SC_OK));
         }
     }
 
@@ -111,8 +112,8 @@ public class RestTemplateConfigurationTest extends WireMockBaseTest {
     private void assertResponse(final ResponseEntity<JsonNode> response) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        assertThat(response.getBody(), is(objectMapper.readValue(RESPONSE_BODY, JsonNode.class)));
-        assertThat(response.getHeaders().get(CONTENT_TYPE), contains(MIME_TYPE));
-        assertThat(response.getStatusCode().value(), is(SC_OK));
+        assertEquals(response.getBody(), is(objectMapper.readValue(RESPONSE_BODY, JsonNode.class)));
+        assertEquals(response.getHeaders().get(CONTENT_TYPE), contains(MIME_TYPE));
+        assertEquals(response.getStatusCode().value(), is(SC_OK));
     }
 }

@@ -232,7 +232,7 @@ dependencyManagement {
       entry 'tomcat-embed-websocket'
     }
     // multiple CVEs
-    dependencySet(group: 'com.netflix.servo', version: '0.12.5') {
+    dependencySet(group: 'com.netflix.servo', version: '0.13.2') {
       entry 'servo-core'
     }
     dependencySet(group: 'org.codehaus.groovy', version: '3.0.3') {

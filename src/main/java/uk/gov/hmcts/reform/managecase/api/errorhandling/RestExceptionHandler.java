@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -16,9 +17,11 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +45,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .toArray(String[]::new);
         log.debug("MethodArgumentNotValidException:{}", ex.getLocalizedMessage());
         return toResponseEntity(status, null, errors);
+    }
+
+    @ExceptionHandler(ApiException.class)
+    @ResponseBody
+    public ResponseEntity<HttpError> handleApiException(final HttpServletRequest request,
+                                                        final ApiException exception) {
+        log.error(exception.getMessage(), exception);
+        final HttpError<Serializable> error = new HttpError<>(exception, request);
+        return ResponseEntity
+            .status(error.getStatus())
+            .body(error);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

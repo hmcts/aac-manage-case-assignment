@@ -49,6 +49,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({CaseAssignedUserRoleException.class})
     @ResponseBody
     public ResponseEntity<Object> handleApiException(final CaseAssignedUserRoleException ex) {
+
         log.error("CaseAssignedUserRoles exception:", ex.getMessage(), ex);
         var responseStatus = ex.getClass().getAnnotation(ResponseStatus.class);
         return toResponseEntity(getHttpStatus(responseStatus), ex.getLocalizedMessage(), null);

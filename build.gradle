@@ -395,6 +395,8 @@ dependencies {
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
+  testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
+
 
 }
 
@@ -412,4 +414,10 @@ bootJar {
 
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
+}
+
+task fortifyScan(type: JavaExec)  {
+  main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+  classpath += sourceSets.test.runtimeClasspath
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }

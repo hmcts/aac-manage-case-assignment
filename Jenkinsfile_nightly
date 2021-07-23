@@ -1,0 +1,13 @@
+#!groovy
+@Library("Infrastructure")
+
+def type = "java"
+def product = "aac"
+def component = "spring-boot-template"
+
+withNightlyPipeline(type, product, component) {
+  enableFortifyScan()
+  after('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+  }
+}

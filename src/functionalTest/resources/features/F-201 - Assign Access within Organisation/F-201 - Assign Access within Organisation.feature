@@ -14,13 +14,17 @@ Feature: F-201: Assign Access within Organisation
       And a user [S2 - another solicitor in the same organisation, with whom S1 will share a case with an assignment within organisation],
       And a case [C1, which S1 has just] created as in [F-201_Prerequisite_Case_Creation_C1],
 
-     When a request is prepared with appropriate values,
+      And a call [by S2 to access the case created by S1] will get the expected response as in [F-201_Case_Not_Found].
+
+    When a request is prepared with appropriate values,
       And the request [is to be invoked by S1 to assign access over C1 for S2 within the same organisation],
       And it is submitted to call the [Assign Access within Organisation] operation of [Manage Case Assignment Microservice],
 
      Then a positive response is received,
       And the response has all other details as expected,
       And a call [by S2 to query his/her case roles granted over C1] will get the expected response as in [F-201_S2_Querying_Their_Access_Over_C1].
+
+      And a call [by S2 to access the case created by S1] will get the expected response as in [F-201_Case_Found].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-201.1b

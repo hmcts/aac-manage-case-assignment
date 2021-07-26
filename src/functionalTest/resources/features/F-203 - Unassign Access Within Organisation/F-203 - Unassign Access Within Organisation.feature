@@ -19,13 +19,17 @@ Feature: F-203: Unassign Access Within Organisation
       And a successful call [by Becky to grant access to C1 for Bill] as in [F-203_Prerequisite_Case_Assignment_C1_Bill],
       And a successful call [by Becky to confirm the access to C1 for Benjamin & Bill] as in [F-203_Prerequisite_Case_Access_Confirmation_C1_Benjamin_Bill_By_Becky],
 
+      And a call [by Bill to access the case created by Becky] will get the expected response as in [F-203_Case_Found],
+
      When a request is prepared with appropriate values,
       And the request [is made by Benjamin and intends to unassign access to C1 for Becky and Bill],
       And it is submitted to call the [Unassign Access within Organisation] operation of [Manage Case Assignment Microservice],
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to Get Assignments In My Organisation by Benjamin to verify unassignment of Becky and Bill from C1] will get the expected response as in [S-203.1_Verify_Assignments_In_My_Org].
+      And a call [to Get Assignments In My Organisation by Benjamin to verify unassignment of Becky and Bill from C1] will get the expected response as in [S-203.1_Verify_Assignments_In_My_Org],
+
+      And a call [by Bill to access the case created by Becky] will get the expected response as in [F-203_Case_Not_Found].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 2
@@ -40,13 +44,17 @@ Feature: F-203: Unassign Access Within Organisation
       And a successful call [by CAA to grant access to C1 for Bill] as in [F-203_Prerequisite_Case_Assignment_C1_Bill_By_CAA],
       And a successful call [by CAA to confirm the access to C1 for Becky & Bill] as in [F-203_Prerequisite_Case_Access_Confirmation_C1_Becky_Bill_By_CAA],
 
+      And a call [by Bill to access the case created by Becky] will get the expected response as in [F-203_Case_Found],
+
      When a request is prepared with appropriate values,
       And the request [is made by CAA and intends to unassign access to C1 for Becky and Bill],
       And it is submitted to call the [Unassign Access within Organisation] operation of [Manage Case Assignment Microservice],
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to Get Assignments In My Organisation by CAA to verify unassignment of Becky and Bill from C1] will get the expected response as in [S-203.2_Verify_Assignments_In_My_Org].
+      And a call [to Get Assignments In My Organisation by CAA to verify unassignment of Becky and Bill from C1] will get the expected response as in [S-203.2_Verify_Assignments_In_My_Org],
+
+      And a call [by Bill to access the case created by Becky] will get the expected response as in [F-203_Case_Not_Found].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 3

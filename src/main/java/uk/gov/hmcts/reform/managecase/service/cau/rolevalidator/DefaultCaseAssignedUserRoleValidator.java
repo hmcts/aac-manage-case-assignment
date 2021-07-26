@@ -24,6 +24,7 @@ public class DefaultCaseAssignedUserRoleValidator implements CaseAssignedUserRol
         this.applicationParams = applicationParams;
     }
 
+
     public boolean canAccessUserCaseRoles(List<String> userIds) {
         boolean canAccess =
             userRepository.anyRoleEqualsAnyOf(applicationParams.getAcaAccessControlCrossJurisdictionRoles());

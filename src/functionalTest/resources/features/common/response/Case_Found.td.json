@@ -1,0 +1,151 @@
+{
+  "_guid_": "Case_Found",
+  "_extends_": "Retrieve_Case_By_ID__Base",
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_MasterCaseType",
+      "state": "CaseCreated",
+      "data": {
+        "AddressField": {
+          "Country": "UK",
+          "AddressLine1": "ABC Street",
+          "AddressLine2": "DEF Avenue",
+          "AddressLine3": null
+        },
+        "AddressUKField": {
+          "County": null,
+          "Country": null,
+          "PostCode": null,
+          "PostTown": null,
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null
+        },
+        "DocumentField": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4/binary",
+          "document_filename": "Sample.pdf"
+        },
+        "MoneyField": "20000",
+        "DynamicList": null,
+        "MarritalStatus": "MARRIAGE",
+        "NumberField": "234",
+        "MultiSelectField": [
+          "OXFORD",
+          "CARDIFF"
+        ],
+        "EmailField": "info@ccd.hmcts.net",
+        "YesNoField": "No",
+        "TextField": "Case Created for FTA",
+        "PhoneField": "+447541710866",
+        "DateField": "1977-01-01",
+        "OrganisationPolicyField2": {
+          "Organisation": {
+            "OrganisationID": "QUK822N",
+            "OrganisationName": "CCD Solicitors Limited"
+          },
+          "OrgPolicyReference": "DefendantPolicy",
+          "OrgPolicyCaseAssignedRole": "[Defendant]"
+        },
+        "TextAreaField": "multi line\ninput \nfor test",
+        "OrganisationPolicyField1": {
+          "Organisation": {
+            "OrganisationID": "QUK822N",
+            "OrganisationName": "CCD Solicitors Limited"
+          },
+          "OrgPolicyReference": "ClaimantPolicy",
+          "OrgPolicyCaseAssignedRole": "[Claimant]"
+        },
+        "CollectionField": [
+          {
+            "id": "[[ANYTHING_PRESENT]]",
+            "value": "value in collection element - 1"
+          },
+          {
+            "id": "[[ANYTHING_PRESENT]]",
+            "value": "value in collection element - 2"
+          }
+        ]
+      },
+      "data_classification": {
+        "AddressField": {
+          "value": {
+            "Country": "PUBLIC",
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC"
+          },
+          "classification": "PUBLIC"
+        },
+        "AddressUKField": {
+          "value": {
+            "County": "PUBLIC",
+            "Country": "PUBLIC",
+            "PostCode": "PUBLIC",
+            "PostTown": "PUBLIC",
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC"
+          },
+          "classification": "PUBLIC"
+        },
+        "DocumentField": "PUBLIC",
+        "MoneyField": "PUBLIC",
+        "DynamicList": "PUBLIC",
+        "MarritalStatus": "PUBLIC",
+        "NumberField": "PUBLIC",
+        "MultiSelectField": "PUBLIC",
+        "EmailField": "PUBLIC",
+        "YesNoField": "PUBLIC",
+        "TextField": "PUBLIC",
+        "PhoneField": "PUBLIC",
+        "DateField": "PUBLIC",
+        "OrganisationPolicyField2": {
+          "value": {
+            "Organisation": {
+              "value": {
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "OrgPolicyReference": "PUBLIC",
+            "OrgPolicyCaseAssignedRole": "PUBLIC"
+          },
+          "classification": "PUBLIC"
+        },
+        "TextAreaField": "PUBLIC",
+        "OrganisationPolicyField1": {
+          "value": {
+            "Organisation": {
+              "value": {
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "OrgPolicyReference": "PUBLIC",
+            "OrgPolicyCaseAssignedRole": "PUBLIC"
+          },
+          "classification": "PUBLIC"
+        },
+        "CollectionField": {
+          "value": [
+            {
+              "id": "[[ANYTHING_PRESENT]]",
+              "classification": "PUBLIC"
+            },
+            {
+              "id": "[[ANYTHING_PRESENT]]",
+              "classification": "PUBLIC"
+            }
+          ],
+          "classification": "PUBLIC"
+        }
+      }
+    }
+  }
+}

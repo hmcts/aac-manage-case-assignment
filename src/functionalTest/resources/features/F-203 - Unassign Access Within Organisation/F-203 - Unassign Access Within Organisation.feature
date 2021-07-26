@@ -18,7 +18,6 @@ Feature: F-203: Unassign Access Within Organisation
       And a successful call [by Becky to grant access to C1 for Benjamin] as in [F-203_Prerequisite_Case_Assignment_C1_Benjamin],
       And a successful call [by Becky to grant access to C1 for Bill] as in [F-203_Prerequisite_Case_Assignment_C1_Bill],
       And a successful call [by Becky to confirm the access to C1 for Benjamin & Bill] as in [F-203_Prerequisite_Case_Access_Confirmation_C1_Benjamin_Bill_By_Becky],
-
       And a call [by Bill to access the case created by Becky] will get the expected response as in [F-203_Case_Found],
 
      When a request is prepared with appropriate values,
@@ -28,7 +27,6 @@ Feature: F-203: Unassign Access Within Organisation
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to Get Assignments In My Organisation by Benjamin to verify unassignment of Becky and Bill from C1] will get the expected response as in [S-203.1_Verify_Assignments_In_My_Org],
-
       And a call [by Bill to access the case created by Becky] will get the expected response as in [F-203_Case_Not_Found].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -43,7 +41,6 @@ Feature: F-203: Unassign Access Within Organisation
       And a successful call [by CAA to grant access to C1 for Becky] as in [F-203_Prerequisite_Case_Assignment_C1_Becky_By_CAA],
       And a successful call [by CAA to grant access to C1 for Bill] as in [F-203_Prerequisite_Case_Assignment_C1_Bill_By_CAA],
       And a successful call [by CAA to confirm the access to C1 for Becky & Bill] as in [F-203_Prerequisite_Case_Access_Confirmation_C1_Becky_Bill_By_CAA],
-
       And a call [by Bill to access the case created by Becky] will get the expected response as in [F-203_Case_Found],
 
      When a request is prepared with appropriate values,
@@ -53,7 +50,6 @@ Feature: F-203: Unassign Access Within Organisation
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to Get Assignments In My Organisation by CAA to verify unassignment of Becky and Bill from C1] will get the expected response as in [S-203.2_Verify_Assignments_In_My_Org],
-
       And a call [by Bill to access the case created by Becky] will get the expected response as in [F-203_Case_Not_Found].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -74,6 +70,7 @@ Feature: F-203: Unassign Access Within Organisation
       And a successful call [by Becky to grant access to C3 for Benjamin] as in [F-203_Prerequisite_Case_Assignment_C3_Benjamin],
       And a successful call [by Becky to grant access to C3 for Bill] as in [F-203_Prerequisite_Case_Assignment_C3_Bill],
       And a successful call [by Becky to confirm the access to C1, C2 & C3 for Benjamin & Bill] as in [F-203_Prerequisite_Case_Access_Confirmation_C1_C2_C3_Benjamin_Bill_By_Becky],
+      And a call [by Bill to access the case created by Becky] will get the expected response as in [F-203_Case_Found],
 
      When a request is prepared with appropriate values,
       And the request [is made by Becky and intends to unassign access to C1, C2 and C3 for Benjamin & Bill],
@@ -81,7 +78,8 @@ Feature: F-203: Unassign Access Within Organisation
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to Get Assignments In My Organisation by Becky to verify unassignment of Benjamin and Bill from C1, C2 and C3] will get the expected response as in [S-203.3_Verify_Assignments_In_My_Org].
+      And a call [to Get Assignments In My Organisation by Becky to verify unassignment of Benjamin and Bill from C1, C2 and C3] will get the expected response as in [S-203.3_Verify_Assignments_In_My_Org],
+      And a call [by Bill to access the case created by Becky] will get the expected response as in [F-203_Case_Not_Found].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 4
@@ -98,6 +96,7 @@ Feature: F-203: Unassign Access Within Organisation
       And a successful call [by CAA to grant access to C2 for Bill] as in [F-203_Prerequisite_Case_Assignment_C2_Bill_By_CAA],
       And a successful call [by CAA to grant access to C3 for Bill] as in [F-203_Prerequisite_Case_Assignment_C3_Bill_By_CAA],
       And a successful call [by CAA to confirm the access to C1, C2 & C3 for Bill] as in [F-203_Prerequisite_Case_Access_Confirmation_C1_C2_C3_Bill_By_CAA],
+      And a call [by Bill to access the case created by Becky] will get the expected response as in [F-203_Case_Found],
 
      When a request is prepared with appropriate values,
       And the request [is made by CAA and intends to unassign access to C1, C2 and C3 for Becky & Bill],
@@ -105,7 +104,8 @@ Feature: F-203: Unassign Access Within Organisation
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to Get Assignments In My Organisation by CAA to verify unassignment of Becky and Bill from C1, C2 and C3] will get the expected response as in [S-203.4_Verify_Assignments_In_My_Org].
+      And a call [to Get Assignments In My Organisation by CAA to verify unassignment of Becky and Bill from C1, C2 and C3] will get the expected response as in [S-203.4_Verify_Assignments_In_My_Org],
+      And a call [by Bill to access the case created by Becky] will get the expected response as in [F-203_Case_Not_Found].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 5

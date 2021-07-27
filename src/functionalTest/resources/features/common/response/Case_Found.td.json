@@ -24,11 +24,7 @@
           "AddressLine2": null,
           "AddressLine3": null
         },
-        "DocumentField": {
-          "document_url": "{{DM_STORE_BASE_URL}}/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4",
-          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4/binary",
-          "document_filename": "Sample.pdf"
-        },
+        "DocumentField" : null,
         "MoneyField": "20000",
         "DynamicList": null,
         "MarritalStatus": "MARRIAGE",
@@ -44,8 +40,7 @@
         "DateField": "1977-01-01",
         "OrganisationPolicyField2": {
           "Organisation": {
-            "OrganisationID": "QUK822N",
-            "OrganisationName": "CCD Solicitors Limited"
+            "OrganisationID": "QUK822N"
           },
           "OrgPolicyReference": "DefendantPolicy",
           "OrgPolicyCaseAssignedRole": "[Defendant]"
@@ -53,8 +48,7 @@
         "TextAreaField": "multi line\ninput \nfor test",
         "OrganisationPolicyField1": {
           "Organisation": {
-            "OrganisationID": "QUK822N",
-            "OrganisationName": "CCD Solicitors Limited"
+            "OrganisationID": "QUK822N"
           },
           "OrgPolicyReference": "ClaimantPolicy",
           "OrgPolicyCaseAssignedRole": "[Claimant]"

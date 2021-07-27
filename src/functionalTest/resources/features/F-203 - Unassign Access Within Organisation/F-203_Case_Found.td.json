@@ -15,17 +15,18 @@
       "caseId": "${[scenarioContext][parentContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
     }
   },
-
   "expectedResponse": {
     "body": {
+      "data": {
         "OrganisationPolicyField2": {
           "Organisation": {
             "OrganisationName": "CCD Solicitors Limited"
           }
         },
-      "OrganisationPolicyField1": {
-        "Organisation": {
-          "OrganisationName": "CCD Solicitors Limited"
+        "OrganisationPolicyField1": {
+          "Organisation": {
+            "OrganisationName": "CCD Solicitors Limited"
+          }
         }
       }
     }

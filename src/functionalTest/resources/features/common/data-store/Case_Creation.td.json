@@ -44,11 +44,7 @@
 					"AddressLine3": null,
 					"Country": "UK"
 				},
-				"DocumentField": {
-					"document_url": "{{DM_STORE_BASE_URL}}/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4",
-					"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4/binary",
-					"document_filename": "Sample.pdf"
-				}
+				"DocumentField":null
 			}
 		}
 	},
@@ -83,11 +79,7 @@
 					"PostCode": null,
 					"Country": null
 				},
-				"DocumentField": {
-					"document_url": "{{DM_STORE_BASE_URL}}/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4",
-					"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/9dfaddc1-d5de-4f5e-88bc-652c839855e4/binary",
-					"document_filename": "Sample.pdf"
-				},
+				"DocumentField": null,
 				"MoneyField": "20000",
 				"DynamicList": null,
 				"MarritalStatus": "MARRIAGE",

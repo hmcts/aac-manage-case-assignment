@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-203_Case_Not_Found",
+  "_guid_": "Case_Not_Found",
 
   "productName": "CCD Data Store",
   "operationName": "Retrieve a case by ID",
@@ -7,23 +7,10 @@
   "method": "GET",
   "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/cases/{caseId}",
 
-  "specs" : [
-    "by Bill to access the case created by Becky"
-  ],
-
-  "users": {
-    "invokingUser": {
-      "_extends_": "ACA_Users_Bill"
-    }
-  },
-
   "request": {
     "_extends_": "Common_Request",
     "headers": {
       "experimental": "true"
-    },
-    "pathVariables": {
-      "caseId": "${[scenarioContext][parentContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
     }
   },
 
@@ -32,7 +19,6 @@
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "message" : "No case found",
-      "path" : "/cases/${[scenarioContext][parentContext][childContexts][F-203_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

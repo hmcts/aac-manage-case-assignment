@@ -8,8 +8,7 @@
 
   "users": {
     "invokingUser": {
-        "username": "befta.master.solicitor.benjamin@gmail.com",
-        "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_2_PWD]]"
+        "_extends_" : "ACA_Users_Benjamin"
     }
   },
 

@@ -43,8 +43,8 @@ Feature: F-203: Unassign Access Within Organisation
       And a successful call [by CAA to grant access to C1 for Becky] as in [F-203_Prerequisite_Case_Assignment_C1_Becky_By_CAA],
       And a successful call [by CAA to grant access to C1 for Bill] as in [F-203_Prerequisite_Case_Assignment_C1_Bill_By_CAA],
       And a successful call [by CAA to confirm the access to C1 for Becky & Bill] as in [F-203_Prerequisite_Case_Access_Confirmation_C1_Becky_Bill_By_CAA],
-      And a call [by Bill to access the case created by Becky] will get the expected response as in [F-203_C1_Case_Found_Bill],
-      And a call [by Becky to access the case created by Becky] will get the expected response as in [F-203_C1_Case_Found_Becky],
+      And a call [by Bill to access the case C1 will get the expected response as in [F-203_C1_Case_Found_Bill],
+      And a call [by Becky to access the case C1] will get the expected response as in [F-203_C1_Case_Found_Becky],
 
      When a request is prepared with appropriate values,
       And the request [is made by CAA and intends to unassign access to C1 for Becky and Bill],
@@ -53,8 +53,8 @@ Feature: F-203: Unassign Access Within Organisation
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to Get Assignments In My Organisation by CAA to verify unassignment of Becky and Bill from C1] will get the expected response as in [S-203.2_Verify_Assignments_In_My_Org],
-      And a call [by Bill to access the case created by Becky] will get the expected response as in [F-203_C1_Case_Not_Found_Bill],
-      And a call [by Becky to access the case created by Becky] will get the expected response as in [F-203_C1_Case_Not_Found_Becky].
+      And a call [by Bill to access the case C1] will get the expected response as in [F-203_C1_Case_Not_Found_Bill],
+      And a call [by Becky to access the case C1] will get the expected response as in [F-203_C1_Case_Not_Found_Becky].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 3

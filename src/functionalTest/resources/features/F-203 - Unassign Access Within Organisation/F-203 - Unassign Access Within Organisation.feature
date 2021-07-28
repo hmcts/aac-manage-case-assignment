@@ -43,7 +43,7 @@ Feature: F-203: Unassign Access Within Organisation
       And a successful call [by CAA to grant access to C1 for Becky] as in [F-203_Prerequisite_Case_Assignment_C1_Becky_By_CAA],
       And a successful call [by CAA to grant access to C1 for Bill] as in [F-203_Prerequisite_Case_Assignment_C1_Bill_By_CAA],
       And a successful call [by CAA to confirm the access to C1 for Becky & Bill] as in [F-203_Prerequisite_Case_Access_Confirmation_C1_Becky_Bill_By_CAA],
-      And a call [by Bill to access the case C1 will get the expected response as in [F-203_C1_Case_Found_Bill],
+      And a call [by Bill to access the case C1] will get the expected response as in [F-203_C1_Case_Found_Bill],
       And a call [by Becky to access the case C1] will get the expected response as in [F-203_C1_Case_Found_Becky],
 
      When a request is prepared with appropriate values,
@@ -141,7 +141,7 @@ Feature: F-203: Unassign Access Within Organisation
       And a case [by Becky to create a case - C1 with Organisation policies containing R1 and R2] created as in [F-203_Prerequisite_Case_Creation_Seperate_Org_Policies_C1],
       And a successful call [by Becky to grant access to C1 for Benjamin with role R1] as in [F-203_Prerequisite_Case_Assignment_Seperate_Org_Policies_C1_Benjamin_By_Becky],
       And a successful call [by Becky to confirm the access to C1 for Benjamin] as in [F-203_Prerequisite_Case_Access_Confirmation_Seperate_Org_Policies_C1_Benjamin_By_Becky],
-      And a call [by Benjamin to access the case C1] will get the expected response as in [F-203_C1_Case_Found_Benjamin],
+      And a call [by Benjamin to access the case C1 with separate organisation policies] will get the expected response as in [F-203_Separate_Org_Policies_Case_Found_Benjamin],
 
      When a request is prepared with appropriate values,
       And the request [is made by Becky and intends to unassign access to C1 for Benjamin and Other_User],
@@ -150,7 +150,7 @@ Feature: F-203: Unassign Access Within Organisation
      Then a negative response is received,
       And the response has all the details as expected,
       And a call [by Becky to confirm that Benjamin still has access to the case] will get the expected response as in [S-203.5_Verify_Assignments_In_My_Org_Becky],
-      And a call [by Benjamin to access the case C1] will get the expected response as in [F-203_C1_Case_Found_Benjamin].
+      And a call [by Benjamin to access the case C1 with separate organisation policies] will get the expected response as in [F-203_Separate_Org_Policies_Case_Found_Benjamin].
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 6
   @S-203.6
@@ -247,7 +247,11 @@ Feature: F-203: Unassign Access Within Organisation
       And the response has all the details as expected,
       And a call [to Get Assignments In My Organisation by Becky to verify remaining assignments of R2 only to Benjamin and Bill for C1, C2 and C3] will get the expected response as in [S-203.9_Verify_Assignments_In_My_Org],
       And a call [by Bill to access the case C1] will get the expected response as in [F-203_C1_Case_Found_Bill],
-      And a call [by Benjamin to access the case C1] will get the expected response as in [F-203_C1_Case_Found_Benjamin].
+      And a call [by Bill to access the case C2] will get the expected response as in [F-203_C2_Case_Found_Bill],
+      And a call [by Bill to access the case C3] will get the expected response as in [F-203_C3_Case_Found_Bill],
+      And a call [by Benjamin to access the case C1] will get the expected response as in [F-203_C1_Case_Found_Benjamin],
+      And a call [by Benjamin to access the case C2] will get the expected response as in [F-203_C2_Case_Found_Benjamin],
+      And a call [by Benjamin to access the case C3] will get the expected response as in [F-203_C3_Case_Found_Benjamin].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 10 (Happy path)
@@ -281,8 +285,12 @@ Feature: F-203: Unassign Access Within Organisation
      Then a positive response is received,
       And the response has all the details as expected,
       And a call [to Get Assignments In My Organisation by CAA to verify remaining assignments of R2 only to Becky and Bill for C1, C2 and C3] will get the expected response as in [S-203.10_Verify_Assignments_In_My_Org],
+      And a call [by Bill to access the case C1] will get the expected response as in [F-203_C1_Case_Found_Bill],
+      And a call [by Bill to access the case C2] will get the expected response as in [F-203_C2_Case_Found_Bill],
       And a call [by Bill to access the case C3] will get the expected response as in [F-203_C3_Case_Found_Bill],
-      And a call [by Becky to access the case C1] will get the expected response as in [F-203_C1_Case_Found_Becky].
+      And a call [by Becky to access the case C1] will get the expected response as in [F-203_C1_Case_Found_Becky],
+      And a call [by Becky to access the case C2] will get the expected response as in [F-203_C2_Case_Found_Becky],
+      And a call [by Becky to access the case C3] will get the expected response as in [F-203_C3_Case_Found_Becky].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 11

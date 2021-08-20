@@ -25,5 +25,28 @@
     <cve>CVE-2007-1651</cve>
     <cve>CVE-2007-1652</cve>
   </suppress>
-  
+
+  <suppress until="2021-09-20">
+    <notes><![CDATA[
+   file name: jakarta.el-3.0.3.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.glassfish/jakarta\.el@.*$</packageUrl>
+    <cpe>cpe:/a:eclipse:jakarta_expression_language</cpe>
+  </suppress>
+
+  <suppress until="2021-09-20">
+    <notes><![CDATA[
+   file name: lang-tag-1.4.4.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.nimbusds/lang\-tag@.*$</packageUrl>
+    <cve>CVE-2020-23171</cve>
+  </suppress>
+
+  <suppress until="2021-09-20">
+    <notes><![CDATA[
+   file name: spring-security-core-5.4.5.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-core@.*$</packageUrl>
+    <vulnerabilityName>CVE-2021-22119</vulnerabilityName>
+  </suppress>
 </suppressions>

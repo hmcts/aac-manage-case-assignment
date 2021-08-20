@@ -94,6 +94,12 @@ env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
 env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${dataStoreApiDevelopPr}.service.core-compute-preview.internal".toLowerCase()
 
+// Vars for Kubernetes
+env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
+env.PACT_BROKER_URL = 'pact-broker.platform.hmcts.net'
+env.PACT_BROKER_SCHEME = 'https'
+env.PACT_BROKER_PORT = '443'
+
 withPipeline("java", product, component) {
   after('test') {
     builder.gradle('integration')
@@ -155,6 +161,10 @@ withPipeline("java", product, component) {
   after('functionalTest:aat') {
     copyIgnore('./build/reports/tests/befta/functional/cucumber-html-reports', './BEFTA Report for Functional Tests/')
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
+  }
+
+  after('pact-provider-verification') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/runProviderPactVerification/*'
   }
 }
 

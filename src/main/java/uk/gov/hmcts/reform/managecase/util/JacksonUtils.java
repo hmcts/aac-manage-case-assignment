@@ -1,20 +1,23 @@
 package uk.gov.hmcts.reform.managecase.util;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.managecase.domain.DynamicList;
 import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
 
-import java.util.List;
-
-import java.util.Iterator;
-import java.util.Map;
-
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class JacksonUtils {
@@ -26,8 +29,24 @@ public class JacksonUtils {
         this.objectMapper = objectMapper;
     }
 
+    public static final JsonFactory jsonFactory = JsonFactory.builder()
+        // Change per-factory setting to prevent use of `String.intern()` on symbols
+        .disable(JsonFactory.Feature.INTERN_FIELD_NAMES)
+        .build();
+
+    public static final ObjectMapper MAPPER = JsonMapper.builder(jsonFactory)
+        .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true)
+        .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+        .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
+        .build();
+
     public <T> T convertValue(Object fromValue, Class<T> toValueType) {
         return objectMapper.convertValue(fromValue, toValueType);
+    }
+
+    public static Map<String, JsonNode> convertValue(Object from) {
+        return MAPPER.convertValue(from, new TypeReference<HashMap<String, JsonNode>>() {
+        });
     }
 
     /**

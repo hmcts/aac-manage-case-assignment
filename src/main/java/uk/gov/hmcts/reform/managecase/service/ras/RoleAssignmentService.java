@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentAttributes;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentQuery;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleType;
 
 import java.util.List;
@@ -21,6 +23,20 @@ public class RoleAssignmentService {
                                  RoleAssignmentsMapper roleAssignmentsMapper) {
         this.roleAssignmentServiceHelper = roleAssignmentServiceHelper;
         this.roleAssignmentsMapper = roleAssignmentsMapper;
+    }
+
+    public void deleteRoleAssignments(List<RoleAssignmentsDeleteRequest> deleteRequests) {
+        if (deleteRequests != null && !deleteRequests.isEmpty()) {
+            List<RoleAssignmentQuery> queryRequests = deleteRequests.stream()
+                .map(request -> new RoleAssignmentQuery(
+                    request.getCaseId(),
+                    request.getUserId(),
+                    request.getRoleNames())
+                )
+                .collect(Collectors.toList());
+
+            roleAssignmentServiceHelper.deleteRoleAssignmentsByQuery(queryRequests);
+        }
     }
 
     public List<CaseAssignedUserRole> findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {

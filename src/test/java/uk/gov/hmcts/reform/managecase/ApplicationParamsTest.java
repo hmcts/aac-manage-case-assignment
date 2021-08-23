@@ -31,4 +31,16 @@ class ApplicationParamsTest {
 
     }
 
+
+    @Test
+    public void shouldGetAmDeleteByQueryRoleAssignmentsURL() {
+        final var roleAssignmentServiceHost = "test-value";
+        final var baseUrl = roleAssignmentServiceHost + "/am/role-assignments/query/delete";
+
+        ReflectionTestUtils.setField(applicationParams, "roleAssignmentServiceHost", roleAssignmentServiceHost);
+
+        assertEquals(baseUrl, applicationParams.amDeleteByQueryRoleAssignmentsURL());
+
+    }
+
 }

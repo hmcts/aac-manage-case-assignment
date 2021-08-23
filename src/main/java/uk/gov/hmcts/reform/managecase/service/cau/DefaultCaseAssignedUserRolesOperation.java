@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
+import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRoleWithOrganisation;
 
 import java.util.List;
 
@@ -16,6 +17,11 @@ public class DefaultCaseAssignedUserRolesOperation implements CaseAssignedUserRo
     @Autowired
     public DefaultCaseAssignedUserRolesOperation(CaseAccessOperation caseAccessOperation) {
         this.caseAccessOperation = caseAccessOperation;
+    }
+
+    @Override
+    public void removeCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
+        this.caseAccessOperation.removeCaseUserRoles(caseUserRoles);
     }
 
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {

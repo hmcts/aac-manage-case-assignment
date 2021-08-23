@@ -4,21 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-@ToString
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class CaseAssignedUserRole {
+public class CaseAssignedUserRolesRequest {
 
-    @JsonProperty("case_id")
-    private String caseDataId;
-
-    @JsonProperty("user_id")
-    private String userId;
-
-    @JsonProperty("case_role")
-    private String caseRole;
+    @JsonProperty("case_users")
+    private List<CaseAssignedUserRoleWithOrganisation> caseAssignedUserRoles;
 
 }

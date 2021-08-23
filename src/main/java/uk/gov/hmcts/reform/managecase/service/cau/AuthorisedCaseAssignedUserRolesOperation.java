@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseRoleAccessException;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
+import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.service.cau.rolevalidator.CaseAssignedUserRoleValidator;
 
 import java.util.List;
@@ -25,6 +26,11 @@ public class AuthorisedCaseAssignedUserRolesOperation implements CaseAssignedUse
                                                     final CaseAssignedUserRoleValidator cauRoleValidator) {
         this.cauRolesOperation = cauRolesOperation;
         this.cauRoleValidator = cauRoleValidator;
+    }
+
+    @Override
+    public void removeCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
+        this.cauRolesOperation.removeCaseUserRoles(caseUserRoles);
     }
 
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {

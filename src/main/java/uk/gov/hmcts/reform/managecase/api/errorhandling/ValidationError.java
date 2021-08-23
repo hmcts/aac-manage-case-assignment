@@ -58,6 +58,10 @@ public final class ValidationError {
 
     public static final String EMPTY_CASE_ID_LIST = "Case ID list is empty";
     public static final String USER_ID_INVALID = "User ID is not valid";
+    public static final String ORGANISATION_ID_INVALID = "Organisation ID is not valid";
+    public static final String CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION =
+        "Client service not authorised to perform operation";
+    public static final String EMPTY_CASE_USER_ROLE_LIST = "Case user roles list is empty";
     public static final String OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED =
         "Access to other user's case role assignments not granted";
 

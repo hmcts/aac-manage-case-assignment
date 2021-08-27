@@ -131,4 +131,9 @@ public class JacksonUtils {
 
         return objectMapper.valueToTree(dynamicList);
     }
+
+    public static Map<String, Object> convertJsonNode(Object from) {
+        return MAPPER.convertValue(from, new TypeReference<HashMap<String, Object>>() {
+        });
+    }
 }

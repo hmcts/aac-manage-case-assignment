@@ -323,6 +323,9 @@ dependencies {
   implementation "com.nimbusds:nimbus-jose-jwt:7.9"
   implementation "net.minidev:json-smart:2.4.7"
 
+  // Explicitly specify version of jakarta.el to be used to resolve CVE-2021-28170
+  implementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.1'
+
   implementation "org.springframework.security:spring-security-web:5.4.5"
   implementation "org.springframework.security:spring-security-config:5.4.5"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.4.5"

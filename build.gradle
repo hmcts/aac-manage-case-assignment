@@ -121,7 +121,7 @@ task functional(type: Test) {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = [
-               '--threads', '20',
+               '--threads', '15',
                '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
                '--tags', 'not @Ignore',
                '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'

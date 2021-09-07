@@ -34,11 +34,4 @@
     <cve>CVE-2020-23171</cve>
   </suppress>
 
-  <suppress until="2021-09-25">
-    <notes>susceptible to a Denial-of-Service (DoS) attack via the initiation of the Authorization Request 
-      in an OAuth 2.0 Client Web and WebFlux application
-    </notes>
-    <cve>CVE-2021-22119</cve>
-  </suppress>
-
 </suppressions>

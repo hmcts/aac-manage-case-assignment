@@ -16,10 +16,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
-import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
-import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
+import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentService;
 
 import java.util.ArrayList;
@@ -35,13 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -50,17 +43,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class CaseAccessOperationTest {
 
-    @Mock(lenient = true)
-    private DataStoreApiClient dataStoreApiClient;
-
     @Mock
     private RoleAssignmentService roleAssignmentService;
 
     @InjectMocks
     private CaseAccessOperation caseAccessOperation;
 
-    @Mock
-    private SecurityUtils securityUtils;
+    @Mock(lenient = true)
+    private DataStoreRepository dataStoreRepository;
 
     private static final Long CASE_REFERENCE = 1234123412341236L;
     private static final Long CASE_REFERENCE_OTHER = 1111222233334444L;
@@ -68,13 +58,12 @@ public class CaseAccessOperationTest {
     private static final String USER_ID_OTHER = "USER_ID_OTHER";
     private static final Long CASE_ID = 456L;
     private static final Long CASE_ID_OTHER = 1234L;
-    private static final Long CASE_NOT_FOUND = 9999999999999999L;
+    private static final Long CASE_NOT_FOUND_REFERENCE = 9999999999999999L;
     private static final String CASE_ROLE = "[DEFENDANT]";
     private static final String CASE_ROLE_OTHER = "[OTHER]";
     private static final String CASE_ROLE_CREATOR = "[CREATOR]";
     private static final String ORGANISATION = "ORGANISATION";
     private static final String ORGANISATION_OTHER = "ORGANISATION_OTHER";
-    private static final String USER_TOKEN = "1234567890";
 
     @Nested()
     @DisplayName("removeCaseUserRoles(caseUserRoles)")
@@ -83,23 +72,11 @@ public class CaseAccessOperationTest {
         @Captor
         private ArgumentCaptor<List<RoleAssignmentsDeleteRequest>> deleteRequestsCaptor;
 
-        @Captor
-        private ArgumentCaptor<SupplementaryDataUpdateRequest> updateSupplementaryArgumentCaptor;
-
-        private SupplementaryDataUpdateRequest supplementaryDataUpdateRequest;
-        private SupplementaryDataUpdateRequest supplementaryDataUpdateRequestOther;
+        private Map<String, Map<String, Long>> caseReferenceToOrgIdCountMap;
+        private Map<String, Map<String, Long>> caseReferenceToOrgIdCountMapOther;
 
         @BeforeEach
         void setup() {
-            given(securityUtils.getUserBearerToken()).willReturn(USER_TOKEN);
-
-
-
-            SupplementaryDataResource resource = new SupplementaryDataResource();
-            Map<String, Object> resourceMap = new HashMap<>();
-            resourceMap.put(getOrgUserCountSupDataKey(ORGANISATION), 4);
-            resourceMap.put(getOrgUserCountSupDataKey(ORGANISATION_OTHER), 3);
-            resource.setResponse(resourceMap);
 
             CaseDetails caseDetails = CaseDetails.builder()
                 .id(String.valueOf(CASE_ID))
@@ -111,21 +88,23 @@ public class CaseAccessOperationTest {
                 .reference(CASE_REFERENCE_OTHER)
                 .build();
 
-            doReturn(caseDetailsOther).when(dataStoreApiClient)
-                .getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN, String.valueOf(CASE_REFERENCE_OTHER));
-            doReturn(caseDetails).when(dataStoreApiClient)
-                .getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN, String.valueOf(CASE_REFERENCE));
+            doReturn(caseDetailsOther).when(dataStoreRepository)
+                .findCaseByCaseIdUsingExternalApi(String.valueOf(CASE_REFERENCE_OTHER));
+            doReturn(caseDetails).when(dataStoreRepository)
+                .findCaseByCaseIdUsingExternalApi(String.valueOf(CASE_REFERENCE));
+            doReturn(null).when(dataStoreRepository)
+                .findCaseByCaseIdUsingExternalApi(String.valueOf(CASE_NOT_FOUND_REFERENCE));
 
-            Map<String, Object> orgIdToCountMap = new HashMap<>();
-            orgIdToCountMap.put(getOrgUserCountSupDataKey(ORGANISATION), -1L);
-            supplementaryDataUpdateRequest = new SupplementaryDataUpdateRequest();
-            supplementaryDataUpdateRequest.setIncOperation(orgIdToCountMap);
+            Map<String, Long> orgIdToCountMap = new HashMap<>();
+            orgIdToCountMap.put(ORGANISATION, 1L);
+            caseReferenceToOrgIdCountMap = new HashMap<>();
+            caseReferenceToOrgIdCountMap.put(CASE_REFERENCE.toString(), orgIdToCountMap);
 
-            Map<String, Object> orgIdToCountMapOther = new HashMap<>();
-            orgIdToCountMapOther.put(getOrgUserCountSupDataKey(ORGANISATION), -1L);
-            orgIdToCountMapOther.put(getOrgUserCountSupDataKey(ORGANISATION_OTHER), -1L);
-            supplementaryDataUpdateRequestOther = new SupplementaryDataUpdateRequest();
-            supplementaryDataUpdateRequestOther.setIncOperation(orgIdToCountMapOther);
+            Map<String, Long> orgIdToCountMapOther = new HashMap<>();
+            orgIdToCountMapOther.put(ORGANISATION, 1L);
+            orgIdToCountMapOther.put(ORGANISATION_OTHER, 1L);
+            caseReferenceToOrgIdCountMapOther = new HashMap<>();
+            caseReferenceToOrgIdCountMapOther.put(CASE_REFERENCE_OTHER.toString(), orgIdToCountMapOther);
         }
 
         @Test
@@ -158,9 +137,8 @@ public class CaseAccessOperationTest {
                     deleteRequests.get(0)
                 )
             );
-            verify(dataStoreApiClient, times(1)).getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN,
-                                                                                      CASE_REFERENCE.toString());
-            verify(dataStoreApiClient, never()).updateCaseSupplementaryData(any(), any());
+            verify(dataStoreRepository, times(1))
+                .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE.toString());
         }
 
         @Test
@@ -193,10 +171,8 @@ public class CaseAccessOperationTest {
                     deleteRequests.get(0)
                 )
             );
-            verify(dataStoreApiClient, times(1)).getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN,
-                                                                                      CASE_REFERENCE.toString());
-            verify(dataStoreApiClient, never()).updateCaseSupplementaryData(any(), any());
-
+            verify(dataStoreRepository, times(1))
+                .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE.toString());
         }
 
         @Test
@@ -242,11 +218,10 @@ public class CaseAccessOperationTest {
                     deleteRequestsMapByCaseId.get(CASE_REFERENCE_OTHER.toString())
                 )
             );
-            verify(dataStoreApiClient, times(1)).getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN,
-                                                                                      CASE_REFERENCE.toString());
-            verify(dataStoreApiClient, times(1)).getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN,
-                                                                                      CASE_REFERENCE_OTHER.toString());
-            verify(dataStoreApiClient, never()).updateCaseSupplementaryData(any(), any());
+            verify(dataStoreRepository, times(1))
+                .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE.toString());
+            verify(dataStoreRepository, times(1))
+                .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE_OTHER.toString());
         }
 
         @Test
@@ -255,16 +230,16 @@ public class CaseAccessOperationTest {
 
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRoleWithOrganisation(CASE_NOT_FOUND.toString(), USER_ID, CASE_ROLE)
+                new CaseAssignedUserRoleWithOrganisation(CASE_NOT_FOUND_REFERENCE.toString(), USER_ID, CASE_ROLE)
             );
 
             // ACT / ASSERT
             assertThrows(CaseNotFoundException.class, () -> caseAccessOperation.removeCaseUserRoles(caseUserRoles));
 
             verifyNoInteractions(roleAssignmentService);
-            verify(dataStoreApiClient, times(1)).getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN,
-                                                                                      CASE_NOT_FOUND.toString());
-            verify(dataStoreApiClient, never()).updateCaseSupplementaryData(any(), any());
+            verify(dataStoreRepository, times(1))
+                .findCaseByCaseIdUsingExternalApi(CASE_NOT_FOUND_REFERENCE.toString());
+            //verify(dataStoreApiClient, never()).updateCaseSupplementaryData(any(), any());
         }
 
         @Test
@@ -298,16 +273,10 @@ public class CaseAccessOperationTest {
             );
 
             // ASSERT
-            verify(dataStoreApiClient).updateCaseSupplementaryData(
-                anyString(),
-                updateSupplementaryArgumentCaptor.capture()
-            );
-            SupplementaryDataUpdateRequest request = updateSupplementaryArgumentCaptor.getValue();
-            assertEquals(supplementaryDataUpdateRequest.getIncOperation(), request.getIncOperation());
-            verify(dataStoreApiClient, times(1)).getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN,
-                                                                                      CASE_REFERENCE.toString());
-            verify(dataStoreApiClient, times(1))
-                .updateCaseSupplementaryData(CASE_REFERENCE.toString(), supplementaryDataUpdateRequest);
+            verify(dataStoreRepository, times(1))
+                .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE.toString());
+            verify(dataStoreRepository, times(1))
+                .incrementCaseSupplementaryData(caseReferenceToOrgIdCountMap);
         }
 
         @Test
@@ -328,9 +297,8 @@ public class CaseAccessOperationTest {
 
             // ASSERT
             verify(roleAssignmentService, times(1)).deleteRoleAssignments(new ArrayList<>());
-            verify(dataStoreApiClient, times(1)).getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN,
-                                                                                      CASE_REFERENCE.toString());
-            verify(dataStoreApiClient, never()).updateCaseSupplementaryData(any(), any());
+            verify(dataStoreRepository, times(1))
+                .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE.toString());
         }
 
         @Test
@@ -367,9 +335,8 @@ public class CaseAccessOperationTest {
                 )
             );
 
-            verify(dataStoreApiClient, times(1)).getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN,
+            verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
                                                                                       CASE_REFERENCE.toString());
-            verify(dataStoreApiClient, never()).updateCaseSupplementaryData(anyString(), any());
         }
 
         @Test
@@ -394,12 +361,6 @@ public class CaseAccessOperationTest {
             caseAccessOperation.removeCaseUserRoles(caseUserRoles);
 
             // ASSERT
-            verify(dataStoreApiClient).updateCaseSupplementaryData(
-                anyString(),
-                updateSupplementaryArgumentCaptor.capture()
-            );
-            SupplementaryDataUpdateRequest request = updateSupplementaryArgumentCaptor.getValue();
-            assertEquals(supplementaryDataUpdateRequest.getIncOperation(), request.getIncOperation());
 
             verify(roleAssignmentService).deleteRoleAssignments(deleteRequestsCaptor.capture()
             );
@@ -411,9 +372,9 @@ public class CaseAccessOperationTest {
                     deleteRequests.get(0)
                 )
             );
-            verify(dataStoreApiClient, times(1))
-                .updateCaseSupplementaryData(CASE_REFERENCE.toString(), supplementaryDataUpdateRequest);
-            verify(dataStoreApiClient, times(1)).getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN,
+            verify(dataStoreRepository, times(1))
+                .incrementCaseSupplementaryData(caseReferenceToOrgIdCountMap);
+            verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
                                                                                       CASE_REFERENCE.toString());
         }
 
@@ -443,14 +404,6 @@ public class CaseAccessOperationTest {
             caseAccessOperation.removeCaseUserRoles(caseUserRoles);
 
             // ASSERT
-            verify(dataStoreApiClient).updateCaseSupplementaryData(
-                anyString(),
-                updateSupplementaryArgumentCaptor.capture()
-            );
-
-            SupplementaryDataUpdateRequest request = updateSupplementaryArgumentCaptor.getValue();
-            assertEquals(supplementaryDataUpdateRequest.getIncOperation(), request.getIncOperation());
-
             verify(roleAssignmentService).deleteRoleAssignments(deleteRequestsCaptor.capture()
             );
             List<RoleAssignmentsDeleteRequest> deleteRequests = deleteRequestsCaptor.getValue();
@@ -461,9 +414,9 @@ public class CaseAccessOperationTest {
                     deleteRequests.get(0)
                 )
             );
-            verify(dataStoreApiClient, times(1))
-                .updateCaseSupplementaryData(CASE_REFERENCE.toString(), supplementaryDataUpdateRequest);
-            verify(dataStoreApiClient, times(1)).getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN,
+            verify(dataStoreRepository, times(1))
+                .incrementCaseSupplementaryData(caseReferenceToOrgIdCountMap);
+            verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
                                                                                       CASE_REFERENCE.toString());
         }
 
@@ -494,14 +447,6 @@ public class CaseAccessOperationTest {
             caseAccessOperation.removeCaseUserRoles(caseUserRoles);
 
             // ASSERT
-            verify(dataStoreApiClient).updateCaseSupplementaryData(
-                anyString(),
-                updateSupplementaryArgumentCaptor.capture()
-            );
-
-            SupplementaryDataUpdateRequest request = updateSupplementaryArgumentCaptor.getValue();
-            assertEquals(supplementaryDataUpdateRequest.getIncOperation(), request.getIncOperation());
-
             verify(roleAssignmentService).deleteRoleAssignments(deleteRequestsCaptor.capture()
             );
             List<RoleAssignmentsDeleteRequest> deleteRequests = deleteRequestsCaptor.getValue();
@@ -512,9 +457,9 @@ public class CaseAccessOperationTest {
                     deleteRequests.get(0)
                 )
             );
-            verify(dataStoreApiClient, times(1))
-                .updateCaseSupplementaryData(CASE_REFERENCE.toString(), supplementaryDataUpdateRequest);
-            verify(dataStoreApiClient, times(1)).getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN,
+            verify(dataStoreRepository, times(1))
+                .incrementCaseSupplementaryData(caseReferenceToOrgIdCountMap);
+            verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
                                                                                       CASE_REFERENCE.toString());
         }
 
@@ -554,8 +499,7 @@ public class CaseAccessOperationTest {
                     deleteRequests.get(0)
                 )
             );
-            verify(dataStoreApiClient, never()).updateCaseSupplementaryData(any(), any());
-            verify(dataStoreApiClient, times(1)).getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN,
+            verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
                                                                                       CASE_REFERENCE.toString());
         }
 
@@ -596,8 +540,7 @@ public class CaseAccessOperationTest {
                     deleteRequests.get(0)
                 )
             );
-            verify(dataStoreApiClient, never()).updateCaseSupplementaryData(any(), any());
-            verify(dataStoreApiClient, times(1)).getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN,
+            verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
                                                                                       CASE_REFERENCE.toString());
         }
 
@@ -636,13 +579,6 @@ public class CaseAccessOperationTest {
             caseAccessOperation.removeCaseUserRoles(caseUserRoles);
 
             // ASSERT
-            verify(dataStoreApiClient).updateCaseSupplementaryData(
-                anyString(),
-                updateSupplementaryArgumentCaptor.capture()
-            );
-            SupplementaryDataUpdateRequest request = updateSupplementaryArgumentCaptor.getValue();
-            assertEquals(supplementaryDataUpdateRequestOther.getIncOperation(), request.getIncOperation());
-
             verify(roleAssignmentService).deleteRoleAssignments(deleteRequestsCaptor.capture()
             );
             List<RoleAssignmentsDeleteRequest> deleteRequests = deleteRequestsCaptor.getValue();
@@ -657,7 +593,7 @@ public class CaseAccessOperationTest {
                     deleteRequests.get(1)
                 )
             );
-            verify(dataStoreApiClient, times(1)).getCaseDetailsByCaseIdViaExternalApi(USER_TOKEN,
+            verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
                                                                                       CASE_REFERENCE.toString());
         }
     }
@@ -680,7 +616,7 @@ public class CaseAccessOperationTest {
 
         @Test
         void shouldReturnEmptyResultOnNonExistingCases() {
-            List<Long> caseReferences = Lists.newArrayList(CASE_NOT_FOUND);
+            List<Long> caseReferences = Lists.newArrayList(CASE_NOT_FOUND_REFERENCE);
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(
                 caseReferences, Lists.newArrayList());
 
@@ -730,10 +666,6 @@ public class CaseAccessOperationTest {
                                                 List<CaseAssignedUserRole> secondCallCaseUserRoles) {
         mockExistingCaseUserRolesForRA(existingCaseUserRoles)
             .thenReturn(secondCallCaseUserRoles);
-    }
-
-    private String getOrgUserCountSupDataKey(String organisationId) {
-        return "orgs_assigned_users." + organisationId;
     }
 }
 

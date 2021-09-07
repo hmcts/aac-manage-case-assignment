@@ -3,14 +3,13 @@ package uk.gov.hmcts.reform.managecase.service.cau;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
-import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
-import uk.gov.hmcts.reform.managecase.data.casedetails.supplementary.SupplementaryDataOperation;
+import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentService;
 
@@ -25,18 +24,18 @@ import java.util.stream.Collectors;
 @Service
 public class CaseAccessOperation {
 
-    public static final String ORGS_ASSIGNED_USERS_PATH = "orgs_assigned_users.";
     public static final String CREATOR = "[CREATOR]";
 
     private final RoleAssignmentService roleAssignmentService;
-    private final DataStoreApiClient dataStoreApi;
+    private final DataStoreRepository dataStoreRepository;
     protected final SecurityUtils securityUtils;
 
     @Autowired
-    public CaseAccessOperation(RoleAssignmentService roleAssignmentService, DataStoreApiClient dataStoreApi,
+    public CaseAccessOperation(RoleAssignmentService roleAssignmentService, @Qualifier("defaultDataStoreRepository")
+        DataStoreRepository dataStoreRepository,
                                SecurityUtils securityUtils) {
         this.roleAssignmentService = roleAssignmentService;
-        this.dataStoreApi = dataStoreApi;
+        this.dataStoreRepository = dataStoreRepository;
         this.securityUtils = securityUtils;
     }
 
@@ -102,35 +101,7 @@ public class CaseAccessOperation {
         Map<String, Map<String, Long>> removeUserCounts
             = getNewUserCountByCaseAndOrganisation(filteredCauRolesByCaseDetails, null);
 
-        updateSupplementaryData(SupplementaryDataOperation.INC, removeUserCounts);
-    }
-
-    private void updateSupplementaryData(SupplementaryDataOperation operation, Map<String, Map<String, Long>> data) {
-        for (Map.Entry<String, Map<String, Long>> caseReferenceToOrgCountMapEntry : data.entrySet()) {
-            SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest();
-            Map<String, Object> formattedOrgToCountMap = new HashMap<>();
-            for (Map.Entry<String, Long> originalOrgToCountMap : caseReferenceToOrgCountMapEntry.getValue()
-                .entrySet()) {
-                formattedOrgToCountMap.put(
-                    ORGS_ASSIGNED_USERS_PATH + originalOrgToCountMap.getKey(),
-                    Math.negateExact(originalOrgToCountMap.getValue())
-                );
-            }
-            switch (operation.getOperationName()) {
-                case "$inc":
-                    updateRequest.setIncOperation(formattedOrgToCountMap);
-                    break;
-                case "$set":
-                    updateRequest.setSetOperation(formattedOrgToCountMap);
-                    break;
-                case "$find":
-                    updateRequest.setFindOperation(formattedOrgToCountMap);
-                    break;
-                default:
-                    log.error("Supplementary Data Operation " + operation.getOperationName() + " not recognized");
-            }
-            dataStoreApi.updateCaseSupplementaryData(caseReferenceToOrgCountMapEntry.getKey(), updateRequest);
-        }
+        dataStoreRepository.incrementCaseSupplementaryData(removeUserCounts);
     }
 
     private Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> findAndFilterOnExistingCauRoles(
@@ -218,8 +189,7 @@ public class CaseAccessOperation {
 
     private List<CaseDetails> getCaseDetailsList(List<Long> caseReferences) {
         return caseReferences.stream()
-            .map(caseReference -> dataStoreApi.getCaseDetailsByCaseIdViaExternalApi(
-                securityUtils.getUserBearerToken(),
+            .map(caseReference -> dataStoreRepository.findCaseByCaseIdUsingExternalApi(
                 caseReference.toString()
             )).filter(Objects::nonNull)
             .collect(Collectors.toCollection(ArrayList::new));

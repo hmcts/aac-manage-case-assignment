@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.UpdateSupplementaryDataException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
@@ -22,6 +23,8 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisat
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
@@ -40,14 +43,17 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.CHANGE_ORGANISATION_REQUEST_FIELD;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getCaseViewFields;
@@ -57,8 +63,11 @@ import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CALLBACK_FAILED_ERRORS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.CHANGE_ORGANISATION_REQUEST_MISSING_CASE_FIELD_ID;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.INCOMPLETE_CALLBACK;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.INVALID_UPDATE_SUPPLEMENTARY_REQUEST;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOC_REQUEST_DESCRIPTION;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NO_ORGANISATION_VALUE_MAPPING;
+import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NULL_UPDATE_SUPPLEMENTARY_REQUEST_PARAMETER;
 
 
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
@@ -82,8 +91,13 @@ class DataStoreRepositoryTest {
 
     public static final String USER_TOKEN = "Bearer user Token";
     public static final String SYSTEM_USER_TOKEN = "Bearer system user Token";
-
+    private static final String ORGANISATION = "ORGANISATION";
+    private static final String ORGANISATION_OTHER = "ORGANISATION_OTHER";
+    private static final Long CASE_REFERENCE = 1234123412341236L;
+    private static final Long CASE_REFERENCE_OTHER = 1111222233334444L;
     private static final String JURISDICTION = "Jurisdiction";
+    private Map<String, Map<String, Long>> caseReferenceToOrgIdCountMap;
+    private Map<String, Map<String, Long>> caseReferenceToOrgIdCountMapUnprocessed;
 
     @Mock
     private DataStoreApiClient dataStoreApi;
@@ -601,5 +615,117 @@ class DataStoreRepositoryTest {
             repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build()))
             .isInstanceOf(RuntimeException.class)
             .hasMessage(CALLBACK_FAILED_ERRORS_MESSAGE);
+    }
+
+    @Test
+    @DisplayName("Call ccd-datastore to increment single organisation in case supplementary data")
+    void shouldReturnSupplementaryDataResourceWhenSuccessfulSingleIncrementCall() {
+
+        SupplementaryDataResource expectedResource = new SupplementaryDataResource();
+        Map<String, Object> resourceMap = new HashMap<>();
+        resourceMap.put(getOrgUserCountSupDataKey(ORGANISATION), 4);
+        expectedResource.setResponse(resourceMap);
+
+        Map<String, Long> orgIdToCountMapUnprocessed = new HashMap<>();
+        orgIdToCountMapUnprocessed.put(ORGANISATION, 1L);
+        caseReferenceToOrgIdCountMapUnprocessed = new HashMap<>();
+        caseReferenceToOrgIdCountMapUnprocessed.put(CASE_REFERENCE.toString(), orgIdToCountMapUnprocessed);
+
+        Map<String, Object> orgIdToCountMap = new HashMap<>();
+        orgIdToCountMap.put(getOrgUserCountSupDataKey(ORGANISATION), -1L);
+
+        SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest();
+        updateRequest.setIncOperation(orgIdToCountMap);
+        doReturn(expectedResource).when(dataStoreApi).updateCaseSupplementaryData(
+            CASE_REFERENCE.toString(),
+            updateRequest
+        );
+
+        SupplementaryDataResource responseResource = repository.incrementCaseSupplementaryData(
+            caseReferenceToOrgIdCountMapUnprocessed
+        );
+        assertEquals(expectedResource, responseResource);
+
+    }
+
+    @Test
+    @DisplayName("Call ccd-datastore to increment multiple organisation in case supplementary data")
+    void shouldReturnSupplementaryDataResourceWhenSuccessfulMultipleIncrementCall() {
+
+        SupplementaryDataResource expectedResource = new SupplementaryDataResource();
+        Map<String, Object> resourceMap = new HashMap<>();
+        resourceMap.put(getOrgUserCountSupDataKey(ORGANISATION), 4);
+        resourceMap.put(getOrgUserCountSupDataKey(ORGANISATION_OTHER), 3);
+        expectedResource.setResponse(resourceMap);
+
+        Map<String, Long> orgIdToCountMapUnprocessed = new HashMap<>();
+        orgIdToCountMapUnprocessed.put(ORGANISATION, 1L);
+        orgIdToCountMapUnprocessed.put(ORGANISATION_OTHER, 2L);
+        caseReferenceToOrgIdCountMapUnprocessed = new HashMap<>();
+        caseReferenceToOrgIdCountMapUnprocessed.put(CASE_REFERENCE_OTHER.toString(), orgIdToCountMapUnprocessed);
+
+        Map<String, Object> orgIdToCountMapOther = new HashMap<>();
+        orgIdToCountMapOther.put(getOrgUserCountSupDataKey(ORGANISATION), -1L);
+        orgIdToCountMapOther.put(getOrgUserCountSupDataKey(ORGANISATION_OTHER), -2L);
+
+        SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest();
+        updateRequest.setIncOperation(orgIdToCountMapOther);
+        doReturn(expectedResource).when(dataStoreApi).updateCaseSupplementaryData(
+            CASE_REFERENCE_OTHER.toString(),
+            updateRequest
+        );
+
+        SupplementaryDataResource responseResource = repository
+            .incrementCaseSupplementaryData(caseReferenceToOrgIdCountMapUnprocessed);
+        assertEquals(expectedResource, responseResource);
+
+    }
+
+    @Test
+    @DisplayName("Do not call ccd-datastore to update case supplementary data when data is null")
+    void shouldReturnNullWhenDataIsNull() {
+
+        final UpdateSupplementaryDataException expectedException =
+            assertThrows(UpdateSupplementaryDataException.class, () -> repository.incrementCaseSupplementaryData(
+                null));
+        assertEquals(NULL_UPDATE_SUPPLEMENTARY_REQUEST_PARAMETER, expectedException.getMessage());
+        verifyNoInteractions(dataStoreApi);
+    }
+
+    @Test
+    @DisplayName("Do not call ccd-datastore to update case supplementary data when data is incomplete")
+    void shouldReturnNullWhenDataIsIncomplete() {
+
+        Map<String, Long> orgIdToCountMap = new HashMap<>();
+        orgIdToCountMap.put(ORGANISATION_OTHER, null);
+        caseReferenceToOrgIdCountMap = new HashMap<>();
+        caseReferenceToOrgIdCountMap.put(CASE_REFERENCE.toString(), orgIdToCountMap);
+
+        final UpdateSupplementaryDataException expectedException =
+            assertThrows(UpdateSupplementaryDataException.class, () -> repository.incrementCaseSupplementaryData(
+                caseReferenceToOrgIdCountMap));
+        assertEquals(INVALID_UPDATE_SUPPLEMENTARY_REQUEST, expectedException.getMessage());
+        verifyNoInteractions(dataStoreApi);
+
+    }
+
+    @Test
+    @DisplayName("Do not call ccd-datastore to update case supplementary data when data is empty")
+    void shouldReturnNullWhenDataIsEmpty() {
+
+        Map<String, Long> orgIdToCountMap = new HashMap<>();
+        caseReferenceToOrgIdCountMap = new HashMap<>();
+        caseReferenceToOrgIdCountMap.put(CASE_REFERENCE.toString(), orgIdToCountMap);
+
+        final UpdateSupplementaryDataException expectedException =
+            assertThrows(UpdateSupplementaryDataException.class, () -> repository.incrementCaseSupplementaryData(
+                caseReferenceToOrgIdCountMap));
+        assertEquals(NO_ORGANISATION_VALUE_MAPPING, expectedException.getMessage());
+        verifyNoInteractions(dataStoreApi);
+
+    }
+
+    private String getOrgUserCountSupDataKey(String organisationId) {
+        return "orgs_assigned_users." + organisationId;
     }
 }

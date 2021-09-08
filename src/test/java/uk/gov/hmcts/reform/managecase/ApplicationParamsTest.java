@@ -10,7 +10,7 @@ class ApplicationParamsTest {
     private ApplicationParams applicationParams = new ApplicationParams();
 
     @Test
-    public void shouldGetRoleAssignmentServiceHost() {
+    void shouldGetRoleAssignmentServiceHost() {
         final var roleAssignmentServiceHost = "test-value";
         final var baseUrl = roleAssignmentServiceHost + "/am/role-assignments";
 
@@ -21,7 +21,7 @@ class ApplicationParamsTest {
     }
 
     @Test
-    public void shouldGetAmQueryRoleAssignmentsURL() {
+    void shouldGetAmQueryRoleAssignmentsURL() {
         final var roleAssignmentServiceHost = "test-value";
         final var baseUrl = roleAssignmentServiceHost + "/am/role-assignments/query";
 
@@ -33,7 +33,7 @@ class ApplicationParamsTest {
 
 
     @Test
-    public void shouldGetAmDeleteByQueryRoleAssignmentsURL() {
+    void shouldGetAmDeleteByQueryRoleAssignmentsURL() {
         final var roleAssignmentServiceHost = "test-value";
         final var baseUrl = roleAssignmentServiceHost + "/am/role-assignments/query/delete";
 

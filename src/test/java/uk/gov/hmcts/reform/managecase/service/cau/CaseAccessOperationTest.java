@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.OngoingStubbing;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsDeleteRequest;
@@ -32,9 +33,11 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -139,6 +142,7 @@ public class CaseAccessOperationTest {
             );
             verify(dataStoreRepository, times(1))
                 .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE.toString());
+            verify(dataStoreRepository, never()).incrementCaseSupplementaryData(any());
         }
 
         @Test
@@ -173,6 +177,7 @@ public class CaseAccessOperationTest {
             );
             verify(dataStoreRepository, times(1))
                 .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE.toString());
+            verify(dataStoreRepository, never()).incrementCaseSupplementaryData(any());
         }
 
         @Test
@@ -222,6 +227,7 @@ public class CaseAccessOperationTest {
                 .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE.toString());
             verify(dataStoreRepository, times(1))
                 .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE_OTHER.toString());
+            verify(dataStoreRepository, never()).incrementCaseSupplementaryData(any());
         }
 
         @Test
@@ -234,12 +240,15 @@ public class CaseAccessOperationTest {
             );
 
             // ACT / ASSERT
-            assertThrows(CaseNotFoundException.class, () -> caseAccessOperation.removeCaseUserRoles(caseUserRoles));
+            assertThrows(
+                CaseCouldNotBeFoundException.class,
+                () -> caseAccessOperation.removeCaseUserRoles(caseUserRoles)
+            );
 
             verifyNoInteractions(roleAssignmentService);
             verify(dataStoreRepository, times(1))
                 .findCaseByCaseIdUsingExternalApi(CASE_NOT_FOUND_REFERENCE.toString());
-            //verify(dataStoreApiClient, never()).updateCaseSupplementaryData(any(), any());
+            verify(dataStoreRepository, never()).incrementCaseSupplementaryData(any());
         }
 
         @Test
@@ -299,6 +308,7 @@ public class CaseAccessOperationTest {
             verify(roleAssignmentService, times(1)).deleteRoleAssignments(new ArrayList<>());
             verify(dataStoreRepository, times(1))
                 .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE.toString());
+            verify(dataStoreRepository, never()).incrementCaseSupplementaryData(any());
         }
 
         @Test
@@ -336,7 +346,8 @@ public class CaseAccessOperationTest {
             );
 
             verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
-                                                                                      CASE_REFERENCE.toString());
+                CASE_REFERENCE.toString());
+            verify(dataStoreRepository, never()).incrementCaseSupplementaryData(any());
         }
 
         @Test
@@ -375,7 +386,7 @@ public class CaseAccessOperationTest {
             verify(dataStoreRepository, times(1))
                 .incrementCaseSupplementaryData(caseReferenceToOrgIdCountMap);
             verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
-                                                                                      CASE_REFERENCE.toString());
+                CASE_REFERENCE.toString());
         }
 
         @Test
@@ -417,7 +428,7 @@ public class CaseAccessOperationTest {
             verify(dataStoreRepository, times(1))
                 .incrementCaseSupplementaryData(caseReferenceToOrgIdCountMap);
             verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
-                                                                                      CASE_REFERENCE.toString());
+                CASE_REFERENCE.toString());
         }
 
         @Test
@@ -460,7 +471,7 @@ public class CaseAccessOperationTest {
             verify(dataStoreRepository, times(1))
                 .incrementCaseSupplementaryData(caseReferenceToOrgIdCountMap);
             verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
-                                                                                      CASE_REFERENCE.toString());
+                CASE_REFERENCE.toString());
         }
 
         @Test
@@ -500,7 +511,8 @@ public class CaseAccessOperationTest {
                 )
             );
             verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
-                                                                                      CASE_REFERENCE.toString());
+                CASE_REFERENCE.toString());
+            verify(dataStoreRepository, never()).incrementCaseSupplementaryData(any());
         }
 
         @Test
@@ -541,7 +553,8 @@ public class CaseAccessOperationTest {
                 )
             );
             verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
-                                                                                      CASE_REFERENCE.toString());
+                CASE_REFERENCE.toString());
+            verify(dataStoreRepository, never()).incrementCaseSupplementaryData(any());
         }
 
         @Test
@@ -594,7 +607,7 @@ public class CaseAccessOperationTest {
                 )
             );
             verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
-                                                                                      CASE_REFERENCE.toString());
+                CASE_REFERENCE.toString());
         }
     }
 

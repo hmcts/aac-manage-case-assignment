@@ -66,8 +66,6 @@ import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreReposito
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.INVALID_UPDATE_SUPPLEMENTARY_REQUEST;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOC_REQUEST_DESCRIPTION;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT;
-import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NO_ORGANISATION_VALUE_MAPPING;
-import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.NULL_UPDATE_SUPPLEMENTARY_REQUEST_PARAMETER;
 
 
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
@@ -323,7 +321,7 @@ class DataStoreRepositoryTest {
     }
 
     @Test
-    @DisplayName("Should throw CaseNotFoundException  when Find case by caseId")
+    @DisplayName("Should throw CaseCouldNotBeFoundException when Find case by caseId")
     void shouldThrowCaseNotFoundExceptionForFindCaseByCaseId() {
         // ARRANGE
         Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null, Charset.defaultCharset(),
@@ -635,7 +633,7 @@ class DataStoreRepositoryTest {
         orgIdToCountMap.put(getOrgUserCountSupDataKey(ORGANISATION), -1L);
 
         SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest();
-        updateRequest.setIncOperation(orgIdToCountMap);
+        updateRequest.setIncrementalMap(orgIdToCountMap);
         doReturn(expectedResource).when(dataStoreApi).updateCaseSupplementaryData(
             CASE_REFERENCE.toString(),
             updateRequest
@@ -669,27 +667,15 @@ class DataStoreRepositoryTest {
         orgIdToCountMapOther.put(getOrgUserCountSupDataKey(ORGANISATION_OTHER), -2L);
 
         SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest();
-        updateRequest.setIncOperation(orgIdToCountMapOther);
+        updateRequest.setIncrementalMap(orgIdToCountMapOther);
         doReturn(expectedResource).when(dataStoreApi).updateCaseSupplementaryData(
             CASE_REFERENCE_OTHER.toString(),
             updateRequest
         );
-
         SupplementaryDataResource responseResource = repository
             .incrementCaseSupplementaryData(caseReferenceToOrgIdCountMapUnprocessed);
         assertEquals(expectedResource, responseResource);
 
-    }
-
-    @Test
-    @DisplayName("Do not call ccd-datastore to update case supplementary data when data is null")
-    void shouldReturnNullWhenDataIsNull() {
-
-        final UpdateSupplementaryDataException expectedException =
-            assertThrows(UpdateSupplementaryDataException.class, () -> repository.incrementCaseSupplementaryData(
-                null));
-        assertEquals(NULL_UPDATE_SUPPLEMENTARY_REQUEST_PARAMETER, expectedException.getMessage());
-        verifyNoInteractions(dataStoreApi);
     }
 
     @Test
@@ -705,22 +691,6 @@ class DataStoreRepositoryTest {
             assertThrows(UpdateSupplementaryDataException.class, () -> repository.incrementCaseSupplementaryData(
                 caseReferenceToOrgIdCountMap));
         assertEquals(INVALID_UPDATE_SUPPLEMENTARY_REQUEST, expectedException.getMessage());
-        verifyNoInteractions(dataStoreApi);
-
-    }
-
-    @Test
-    @DisplayName("Do not call ccd-datastore to update case supplementary data when data is empty")
-    void shouldReturnNullWhenDataIsEmpty() {
-
-        Map<String, Long> orgIdToCountMap = new HashMap<>();
-        caseReferenceToOrgIdCountMap = new HashMap<>();
-        caseReferenceToOrgIdCountMap.put(CASE_REFERENCE.toString(), orgIdToCountMap);
-
-        final UpdateSupplementaryDataException expectedException =
-            assertThrows(UpdateSupplementaryDataException.class, () -> repository.incrementCaseSupplementaryData(
-                caseReferenceToOrgIdCountMap));
-        assertEquals(NO_ORGANISATION_VALUE_MAPPING, expectedException.getMessage());
         verifyNoInteractions(dataStoreApi);
 
     }

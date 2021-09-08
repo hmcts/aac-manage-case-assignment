@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.client.datastore;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -15,41 +16,19 @@ import java.util.Map;
 public class SupplementaryDataUpdateRequest {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Map<String, Object> $inc;
+    @JsonProperty("$inc")
+    private Map<String, Object> incrementalMap;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Map<String, Object> $set;
+    @JsonProperty("$set")
+    private Map<String, Object> setMap;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Map<String, Object> $find;
+    @JsonProperty("$find")
+    private Map<String, Object> findMap;
 
     @JsonIgnore
-    public Map<String, Object> getIncOperation() {
-        return $inc;
-    }
-
-    @JsonIgnore
-    public void setIncOperation(Map<String, Object> $inc) {
-        this.$inc = $inc;
-    }
-
-    @JsonIgnore
-    public Map<String, Object> getSetOperation() {
-        return $set;
-    }
-
-    @JsonIgnore
-    public void setSetOperation(Map<String, Object> $set) {
-        this.$set = $set;
-    }
-
-    @JsonIgnore
-    public Map<String, Object> getFindOperation() {
-        return $find;
-    }
-
-    @JsonIgnore
-    public void setFindOperation(Map<String, Object> $find) {
-        this.$find = $find;
+    public void setIncrementalMap(Map<String, Object> incrementalMap) {
+        this.incrementalMap = incrementalMap;
     }
 }

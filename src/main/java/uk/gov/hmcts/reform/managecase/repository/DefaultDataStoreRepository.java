@@ -54,10 +54,6 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     public static final String INCOMPLETE_CALLBACK = "INCOMPLETE_CALLBACK";
     public static final String CALLBACK_FAILED_ERRORS_MESSAGE =
         "Submitted callback failed. Please check data-store-api logs";
-    public static final String NULL_UPDATE_SUPPLEMENTARY_REQUEST_PARAMETER =
-        "Update supplementary data request must contain data";
-    public static final String NO_ORGANISATION_VALUE_MAPPING =
-        "Update supplementary data request must contain at least one organisation to value mapping";
     public static final String INVALID_UPDATE_SUPPLEMENTARY_REQUEST =
         "Update supplementary data request must contain both an organisation and value";
 
@@ -218,33 +214,25 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     @Override
     public SupplementaryDataResource incrementCaseSupplementaryData(Map<String,
         Map<String, Long>> data) {
-        if (data != null) {
-            for (Map.Entry<String, Map<String, Long>> caseReferenceToOrgCountMapEntry : data.entrySet()) {
-                SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest();
-                Map<String, Object> formattedOrgToCountMap = new HashMap<>();
-                for (Map.Entry<String, Long> originalOrgToCountMap : caseReferenceToOrgCountMapEntry.getValue()
-                    .entrySet()) {
-                    if (originalOrgToCountMap.getKey() != null && originalOrgToCountMap.getValue() != null) {
-                        formattedOrgToCountMap.put(
-                            ORGS_ASSIGNED_USERS_PATH + originalOrgToCountMap.getKey(),
-                            Math.negateExact(originalOrgToCountMap.getValue())
-                        );
-                    } else {
-                        throw new UpdateSupplementaryDataException(INVALID_UPDATE_SUPPLEMENTARY_REQUEST);
-                    }
-                }
-                if (!formattedOrgToCountMap.isEmpty()) {
-                    updateRequest.setIncOperation(formattedOrgToCountMap);
-                    return dataStoreApi.updateCaseSupplementaryData(
-                        caseReferenceToOrgCountMapEntry.getKey(),
-                        updateRequest
+        for (Map.Entry<String, Map<String, Long>> caseReferenceToOrgCountMapEntry : data.entrySet()) {
+            SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest();
+            Map<String, Object> formattedOrgToCountMap = new HashMap<>();
+            for (Map.Entry<String, Long> originalOrgToCountMap : caseReferenceToOrgCountMapEntry.getValue()
+                .entrySet()) {
+                if (originalOrgToCountMap.getKey() != null && originalOrgToCountMap.getValue() != null) {
+                    formattedOrgToCountMap.put(
+                        ORGS_ASSIGNED_USERS_PATH + originalOrgToCountMap.getKey(),
+                        Math.negateExact(originalOrgToCountMap.getValue())
                     );
                 } else {
-                    throw new UpdateSupplementaryDataException(NO_ORGANISATION_VALUE_MAPPING);
+                    throw new UpdateSupplementaryDataException(INVALID_UPDATE_SUPPLEMENTARY_REQUEST);
                 }
             }
-        } else {
-            throw new UpdateSupplementaryDataException(NULL_UPDATE_SUPPLEMENTARY_REQUEST_PARAMETER);
+            updateRequest.setIncrementalMap(formattedOrgToCountMap);
+            return dataStoreApi.updateCaseSupplementaryData(
+                caseReferenceToOrgCountMapEntry.getKey(),
+                updateRequest
+            );
         }
         return null;
     }

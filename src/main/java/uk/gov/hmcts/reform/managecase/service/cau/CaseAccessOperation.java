@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsDeleteRequest;
@@ -101,7 +102,9 @@ public class CaseAccessOperation {
         Map<String, Map<String, Long>> removeUserCounts
             = getNewUserCountByCaseAndOrganisation(filteredCauRolesByCaseDetails, null);
 
-        dataStoreRepository.incrementCaseSupplementaryData(removeUserCounts);
+        if (!removeUserCounts.isEmpty()) {
+            dataStoreRepository.incrementCaseSupplementaryData(removeUserCounts);
+        }
     }
 
     private Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> findAndFilterOnExistingCauRoles(
@@ -180,7 +183,7 @@ public class CaseAccessOperation {
             if (caseDetailsByReferences.containsKey(caseReference)) {
                 cauRolesByCaseCaseDetails.put(caseDetailsByReferences.get(caseReference), roles);
             } else {
-                throw new CaseNotFoundException(key);
+                throw new CaseCouldNotBeFoundException("No case found for reference: " + key);
             }
         });
 

@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.managecase.client.datastore;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModelProperty;
@@ -48,9 +46,6 @@ public class CaseDetails {
     @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID_LENGTH)
     @LuhnCheck(message = ValidationError.CASE_ID_INVALID, ignoreNonDigitCharacters = false)
     private String id;
-
-    @JsonIgnore
-    private Long reference;
 
     private String jurisdiction;
 
@@ -149,17 +144,7 @@ public class CaseDetails {
     }
 
     @JsonIgnore
-    public String getReferenceAsString() {
-        return reference != null ? reference.toString() : null;
-    }
-
-    @JsonGetter("id")
-    public Long getReference() {
-        return reference;
-    }
-
-    @JsonSetter("id")
-    public void setReference(Long reference) {
-        this.reference = reference;
+    public Long getReferenceAsLong() {
+        return Long.parseLong(id);
     }
 }

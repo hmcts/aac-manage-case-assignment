@@ -51,7 +51,7 @@ public class CaseAccessOperation {
         List<String> userIds = getUserIdsFromMap(cauRolesByCaseDetails);
 
         final var caseIds = caseDetailsList.stream()
-            .map(CaseDetails::getReferenceAsString).collect(Collectors.toList());
+            .map(CaseDetails::getId).collect(Collectors.toList());
         return roleAssignmentService.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
 
     }
@@ -85,7 +85,7 @@ public class CaseAccessOperation {
             // for each user in current case: add list of all case-roles to revoke to the delete requests
             caseRolesByUserAndCase.forEach((userId, roleNames) ->
                                                deleteRequests.add(RoleAssignmentsDeleteRequest.builder()
-                                                                      .caseId(caseDetails.getReferenceAsString())
+                                                                      .caseId(caseDetails.getId())
                                                                       .userId(userId)
                                                                       .roleNames(roleNames)
                                                                       .build()
@@ -121,7 +121,7 @@ public class CaseAccessOperation {
                 entry -> filterOnExistingCauRoles(
                     entry.getValue(),
                     existingCaseUserRolesByCaseReference.getOrDefault(
-                        entry.getKey().getReferenceAsString(),
+                        entry.getKey().getId(),
                         new ArrayList<>()
                     )
                 )
@@ -168,7 +168,7 @@ public class CaseAccessOperation {
 
         // create map of case references to case details
         Map<Long, CaseDetails> caseDetailsByReferences = getCaseDetailsList(caseReferences).stream()
-            .collect(Collectors.toMap(CaseDetails::getReference, caseDetails -> caseDetails));
+            .collect(Collectors.toMap(CaseDetails::getReferenceAsLong, caseDetails -> caseDetails));
 
         // group roles by case reference
         Map<String, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseReference = caseUserRoles.stream()
@@ -240,7 +240,7 @@ public class CaseAccessOperation {
         // for each case: count new Case-User relationships by Organisation
         caseUserRolesWhichHaveAnOrgId.forEach((caseDetails, requestedAssignments) -> {
             List<String> existingUsersForCase
-                = existingCaseUserRelationships.getOrDefault(caseDetails.getReference(), new ArrayList<>());
+                = existingCaseUserRelationships.getOrDefault(caseDetails.getReferenceAsLong(), new ArrayList<>());
 
             Map<String, Long> relationshipCounts = requestedAssignments.stream()
                 // filter out any existing relationships
@@ -255,7 +255,7 @@ public class CaseAccessOperation {
 
             // skip if no organisations have any relationships
             if (!relationshipCounts.isEmpty()) {
-                result.put(caseDetails.getReferenceAsString(), relationshipCounts);
+                result.put(caseDetails.getId(), relationshipCounts);
             }
         });
 

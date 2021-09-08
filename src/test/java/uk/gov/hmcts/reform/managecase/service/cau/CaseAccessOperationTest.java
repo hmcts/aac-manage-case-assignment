@@ -80,12 +80,12 @@ public class CaseAccessOperationTest {
 
             CaseDetails caseDetails = CaseDetails.builder()
                 .id(String.valueOf(CASE_ID))
-                .reference(CASE_REFERENCE)
+                .id(CASE_REFERENCE.toString())
                 .build();
 
             CaseDetails caseDetailsOther = CaseDetails.builder()
                 .id(String.valueOf(CASE_ID_OTHER))
-                .reference(CASE_REFERENCE_OTHER)
+                .id(CASE_REFERENCE_OTHER.toString())
                 .build();
 
             doReturn(caseDetailsOther).when(dataStoreRepository)

@@ -68,7 +68,7 @@ public interface DataStoreApiClient {
                                                      @PathVariable(CASE_ID) String caseId);
 
     @PostMapping(SUPPLEMENTARY_UPDATE)
-    SupplementaryDataResource updateCaseSupplementaryData(
+    void updateCaseSupplementaryData(
                                    @PathVariable(CASE_ID) String caseId,
                                    SupplementaryDataUpdateRequest supplementaryDataUpdateRequest);
 

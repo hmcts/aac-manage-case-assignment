@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisat
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
@@ -50,8 +49,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -619,11 +618,6 @@ class DataStoreRepositoryTest {
     @DisplayName("Call ccd-datastore to increment single organisation in case supplementary data")
     void shouldReturnSupplementaryDataResourceWhenSuccessfulSingleIncrementCall() {
 
-        SupplementaryDataResource expectedResource = new SupplementaryDataResource();
-        Map<String, Object> resourceMap = new HashMap<>();
-        resourceMap.put(getOrgUserCountSupDataKey(ORGANISATION), 4);
-        expectedResource.setResponse(resourceMap);
-
         Map<String, Long> orgIdToCountMapUnprocessed = new HashMap<>();
         orgIdToCountMapUnprocessed.put(ORGANISATION, 1L);
         caseReferenceToOrgIdCountMapUnprocessed = new HashMap<>();
@@ -634,27 +628,21 @@ class DataStoreRepositoryTest {
 
         SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest();
         updateRequest.setIncrementalMap(orgIdToCountMap);
-        doReturn(expectedResource).when(dataStoreApi).updateCaseSupplementaryData(
-            CASE_REFERENCE.toString(),
-            updateRequest
-        );
 
-        SupplementaryDataResource responseResource = repository.incrementCaseSupplementaryData(
-            caseReferenceToOrgIdCountMapUnprocessed
-        );
-        assertEquals(expectedResource, responseResource);
+        repository.incrementCaseSupplementaryData(caseReferenceToOrgIdCountMapUnprocessed);
+
+        ArgumentCaptor<SupplementaryDataUpdateRequest> requestCaptor = ArgumentCaptor
+            .forClass(SupplementaryDataUpdateRequest.class);
+        ArgumentCaptor<String> caseIdCaptor = ArgumentCaptor.forClass(String.class);
+        verify(dataStoreApi).updateCaseSupplementaryData(caseIdCaptor.capture(), requestCaptor.capture());
+        assertEquals(CASE_REFERENCE.toString(), caseIdCaptor.getValue());
+        assertEquals(updateRequest, requestCaptor.getValue());
 
     }
 
     @Test
-    @DisplayName("Call ccd-datastore to increment multiple organisation in case supplementary data")
-    void shouldReturnSupplementaryDataResourceWhenSuccessfulMultipleIncrementCall() {
-
-        SupplementaryDataResource expectedResource = new SupplementaryDataResource();
-        Map<String, Object> resourceMap = new HashMap<>();
-        resourceMap.put(getOrgUserCountSupDataKey(ORGANISATION), 4);
-        resourceMap.put(getOrgUserCountSupDataKey(ORGANISATION_OTHER), 3);
-        expectedResource.setResponse(resourceMap);
+    @DisplayName("Call ccd-datastore to increment multiple organisations in case supplementary data")
+    void shouldReturnSupplementaryDataResourceWhenSuccessfulMultipleOrganisationIncrementCall() {
 
         Map<String, Long> orgIdToCountMapUnprocessed = new HashMap<>();
         orgIdToCountMapUnprocessed.put(ORGANISATION, 1L);
@@ -665,17 +653,50 @@ class DataStoreRepositoryTest {
         Map<String, Object> orgIdToCountMapOther = new HashMap<>();
         orgIdToCountMapOther.put(getOrgUserCountSupDataKey(ORGANISATION), -1L);
         orgIdToCountMapOther.put(getOrgUserCountSupDataKey(ORGANISATION_OTHER), -2L);
-
         SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest();
         updateRequest.setIncrementalMap(orgIdToCountMapOther);
-        doReturn(expectedResource).when(dataStoreApi).updateCaseSupplementaryData(
-            CASE_REFERENCE_OTHER.toString(),
-            updateRequest
-        );
-        SupplementaryDataResource responseResource = repository
-            .incrementCaseSupplementaryData(caseReferenceToOrgIdCountMapUnprocessed);
-        assertEquals(expectedResource, responseResource);
 
+        repository.incrementCaseSupplementaryData(caseReferenceToOrgIdCountMapUnprocessed);
+
+        ArgumentCaptor<SupplementaryDataUpdateRequest> requestCaptor = ArgumentCaptor
+            .forClass(SupplementaryDataUpdateRequest.class);
+        ArgumentCaptor<String> caseIdCaptor = ArgumentCaptor.forClass(String.class);
+        verify(dataStoreApi).updateCaseSupplementaryData(caseIdCaptor.capture(), requestCaptor.capture());
+        assertEquals(CASE_REFERENCE_OTHER.toString(), caseIdCaptor.getValue());
+        assertEquals(updateRequest, requestCaptor.getValue());
+    }
+
+    @Test
+    @DisplayName("Call ccd-datastore to increment organisations across multiple cases")
+    void shouldReturnSupplementaryDataResourceWhenSuccessfulMultipleCaseIncrementCall() {
+
+        Map<String, Long> orgIdToCountMapUnprocessed = new HashMap<>();
+        orgIdToCountMapUnprocessed.put(ORGANISATION_OTHER, 2L);
+        caseReferenceToOrgIdCountMapUnprocessed = new HashMap<>();
+        caseReferenceToOrgIdCountMapUnprocessed.put(CASE_REFERENCE_OTHER.toString(), orgIdToCountMapUnprocessed);
+        Map<String, Long> orgIdToCountMapUnprocessedSecond = new HashMap<>();
+        orgIdToCountMapUnprocessedSecond.put(ORGANISATION, 1L);
+        orgIdToCountMapUnprocessedSecond.put(ORGANISATION_OTHER, 3L);
+        caseReferenceToOrgIdCountMapUnprocessed.put(CASE_REFERENCE.toString(), orgIdToCountMapUnprocessedSecond);
+
+        Map<String, Object> orgIdToCountMap = new HashMap<>();
+        orgIdToCountMap.put(getOrgUserCountSupDataKey(ORGANISATION), -1L);
+        orgIdToCountMap.put(getOrgUserCountSupDataKey(ORGANISATION_OTHER), -3L);
+        SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest();
+        updateRequest.setIncrementalMap(orgIdToCountMap);
+
+        Map<String, Object> orgIdToCountMapOther = new HashMap<>();
+        orgIdToCountMapOther.put(getOrgUserCountSupDataKey(ORGANISATION_OTHER), -2L);
+        SupplementaryDataUpdateRequest updateRequestOther = new SupplementaryDataUpdateRequest();
+        updateRequestOther.setIncrementalMap(orgIdToCountMapOther);
+
+        repository.incrementCaseSupplementaryData(caseReferenceToOrgIdCountMapUnprocessed);
+
+        verify(dataStoreApi, times(2)).updateCaseSupplementaryData(any(), any());
+        verify(dataStoreApi, times(1))
+            .updateCaseSupplementaryData(CASE_REFERENCE.toString(), updateRequest);
+        verify(dataStoreApi, times(1))
+            .updateCaseSupplementaryData(CASE_REFERENCE_OTHER.toString(), updateRequestOther);
     }
 
     @Test

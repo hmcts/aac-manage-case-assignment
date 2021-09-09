@@ -4,7 +4,6 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
-import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
@@ -36,6 +35,5 @@ public interface DataStoreRepository {
 
     CaseDetails findCaseByCaseIdAsSystemUserUsingExternalApi(String caseId);
 
-    SupplementaryDataResource incrementCaseSupplementaryData(Map<String,
-        Map<String, Long>> data);
+    void incrementCaseSupplementaryData(Map<String, Map<String, Long>> data);
 }

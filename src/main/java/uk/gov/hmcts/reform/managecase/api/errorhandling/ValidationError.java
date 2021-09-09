@@ -70,9 +70,9 @@ public final class ValidationError {
             + "Role Assignment Service because of %s";
 
     public static final String ROLE_ASSIGNMENTS_CLIENT_ERROR =
-        "Client error when getting Role Assignments from Role Assignment Service because of %s";
+        "Client error when %s Role Assignments from Role Assignment Service because of %s";
     public static final String ROLE_ASSIGNMENT_SERVICE_ERROR =
-        "Problem getting Role Assignments from Role Assignment Service because of %s";
+        "Problem %s Role Assignments from Role Assignment Service because of %s";
 
     // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     private ValidationError() {

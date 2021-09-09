@@ -85,11 +85,8 @@ public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHel
         if (exception instanceof HttpClientErrorException
             && ((HttpClientErrorException) exception).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
             return resourceNotFoundException;
-        } else if (exception instanceof HttpClientErrorException
-            && HttpStatus.valueOf(((HttpClientErrorException) exception).getRawStatusCode()).is4xxClientError()) {
-            return new BadRequestException(String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, exception.getMessage()));
         } else {
-            return new ServiceException(String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, exception.getMessage()));
+            return mapException(exception, "getting");
         }
     }
 

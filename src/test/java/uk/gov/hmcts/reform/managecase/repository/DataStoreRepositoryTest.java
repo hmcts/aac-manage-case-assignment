@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdates;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewJurisdiction;
@@ -112,6 +113,8 @@ class DataStoreRepositoryTest {
     void setUp() {
         initMocks(this);
         given(securityUtils.getCaaSystemUserToken()).willReturn(SYSTEM_USER_TOKEN);
+        given(securityUtils.getUserBearerToken()).willReturn(SYSTEM_USER_TOKEN);
+
     }
 
     @Test
@@ -626,15 +629,17 @@ class DataStoreRepositoryTest {
         Map<String, Object> orgIdToCountMap = new HashMap<>();
         orgIdToCountMap.put(getOrgUserCountSupDataKey(ORGANISATION), -1L);
 
+        SupplementaryDataUpdates updates = new SupplementaryDataUpdates();
+        updates.setIncrementalMap(orgIdToCountMap);
         SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest();
-        updateRequest.setIncrementalMap(orgIdToCountMap);
+        updateRequest.setSupplementaryDataUpdates(updates);
 
         repository.incrementCaseSupplementaryData(caseReferenceToOrgIdCountMapUnprocessed);
 
         ArgumentCaptor<SupplementaryDataUpdateRequest> requestCaptor = ArgumentCaptor
             .forClass(SupplementaryDataUpdateRequest.class);
         ArgumentCaptor<String> caseIdCaptor = ArgumentCaptor.forClass(String.class);
-        verify(dataStoreApi).updateCaseSupplementaryData(caseIdCaptor.capture(), requestCaptor.capture());
+        verify(dataStoreApi).updateCaseSupplementaryData(anyString(), caseIdCaptor.capture(), requestCaptor.capture());
         assertEquals(CASE_REFERENCE.toString(), caseIdCaptor.getValue());
         assertEquals(updateRequest, requestCaptor.getValue());
 
@@ -653,15 +658,17 @@ class DataStoreRepositoryTest {
         Map<String, Object> orgIdToCountMapOther = new HashMap<>();
         orgIdToCountMapOther.put(getOrgUserCountSupDataKey(ORGANISATION), -1L);
         orgIdToCountMapOther.put(getOrgUserCountSupDataKey(ORGANISATION_OTHER), -2L);
+        SupplementaryDataUpdates updates = new SupplementaryDataUpdates();
+        updates.setIncrementalMap(orgIdToCountMapOther);
         SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest();
-        updateRequest.setIncrementalMap(orgIdToCountMapOther);
+        updateRequest.setSupplementaryDataUpdates(updates);
 
         repository.incrementCaseSupplementaryData(caseReferenceToOrgIdCountMapUnprocessed);
 
         ArgumentCaptor<SupplementaryDataUpdateRequest> requestCaptor = ArgumentCaptor
             .forClass(SupplementaryDataUpdateRequest.class);
         ArgumentCaptor<String> caseIdCaptor = ArgumentCaptor.forClass(String.class);
-        verify(dataStoreApi).updateCaseSupplementaryData(caseIdCaptor.capture(), requestCaptor.capture());
+        verify(dataStoreApi).updateCaseSupplementaryData(anyString(), caseIdCaptor.capture(), requestCaptor.capture());
         assertEquals(CASE_REFERENCE_OTHER.toString(), caseIdCaptor.getValue());
         assertEquals(updateRequest, requestCaptor.getValue());
     }
@@ -682,21 +689,25 @@ class DataStoreRepositoryTest {
         Map<String, Object> orgIdToCountMap = new HashMap<>();
         orgIdToCountMap.put(getOrgUserCountSupDataKey(ORGANISATION), -1L);
         orgIdToCountMap.put(getOrgUserCountSupDataKey(ORGANISATION_OTHER), -3L);
+        SupplementaryDataUpdates updates = new SupplementaryDataUpdates();
+        updates.setIncrementalMap(orgIdToCountMap);
         SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest();
-        updateRequest.setIncrementalMap(orgIdToCountMap);
+        updateRequest.setSupplementaryDataUpdates(updates);
 
         Map<String, Object> orgIdToCountMapOther = new HashMap<>();
         orgIdToCountMapOther.put(getOrgUserCountSupDataKey(ORGANISATION_OTHER), -2L);
+        SupplementaryDataUpdates updatesOther = new SupplementaryDataUpdates();
+        updatesOther.setIncrementalMap(orgIdToCountMapOther);
         SupplementaryDataUpdateRequest updateRequestOther = new SupplementaryDataUpdateRequest();
-        updateRequestOther.setIncrementalMap(orgIdToCountMapOther);
+        updateRequestOther.setSupplementaryDataUpdates(updatesOther);
 
         repository.incrementCaseSupplementaryData(caseReferenceToOrgIdCountMapUnprocessed);
 
-        verify(dataStoreApi, times(2)).updateCaseSupplementaryData(any(), any());
+        verify(dataStoreApi, times(2)).updateCaseSupplementaryData(any(), any(), any());
         verify(dataStoreApi, times(1))
-            .updateCaseSupplementaryData(CASE_REFERENCE.toString(), updateRequest);
+            .updateCaseSupplementaryData(SYSTEM_USER_TOKEN, CASE_REFERENCE.toString(), updateRequest);
         verify(dataStoreApi, times(1))
-            .updateCaseSupplementaryData(CASE_REFERENCE_OTHER.toString(), updateRequestOther);
+            .updateCaseSupplementaryData(SYSTEM_USER_TOKEN, CASE_REFERENCE_OTHER.toString(), updateRequestOther);
     }
 
     @Test

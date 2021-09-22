@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class CaseAccessOperation {
 
     public static final String CREATOR = "[CREATOR]";
+    public static final String ORGS_ASSIGNED_USERS_PATH = "orgs_assigned_users.";
 
     private final RoleAssignmentService roleAssignmentService;
     private final DataStoreRepository dataStoreRepository;
@@ -106,6 +108,59 @@ public class CaseAccessOperation {
             dataStoreRepository.incrementCaseSupplementaryData(removeUserCounts);
         }
     }
+
+    //TODO move to var.
+    public void addCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
+
+        final Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseDetails =
+            getMapOfCaseAssignedUserRolesByCaseDetails(caseUserRoles);
+
+        // load all existing case user roles upfront
+        final List<CaseAssignedUserRole> existingCaseUserRoles = findCaseUserRoles(cauRolesByCaseDetails);
+
+        final Map<String, Map<String, Long>> newUserCounts
+            = getNewUserCountByCaseAndOrganisation(cauRolesByCaseDetails, existingCaseUserRoles);
+
+        cauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
+                                          Map<String, Set<String>> caseRolesByUserIdAndCase = requestedAssignments.stream()
+                                              // filter out existing case user roles
+                                              .filter(caseUserRole ->
+                                                          existingCaseUserRoles.stream()
+                                                              .noneMatch(cauRole -> caseUserRole.getCaseDataId().equals(cauRole.getCaseDataId())
+                                                                  && caseUserRole.getUserId().equals(cauRole.getUserId())
+                                                                  && caseUserRole.getCaseRole().equalsIgnoreCase(cauRole.getCaseRole())))
+                                              // group by UserID
+                                              .collect(Collectors.groupingBy(
+                                                  CaseAssignedUserRole::getUserId,
+                                                  Collectors.collectingAndThen(
+                                                      Collectors.toList(),
+                                                      caseUserRole -> caseUserRole.stream()
+                                                          .map(CaseAssignedUserRole::getCaseRole)
+                                                          .collect(Collectors.toSet())
+                                                  )));
+
+                                          final List<RoleAssignmentsDeleteRequest> addRequests = new ArrayList<>();
+                                          caseRolesByUserIdAndCase.forEach((userId, caseRoles) ->
+                                                                               // NB: `replaceExisting = false` uses RAS which needs us to filter out existing case user roles
+                                                                               //      to prevent duplicates being generated.  see filter above.
+
+                                                                               addRequests.add(RoleAssignmentsDeleteRequest.builder()
+                                                                                                   .caseId(caseDetails.getId())
+                                                                                                   .userId(userId)
+                                                                                                   .roleNames(caseRoles.stream().collect(
+                                                                                                       Collectors.toList()))
+                                                                                                   .build()
+                                                                               ));
+                                                                               roleAssignmentService.createCaseRoleAssignments(addRequests);
+
+                                      }
+        );
+
+        if (!newUserCounts.isEmpty()) {
+            dataStoreRepository.incrementCaseSupplementaryData(newUserCounts);
+        }
+    }
+
 
     private Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> findAndFilterOnExistingCauRoles(
         Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseDetails

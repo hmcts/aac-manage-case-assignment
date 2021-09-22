@@ -9,5 +9,7 @@ public interface RoleAssignmentServiceHelper {
 
     void deleteRoleAssignmentsByQuery(List<RoleAssignmentQuery> queryRequests);
 
+    RoleAssignmentResponse addRoleAssignmentsByQuery(List<RoleAssignmentQuery> queryRequests);
+
     RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds);
 }

@@ -62,6 +62,27 @@ public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHel
     }
 
     @Override
+    public RoleAssignmentResponse addRoleAssignmentsByQuery(List<RoleAssignmentQuery> queryRequests) {
+        try {
+            final HttpEntity<Object> requestEntity = new HttpEntity<>(
+                MultipleQueryRequestResource.builder().queryRequests(queryRequests).build(),
+                securityUtils.authorizationHeaders()
+            );
+
+            return restTemplate.exchange(
+                applicationParams.roleAssignmentBaseURL(),
+                HttpMethod.POST,
+                requestEntity,
+                RoleAssignmentResponse.class
+            ).getBody();
+
+        } catch (HttpStatusCodeException e) {
+            log.warn("Error while adding Role Assignments", e);
+            throw mapException(e, "adding");
+        }
+    }
+
+    @Override
     public RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
         try {
             final var roleAssignmentQuery = new RoleAssignmentQuery(caseIds, userIds);

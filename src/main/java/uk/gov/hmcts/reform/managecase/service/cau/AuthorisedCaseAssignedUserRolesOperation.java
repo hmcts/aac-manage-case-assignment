@@ -40,4 +40,10 @@ public class AuthorisedCaseAssignedUserRolesOperation implements CaseAssignedUse
         throw new CaseRoleAccessException(OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED);
     }
 
+    public void addCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
+        // NB: Although there are no user based authorisation steps performed here ...
+        // ... there are additional s2s authorisation steps performed in the controller.
+        this.cauRolesOperation.addCaseUserRoles(caseUserRoles);
+    }
+
 }

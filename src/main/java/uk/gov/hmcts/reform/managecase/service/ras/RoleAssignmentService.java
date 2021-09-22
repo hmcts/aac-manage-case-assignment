@@ -1,17 +1,20 @@
 package uk.gov.hmcts.reform.managecase.service.ras;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentAttributes;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentQuery;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsDeleteRequest;
-import uk.gov.hmcts.reform.managecase.api.payload.RoleType;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class RoleAssignmentService {
 
@@ -38,6 +41,24 @@ public class RoleAssignmentService {
             roleAssignmentServiceHelper.deleteRoleAssignmentsByQuery(queryRequests);
         }
     }
+
+    public RoleAssignments createCaseRoleAssignments(List<RoleAssignmentsDeleteRequest> addRequest) {
+
+        if (addRequest != null && !addRequest.isEmpty()) {
+            List<RoleAssignmentQuery> queryRequests = addRequest.stream()
+                .map(request -> new RoleAssignmentQuery(
+                         request.getCaseId(),
+                         request.getUserId(),
+                         request.getRoleNames()
+                     )
+                )
+                .collect(Collectors.toList());
+
+            roleAssignmentServiceHelper.addRoleAssignmentsByQuery(queryRequests);
+        }
+        return null;
+    }
+
 
     public List<CaseAssignedUserRole> findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
         final var roleAssignmentResponse =

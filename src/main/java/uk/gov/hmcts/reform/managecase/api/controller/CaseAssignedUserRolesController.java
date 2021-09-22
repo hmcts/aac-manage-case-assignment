@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +41,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.AUTHENTICATION_TOKEN_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ROLE_FORMAT_INVALID;
@@ -47,6 +49,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.EMPTY_CASE_ID_LIST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.EMPTY_CASE_USER_ROLE_LIST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ORGANISATION_ID_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.UNAUTHORISED_S2S_SERVICE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.USER_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
@@ -54,8 +57,10 @@ import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTH
 @RequestMapping(path = "/")
 public class CaseAssignedUserRolesController {
 
+    //TODO MOVE TO ENUM
     public static final String ADD_SUCCESS_MESSAGE = "Case-User-Role assignments created successfully";
     public static final String REMOVE_SUCCESS_MESSAGE = "Case-User-Role assignments removed successfully";
+    public static final String ADD_CASE_ASSIGNED_USER_ROLES ="Add Case-Assigned Users and Roles";
 
     final Pattern caseRolePattern = Pattern.compile("^\\[.+]$");
 
@@ -75,6 +80,58 @@ public class CaseAssignedUserRolesController {
         this.caseAssignedUserRolesOperation = caseAssignedUserRolesOperation;
         this.securityUtils = securityUtils;
     }
+
+
+
+    @PostMapping(
+        path = "/case-users"
+    )
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation(
+        value = "Add Case-Assigned Users and Roles"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 201,
+            message = ADD_SUCCESS_MESSAGE,
+            response = CaseAssignedUserRolesResponse.class
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:\n"
+                + "1. " + EMPTY_CASE_USER_ROLE_LIST + ", \n"
+                + "2. " + CASE_ID_INVALID + ": has to be a valid 16-digit Luhn number, \n"
+                + "3. " + USER_ID_INVALID + ": has to be a string of length > 0, \n"
+                + "4. " + CASE_ROLE_FORMAT_INVALID + ": has to be a none-empty string in square brackets, \n"
+                + "5. " + ORGANISATION_ID_INVALID + ": has to be a non-empty string, when present."
+        ),
+        @ApiResponse(
+            code = 401,
+            message = AUTHENTICATION_TOKEN_INVALID
+        ),
+        @ApiResponse(
+            code = 403,
+            message = "One of the following reasons:\n"
+                + "1. " + UNAUTHORISED_S2S_SERVICE + "\n"
+                + "2. " + CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."
+        ),
+        @ApiResponse(
+            code = 404,
+            message = CASE_NOT_FOUND
+        )
+    })
+
+    public ResponseEntity<CaseAssignedUserRolesResponse> addCaseUserRoles(
+        @ApiParam(value = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
+        @RequestHeader(SERVICE_AUTHORIZATION) String clientS2SToken,
+        @ApiParam(value = "List of Case-User-Role assignments to add", required = true)
+        @RequestBody CaseAssignedUserRolesRequest caseAssignedUserRolesRequest
+    ) {
+        validateRequest(clientS2SToken, caseAssignedUserRolesRequest);
+        this.caseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRolesRequest.getCaseAssignedUserRoles());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
+    }
+
 
 
     @DeleteMapping(
@@ -122,7 +179,7 @@ public class CaseAssignedUserRolesController {
         @RequestBody CaseAssignedUserRolesRequest caseAssignedUserRolesRequest
     ) {
         validateRequest(clientS2SToken, caseAssignedUserRolesRequest);
-        this.caseAssignedUserRolesOperation.removeCaseUserRoles(caseAssignedUserRolesRequest
+            this.caseAssignedUserRolesOperation.removeCaseUserRoles(caseAssignedUserRolesRequest
                                                                     .getCaseAssignedUserRoles());
         return ResponseEntity.status(HttpStatus.OK).body(new CaseAssignedUserRolesResponse(REMOVE_SUCCESS_MESSAGE));
     }

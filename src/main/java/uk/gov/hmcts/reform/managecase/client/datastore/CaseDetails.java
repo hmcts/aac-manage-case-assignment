@@ -147,4 +147,9 @@ public class CaseDetails {
     public Long getReferenceAsLong() {
         return Long.parseLong(id);
     }
+
+    @JsonIgnore
+    public String getReferenceAsString() {
+        return id != null ? id.toString() : null;
+    }
 }

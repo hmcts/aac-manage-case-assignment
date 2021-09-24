@@ -14,7 +14,10 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.BadRequestException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ResourceNotFoundException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ServiceException;
 import uk.gov.hmcts.reform.managecase.api.payload.MultipleQueryRequestResource;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentQuery;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentRequestResource;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentRequestResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
@@ -62,23 +65,21 @@ public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHel
     }
 
     @Override
-    public RoleAssignmentResponse addRoleAssignmentsByQuery(List<RoleAssignmentQuery> queryRequests) {
+    public RoleAssignmentRequestResponse createRoleAssignment(RoleAssignmentRequestResource assignmentRequest) {
         try {
-            final HttpEntity<Object> requestEntity = new HttpEntity<>(
-                MultipleQueryRequestResource.builder().queryRequests(queryRequests).build(),
-                securityUtils.authorizationHeaders()
-            );
+            final HttpEntity<Object> requestEntity =
+                new HttpEntity<>(assignmentRequest, securityUtils.authorizationHeaders());
 
             return restTemplate.exchange(
                 applicationParams.roleAssignmentBaseURL(),
                 HttpMethod.POST,
                 requestEntity,
-                RoleAssignmentResponse.class
+                RoleAssignmentRequestResponse.class
             ).getBody();
 
         } catch (HttpStatusCodeException e) {
-            log.warn("Error while adding Role Assignments", e);
-            throw mapException(e, "adding");
+            log.warn("Error while creating Role Assignments", e);
+            throw mapException(e, "creating");
         }
     }
 

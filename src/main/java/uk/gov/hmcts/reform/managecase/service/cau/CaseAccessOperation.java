@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsAddRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
@@ -109,20 +110,15 @@ public class CaseAccessOperation {
         }
     }
 
-    //TODO move to var.
     public void addCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
 
-        final Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseDetails =
-            getMapOfCaseAssignedUserRolesByCaseDetails(caseUserRoles);
-
+        final var cauRolesByCaseDetails = getMapOfCaseAssignedUserRolesByCaseDetails(caseUserRoles);
         // load all existing case user roles upfront
-        final List<CaseAssignedUserRole> existingCaseUserRoles = findCaseUserRoles(cauRolesByCaseDetails);
-
-        final Map<String, Map<String, Long>> newUserCounts
-            = getNewUserCountByCaseAndOrganisation(cauRolesByCaseDetails, existingCaseUserRoles);
+        final var existingCaseUserRoles = findCaseUserRoles(cauRolesByCaseDetails);
+        final var newUserCounts = getNewUserCountByCaseAndOrganisation(cauRolesByCaseDetails, existingCaseUserRoles);
 
         cauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
-                                          Map<String, Set<String>> caseRolesByUserIdAndCase = requestedAssignments.stream()
+                                          final var caseRolesByUserIdAndCase = requestedAssignments.stream()
                                               // filter out existing case user roles
                                               .filter(caseUserRole ->
                                                           existingCaseUserRoles.stream()
@@ -137,15 +133,14 @@ public class CaseAccessOperation {
                                                       caseUserRole -> caseUserRole.stream()
                                                           .map(CaseAssignedUserRole::getCaseRole)
                                                           .collect(Collectors.toSet())
-                                                  )));
+                                                  )
+                                              ));
 
-                                          final List<RoleAssignmentsDeleteRequest> addRequests = new ArrayList<>();
+                                          final List<RoleAssignmentsAddRequest> addRequests = new ArrayList<>();
                                           caseRolesByUserIdAndCase.forEach((userId, caseRoles) ->
-                                                                               // NB: `replaceExisting = false` uses RAS which needs us to filter out existing case user roles
-                                                                               //      to prevent duplicates being generated.  see filter above.
 
-                                                                               addRequests.add(RoleAssignmentsDeleteRequest.builder()
-                                                                                                   .caseId(caseDetails.getId())
+                                                                               addRequests.add(RoleAssignmentsAddRequest.builder()
+                                                                                                   .caseDetails(caseDetails)
                                                                                                    .userId(userId)
                                                                                                    .roleNames(caseRoles.stream().collect(
                                                                                                        Collectors.toList()))
@@ -156,11 +151,10 @@ public class CaseAccessOperation {
                                       }
         );
 
-        if (!newUserCounts.isEmpty()) {
+            if (!newUserCounts.isEmpty()) {
             dataStoreRepository.incrementCaseSupplementaryData(newUserCounts);
         }
     }
-
 
     private Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> findAndFilterOnExistingCauRoles(
         Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseDetails

@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdates;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -213,7 +214,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     @Override
     public void incrementCaseSupplementaryData(Map<String, Map<String, Long>> data) {
         for (Map.Entry<String, Map<String, Long>> caseReferenceToOrgCountMapEntry : data.entrySet()) {
-            SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest();
+            SupplementaryDataUpdates updateRequest = new SupplementaryDataUpdates();
             Map<String, Object> formattedOrgToCountMap = new HashMap<>();
             for (Map.Entry<String, Long> originalOrgToCountMap : caseReferenceToOrgCountMapEntry.getValue()
                 .entrySet()) {
@@ -227,9 +228,11 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                 }
             }
             updateRequest.setIncrementalMap(formattedOrgToCountMap);
-            dataStoreApi.updateCaseSupplementaryData(
+            SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest();
+            request.setSupplementaryDataUpdates(updateRequest);
+            dataStoreApi.updateCaseSupplementaryData(securityUtils.getUserBearerToken(),
                 caseReferenceToOrgCountMapEntry.getKey(),
-                updateRequest
+                request
             );
         }
     }

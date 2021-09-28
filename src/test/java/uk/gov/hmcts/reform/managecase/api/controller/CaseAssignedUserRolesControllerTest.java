@@ -76,6 +76,8 @@ class CaseAssignedUserRolesControllerTest {
     private static final String ORGANISATION_ID_BAD = "";
     private static final String USER_ID_1 = "123";
     private static final String USER_ID_2 = "321";
+    public static final String ADD_SUCCESS_MESSAGE = "Case-User-Role assignments created successfully";
+
 
     @BeforeEach
     void setUp() {
@@ -468,6 +470,258 @@ class CaseAssignedUserRolesControllerTest {
                     exception.getMessage(),
                     containsString(ORGANISATION_ID_INVALID)
                 )
+            );
+        }
+
+    }
+
+    @Nested
+    @DisplayName("POST /case-users")
+    class AddCaseUserRoles {
+
+        @BeforeEach
+        void setUp() {
+            // setup happy authorised s2s service path
+            when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(
+                Lists.newArrayList(ADD_SERVICE_GOOD)
+            );
+            doReturn(ADD_SERVICE_GOOD).when(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN_GOOD);
+        }
+
+        @Test
+        void addCaseUserRoles_shouldCallAddWhenValidSingleGoodCaseUserRoleSupplied() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD)
+            );
+
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT
+            ResponseEntity<CaseAssignedUserRolesResponse> response =
+                controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, addCaseUserRolesRequest);
+
+            // ASSERT
+            assertNotNull(response);
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
+            assertNotNull(response.getBody());
+            assertEquals(ADD_SUCCESS_MESSAGE, response.getBody().getStatus());
+            verify(caseAssignedUserRolesOperation, times(1)).addCaseUserRoles(caseUserRoles);
+        }
+
+        @Test
+        void addCaseUserRoles_shouldCallAddWhenValidSingleGoodCaseUserRoleSupplied_withOrganisation() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD, ORGANISATION_ID_GOOD)
+            );
+
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT
+            ResponseEntity<CaseAssignedUserRolesResponse> response =
+                controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, addCaseUserRolesRequest);
+
+            // ASSERT
+            assertNotNull(response);
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
+            assertNotNull(response.getBody());
+            assertEquals(ADD_SUCCESS_MESSAGE, response.getBody().getStatus());
+            verify(caseAssignedUserRolesOperation, times(1)).addCaseUserRoles(caseUserRoles);
+        }
+
+        @Test
+        void addCaseUserRoles_shouldCallAddWhenValidMultipleGoodCaseUserRolesSupplied() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD),
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_2, CASE_ROLE_GOOD),
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_2, CASE_ROLE_GOOD, ORGANISATION_ID_GOOD)
+            );
+
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT
+            ResponseEntity<CaseAssignedUserRolesResponse> response =
+                controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, addCaseUserRolesRequest);
+
+            // ASSERT
+            assertNotNull(response);
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
+            assertNotNull(response.getBody());
+            assertEquals(ADD_SUCCESS_MESSAGE, response.getBody().getStatus());
+            verify(caseAssignedUserRolesOperation, times(1)).addCaseUserRoles(caseUserRoles);
+        }
+
+        @Test
+        void addCaseUserRoles_throwsExceptionWhenClientServiceNotAuthorised() {
+            // ARRANGE
+            doReturn(ADD_SERVICE_BAD).when(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN_BAD);
+
+            // ACT / ASSERT
+            CaseRoleAccessException exception = assertThrows(CaseRoleAccessException.class,
+                                                             () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_BAD, null));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                                 containsString(CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION))
+            );
+        }
+
+        @Test
+        void addCaseUserRoles_throwsExceptionWhenNullPassed() {
+            // ARRANGE
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                                                         () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, null));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                                 containsString(EMPTY_CASE_USER_ROLE_LIST))
+            );
+        }
+
+        @Test
+        void addCaseUserRoles_throwsExceptionWhenNullCaseUserRolesListPassed() {
+            // ARRANGE
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(null);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                                                         () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, addCaseUserRolesRequest));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                                 containsString(EMPTY_CASE_USER_ROLE_LIST))
+            );
+        }
+
+        @Test
+        void addCaseUserRoles_throwsExceptionWhenEmptyCaseUserRolesListPassed() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList();
+
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                                                         () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, addCaseUserRolesRequest));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                                 containsString(EMPTY_CASE_USER_ROLE_LIST))
+            );
+        }
+
+        @Test
+        void addCaseUserRoles_throwsExceptionWhenInvalidCaseIdPassed() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                // case_id: has to be a valid 16-digit Luhn number
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_BAD, USER_ID_1, CASE_ROLE_GOOD)
+            );
+
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                                                         () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, addCaseUserRolesRequest));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                                 containsString(CASE_ID_INVALID))
+            );
+        }
+
+        @Test
+        void addCaseUserRoles_throwsExceptionWhenInvalidUserIdPassed() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                // user_id: has to be a string of length > 0
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_GOOD)
+            );
+
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                                                         () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, addCaseUserRolesRequest));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                                 containsString(USER_ID_INVALID))
+            );
+        }
+
+        @Test
+        void addCaseUserRoles_throwsExceptionWhenInvalidCaseRolePassed() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                // case_role: has to be a none-empty string in square brackets
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_BAD)
+            );
+
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                                                         () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, addCaseUserRolesRequest));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                                 containsString(CASE_ROLE_FORMAT_INVALID))
+            );
+        }
+
+        @Test
+        void addCaseUserRoles_throwsExceptionWhenInvalidOrganisationIdPassed() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                // organisation_id: has to be a non-empty string, when present
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD, ORGANISATION_ID_BAD)
+            );
+
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                                                         () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, addCaseUserRolesRequest));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                                 containsString(ORGANISATION_ID_INVALID))
+            );
+        }
+
+        @Test
+        void addCaseUserRoles_throwsExceptionWhenMultipleErrorsPassed() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                // case_id: has to be a valid 16-digit Luhn number
+                // case_role: has to be a none-empty string in square brackets
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_BAD, USER_ID_1, CASE_ROLE_BAD),
+                // user_id: has to be a string of length > 0
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, "", CASE_ROLE_GOOD),
+                // organisation_id: has to be a non-empty string, when present
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_GOOD, USER_ID_1, CASE_ROLE_GOOD, ORGANISATION_ID_BAD)
+            );
+
+            CaseAssignedUserRolesRequest addCaseUserRolesRequest = new CaseAssignedUserRolesRequest(caseUserRoles);
+
+            // ACT / ASSERT
+            BadRequestException exception = assertThrows(BadRequestException.class,
+                                                         () -> controller.addCaseUserRoles(CLIENT_S2S_TOKEN_GOOD, addCaseUserRolesRequest));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(),
+                                 containsString(CASE_ID_INVALID)),
+                () -> assertThat(exception.getMessage(),
+                                 containsString(USER_ID_INVALID)),
+                () -> assertThat(exception.getMessage(),
+                                 containsString(CASE_ROLE_FORMAT_INVALID)),
+                () -> assertThat(exception.getMessage(),
+                                 containsString(ORGANISATION_ID_INVALID))
             );
         }
 

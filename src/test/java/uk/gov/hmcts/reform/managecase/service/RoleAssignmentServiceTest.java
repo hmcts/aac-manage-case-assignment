@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.managecase.service;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,6 @@ import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentAttributes;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentQuery;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentRequestResource;
-import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentRequestResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsDeleteRequest;
@@ -256,17 +254,6 @@ class RoleAssignmentServiceTest {
     @SuppressWarnings("ConstantConditions")
     class CreateCaseRoleAssignments {
 
-        private ArgumentCaptor<RoleAssignmentRequestResource> roleAssignmentRequestResourceCaptor;
-
-        @BeforeEach
-        void setUp() {
-
-            final var roleAssignmentRequestResponse
-                = RoleAssignmentRequestResponse.builder().build();
-
-            roleAssignmentRequestResourceCaptor = ArgumentCaptor.forClass(RoleAssignmentRequestResource.class);
-        }
-
         @Test
         void shouldCreateSingleCaseRoleAssignments() {
 
@@ -311,43 +298,39 @@ class RoleAssignmentServiceTest {
             assertNotNull(actualRoleAssignment);
 
             actualRoleAssignment.getRequestedRoles().stream()
-                .forEach(roleAssignmentResource -> {
+                .forEach(roleAssignmentResource -> assertAll(
+                    () -> Assertions.assertEquals(expectedUserId, roleAssignmentResource.getActorId()),
+                    () -> Assertions.assertEquals(expectedRoleName, roleAssignmentResource.getRoleName()),
 
-                  assertAll(
-                      () -> Assertions.assertEquals(expectedUserId, roleAssignmentResource.getActorId()),
-                      () -> Assertions.assertEquals(expectedRoleName, roleAssignmentResource.getRoleName()),
+                    // defaults
+                    () -> Assertions.assertEquals(ActorIdType.IDAM.name(), roleAssignmentResource.getActorIdType()),
 
-                      // defaults
-                      () -> Assertions.assertEquals(ActorIdType.IDAM.name(), roleAssignmentResource.getActorIdType()),
+                    () -> Assertions.assertEquals(
+                        Classification.RESTRICTED.name(),
+                        roleAssignmentResource.getClassification()
+                    ),
+                    () -> Assertions.assertEquals(GrantType.SPECIFIC.name(), roleAssignmentResource.getGrantType()),
+                    () -> Assertions.assertEquals(
+                        expectedRoleCategory.name(),
+                        roleAssignmentResource.getRoleCategory()
+                    ),
+                    () -> assertFalse(roleAssignmentResource.getReadOnly()),
+                    () -> assertNotNull(roleAssignmentResource.getBeginTime()),
 
-                      () -> Assertions.assertEquals(
-                          Classification.RESTRICTED.name(),
-                          roleAssignmentResource.getClassification()
-                      ),
-                      () -> Assertions.assertEquals(GrantType.SPECIFIC.name(), roleAssignmentResource.getGrantType()),
-                      () -> Assertions.assertEquals(
-                          expectedRoleCategory.name(),
-                          roleAssignmentResource.getRoleCategory()
-                      ),
-                      () -> assertFalse(roleAssignmentResource.getReadOnly()),
-                      () -> assertNotNull(roleAssignmentResource.getBeginTime()),
-
-                      // attributes match case
-                      () -> Assertions.assertEquals(
-                          Optional.of(expectedCaseDetails.getReferenceAsString()),
-                          roleAssignmentResource.getAttributes().getCaseId()
-                      ),
-                      () -> Assertions.assertEquals(
-                          Optional.of(expectedCaseDetails.getJurisdiction()),
-                          roleAssignmentResource.getAttributes().getJurisdiction()
-                      ),
-                      () -> Assertions.assertEquals(
-                          Optional.of(expectedCaseDetails.getCaseTypeId()),
-                          roleAssignmentResource.getAttributes().getCaseType()
-                      )
-                  );
-                }
-            );
+                    // attributes match case
+                    () -> Assertions.assertEquals(
+                        Optional.of(expectedCaseDetails.getReferenceAsString()),
+                        roleAssignmentResource.getAttributes().getCaseId()
+                    ),
+                    () -> Assertions.assertEquals(
+                        Optional.of(expectedCaseDetails.getJurisdiction()),
+                        roleAssignmentResource.getAttributes().getJurisdiction()
+                    ),
+                    () -> Assertions.assertEquals(
+                        Optional.of(expectedCaseDetails.getCaseTypeId()),
+                        roleAssignmentResource.getAttributes().getCaseType()
+                    )
+                ));
         }
 
         private CaseDetails createCaseDetails() {

@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.BadRequestException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ResourceNotFoundException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ServiceException;
 import uk.gov.hmcts.reform.managecase.api.payload.MultipleQueryRequestResource;
-import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentQuery;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentRequestResource;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentRequestResponse;

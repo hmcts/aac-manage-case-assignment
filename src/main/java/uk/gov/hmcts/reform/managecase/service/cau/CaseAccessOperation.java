@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -118,40 +117,39 @@ public class CaseAccessOperation {
         final var newUserCounts = getNewUserCountByCaseAndOrganisation(cauRolesByCaseDetails, existingCaseUserRoles);
 
         cauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
-                                          final var caseRolesByUserIdAndCase = requestedAssignments.stream()
-                                              // filter out existing case user roles
-                                              .filter(caseUserRole ->
-                                                          existingCaseUserRoles.stream()
-                                                              .noneMatch(cauRole -> caseUserRole.getCaseDataId().equals(cauRole.getCaseDataId())
-                                                                  && caseUserRole.getUserId().equals(cauRole.getUserId())
-                                                                  && caseUserRole.getCaseRole().equalsIgnoreCase(cauRole.getCaseRole())))
-                                              // group by UserID
-                                              .collect(Collectors.groupingBy(
-                                                  CaseAssignedUserRole::getUserId,
-                                                  Collectors.collectingAndThen(
-                                                      Collectors.toList(),
-                                                      caseUserRole -> caseUserRole.stream()
-                                                          .map(CaseAssignedUserRole::getCaseRole)
-                                                          .collect(Collectors.toSet())
-                                                  )
-                                              ));
+            final var caseRolesByUserIdAndCase = requestedAssignments.stream()
+                // filter out existing case user roles
+                .filter(caseUserRole ->
+                            existingCaseUserRoles.stream()
+                                .noneMatch(cauRole -> caseUserRole.getCaseDataId().equals(cauRole.getCaseDataId())
+                                    && caseUserRole.getUserId().equals(cauRole.getUserId())
+                                    && caseUserRole.getCaseRole().equalsIgnoreCase(cauRole.getCaseRole())))
+                // group by UserID
+                .collect(Collectors.groupingBy(
+                    CaseAssignedUserRole::getUserId,
+                    Collectors.collectingAndThen(
+                        Collectors.toList(),
+                        caseUserRole -> caseUserRole.stream()
+                            .map(CaseAssignedUserRole::getCaseRole)
+                            .collect(Collectors.toSet())
+                    )
+                ));
 
-                                          final List<RoleAssignmentsAddRequest> addRequests = new ArrayList<>();
-                                          caseRolesByUserIdAndCase.forEach((userId, caseRoles) ->
+            final List<RoleAssignmentsAddRequest> addRequests = new ArrayList<>();
+            caseRolesByUserIdAndCase.forEach((userId, caseRoles) ->
 
-                                                                               addRequests.add(RoleAssignmentsAddRequest.builder()
-                                                                                                   .caseDetails(caseDetails)
-                                                                                                   .userId(userId)
-                                                                                                   .roleNames(caseRoles.stream().collect(
-                                                                                                       Collectors.toList()))
-                                                                                                   .build()
-                                                                               ));
-                                                                               roleAssignmentService.createCaseRoleAssignments(addRequests);
+                                                 addRequests.add(RoleAssignmentsAddRequest.builder()
+                                                                     .caseDetails(caseDetails)
+                                                                     .userId(userId)
+                                                                     .roleNames(caseRoles.stream().collect(
+                                                                         Collectors.toList()))
+                                                                     .build()
+                                                 ));
+            roleAssignmentService.createCaseRoleAssignments(addRequests);
 
-                                      }
-        );
+        });
 
-            if (!newUserCounts.isEmpty()) {
+        if (!newUserCounts.isEmpty()) {
             dataStoreRepository.incrementCaseSupplementaryData(newUserCounts);
         }
     }
@@ -287,7 +285,8 @@ public class CaseAccessOperation {
                         caseUserRole -> caseUserRole.stream()
                             .map(CaseAssignedUserRole::getUserId)
                             .distinct().collect(Collectors.toList())
-                    )));
+                    )
+                ));
 
         // for each case: count new Case-User relationships by Organisation
         caseUserRolesWhichHaveAnOrgId.forEach((caseDetails, requestedAssignments) -> {
@@ -303,7 +302,9 @@ public class CaseAccessOperation {
                     Collectors.collectingAndThen(
                         Collectors.toList(),
                         cauRolesForOrganisation -> cauRolesForOrganisation.stream()
-                            .map(CaseAssignedUserRoleWithOrganisation::getUserId).distinct().count())));
+                            .map(CaseAssignedUserRoleWithOrganisation::getUserId).distinct().count()
+                    )
+                ));
 
             // skip if no organisations have any relationships
             if (!relationshipCounts.isEmpty()) {

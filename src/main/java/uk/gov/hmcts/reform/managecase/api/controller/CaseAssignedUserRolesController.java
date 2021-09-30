@@ -60,7 +60,6 @@ public class CaseAssignedUserRolesController {
     //TODO MOVE TO ENUM
     public static final String ADD_SUCCESS_MESSAGE = "Case-User-Role assignments created successfully";
     public static final String REMOVE_SUCCESS_MESSAGE = "Case-User-Role assignments removed successfully";
-    public static final String ADD_CASE_ASSIGNED_USER_ROLES ="Add Case-Assigned Users and Roles";
 
     final Pattern caseRolePattern = Pattern.compile("^\\[.+]$");
 
@@ -179,7 +178,7 @@ public class CaseAssignedUserRolesController {
         @RequestBody CaseAssignedUserRolesRequest caseAssignedUserRolesRequest
     ) {
         validateRequest(clientS2SToken, caseAssignedUserRolesRequest);
-            this.caseAssignedUserRolesOperation.removeCaseUserRoles(caseAssignedUserRolesRequest
+        this.caseAssignedUserRolesOperation.removeCaseUserRoles(caseAssignedUserRolesRequest
                                                                     .getCaseAssignedUserRoles());
         return ResponseEntity.status(HttpStatus.OK).body(new CaseAssignedUserRolesResponse(REMOVE_SUCCESS_MESSAGE));
     }

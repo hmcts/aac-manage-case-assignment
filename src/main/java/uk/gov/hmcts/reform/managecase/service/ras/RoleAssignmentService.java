@@ -36,7 +36,8 @@ public class RoleAssignmentService {
 
     @Autowired
     public RoleAssignmentService(RoleAssignmentServiceHelper roleAssignmentServiceHelper,
-                                 RoleAssignmentsMapper roleAssignmentsMapper, RoleAssignmentCategoryService roleAssignmentCategoryService) {
+                                 RoleAssignmentsMapper roleAssignmentsMapper,
+                                 RoleAssignmentCategoryService roleAssignmentCategoryService) {
         this.roleAssignmentServiceHelper = roleAssignmentServiceHelper;
         this.roleAssignmentsMapper = roleAssignmentsMapper;
         this.roleAssignmentCategoryService = roleAssignmentCategoryService;

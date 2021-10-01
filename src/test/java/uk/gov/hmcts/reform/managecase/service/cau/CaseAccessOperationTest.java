@@ -142,6 +142,39 @@ public class CaseAccessOperationTest {
             verify(dataStoreRepository, never()).incrementCaseSupplementaryData(any());
         }
 
+
+        @Test
+        @DisplayName("should add single [CREATOR] case user role")
+        void shouldAddCreatorCaseUserRoleForRA() {
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE_CREATOR)
+            );
+
+            // for an existing relation and then after removal
+            // for an existing relation and then after removal
+            mockExistingCaseUserRolesForRA(
+                // before
+                List.of(new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR)),
+                // after
+                new ArrayList<>()
+            );
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(roleAssignmentService,
+                   times(2)).createCaseRoleAssignments(caseUserRolesCaptor.capture());
+
+            verify(dataStoreRepository, times(1))
+                .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE.toString());
+            verify(dataStoreRepository, times(1))
+                .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE_OTHER.toString());
+            verify(dataStoreRepository, never()).incrementCaseSupplementaryData(any());
+        }
+
         @Test
         @DisplayName("should remove single case user role")
         void shouldRemoveSingleCaseUserRoleForRA() {

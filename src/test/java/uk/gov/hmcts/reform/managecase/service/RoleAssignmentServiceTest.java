@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentQuery;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentRequestResource;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsAddRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleType;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -288,6 +289,30 @@ class RoleAssignmentServiceTest {
                 )
             );
         }
+
+        @Test
+        void shouldCreateCaseRoleAssignmentsForRequest() {
+            // GIVEN
+            final List<RoleAssignmentsAddRequest> addRequest = new ArrayList<>();
+            final var caseDetails = createCaseDetails();
+            final var roles = Set.of("[ROLE1]");
+            final var roleAssignmentsAddRequest = RoleAssignmentsAddRequest.builder()
+                .caseDetails(caseDetails)
+                .roleNames(roles.stream().collect(Collectors.toList()))
+                .userId(USER_ID).build();
+
+            addRequest.add(roleAssignmentsAddRequest);
+            given(roleAssignmentCategoryService.getRoleCategory(USER_ID)).willReturn(ROLE_CATEGORY_4_USER_1);
+
+            // WHEN
+            roleAssignmentService.createCaseRoleAssignments(addRequest);
+
+            //THEN
+            // verify RoleCategory has been loaded from service
+            verify(roleAssignmentCategoryService).getRoleCategory(USER_ID);
+        }
+
+
 
         private void assertCorrectlyPopulatedRoleAssignment(final CaseDetails expectedCaseDetails,
                                                             final String expectedUserId,

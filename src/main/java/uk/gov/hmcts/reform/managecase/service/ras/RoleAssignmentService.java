@@ -69,7 +69,7 @@ public class RoleAssignmentService {
                      )
                 ).collect(Collectors.toList());
 
-            queryRequests.stream().map(assignmentRequest ->
+            queryRequests.stream().forEach(assignmentRequest ->
                                            roleAssignmentServiceHelper.createRoleAssignment(assignmentRequest)
             );
         }
@@ -110,12 +110,10 @@ public class RoleAssignmentService {
                 .build())
             .collect(Collectors.toList());
 
-        final var assignmentRequest = RoleAssignmentRequestResource.builder()
+        return RoleAssignmentRequestResource.builder()
             .roleRequest(roleRequest)
             .requestedRoles(requestedRoles)
             .build();
-
-        return assignmentRequest;
     }
 
     private String createRoleRequestReference(final CaseDetails caseDetails, final String userId) {

@@ -41,7 +41,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.AUTHENTICATION_TOKEN_INVALID;
+
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError.AUTHENTICATION_TOKEN_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError.UNAUTHORISED_S2S_SERVICE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ROLE_FORMAT_INVALID;
@@ -49,7 +51,6 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.C
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.EMPTY_CASE_ID_LIST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.EMPTY_CASE_USER_ROLE_LIST;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ORGANISATION_ID_INVALID;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.UNAUTHORISED_S2S_SERVICE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.USER_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
@@ -201,13 +202,13 @@ public class CaseAssignedUserRolesController {
         ),
         @ApiResponse(
             code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID
+            message = AUTHENTICATION_TOKEN_INVALID
         ),
         @ApiResponse(
             code = 403,
             message = "One of the following reasons:"
                 + "\n1) " + AuthError.OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED
-                + "\n2) " + AuthError.UNAUTHORISED_S2S_SERVICE
+                + "\n2) " + UNAUTHORISED_S2S_SERVICE
         )
     })
     public ResponseEntity<CaseAssignedUserRolesResource> getCaseUserRoles(@RequestParam("case_ids")

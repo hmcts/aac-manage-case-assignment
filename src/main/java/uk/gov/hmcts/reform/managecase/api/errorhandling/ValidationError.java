@@ -74,11 +74,6 @@ public final class ValidationError {
     public static final String ROLE_ASSIGNMENT_SERVICE_ERROR =
         "Problem %s Role Assignments from Role Assignment Service because of %s";
 
-    public static final String AUTHENTICATION_TOKEN_INVALID =
-        "Authentication failure due to invalid / expired tokens (IDAM / S2S).";
-
-    public static final String UNAUTHORISED_S2S_SERVICE = "Unauthorised S2S service";
-
     // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     private ValidationError() {
     }

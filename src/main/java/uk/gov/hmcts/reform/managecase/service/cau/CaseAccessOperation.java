@@ -141,8 +141,7 @@ public class CaseAccessOperation {
                                                  addRequests.add(RoleAssignmentsAddRequest.builder()
                                                                      .caseDetails(caseDetails)
                                                                      .userId(userId)
-                                                                     .roleNames(caseRoles.stream().collect(
-                                                                         Collectors.toList()))
+                                                                     .roleNames(new ArrayList<>(caseRoles))
                                                                      .build()
                                                  ));
             roleAssignmentService.createCaseRoleAssignments(addRequests);

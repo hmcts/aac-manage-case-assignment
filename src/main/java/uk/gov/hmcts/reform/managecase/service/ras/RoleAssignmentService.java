@@ -60,17 +60,15 @@ public class RoleAssignmentService {
     public void createCaseRoleAssignments(final List<RoleAssignmentsAddRequest> addRequest) {
 
         if (addRequest != null && !addRequest.isEmpty()) {
-            final var queryRequests = addRequest.stream()
+            addRequest.stream()
                 .map(request -> createCaseRoleAssignments(
-                         request.getCaseDetails(),
-                         request.getUserId(),
-                         request.getRoleNames(),
-                         false
+                    request.getCaseDetails(),
+                    request.getUserId(),
+                    request.getRoleNames(),
+                    false
                      )
-                ).collect(Collectors.toList());
-
-            queryRequests.stream().forEach(assignmentRequest ->
-                                           roleAssignmentServiceHelper.createRoleAssignment(assignmentRequest)
+                ).forEach(assignmentRequest ->
+                              roleAssignmentServiceHelper.createRoleAssignment(assignmentRequest)
             );
         }
     }

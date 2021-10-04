@@ -57,8 +57,7 @@ import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTH
 @RestController
 @RequestMapping(path = "/")
 public class CaseAssignedUserRolesController {
-
-    //TODO MOVE TO ENUM
+    
     public static final String ADD_SUCCESS_MESSAGE = "Case-User-Role assignments created successfully";
     public static final String REMOVE_SUCCESS_MESSAGE = "Case-User-Role assignments removed successfully";
 

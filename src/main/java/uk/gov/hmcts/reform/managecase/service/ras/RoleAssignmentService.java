@@ -67,9 +67,7 @@ public class RoleAssignmentService {
                     request.getRoleNames(),
                     false
                      )
-                ).forEach(assignmentRequest ->
-                              roleAssignmentServiceHelper.createRoleAssignment(assignmentRequest)
-            );
+                ).forEach(assignmentRequest -> roleAssignmentServiceHelper.createRoleAssignment(assignmentRequest));
         }
     }
 

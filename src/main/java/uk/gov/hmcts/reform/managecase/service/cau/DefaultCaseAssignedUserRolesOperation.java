@@ -27,4 +27,8 @@ public class DefaultCaseAssignedUserRolesOperation implements CaseAssignedUserRo
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {
         return this.caseAccessOperation.findCaseUserRoles(caseIds, userIds);
     }
+
+    public void addCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
+        this.caseAccessOperation.addCaseUserRoles(caseUserRoles);
+    }
 }

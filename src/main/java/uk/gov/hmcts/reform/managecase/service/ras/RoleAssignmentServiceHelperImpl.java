@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.ResourceNotFoundExceptio
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ServiceException;
 import uk.gov.hmcts.reform.managecase.api.payload.MultipleQueryRequestResource;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentQuery;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentRequestResource;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentRequestResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
@@ -58,6 +60,25 @@ public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHel
         } catch (HttpStatusCodeException e) {
             log.warn("Error while deleting Role Assignments", e);
             throw mapException(e, "deleting");
+        }
+    }
+
+    @Override
+    public RoleAssignmentRequestResponse createRoleAssignment(RoleAssignmentRequestResource assignmentRequest) {
+        try {
+            final HttpEntity<Object> requestEntity =
+                new HttpEntity<>(assignmentRequest, securityUtils.authorizationHeaders());
+
+            return restTemplate.exchange(
+                applicationParams.roleAssignmentBaseURL(),
+                HttpMethod.POST,
+                requestEntity,
+                RoleAssignmentRequestResponse.class
+            ).getBody();
+
+        } catch (HttpStatusCodeException e) {
+            log.warn("Error while creating Role Assignments", e);
+            throw mapException(e, "creating");
         }
     }
 

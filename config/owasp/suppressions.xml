@@ -16,7 +16,7 @@
   <suppress until="2021-11-25">
     <notes><![CDATA[
      It's a false positive - spring-security version is 5.3.x (see: https://pivotal.io/security/cve-2018-1258)
-   ]]></notes>
+    ]]></notes>
     <cve>CVE-2018-1258</cve>
   </suppress>
 

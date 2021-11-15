@@ -16,7 +16,7 @@
   <suppress until="2021-11-25">
     <notes><![CDATA[
      It's a false positive - spring-security version is 5.3.x (see: https://pivotal.io/security/cve-2018-1258)
-   ]]></notes>
+    ]]></notes>
     <cve>CVE-2018-1258</cve>
   </suppress>
 
@@ -35,11 +35,6 @@
       https://github.com/jeremylong/DependencyCheck/issues/2866</notes>
     <cve>CVE-2007-1651</cve>
     <cve>CVE-2007-1652</cve>
-  </suppress>
-
-  <suppress until="2021-11-25">
-    <notes>Suppress CVE affecting spring-core temporarily until it can be addressed</notes>
-    <cve>CVE-2021-22096</cve>
   </suppress>
 
 </suppressions>

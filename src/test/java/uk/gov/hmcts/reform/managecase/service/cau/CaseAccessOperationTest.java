@@ -15,6 +15,7 @@ import org.mockito.stubbing.OngoingStubbing;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsAddRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
@@ -75,6 +76,9 @@ public class CaseAccessOperationTest {
         @Captor
         private ArgumentCaptor<List<RoleAssignmentsDeleteRequest>> deleteRequestsCaptor;
 
+        @Captor
+        private  ArgumentCaptor<List<RoleAssignmentsAddRequest>> caseUserRolesCaptor;
+
         private Map<String, Map<String, Long>> caseReferenceToOrgIdCountMap;
         private Map<String, Map<String, Long>> caseReferenceToOrgIdCountMapOther;
 
@@ -108,6 +112,67 @@ public class CaseAccessOperationTest {
             orgIdToCountMapOther.put(ORGANISATION_OTHER, 1L);
             caseReferenceToOrgIdCountMapOther = new HashMap<>();
             caseReferenceToOrgIdCountMapOther.put(CASE_REFERENCE_OTHER.toString(), orgIdToCountMapOther);
+        }
+
+
+        @Test
+        @DisplayName("should add single [CREATOR] case user role")
+        void shouldAddSingleCreatorCaseUserRoleForRA() {
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR)
+            );
+
+            // for an existing relation and then after removal
+            mockExistingCaseUserRolesForRA(
+                // before
+                List.of(new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR)),
+                // after
+                new ArrayList<>()
+            );
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(roleAssignmentService).createCaseRoleAssignments(caseUserRolesCaptor.capture());
+
+            verify(dataStoreRepository, times(1))
+                .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE.toString());
+            verify(dataStoreRepository, never()).incrementCaseSupplementaryData(any());
+        }
+
+
+        @Test
+        @DisplayName("should add single [CREATOR] case user role")
+        void shouldAddCreatorCaseUserRoleForRA() {
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE_CREATOR)
+            );
+
+            // for an existing relation and then after removal
+            // for an existing relation and then after removal
+            mockExistingCaseUserRolesForRA(
+                // before
+                List.of(new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR)),
+                // after
+                new ArrayList<>()
+            );
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(roleAssignmentService,
+                   times(2)).createCaseRoleAssignments(caseUserRolesCaptor.capture());
+
+            verify(dataStoreRepository, times(1))
+                .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE.toString());
+            verify(dataStoreRepository, times(1))
+                .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE_OTHER.toString());
+            verify(dataStoreRepository, never()).incrementCaseSupplementaryData(any());
         }
 
         @Test

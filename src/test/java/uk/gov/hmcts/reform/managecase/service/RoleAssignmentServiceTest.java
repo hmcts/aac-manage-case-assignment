@@ -10,16 +10,24 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.ActorIdType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentAttributes;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentQuery;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentRequestResource;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsAddRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleType;
-import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentServiceHelper;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.service.casedataaccesscontrol.RoleAssignmentCategoryService;
 import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentService;
+import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentServiceHelper;
 import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentsMapper;
 
 import java.time.Instant;
@@ -28,6 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,6 +44,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,23 +56,22 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class RoleAssignmentServiceTest {
 
-    @Mock
-    private RoleAssignmentServiceHelper roleAssignmentServiceHelper;
-
-    @Mock
-    private RoleAssignmentsMapper roleAssignmentsMapper;
-
-    @Mock
-    private RoleAssignmentResponse mockedRoleAssignmentResponse;
-
-    @InjectMocks
-    private RoleAssignmentService roleAssignmentService;
-
-    private List<String> caseIds = Arrays.asList("111", "222");
-    private List<String> userIds = Arrays.asList("111", "222");
     private static final String CASE_ID = "111111";
     private static final String USER_ID = "user1";
     private static final String USER_ID_2 = "user2";
+    private static final RoleCategory ROLE_CATEGORY_4_USER_1 = RoleCategory.PROFESSIONAL;
+    @Mock
+    private RoleAssignmentCategoryService roleAssignmentCategoryService;
+    @Mock
+    private RoleAssignmentServiceHelper roleAssignmentServiceHelper;
+    @Mock
+    private RoleAssignmentsMapper roleAssignmentsMapper;
+    @Mock
+    private RoleAssignmentResponse mockedRoleAssignmentResponse;
+    @InjectMocks
+    private RoleAssignmentService roleAssignmentService;
+    private final List<String> caseIds = Arrays.asList("111", "222");
+    private final List<String> userIds = Arrays.asList("111", "222");
 
     @Test
     public void shouldGetRoleAssignmentsByCasesAndUsers() {
@@ -80,16 +89,36 @@ class RoleAssignmentServiceTest {
         assertThat(caseAssignedUserRole.get(0).getCaseDataId(), is(CASE_ID));
     }
 
+    private RoleAssignments getRoleAssignments() {
+
+        final Instant currentTIme = Instant.now();
+        final long oneHour = 3600000;
+
+        final RoleAssignmentAttributes roleAssignmentAttributes =
+            RoleAssignmentAttributes.builder().caseId(Optional.of(CASE_ID)).build();
+
+        final List<RoleAssignment> roleAssignments = Arrays.asList(
+
+            RoleAssignment.builder().actorId("actorId").roleType(RoleType.CASE.name())
+                .attributes(roleAssignmentAttributes)
+                .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build(),
+
+            RoleAssignment.builder().actorId("actorId1").roleType(RoleType.CASE.name())
+                .attributes(roleAssignmentAttributes)
+                .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build()
+        );
+        return RoleAssignments.builder().roleAssignmentsList(roleAssignments).build();
+    }
+
     @Nested
     @DisplayName("deleteRoleAssignments()")
     @SuppressWarnings({"ConstantConditions", "FieldCanBeLocal"})
     class DeleteRoleAssignments {
 
-        @Captor
-        private ArgumentCaptor<List<RoleAssignmentQuery>> queryRequestsCaptor;
-
         private final String role1 = "[ROLE1]";
         private final String role2 = "[ROLE2]";
+        @Captor
+        private ArgumentCaptor<List<RoleAssignmentQuery>> queryRequestsCaptor;
 
         @Test
         void shouldDoNothingForNullDeleteRequests() {
@@ -221,24 +250,121 @@ class RoleAssignmentServiceTest {
 
     }
 
-    private RoleAssignments getRoleAssignments() {
+    @Nested
+    @DisplayName("createCaseRoleAssignments()")
+    @SuppressWarnings("ConstantConditions")
+    class CreateCaseRoleAssignments {
 
-        final Instant currentTIme = Instant.now();
-        final long oneHour = 3600000;
+        @Test
+        void shouldCreateSingleCaseRoleAssignments() {
 
-        final RoleAssignmentAttributes roleAssignmentAttributes =
-            RoleAssignmentAttributes.builder().caseId(Optional.of(CASE_ID)).build();
+            // GIVEN
+            CaseDetails caseDetails = createCaseDetails();
+            Set<String> roles = Set.of("[ROLE1]");
+            boolean replaceExisting = false;
 
-        final List<RoleAssignment> roleAssignments = Arrays.asList(
+            given(roleAssignmentCategoryService.getRoleCategory(USER_ID)).willReturn(ROLE_CATEGORY_4_USER_1);
 
-            RoleAssignment.builder().actorId("actorId").roleType(RoleType.CASE.name())
-                .attributes(roleAssignmentAttributes)
-                .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build(),
+            // WHEN
+            RoleAssignmentRequestResource roleAssignments = roleAssignmentService.createCaseRoleAssignments(
+                caseDetails,
+                USER_ID,
+                roles.stream().collect(
+                    Collectors.toList()),
+                replaceExisting
+            );
 
-            RoleAssignment.builder().actorId("actorId1").roleType(RoleType.CASE.name())
-                .attributes(roleAssignmentAttributes)
-                .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build()
-        );
-        return RoleAssignments.builder().roleAssignmentsList(roleAssignments).build();
+            // THEN
+            // verify RoleCategory has been loaded from service
+            verify(roleAssignmentCategoryService).getRoleCategory(USER_ID);
+
+
+            assertAll(
+                () -> assertCorrectlyPopulatedRoleAssignment(
+                    caseDetails,
+                    USER_ID,
+                    roles.stream().collect(Collectors.joining()),
+                    ROLE_CATEGORY_4_USER_1,
+                    roleAssignments
+                )
+            );
+        }
+
+        @Test
+        void shouldCreateCaseRoleAssignmentsForRequest() {
+            // GIVEN
+            final List<RoleAssignmentsAddRequest> addRequest = new ArrayList<>();
+            final var caseDetails = createCaseDetails();
+            final var roles = Set.of("[ROLE1]");
+            final var roleAssignmentsAddRequest = RoleAssignmentsAddRequest.builder()
+                .caseDetails(caseDetails)
+                .roleNames(roles.stream().collect(Collectors.toList()))
+                .userId(USER_ID).build();
+
+            addRequest.add(roleAssignmentsAddRequest);
+            given(roleAssignmentCategoryService.getRoleCategory(USER_ID)).willReturn(ROLE_CATEGORY_4_USER_1);
+
+            // WHEN
+            roleAssignmentService.createCaseRoleAssignments(addRequest);
+
+            //THEN
+            // verify RoleCategory has been loaded from service
+            verify(roleAssignmentCategoryService).getRoleCategory(USER_ID);
+        }
+
+
+
+        private void assertCorrectlyPopulatedRoleAssignment(final CaseDetails expectedCaseDetails,
+                                                            final String expectedUserId,
+                                                            final String expectedRoleName,
+                                                            final RoleCategory expectedRoleCategory,
+                                                            final RoleAssignmentRequestResource actualRoleAssignment) {
+
+            assertNotNull(actualRoleAssignment);
+
+            actualRoleAssignment.getRequestedRoles().stream()
+                .forEach(roleAssignmentResource -> assertAll(
+                    () -> Assertions.assertEquals(expectedUserId, roleAssignmentResource.getActorId()),
+                    () -> Assertions.assertEquals(expectedRoleName, roleAssignmentResource.getRoleName()),
+
+                    // defaults
+                    () -> Assertions.assertEquals(ActorIdType.IDAM.name(), roleAssignmentResource.getActorIdType()),
+
+                    () -> Assertions.assertEquals(
+                        Classification.RESTRICTED.name(),
+                        roleAssignmentResource.getClassification()
+                    ),
+                    () -> Assertions.assertEquals(GrantType.SPECIFIC.name(), roleAssignmentResource.getGrantType()),
+                    () -> Assertions.assertEquals(
+                        expectedRoleCategory.name(),
+                        roleAssignmentResource.getRoleCategory()
+                    ),
+                    () -> assertFalse(roleAssignmentResource.getReadOnly()),
+                    () -> assertNotNull(roleAssignmentResource.getBeginTime()),
+
+                    // attributes match case
+                    () -> Assertions.assertEquals(
+                        Optional.of(expectedCaseDetails.getReferenceAsString()),
+                        roleAssignmentResource.getAttributes().getCaseId()
+                    ),
+                    () -> Assertions.assertEquals(
+                        Optional.of(expectedCaseDetails.getJurisdiction()),
+                        roleAssignmentResource.getAttributes().getJurisdiction()
+                    ),
+                    () -> Assertions.assertEquals(
+                        Optional.of(expectedCaseDetails.getCaseTypeId()),
+                        roleAssignmentResource.getAttributes().getCaseType()
+                    )
+                ));
+        }
+
+        private CaseDetails createCaseDetails() {
+            final var caseDetails = CaseDetails.builder()
+                .id("123456L")
+                .jurisdiction("test-jurisdiction")
+                .caseTypeId("case-type-id").build();
+            return caseDetails;
+        }
+
     }
 }

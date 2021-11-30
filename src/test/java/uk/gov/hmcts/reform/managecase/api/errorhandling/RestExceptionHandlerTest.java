@@ -63,7 +63,7 @@ public class RestExceptionHandlerTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         NoticeOfChangeController controller = new NoticeOfChangeController(service,
                                                                            approvalService,
@@ -84,7 +84,7 @@ public class RestExceptionHandlerTest {
 
         // ARRANGE
         String myUniqueExceptionMessage = "Case could not be found";
-        // any runtime exception (that is not an ApiException)
+        // any runtime exception (that is not an CaseAssignedUserRoleException)
         CaseCouldNotBeFoundException expectedException =
             new CaseCouldNotBeFoundException(myUniqueExceptionMessage);
 

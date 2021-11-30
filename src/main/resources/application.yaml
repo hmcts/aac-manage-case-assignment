@@ -70,6 +70,9 @@ ccd:
     host: ${CCD_DEFINITION_STORE_API_BASE_URL:http://localhost:4451}
     allowed-urls: ${MCA_DEF_STORE_PROXY_URLS_ALLOWED_LIST:/api/display/challenge-questions.*}
     allowed-service: xui_webapp
+  s2s-authorised:
+    services:
+      case_user_roles: aac_manage_case_assignment,xui_webapp
 
 zuul:
   routes:
@@ -87,3 +90,31 @@ mca:
 notify:
   api-key: ${NOTIFY_MCA_API_KEY:notify-test-api-key}
   email-template-id: ${NOTIFY_EMAIL_TEMPLATE_ID:a60215dd-08bb-475e-956c-e97fdb7e448c}
+
+role:
+  assignment:
+    api:
+      host: ${ROLE_ASSIGNMENT_URL:http://localhost:5555}
+
+http:
+  client:
+    max:
+      total: ${HTTP_CLIENT_MAX_TOTAL:100}
+      client_per_route: ${HTTP_CLIENT_MAX_CLIENT_PER_ROUTE:20}
+    seconds:
+      idle:
+        connection: ${HTTP_CLIENT_SECONDS_IDLE_CONNECTION:120}
+    validate:
+      after:
+        inactivity: ${HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY:2000}
+    connection:
+      timeout: ${HTTP_CLIENT_CONNECTION_TIMEOUT:30000}
+    read:
+      timeout: ${HTTP_CLIENT_READ_TIMEOUT:60000}
+
+aca:
+  access-control:
+    cross-jurisdictional-roles: ${DATA_STORE_CROSS_JURISDICTIONAL_ROLES:caseworker-caa,caseworker-approver}
+    caseworker:
+      role:
+        regex: ${CASEWORKER_ROLE_REGEX:caseworker.+}

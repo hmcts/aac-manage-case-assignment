@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.managecase.client.datastore;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -142,4 +143,13 @@ public class CaseDetails {
         return fieldNode == null || fieldNode.isNull() ? null : fieldNode.asText();
     }
 
+    @JsonIgnore
+    public Long getReferenceAsLong() {
+        return Long.parseLong(id);
+    }
+
+    @JsonIgnore
+    public String getReferenceAsString() {
+        return id != null ? id.toString() : null;
+    }
 }

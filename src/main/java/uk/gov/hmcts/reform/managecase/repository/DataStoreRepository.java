@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 
 import java.util.List;
+import java.util.Map;
 
 public interface DataStoreRepository {
 
@@ -33,4 +34,6 @@ public interface DataStoreRepository {
     CaseDetails findCaseByCaseIdUsingExternalApi(String caseId);
 
     CaseDetails findCaseByCaseIdAsSystemUserUsingExternalApi(String caseId);
+
+    void incrementCaseSupplementaryData(Map<String, Map<String, Long>> data);
 }

@@ -70,6 +70,9 @@ ccd:
     host: ${CCD_DEFINITION_STORE_API_BASE_URL:http://localhost:4451}
     allowed-urls: ${MCA_DEF_STORE_PROXY_URLS_ALLOWED_LIST:/api/display/challenge-questions.*}
     allowed-service: xui_webapp
+  s2s-authorised:
+    services:
+      case_user_roles: aac_manage_case_assignment,xui_webapp
 
 zuul:
   routes:

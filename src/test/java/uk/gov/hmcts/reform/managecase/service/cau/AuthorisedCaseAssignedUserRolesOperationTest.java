@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseRoleAccessException;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
+import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.service.cau.rolevalidator.CaseAssignedUserRoleValidator;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class AuthorisedCaseAssignedUserRolesOperationTest {
@@ -63,6 +65,18 @@ class AuthorisedCaseAssignedUserRolesOperationTest {
             CaseRoleAccessException.class, () -> authorisedCaseAssignedUserRolesOperation
                 .findCaseUserRoles(caseIds, userIds)
         );
+    }
+
+    @Test
+    void shouldCallDefaultRemoveCaseUserRoles() {
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRolesRequests = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(),
+            new CaseAssignedUserRoleWithOrganisation()
+        );
+
+        authorisedCaseAssignedUserRolesOperation.removeCaseUserRoles(caseUserRolesRequests);
+
+        verify(defaultCaseAssignedUserRolesOperation).removeCaseUserRoles(caseUserRolesRequests);
     }
 
     private List<CaseAssignedUserRole> createCaseAssignedUserRoles() {

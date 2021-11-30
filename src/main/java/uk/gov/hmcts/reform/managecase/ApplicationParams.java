@@ -36,6 +36,8 @@ public class ApplicationParams {
     private List<String> acaAccessControlCrossJurisdictionRoles;
     @Value("${aca.access-control.caseworker.role.regex}")
     private String acaAccessControlCaseworkerRoleRegex;
+    @Value("#{'${ccd.s2s-authorised.services.case_user_roles}'.split(',')}")
+    private List<String> authorisedServicesForCaseUserRoles;
 
     public String getCaaSystemUserId() {
         return caaSystemUserId;
@@ -85,11 +87,19 @@ public class ApplicationParams {
         return roleAssignmentBaseURL() + "/query";
     }
 
+    public String amDeleteByQueryRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/query/delete";
+    }
+
     public List<String> getAcaAccessControlCrossJurisdictionRoles() {
         return acaAccessControlCrossJurisdictionRoles;
     }
 
     public String getAcaAccessControlCaseworkerRoleRegex() {
         return acaAccessControlCaseworkerRoleRegex;
+    }
+
+    public List<String> getAuthorisedServicesForCaseUserRoles() {
+        return authorisedServicesForCaseUserRoles;
     }
 }

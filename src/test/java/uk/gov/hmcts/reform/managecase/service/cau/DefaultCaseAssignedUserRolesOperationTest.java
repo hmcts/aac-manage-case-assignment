@@ -6,11 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
+import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRoleWithOrganisation;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class DefaultCaseAssignedUserRolesOperationTest {
@@ -36,6 +38,18 @@ class DefaultCaseAssignedUserRolesOperationTest {
             .findCaseUserRoles(Lists.newArrayList(), Lists.newArrayList());
 
         assertEquals(2, caseAssignedUserRoles.size());
+    }
+
+    @Test
+    void removeCaseUserRoles() {
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(),
+            new CaseAssignedUserRoleWithOrganisation()
+        );
+
+        caseAssignedUserRolesOperation.removeCaseUserRoles(caseUserRoles);
+
+        verify(caseAccessOperation).removeCaseUserRoles(caseUserRoles);
     }
 
     private List<CaseAssignedUserRole> createCaseAssignedUserRoles() {

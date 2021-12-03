@@ -32,6 +32,7 @@ public interface DataStoreApiClient {
     String START_EVENT_TRIGGER = INTERNAL_CASES + "/event-triggers/{eventId}";
     String SUBMIT_EVENT_FOR_CASE = CASES_WITH_ID + "/events";
     String EXTERNAL_START_EVENT_TRIGGER = "/cases/{caseId}/event-triggers/{eventId}";
+    String SUPPLEMENTARY_UPDATE = "/cases/{caseId}/supplementary-data";
 
     @PostMapping(value = CASE_USERS, consumes = APPLICATION_JSON_VALUE)
     void assignCase(@RequestBody CaseUserRolesRequest userRolesRequest);
@@ -65,4 +66,10 @@ public interface DataStoreApiClient {
     @GetMapping(CASES_WITH_ID)
     CaseDetails getCaseDetailsByCaseIdViaExternalApi(@RequestHeader(AUTHORIZATION) String userAuthorizationHeader,
                                                      @PathVariable(CASE_ID) String caseId);
+
+    @PostMapping(SUPPLEMENTARY_UPDATE)
+    void updateCaseSupplementaryData(@RequestHeader(AUTHORIZATION) String userAuthorizationHeader,
+                                   @PathVariable(CASE_ID) String caseId,
+                                   SupplementaryDataUpdateRequest supplementaryDataUpdateRequest);
+
 }

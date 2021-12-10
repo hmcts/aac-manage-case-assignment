@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.UpdateSupplementaryDataException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
@@ -15,6 +16,8 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdates;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -37,6 +40,8 @@ import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
     "PMD.UseConcurrentHashMap", "PMD.AvoidDuplicateLiterals"})
 public class DefaultDataStoreRepository implements DataStoreRepository {
 
+    public static final String ORGS_ASSIGNED_USERS_PATH = "orgs_assigned_users.";
+
     static final String NOC_REQUEST_DESCRIPTION = "Notice of Change Request Event";
 
     static final String NOT_ENOUGH_DATA_TO_SUBMIT_START_EVENT = "Failed to get enough data from start event "
@@ -49,6 +54,8 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     public static final String INCOMPLETE_CALLBACK = "INCOMPLETE_CALLBACK";
     public static final String CALLBACK_FAILED_ERRORS_MESSAGE =
         "Submitted callback failed. Please check data-store-api logs";
+    public static final String INVALID_UPDATE_SUPPLEMENTARY_REQUEST =
+        "Update supplementary data request must contain both an organisation and value";
 
     private final DataStoreApiClient dataStoreApi;
     private final JacksonUtils jacksonUtils;
@@ -202,6 +209,32 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     @Override
     public CaseDetails findCaseByCaseIdAsSystemUserUsingExternalApi(String caseId) {
         return findCaseByCaseIdExternalApi(caseId, true);
+    }
+
+    @Override
+    public void incrementCaseSupplementaryData(Map<String, Map<String, Long>> data) {
+        for (Map.Entry<String, Map<String, Long>> caseReferenceToOrgCountMapEntry : data.entrySet()) {
+            SupplementaryDataUpdates updateRequest = new SupplementaryDataUpdates();
+            Map<String, Object> formattedOrgToCountMap = new HashMap<>();
+            for (Map.Entry<String, Long> originalOrgToCountMap : caseReferenceToOrgCountMapEntry.getValue()
+                .entrySet()) {
+                if (originalOrgToCountMap.getKey() != null && originalOrgToCountMap.getValue() != null) {
+                    formattedOrgToCountMap.put(
+                        ORGS_ASSIGNED_USERS_PATH + originalOrgToCountMap.getKey(),
+                        Math.negateExact(originalOrgToCountMap.getValue())
+                    );
+                } else {
+                    throw new UpdateSupplementaryDataException(INVALID_UPDATE_SUPPLEMENTARY_REQUEST);
+                }
+            }
+            updateRequest.setIncrementalMap(formattedOrgToCountMap);
+            SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest();
+            request.setSupplementaryDataUpdates(updateRequest);
+            dataStoreApi.updateCaseSupplementaryData(securityUtils.getUserBearerToken(),
+                caseReferenceToOrgCountMapEntry.getKey(),
+                request
+            );
+        }
     }
 
     private CaseDetails findCaseByCaseIdExternalApi(String caseId, boolean asSystemUser) {

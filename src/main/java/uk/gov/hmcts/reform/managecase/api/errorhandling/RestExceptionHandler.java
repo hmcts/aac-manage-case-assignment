@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -42,6 +44,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .toArray(String[]::new);
         log.debug("MethodArgumentNotValidException:{}", ex.getLocalizedMessage());
         return toResponseEntity(status, null, errors);
+    }
+
+    @ExceptionHandler({CaseAssignedUserRoleException.class})
+    @ResponseBody
+    public ResponseEntity<Object> handleApiException(final CaseAssignedUserRoleException ex) {
+
+        log.error("CaseAssignedUserRoles exception:", ex.getMessage(), ex);
+        var responseStatus = ex.getClass().getAnnotation(ResponseStatus.class);
+        return toResponseEntity(getHttpStatus(responseStatus), ex.getLocalizedMessage(), null);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -137,5 +148,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         NoCApiError apiError = new NoCApiError(status, message, code, errors == null ? null : List.of(errors)
         );
         return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+    }
+
+    private HttpStatus getHttpStatus(ResponseStatus responseStatus) {
+        if (!HttpStatus.INTERNAL_SERVER_ERROR.equals(responseStatus.value())) {
+            return responseStatus.value();
+        } else if (!HttpStatus.INTERNAL_SERVER_ERROR.equals(responseStatus.code())) {
+            return responseStatus.code();
+        }
+
+        return null;
     }
 }

@@ -224,7 +224,7 @@ public class CaseAssignmentService {
         return users.stream().anyMatch(user -> assigneeId.equalsIgnoreCase(user.getUserIdentifier()));
     }
 
-    private List<String> getAssigneeRoles(String assigneeId) {
+    public List<String> getAssigneeRoles(String assigneeId) {
         String systemUserToken = idamRepository.getCaaSystemUserAccessToken();
         return idamRepository.getUserByUserId(assigneeId, systemUserToken).getRoles();
     }

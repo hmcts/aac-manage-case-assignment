@@ -30,6 +30,14 @@ public class ApplicationParams {
     private String emailTemplateId;
     @Value("${notify.api-key}")
     private String notifyApiKey;
+    @Value("${role.assignment.api.host}")
+    private String roleAssignmentServiceHost;
+    @Value("#{'${aca.access-control.cross-jurisdictional-roles}'.split(',')}")
+    private List<String> acaAccessControlCrossJurisdictionRoles;
+    @Value("${aca.access-control.caseworker.role.regex}")
+    private String acaAccessControlCaseworkerRoleRegex;
+    @Value("#{'${ccd.s2s-authorised.services.case_user_roles}'.split(',')}")
+    private List<String> authorisedServicesForCaseUserRoles;
 
     public String getCaaSystemUserId() {
         return caaSystemUserId;
@@ -69,5 +77,29 @@ public class ApplicationParams {
 
     public String getNotifyApiKey() {
         return notifyApiKey;
+    }
+
+    public String roleAssignmentBaseURL() {
+        return roleAssignmentServiceHost + "/am/role-assignments";
+    }
+
+    public String amQueryRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/query";
+    }
+
+    public String amDeleteByQueryRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/query/delete";
+    }
+
+    public List<String> getAcaAccessControlCrossJurisdictionRoles() {
+        return acaAccessControlCrossJurisdictionRoles;
+    }
+
+    public String getAcaAccessControlCaseworkerRoleRegex() {
+        return acaAccessControlCaseworkerRoleRegex;
+    }
+
+    public List<String> getAuthorisedServicesForCaseUserRoles() {
+        return authorisedServicesForCaseUserRoles;
     }
 }

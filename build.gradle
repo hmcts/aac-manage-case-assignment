@@ -13,6 +13,7 @@ plugins {
 // Updated spring-security version to 5.4.7 to resolve CVE-2021-22119
 ext['spring-security.version'] = '5.4.7'
 ext['spring-framework.version'] = '5.3.12'
+ext['log4j2.version'] = '2.15.0'
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
@@ -228,10 +229,7 @@ dependencyManagement {
     dependencySet(group: 'com.google.guava', version: '30.0-jre') {
       entry 'guava'
     }
-    // CVE-2020-9488
-    dependencySet(group: 'org.apache.logging.log4j', version: '2.13.2') {
-      entry 'log4j-api'
-    }
+
     // CVE-2021-25122
     dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.54') {
       entry 'tomcat-embed-core'

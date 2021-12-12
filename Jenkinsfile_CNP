@@ -25,6 +25,8 @@ def secrets = [
     secret('ccd-caseworker-autotest-password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
     secret('ccd-importer-autotest-email', 'CCD_IMPORT_AUTOTEST_EMAIL'),
     secret('ccd-importer-autotest-password', 'CCD_IMPORT_AUTOTEST_PASSWORD'),
+    secret('ccd-importer-autotest-email', 'DEFINITION_IMPORTER_USERNAME'),
+    secret('ccd-importer-autotest-password', 'DEFINITION_IMPORTER_PASSWORD'),
     secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
     secret('ccd-befta-caseworker-2-solicitor-1-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD'),
     secret('ccd-befta-master-solicitor1-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_1_PWD'),
@@ -43,6 +45,7 @@ def secrets = [
   ],
   's2s-${env}': [
     secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
+    secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_KEY'),
     secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP'),
     secret('microservicekey-ccd-data', 'BEFTA_S2S_CLIENT_SECRET_OF_CCD_DATA'),
     secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT')
@@ -76,13 +79,16 @@ env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${env.BRANCH_NAME}.ser
 
 // Other env variables needed for BEFTA.
 env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+env.S2S_URL_BASE = env.S2S_URL
 env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
-env.BEFTA_S2S_CLIENT_ID = "xui_webapp"
+env.IDAM_API_URL_BASE = env.IDAM_URL
+env.DEFINITION_STORE_URL_BASE = env.DEFINITION_STORE_HOST
+env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
+env.CCD_API_GATEWAY_S2S_ID = env.BEFTA_S2S_CLIENT_ID
 env.OAUTH2_CLIENT_ID = "ccd_gateway"
 env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
 env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
-env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 env.BEFTA_S2S_CLIENT_ID_OF_CCD_DATA = "ccd_data"
 env.BEFTA_OAUTH2_CLIENT_ID_OF_XUIWEBAPP = "xuiwebapp"
@@ -138,6 +144,8 @@ withPipeline("java", product, component) {
 
   enableAksStagingDeployment()
   disableLegacyDeployment()
+
+  //enableHighLevelDataSetup()
 
   after('smoketest:preview') {
     copyIgnore('./build/reports/tests/befta/smoke/cucumber-html-reports', './BEFTA Report for Smoke Tests/')

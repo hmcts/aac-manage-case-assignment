@@ -375,7 +375,7 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.0.0'
+  testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.8.1'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath

@@ -466,7 +466,7 @@ public class NoticeOfChangeControllerTest {
             this.mockMvc.perform(post("/noc" + REQUEST_NOTICE_OF_CHANGE_PATH)
                     .contentType(APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(requestNoticeOfChangeRequest)))
-                    .andExpect(status().isInternalServerError());
+                    .andExpect(status().isBadGateway());
         }
 
         @DisplayName("should error if Exception thrown")

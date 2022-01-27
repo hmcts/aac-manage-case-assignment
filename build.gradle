@@ -13,6 +13,7 @@ plugins {
 // Updated spring-security version to 5.4.7 to resolve CVE-2021-22119
 ext['spring-security.version'] = '5.4.7'
 ext['spring-framework.version'] = '5.3.12'
+ext['log4j2.version'] = '2.17.0'
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
@@ -128,7 +129,7 @@ task functional(type: Test) {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = [
-               '--threads', '5',
+               '--threads', '1',
                '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
                '--tags', 'not @Ignore',
                '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
@@ -228,10 +229,7 @@ dependencyManagement {
     dependencySet(group: 'com.google.guava', version: '30.0-jre') {
       entry 'guava'
     }
-    // CVE-2020-9488
-    dependencySet(group: 'org.apache.logging.log4j', version: '2.13.2') {
-      entry 'log4j-api'
-    }
+
     // CVE-2021-25122
     dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.54') {
       entry 'tomcat-embed-core'
@@ -366,6 +364,7 @@ dependencies {
   testImplementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
   testImplementation group: 'io.rest-assured', name: 'json-path', version: versions.restAssured
   testImplementation group: 'io.rest-assured', name: 'xml-path', version: versions.restAssured
+  testImplementation 'org.mockito:mockito-inline:4.0.0'
 
   // https://mvnrepository.com/artifact/nl.jqno.equalsverifier/equalsverifier
   testCompile group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '3.4.2'
@@ -427,4 +426,6 @@ task fortifyScan(type: JavaExec)  {
   main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
   classpath += sourceSets.test.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+  // Uncomment the line below to prevent the build from failing if the Fortify scan detects issues
+  //ignoreExitValue = true
 }

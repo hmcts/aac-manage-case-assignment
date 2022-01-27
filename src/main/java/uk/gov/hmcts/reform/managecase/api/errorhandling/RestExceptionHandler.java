@@ -94,7 +94,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .map(res -> new String(res.array(), StandardCharsets.UTF_8))
             .orElse(ex.getMessage());
         log.error("Downstream service errors: {}", errorMessage, ex);
-        return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
+        return toResponseEntity(HttpStatus.BAD_GATEWAY, errorMessage);
     }
 
     @ExceptionHandler(Exception.class)

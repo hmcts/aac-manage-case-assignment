@@ -18,6 +18,7 @@ services:
       CCD_DEFINITION_STORE_API_BASE_URL: http://ccd-definition-store-api-aat.service.core-compute-aat.internal
       PRD_HOST: http://rd-professional-api-aat.service.core-compute-aat.internal
       NOTIFY_MCA_API_KEY: "notify-test-api-key"
+      ROLE_ASSIGNMENT_URL: "${ROLE_ASSIGNMENT_URL:-http://am-role-assignment-service:4096}"
       # for debug JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     ports:
       - $SERVER_PORT:$SERVER_PORT

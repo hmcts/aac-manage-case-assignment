@@ -7,7 +7,7 @@ Feature: F-201: Assign Access within Organisation
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.1
+  @S-201.1 @Ignore
   Scenario: Solicitor successfully sharing case access with another solicitor in their org (happy path)
 
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],
@@ -23,7 +23,7 @@ Feature: F-201: Assign Access within Organisation
       And a call [by S2 to query his/her case roles granted over C1] will get the expected response as in [F-201_S2_Querying_Their_Access_Over_C1].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.1b
+  @S-201.1b @Ignore
   Scenario: Solicitor successfully sharing case access with another solicitor in their org (happy path) called with use_user_token to fetch case details
 
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],
@@ -39,7 +39,7 @@ Feature: F-201: Assign Access within Organisation
       And a call [by S2 to query his/her case roles granted over C1] will get the expected response as in [F-201_S2_Querying_Their_Access_Over_C1].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.2
+  @S-201.2 @Ignore
   Scenario: PUI CAA successfully sharing case access with another solicitor in their org (happy path)
 
     Given a user [S1 - a solicitor, to create a case under their organisation],
@@ -56,7 +56,7 @@ Feature: F-201: Assign Access within Organisation
       And a call [by S2 to query his/her case roles granted over C1] will get the expected response as in [F-201_S2_Querying_Their_Access_Over_C1].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.2b
+  @S-201.2b @Ignore
   Scenario: Must return an error response if PUI CAA tries to share a case access with another solicitor in their org called with use_user_token, but has no case access
 
     Given a user [S1 - a solicitor, to create a case under their organisation],
@@ -73,7 +73,7 @@ Feature: F-201: Assign Access within Organisation
       And a call [by S2 to query his/her case roles granted over C1] will get the expected response as in [F-201_S2_Querying_No_Access_Over_C1].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.3
+  @S-201.3 @Ignore
   Scenario: Must return an error response if assignee doesn't exist in invoker's organisation
 
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],
@@ -119,7 +119,7 @@ Feature: F-201: Assign Access within Organisation
       And the response has all the details as expected,
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.6a
+  @S-201.6a @Ignore
   Scenario: Must return an error response for an assignee user who doesn't have a solicitor role for the jurisdiction of the case
 
     Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
@@ -134,7 +134,7 @@ Feature: F-201: Assign Access within Organisation
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.6b
+  @S-201.6b @Ignore
   Scenario: Must return an error response for an assignee user who doesn't have a valid solicitor role for the jurisdiction of the case
 
     Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
@@ -149,7 +149,7 @@ Feature: F-201: Assign Access within Organisation
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.7
+  @S-201.7 @Ignore
   Scenario: Must return a negative response when the case doesn't contain an assignment for the invoker's organisation
 
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],

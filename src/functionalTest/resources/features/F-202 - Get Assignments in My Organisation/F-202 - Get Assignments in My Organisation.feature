@@ -8,7 +8,7 @@ Background:
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-1
-@S-202.1
+@S-202.1 @Ignore
 Scenario: Must return case assignments in my organisation for the provided Case IDs
 
     Given a user [Becky – a solicitor with the required permissions to create a case],
@@ -30,7 +30,7 @@ Scenario: Must return case assignments in my organisation for the provided Case 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-2
-@S-202.2
+@S-202.2 @Ignore
 Scenario: Must return an error response when a malformed case ID is provided
 
     Given a user [Becky – a solicitor with the required permissions to create a case],
@@ -66,7 +66,7 @@ Scenario: Must return an error response for a missing case ID
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-48 / AC-4
-@S-202.4
+@S-202.4 @Ignore
 Scenario: Must return an error response for a malformed Case ID List
 
     Given a user [Becky – a solicitor with the required permissions to create a case],

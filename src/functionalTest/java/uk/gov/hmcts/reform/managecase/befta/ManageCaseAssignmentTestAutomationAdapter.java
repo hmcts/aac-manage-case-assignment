@@ -1,24 +1,23 @@
 package uk.gov.hmcts.reform.managecase.befta;
 
-import java.util.Map;
-
 import uk.gov.hmcts.befta.BeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
+import uk.gov.hmcts.befta.dse.ccd.CcdEnvironment;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
     @Override
     protected BeftaTestDataLoader buildTestDataLoader() {
-        return new DataLoaderToDefinitionStore(this,
-                                               DataLoaderToDefinitionStore.VALID_CCD_TEST_DEFINITIONS_PATH);
+        return new DefaultBeftaTestDataLoader(CcdEnvironment.AAT);
     }
 
     @Override

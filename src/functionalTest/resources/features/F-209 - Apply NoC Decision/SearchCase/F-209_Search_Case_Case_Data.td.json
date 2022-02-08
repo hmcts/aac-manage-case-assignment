@@ -1,0 +1,56 @@
+{
+  "_guid_" : "F-209_Search_Case_Case_Data",
+  "_extends_" : "F_209_OrgPolicies",
+  "applicantOrganisationPolicy" : {
+    "OrgPolicyCaseAssignedRole" : "[ApplicantSolicitor]",
+    "OrgPolicyReference" : "ApplicantPolicy"
+  },
+  "otherParty" : {
+    "litigantType" : "SOLETRADER",
+    "soletrader" : {
+      "PostalAddress" : {
+        "AddressLine3" : null,
+        "AddressLine2" : null,
+        "AddressLine1" : "",
+        "Country" : null
+      },
+      "BusinessAddress" : {
+        "AddressLine3" : null,
+        "AddressLine2" : null,
+        "AddressLine1" : "7 Ardmore Avenue",
+        "Country" : null
+      },
+      "Name" : "Bob the Builder"
+    },
+    "tradingStartDate" : "1998-11-28"
+  },
+  "otherPartyOrganisationPolicy" : {
+    "OrgPolicyCaseAssignedRole" : "[OtherPartySolicitor]",
+    "OrgPolicyReference" : "OtherPartyPolicy"
+  },
+  "respondentOrganisationPolicy" : {
+    "OrgPolicyCaseAssignedRole" : "[RespondentSolicitor]",
+    "OrgPolicyReference" : "RespondentPolicy"
+  },
+  "respondent" : {
+    "litigantType" : "COMPANY",
+    "company" : {
+      "BusinessAddress" : {
+        "AddressLine3" : null,
+        "AddressLine2" : null,
+        "AddressLine1" : "5A Westway",
+        "Country" : ""
+      },
+      "Name" : "alpha innovare"
+    },
+    "incorporationDate" : "2020-01-01"
+  },
+  "applicant" : {
+    "litigantType" : "INDIVIDUAL",
+    "individual" : {
+      "Title" : "mr",
+      "LastName" : "noronha"
+    },
+    "dob" : "1989-09-19"
+  }
+}

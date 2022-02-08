@@ -1,0 +1,31 @@
+{
+  "_guid_": "F_209_get_case_users_richard_assigned",
+  "_extends_": "F_209_get_case_users_base",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams" : {
+      "case_ids" : "${[scenarioContext][ParentContext][childContexts][F-209_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}"
+    }
+  },
+
+
+  "users": {
+    "S1": {
+      "_extends_": "ACA_Users_Richard"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_" : "Common_Response",
+    "responseCode": 200,
+    "body": {
+      "case_users" : [{
+        "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_F-209_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies]}",
+
+        "case_role": "[ApplicantSolicitor]",
+        "user_id": "${[scenarioContext][testData][users][S1][id]}"
+      } ]
+    }
+  }
+}

@@ -100,10 +100,10 @@ task smoke(type: Test) {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = [
-               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
-               '--tags', '@Smoke and not @Ignore',
-               '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
-             ]
+              '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
+              '--tags', '@Smoke and not @Ignore',
+              '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
+      ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
     }
@@ -129,11 +129,11 @@ task functional(type: Test) {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = [
-               '--threads', '1',
-               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
-               '--tags', 'not @Ignore',
-               '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
-             ]
+              '--threads', '1',
+              '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
+              '--tags', 'not @Ignore',
+              '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
+      ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
     }
@@ -251,28 +251,23 @@ dependencyManagement {
 
 repositories {
   mavenLocal()
-  jcenter()
   mavenCentral()
   maven {
     url 'https://jitpack.io'
-  }
-  maven {
-    url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/'
-  }
-  maven {
-    url  "https://dl.bintray.com/gov-uk-notify/maven"
   }
 }
 
 def versions = [
   junit           : '5.6.2',
   junitPlatform   : '1.6.2',
-  reformLogging   : '5.1.1',
+  reformLogging   : '5.1.9',
   springBoot      : springBoot.class.package.implementationVersion,
   springfoxSwagger: '3.0.0',
   restAssured    : '4.3.1',
   lombok  : '1.18.16',
   pact_version    : '4.1.7',
+  serviceAuthVersion : '4.0.3',
+  idamJavaClient : '2.0.1',
 ]
 
 ext.libraries = [
@@ -317,13 +312,13 @@ dependencies {
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
-  implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.0.4'
+  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
+  implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
+  implementation group: 'com.github.hmcts', name: 'properties-volume-spring-boot-starter', version: '0.0.4'
 
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
-  implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
-  implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.5.5'
+  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.serviceAuthVersion
+  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamJavaClient
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.3.RELEASE'
 
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE"
@@ -376,7 +371,10 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.0.0'
+  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.9.1') {
+//    exclude group: 'com.github.hmcts.befta-fw', module: 'befta-fw'
+  }
+  testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.1'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
@@ -394,8 +392,8 @@ dependencies {
   contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.7.0")
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.0')
   contractTestRuntimeOnly "org.junit.platform:junit-platform-commons:1.7.0"
-  contractTestImplementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.5.5'
-  contractTestImplementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
+  contractTestImplementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamJavaClient
+  contractTestImplementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.serviceAuthVersion
   contractTestImplementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   contractTestImplementation sourceSets.main.runtimeClasspath
@@ -426,6 +424,6 @@ task fortifyScan(type: JavaExec)  {
   main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
   classpath += sourceSets.test.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
-  // Uncomment the line below to prevent the build from failing if the Fortify scan detects issues
-  //ignoreExitValue = true
+  // The line below prevents the build from failing if the Fortify scan detects issues
+  ignoreExitValue = true
 }

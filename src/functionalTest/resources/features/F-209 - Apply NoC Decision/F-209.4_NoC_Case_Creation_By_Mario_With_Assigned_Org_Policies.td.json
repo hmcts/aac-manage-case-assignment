@@ -1,0 +1,69 @@
+{
+  "_guid_": "F-209.4_NoC_Case_Creation_By_Mario_With_Assigned_Org_Policies",
+  "_extends_": "NoC_Case_Creation_With_Org_Policies__Base",
+
+  "specs": [
+    "by Mario to create a case - C1 - via a citizen facing application"
+  ],
+
+  "method": "POST",
+  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Mario"
+    }
+  },
+
+  "prerequisites": [
+    {
+      "Token_Creation": "F-209.4_NoC_Case_Creation_By_Mario_Token_Creation"
+    }
+  ],
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+
+      "data": {
+        "applicantOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": null
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "Org-Two"
+          }
+        },
+        "otherPartyOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "Org-Two"
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+      "body": {
+        "case_data": {
+          "applicantOrganisationPolicy": {
+            "Organisation": {
+              "OrganisationID": null
+            }
+          },
+          "respondentOrganisationPolicy": {
+            "Organisation": {
+              "OrganisationID": "Org-Two"
+            }
+          },
+          "otherPartyOrganisationPolicy": {
+            "Organisation": {
+              "OrganisationID": "Org-Two"
+            }
+          }
+        }
+      }
+    }
+}

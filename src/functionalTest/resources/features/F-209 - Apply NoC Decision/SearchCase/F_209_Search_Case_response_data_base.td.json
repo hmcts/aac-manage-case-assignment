@@ -1,0 +1,28 @@
+{
+  "_guid_" : "F_209_Search_Case_response_data_base",
+
+
+  "id" : "${[scenarioContext][ParentContext][childContexts][F-209_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}",
+  "jurisdiction" : "BEFTA_MASTER",
+  "state" : "CaseCreated",
+  "version" : null,
+  "case_type_id" : "FT_NoCCaseType",
+  "created_date" : "[[ANYTHING_PRESENT]]",
+  "last_modified" : "[[ANYTHING_PRESENT]]",
+  "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
+  "security_classification" : "PUBLIC",
+  "case_data" : {
+    "_extends_": "F-209_Search_Case_Case_Data"
+  },
+  "data_classification" : {
+    "_extends_" : "F-209_Search_Case_Data_Classification"
+  },
+  "after_submit_callback_response" : null,
+  "callback_response_status_code" : null,
+  "callback_response_status" : null,
+  "delete_draft_response_status_code" : null,
+  "delete_draft_response_status" : null,
+  "security_classifications" : {
+    "_extends_" : "F-209_Search_Case_Security_Classification"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "_guid_": "F-203_C2_Case_Not_Found_Becky",
+  "_extends_": "Case_Not_Found",
+
+  "specs" : [
+    "by Becky to access the case C2"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Becky"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][parentContext][childContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "path" : "/cases/${[scenarioContext][parentContext][childContexts][F-203_Prerequisite_Case_Creation_C2][testData][actualResponse][body][id]}"
+    }
+  }
+}

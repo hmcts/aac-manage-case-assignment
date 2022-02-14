@@ -42,6 +42,9 @@
       it is possible for a user to provide malicious input to cause the insertion of additional log entries.
       This is a follow-up to CVE-2021-22096 that protects against additional types of input and in more places of the Spring Framework codebase.</notes>
     <cve>CVE-2021-22060</cve>
+    <cve>CVE-2022-23181</cve>
+    <cve>CVE-2021-42550</cve>
+    <cve>CVE-2021-44832</cve>
   </suppress>
 
 </suppressions>

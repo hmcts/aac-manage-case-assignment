@@ -11,9 +11,10 @@ plugins {
 }
 
 // Updated spring-security version to 5.4.7 to resolve CVE-2021-22119
+// Updated log4j2 version to 2.17.1 to resolve CVE-2021-42550
 ext['spring-security.version'] = '5.4.7'
 ext['spring-framework.version'] = '5.3.12'
-ext['log4j2.version'] = '2.17.0'
+ext['log4j2.version'] = '2.17.1'
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'

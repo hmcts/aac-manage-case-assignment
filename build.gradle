@@ -10,8 +10,8 @@ plugins {
   id 'au.com.dius.pact' version '4.1.7'
 }
 
-// Updated spring-security version to 5.4.7 to resolve CVE-2021-22119
-ext['spring-security.version'] = '5.4.7'
+// Updated spring-security version to 5.6.0-M1 to resolve CWE-862
+ext['spring-security.version'] = '5.6.0-M1'
 ext['spring-framework.version'] = '5.3.15'
 ext['log4j2.version'] = '2.17.1'
 
@@ -328,9 +328,9 @@ dependencies {
   // Explicitly specify version of jakarta.el to be used to resolve CVE-2021-28170
   implementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.1'
 
-  // Updated spring-security components to version 5.4.7 to resolve CVE-2021-22119
-  implementation "org.springframework.security:spring-security-web:5.4.7"
-  implementation "org.springframework.security:spring-security-config:5.4.7"
+  // Updated spring-security components to version 5.6.0-M1 to resolve CWE-862
+  implementation "org.springframework.security:spring-security-web:5.6.0-M1"
+  implementation "org.springframework.security:spring-security-config:5.6.0-M1"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.4.5"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.4.5"
 
@@ -344,7 +344,7 @@ dependencies {
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
   implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'
   implementation 'uk.gov.service.notify:notifications-java-client:3.15.1-RELEASE'
-  
+
   // CVE-2021-42550
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'

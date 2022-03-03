@@ -344,7 +344,7 @@ dependencies {
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
   implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'
   implementation 'uk.gov.service.notify:notifications-java-client:3.15.1-RELEASE'
-  
+
   // CVE-2021-42550
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
@@ -375,7 +375,7 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.9.1') {
+  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.13.0') {
 //    exclude group: 'com.github.hmcts.befta-fw', module: 'befta-fw'
   }
   testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.1'

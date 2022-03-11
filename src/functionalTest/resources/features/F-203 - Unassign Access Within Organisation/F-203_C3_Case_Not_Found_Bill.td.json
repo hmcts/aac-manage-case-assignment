@@ -1,0 +1,26 @@
+{
+  "_guid_": "F-203_C3_Case_Not_Found_Bill",
+  "_extends_": "Case_Not_Found",
+
+  "specs" : [
+    "by Bill to access the case C3"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Bill"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][parentContext][childContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "path" : "/cases/${[scenarioContext][parentContext][childContexts][F-203_Prerequisite_Case_Creation_C3][testData][actualResponse][body][id]}"
+    }
+  }
+}

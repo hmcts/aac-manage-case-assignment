@@ -1,0 +1,113 @@
+{
+  "_guid_" : "F-209_Search_Case_Security_Classification",
+  "applicantOrganisationPolicy" : {
+    "classification" : "PUBLIC",
+    "value" : {
+      "OrgPolicyCaseAssignedRole" : "PUBLIC",
+      "Organisation" : {
+        "classification" : "PUBLIC",
+        "value" : {
+          "OrganisationID" : "PUBLIC"
+        }
+      },
+      "OrgPolicyReference" : "PUBLIC"
+    }
+  },
+  "otherParty" : {
+    "classification" : "PUBLIC",
+    "value" : {
+      "litigantType" : "PUBLIC",
+      "soletrader" : {
+        "classification" : "PUBLIC",
+        "value" : {
+          "PostalAddress" : {
+            "classification" : "PRIVATE",
+            "value" : {
+              "AddressLine3" : "PUBLIC",
+              "AddressLine2" : "PUBLIC",
+              "AddressLine1" : "PUBLIC",
+              "Country" : "PUBLIC"
+            }
+          },
+          "BusinessAddress" : {
+            "classification" : "RESTRICTED",
+            "value" : {
+              "AddressLine3" : "PUBLIC",
+              "AddressLine2" : "PUBLIC",
+              "AddressLine1" : "PUBLIC",
+              "Country" : "PUBLIC"
+            }
+          },
+          "Name" : "PUBLIC"
+        }
+      },
+      "tradingStartDate" : "PUBLIC"
+    }
+  },
+  "otherPartyOrganisationPolicy" : {
+    "classification" : "PUBLIC",
+    "value" : {
+      "OrgPolicyCaseAssignedRole" : "PUBLIC",
+      "Organisation" : {
+        "classification" : "PUBLIC",
+        "value" : {
+          "OrganisationID" : "PUBLIC"
+        }
+      },
+      "OrgPolicyReference" : "PUBLIC"
+    }
+  },
+  "respondentOrganisationPolicy" : {
+    "classification" : "PUBLIC",
+    "value" : {
+      "OrgPolicyCaseAssignedRole" : "PUBLIC",
+      "Organisation" : {
+        "classification" : "PUBLIC",
+        "value" : {
+          "OrganisationID" : "PUBLIC"
+        }
+      },
+      "OrgPolicyReference" : "PUBLIC"
+    }
+  },
+  "respondent" : {
+    "classification" : "PUBLIC",
+    "value" : {
+      "litigantType" : "PUBLIC",
+      "company" : {
+        "classification" : "PUBLIC",
+        "value" : {
+          "BusinessAddress" : {
+            "classification" : "PUBLIC",
+            "value" : {
+              "AddressLine3" : "PUBLIC",
+              "AddressLine2" : "PUBLIC",
+              "AddressLine1" : "PUBLIC",
+              "Country" : "PUBLIC"
+            }
+          },
+          "Name" : "PUBLIC"
+        }
+      },
+      "incorporationDate" : "PUBLIC"
+    }
+  },
+  "applicant" : {
+    "classification" : "PUBLIC",
+    "value" : {
+      "litigantType" : "PUBLIC",
+      "individual" : {
+        "classification" : "PUBLIC",
+        "value" : {
+          "DateOfBirth" : "RESTRICTED",
+          "NationalInsuranceNumber" : "PRIVATE",
+          "FirstName" : "RESTRICTED",
+          "Title" : "PUBLIC",
+          "LastName" : "PUBLIC",
+          "MiddleName" : "PRIVATE"
+        }
+      },
+      "dob" : "PUBLIC"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "_guid_": "F-203_Separate_Org_Policies_Case_Found_Benjamin",
+  "_extends_": "Case_Found",
+  "specs": [
+    "by Benjamin to access the case C1 with separate organisation policies"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Benjamin"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][parentContext][childContexts][F-203_Prerequisite_Case_Creation_Seperate_Org_Policies_C1][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "data": {
+        "OrganisationPolicyField2": {
+          "Organisation": {
+            "OrganisationID": "LESTKK0",
+            "OrganisationName": "CCD Solicitors Limited"
+          }
+        },
+        "OrganisationPolicyField1": {
+          "Organisation": {
+            "OrganisationName": "CCD Solicitors Limited"
+          }
+        }
+      }
+    }
+  }
+}

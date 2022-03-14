@@ -189,6 +189,44 @@ class ApplyNoCDecisionServiceTest {
     }
 
     @Test
+    void shouldRemoveOneExistingOrgUsersWithAccessWhenRemoveDecisionIsApplied() throws JsonProcessingException {
+        CaseDetails caseDetails = CaseDetails.builder()
+            .data(createSingleOrgData())
+            .id(CASE_ID)
+            .build();
+
+        List<CaseUserRole> existingCaseAssignments = List.of(
+            new CaseUserRole(CASE_ID, USER_ID_1, ORG_POLICY_1_ROLE),
+            new CaseUserRole(CASE_ID, USER_ID_1, ORG_POLICY_2_ROLE)
+        );
+        when(dataStoreRepository.getCaseAssignments(singletonList(CASE_ID), null))
+            .thenReturn(existingCaseAssignments);
+
+        FindUsersByOrganisationResponse usersByOrganisation = new FindUsersByOrganisationResponse(List.of(
+            prdUser(1)), ORG_1_ID);
+        when(prdRepository.findUsersByOrganisation(ORG_1_ID)).thenReturn(usersByOrganisation);
+
+        ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
+
+        applyNoCDecisionService.applyNoCDecision(request);
+
+        assertAll(
+            () -> verify(dataStoreRepository).removeCaseUserRoles(caseUserRolesCaptor.capture(),
+                                                                  Mockito.eq(ORG_1_ID)),
+            () -> assertThat(caseUserRolesCaptor.getValue().size(), is(1)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getUserId(), is(USER_ID_1)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseRole(), is(ORG_POLICY_2_ROLE)),
+            () -> verify(notifyService).sendEmail(emailRequestsCaptor.capture()),
+            () -> assertThat(emailRequestsCaptor.getValue().size(), is(1)),
+            () -> assertThat(emailRequestsCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
+            () -> assertThat(emailRequestsCaptor.getValue().get(0).getEmailAddress(), is("User1Email")),
+            () -> verify(dataStoreRepository, never())
+                .assignCase(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())
+        );
+    }
+
+    @Test
     void shouldUpdateCaseDataWhenAddDecisionIsApplied() throws JsonProcessingException {
         LocalDateTime dateTime = LocalDateTime.now();
         CaseDetails caseDetails = CaseDetails.builder()
@@ -884,6 +922,13 @@ class ApplyNoCDecisionServiceTest {
             orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
             organisationAsString(null, null),
             organisationAsString(ORG_2_ID, ORG_2_NAME));
+    }
+
+    private Map<String, JsonNode> createSingleOrgData() throws JsonProcessingException {
+        return createData(orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
+                          orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
+                          organisationAsString(null, null),
+                          organisationAsString(ORG_1_ID, ORG_1_NAME));
     }
 
     private Map<String, JsonNode> createPreviousOrgData(List<PreviousOrganisation> previousOrganisations)

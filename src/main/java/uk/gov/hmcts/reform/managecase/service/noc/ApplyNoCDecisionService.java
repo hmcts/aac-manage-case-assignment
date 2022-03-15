@@ -125,7 +125,7 @@ public class ApplyNoCDecisionService {
             .getCaseAssignments(singletonList(caseDetails.getId()), null);
 
         if (organisationToAdd == null || isNullOrEmpty(organisationToAdd.getOrganisationID())) {
-            applyRemoveRepresentationDecision(existingCaseAssignments, orgPolicyNode, organisationToRemove,
+            applyRemoveRepresentationDecision(existingCaseAssignments, caseRoleId, orgPolicyNode, organisationToRemove,
                 caseDetails.getId());
         } else {
             applyAddOrReplaceRepresentationDecision(existingCaseAssignments, caseRoleId, orgPolicyNode,
@@ -157,7 +157,7 @@ public class ApplyNoCDecisionService {
             List<CaseUserRole> filteredCaseAssignments =
                 filterCaseAssignments(existingCaseAssignments, newAssignedUsers.getLeft());
             removeOrganisationUsersAccess(caseReference, filteredCaseAssignments,
-                organisationToRemove);
+                organisationToRemove, caseRoleId);
         }
     }
 
@@ -170,11 +170,12 @@ public class ApplyNoCDecisionService {
     }
 
     private void applyRemoveRepresentationDecision(List<CaseUserRole> existingCaseAssignments,
+                                                   String caseRoleId,
                                                    JsonNode orgPolicyNode,
                                                    Organisation organisationToRemove,
                                                    String caseReference) {
         nullifyNode(orgPolicyNode.get(ORGANISATION));
-        removeOrganisationUsersAccess(caseReference, existingCaseAssignments, organisationToRemove);
+        removeOrganisationUsersAccess(caseReference, existingCaseAssignments, organisationToRemove, caseRoleId);
     }
 
     private Pair<List<CaseUserRole>, List<ProfessionalUser>> assignAccessToOrganisationUsers(
@@ -202,9 +203,10 @@ public class ApplyNoCDecisionService {
 
     private void removeOrganisationUsersAccess(String caseReference,
                                                List<CaseUserRole> existingCaseAssignments,
-                                               Organisation organisationToRemove) {
+                                               Organisation organisationToRemove,
+                                               String caseRoleId) {
         Pair<List<CaseUserRole>, List<ProfessionalUser>> users =
-            getUsersWithCaseAccess(existingCaseAssignments, organisationToRemove.getOrganisationID());
+            getUsersWithCaseAccess(existingCaseAssignments, organisationToRemove.getOrganisationID(), caseRoleId);
 
         if (!users.getLeft().isEmpty()) {
             dataStoreRepository.removeCaseUserRoles(users.getLeft(), organisationToRemove.getOrganisationID());
@@ -234,12 +236,9 @@ public class ApplyNoCDecisionService {
         return notifyService.sendEmail(emailNotificationRequests);
     }
 
-    private Pair<List<CaseUserRole>, List<ProfessionalUser>> getUsersWithCaseAccess(
-        List<CaseUserRole> existingCaseAssignments,
-        String organisationId) {
-        FindUsersByOrganisationResponse usersByOrganisation;
+    private FindUsersByOrganisationResponse findUsersByOrganisation(String organisationId) {
         try {
-            usersByOrganisation = prdRepository.findUsersByOrganisation(organisationId);
+            return prdRepository.findUsersByOrganisation(organisationId);
         } catch (FeignException e) {
             HttpStatus status = HttpStatus.resolve(e.status());
             String reasonPhrase = status == null ? e.getMessage() : status.getReasonPhrase();
@@ -247,11 +246,27 @@ public class ApplyNoCDecisionService {
             String errorMessage = status == HttpStatus.NOT_FOUND
                 ? String.format("Organisation with ID '%s' can not be found.", organisationId)
                 : String.format("Error encountered while retrieving organisation users for organisation ID '%s': %s",
-                organisationId, reasonPhrase);
+                                organisationId, reasonPhrase);
 
             throw new ValidationException(errorMessage, e);
         }
+    }
+
+    private Pair<List<CaseUserRole>, List<ProfessionalUser>> getUsersWithCaseAccess(
+        List<CaseUserRole> existingCaseAssignments,
+        String organisationId) {
+
+        FindUsersByOrganisationResponse usersByOrganisation = findUsersByOrganisation(organisationId);
         return getIntersection(existingCaseAssignments, usersByOrganisation.getUsers());
+    }
+
+    private Pair<List<CaseUserRole>, List<ProfessionalUser>> getUsersWithCaseAccess(
+        List<CaseUserRole> existingCaseAssignments,
+        String organisationId,
+        String caseRoleId) {
+
+        FindUsersByOrganisationResponse usersByOrganisation = findUsersByOrganisation(organisationId);
+        return getIntersection(existingCaseAssignments, usersByOrganisation.getUsers(), caseRoleId);
     }
 
     /**
@@ -270,6 +285,36 @@ public class ApplyNoCDecisionService {
         professionalUsers.forEach(professionalUser -> {
             Optional<CaseUserRole> caseUserRoleOptional = caseUserRoles.stream()
                 .filter(caseUserRole -> caseUserRole.getUserId().equals(professionalUser.getUserIdentifier()))
+                .findFirst();
+
+            caseUserRoleOptional.ifPresent(caseUserRole -> {
+                caseUserRolesIntersection.add(caseUserRole);
+                professionalUsersIntersection.add(professionalUser);
+            });
+        });
+
+        return new ImmutablePair<>(caseUserRolesIntersection, professionalUsersIntersection);
+    }
+
+    /**
+     * Obtain the intersection of a list of case user role assignments matching case role ID and professional users.
+     * Users are considered the same if their ID and case role both match.
+     * @param caseUserRoles case use role assignments
+     * @param professionalUsers professional users
+     * @param caseRoleId case role identifier
+     * @return the intersection - the list of filtered case user role assignments and
+     *         professional users for the intersection are both provided
+     */
+    private Pair<List<CaseUserRole>, List<ProfessionalUser>> getIntersection(List<CaseUserRole> caseUserRoles,
+                                                                             List<ProfessionalUser> professionalUsers,
+                                                                             String caseRoleId) {
+        List<CaseUserRole> caseUserRolesIntersection = new ArrayList<>();
+        List<ProfessionalUser> professionalUsersIntersection = new ArrayList<>();
+
+        professionalUsers.forEach(professionalUser -> {
+            Optional<CaseUserRole> caseUserRoleOptional = caseUserRoles.stream()
+                .filter(caseUserRole -> caseUserRole.getUserId().equals(professionalUser.getUserIdentifier())
+                    && caseUserRole.getCaseRole().equals(caseRoleId))
                 .findFirst();
 
             caseUserRoleOptional.ifPresent(caseUserRole -> {

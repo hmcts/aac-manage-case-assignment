@@ -12,7 +12,7 @@ plugins {
 
 // Updated spring-security version to 5.4.7 to resolve CVE-2021-22119
 ext['spring-security.version'] = '5.4.7'
-ext['spring-framework.version'] = '5.3.15'
+ext['spring-framework.version'] = '5.3.18'
 ext['log4j2.version'] = '2.17.1'
 
 group = 'uk.gov.hmcts.reform'

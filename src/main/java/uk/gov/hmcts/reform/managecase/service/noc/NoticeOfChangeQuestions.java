@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.managecase.service.noc;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -33,6 +36,8 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidation
 
 @Service
 public class NoticeOfChangeQuestions {
+
+    private static final Logger LOG = LoggerFactory.getLogger(NoticeOfChangeQuestions.class);
 
     public static final String PUI_ROLE = "pui-caa";
 
@@ -58,6 +63,7 @@ public class NoticeOfChangeQuestions {
     }
 
     public ChallengeQuestionsResult getChallengeQuestions(String caseId) {
+        LOG.info("getChallengeQuestions - started for case {}", caseId);
         ChallengeQuestionsResult challengeQuestionsResult = challengeQuestions(caseId).getChallengeQuestionsResult();
 
         List<ChallengeQuestion> challengeQuestionsResponse = challengeQuestionsResult.getQuestions().stream()
@@ -69,6 +75,15 @@ public class NoticeOfChangeQuestions {
 
     public NoCRequestDetails challengeQuestions(String caseId) {
         CaseViewResource caseViewResource = dataStoreRepository.findCaseByCaseId(caseId);
+
+        if (caseViewResource.getCaseViewActionableEvents() != null) {
+            LOG.info("Number of events from data store - {}", caseViewResource.getCaseViewActionableEvents().length);
+            Arrays.stream(caseViewResource.getCaseViewActionableEvents()).forEach(
+                ae -> LOG.info(ae.getId(), ae.getName(), ae.getDescription(), ae.getOrder()));
+        } else {
+            LOG.info("No actionable event found for case {}", caseId);
+        }
+
         checkForCaseEvents(caseViewResource);
 
         CaseDetails caseDetails = dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(caseId);
@@ -136,8 +151,10 @@ public class NoticeOfChangeQuestions {
     private void checkForCaseEvents(CaseViewResource caseViewResource) {
         if (caseViewResource.getCaseViewActionableEvents() == null
             || ArrayUtils.isEmpty(caseViewResource.getCaseViewActionableEvents())) {
+            LOG.error(NOC_EVENT_NOT_AVAILABLE.getErrorMessage());
             throw new NoCException(NOC_EVENT_NOT_AVAILABLE);
         } else if (caseViewResource.getCaseViewActionableEvents().length != 1) {
+            LOG.error(MULTIPLE_NOC_REQUEST_EVENTS.getErrorMessage());
             throw new NoCException(MULTIPLE_NOC_REQUEST_EVENTS);
         }
     }

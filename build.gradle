@@ -10,8 +10,7 @@ plugins {
   id 'au.com.dius.pact' version '4.1.7'
 }
 
-// Updated spring-security version to 5.4.7 to resolve CVE-2021-22119
-ext['spring-security.version'] = '5.4.7'
+ext['spring-security.version'] = '5.6.1'
 ext['spring-framework.version'] = '5.3.18'
 ext['log4j2.version'] = '2.17.1'
 ext['jackson.version'] = '2.13.2'
@@ -326,15 +325,13 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.3.RELEASE'
 
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE"
-  implementation "com.nimbusds:nimbus-jose-jwt:7.9"
   implementation "net.minidev:json-smart:2.4.7"
 
   // Explicitly specify version of jakarta.el to be used to resolve CVE-2021-28170
   implementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.1'
 
-  // Updated spring-security components to version 5.4.7 to resolve CVE-2021-22119
-  implementation "org.springframework.security:spring-security-web:5.4.7"
-  implementation "org.springframework.security:spring-security-config:5.4.7"
+  implementation "org.springframework.security:spring-security-web:5.6.1"
+  implementation "org.springframework.security:spring-security-config:5.6.1"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.4.5"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.4.5"
 
@@ -352,6 +349,7 @@ dependencies {
   // CVE-2021-42550
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.21'
 
   implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
   annotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final'

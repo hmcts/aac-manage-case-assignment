@@ -290,6 +290,7 @@ configurations.all {
 }
 
 dependencies {
+  compile 'com.google.code.gson:gson:2.8.9'
   compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: '2.13.2'
   compile "com.fasterxml.jackson.core:jackson-databind:2.13.2.2"
   compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'

@@ -101,7 +101,6 @@ task smoke(type: Test) {
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = [
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
-              '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
               '--tags', '@Smoke and not @Ignore',
               '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
       ]
@@ -132,7 +131,6 @@ task functional(type: Test) {
       args = [
               '--threads', '1',
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
-              '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
               '--tags', 'not @Ignore',
               '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
       ]

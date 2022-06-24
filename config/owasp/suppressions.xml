@@ -13,6 +13,7 @@
       CVE-2007-1651 refer https://tools.hmcts.net/jira/browse/CCD-39
       CVE-2007-1652 refer https://tools.hmcts.net/jira/browse/CCD-313
       CVE-2016-1000027 refer https://tools.hmcts.net/jira/browse/CCD-3246
+      CVE-2020-23171 refer https://tools.hmcts.net/jira/browse/CCD-1869
     </notes>
     <cve>CVE-2018-1258</cve>
     <cve>CVE-2020-29242</cve>
@@ -22,18 +23,8 @@
     <cve>CVE-2007-1651</cve>
     <cve>CVE-2007-1652</cve>
     <cve>CVE-2016-1000027</cve>
+    <cve>CVE-2020-23171</cve>
   </suppress>
   <!--End of false positives section -->
-
-	<suppress>
-    <notes>
-			Declared as False positive on library com.nimbusds:lang-tag #3594
-			https://github.com/jeremylong/DependencyCheck/issues/3594
-			CVE-2020-23171 Reference https://tools.hmcts.net/jira/browse/CCD-1869
-    </notes>
-    <packageUrl regex="true">^pkg:maven/com\.nimbusds/lang\-tag@.*$</packageUrl>
-    <cpe>cpe:/a:nim-lang:nim-lang</cpe>
-    <cve>CVE-2020-23171</cve>
-	</suppress>
 
 </suppressions>

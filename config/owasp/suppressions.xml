@@ -2,6 +2,29 @@
 <suppressions
   xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
 
+  <!--Please add all the false positives under the below section-->
+  <suppress>
+    <notes>False Positives
+      CVE-2018-1258 refer https://tools.hmcts.net/jira/browse/CCD-645
+      CVE-2020-29242 refer https://tools.hmcts.net/jira/browse/CCD-48
+      CVE-2020-29243 refer https://tools.hmcts.net/jira/browse/CCD-126
+      CVE-2020-29244 refer https://tools.hmcts.net/jira/browse/CCD-338
+      CVE-2020-29245 refer https://tools.hmcts.net/jira/browse/CCD-191
+      CVE-2007-1651 refer https://tools.hmcts.net/jira/browse/CCD-39
+      CVE-2007-1652 refer https://tools.hmcts.net/jira/browse/CCD-313
+      CVE-2016-1000027 refer https://tools.hmcts.net/jira/browse/CCD-3246
+    </notes>
+    <cve>CVE-2018-1258</cve>
+    <cve>CVE-2020-29242</cve>
+    <cve>CVE-2020-29243</cve>
+    <cve>CVE-2020-29244</cve>
+    <cve>CVE-2020-29245</cve>
+    <cve>CVE-2007-1651</cve>
+    <cve>CVE-2007-1652</cve>
+    <cve>CVE-2016-1000027</cve>
+  </suppress>
+  <!--End of false positives section -->
+
 	<suppress>
     <notes>
 			Declared as False positive on library com.nimbusds:lang-tag #3594
@@ -12,34 +35,5 @@
     <cpe>cpe:/a:nim-lang:nim-lang</cpe>
     <cve>CVE-2020-23171</cve>
 	</suppress>
-
-  <suppress>
-    <notes><![CDATA[
-     It's a false positive - spring-security version is 5.3.x (see: https://pivotal.io/security/cve-2018-1258)
-    ]]></notes>
-    <cve>CVE-2018-1258</cve>
-  </suppress>
-
-  <suppress>
-    <notes>These CVE's are coming from Dhowden tag library and it impacts only MP3/MP4/OGG/FLAC metadata parsing
-      library. Also it is declared as false positive in https://github.com/jeremylong/DependencyCheck/issues/3043
-    </notes>
-    <cve>CVE-2020-29242</cve>
-    <cve>CVE-2020-29243</cve>
-    <cve>CVE-2020-29244</cve>
-    <cve>CVE-2020-29245</cve>
-  </suppress>
-
-  <suppress>
-    <notes>Declared as False Positive on com.nimbusds:oauth2-oidc-sdk #2866
-      https://github.com/jeremylong/DependencyCheck/issues/2866</notes>
-    <cve>CVE-2007-1651</cve>
-    <cve>CVE-2007-1652</cve>
-  </suppress>
-
-  <suppress>
-    <notes>False-positive. See CCD-3246</notes>
-    <cve>CVE-2016-1000027</cve>
-  </suppress>
 
 </suppressions>

@@ -3,6 +3,7 @@ ARG PLATFORM=""
 # Application image
 
 FROM hmctspublic.azurecr.io/base/java${PLATFORM}:11-distroless
+USER hmcts
 
 COPY lib/AI-Agent.xml /opt/app/
 COPY build/libs/manage-case-assignment.jar /opt/app/

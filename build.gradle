@@ -11,7 +11,7 @@ plugins {
 }
 
 ext['spring-security.version'] = '5.6.1'
-ext['spring-framework.version'] = '5.3.18'
+ext['spring-framework.version'] = '5.3.20'
 ext['log4j2.version'] = '2.17.1'
 ext['jackson.version'] = '2.13.2'
 
@@ -101,6 +101,7 @@ task smoke(type: Test) {
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = [
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
+              '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
               '--tags', '@Smoke and not @Ignore',
               '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
       ]
@@ -131,6 +132,7 @@ task functional(type: Test) {
       args = [
               '--threads', '1',
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
+              '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
               '--tags', 'not @Ignore',
               '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
       ]
@@ -231,7 +233,7 @@ dependencyManagement {
     }
 
     // CVE-2021-23181
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.58') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.63') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
@@ -290,6 +292,7 @@ configurations.all {
 }
 
 dependencies {
+  compile 'com.google.code.gson:gson:2.8.9'
   compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: '2.13.2'
   compile "com.fasterxml.jackson.core:jackson-databind:2.13.2.2"
   compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'

@@ -272,7 +272,7 @@ Feature: F-205 Validate Notice of Change Answers
     | has a null answer where a non-null answer is expected | 204_Case_Creation       | 204_Update_Org_Policies_Token_Creation      | 204_Update_Org_Policies         |
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-205.15.1 @Ignore @Reenable
+  @S-205.15.1
   Scenario: NoC Answers must return a positive response for various correct answers
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],

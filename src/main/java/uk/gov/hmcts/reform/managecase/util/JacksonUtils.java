@@ -53,7 +53,7 @@ public class JacksonUtils {
      * Nullify all fields within an object node - all fields are set to null nodes.
      * NOTE: Arrays are not supported
      * @param node object node to be nullified
-     * @param ignoredNestedFields names of fields that will be set to NullNode, even if they are nested fields
+     * @param ignoreNestedFields names of fields that will be set to NullNode, even if they are nested fields
      */
     public void nullifyObjectNode(ObjectNode node, String... ignoreNestedFields) {
         List<String> ignoredNestedFieldsList = Arrays.asList(ignoreNestedFields);

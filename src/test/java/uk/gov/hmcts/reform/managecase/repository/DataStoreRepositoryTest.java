@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
+import uk.gov.hmcts.reform.managecase.client.datastore.SearchCaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdates;
@@ -47,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -251,13 +253,14 @@ class DataStoreRepositoryTest {
         List<String> userIds = List.of(ASSIGNEE_ID);
 
         CaseUserRole inputRole = CaseUserRole.builder()
-                .caseId(CASE_ID)
-                .userId(ASSIGNEE_ID)
-                .caseRole(ROLE)
-                .build();
+            .caseId(CASE_ID)
+            .userId(ASSIGNEE_ID)
+            .caseRole(ROLE)
+            .build();
 
-        given(dataStoreApi.getCaseAssignments(caseIds, userIds))
-                .willReturn(new CaseUserRoleResource(List.of(inputRole)));
+        given(dataStoreApi.searchCaseAssignments(argThat(
+            searchRequest -> searchRequest.getCaseIds() == caseIds && searchRequest.getUserIds() == userIds)))
+            .willReturn(new CaseUserRoleResource(List.of(inputRole)));
 
         // ACT
         List<CaseUserRole> caseUserRoles = repository.getCaseAssignments(caseIds, userIds);

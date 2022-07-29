@@ -338,7 +338,7 @@ public class NoticeOfChangeControllerIT {
                 .userId(USER_ID_2)
                 .caseRole(ORG_POLICY_2_ROLE)
                 .build();
-            stubGetCaseAssignments(singletonList(CASE_ID), singletonList(caseUserRole));
+            stubGetCaseAssignments(singletonList(CASE_ID), null, singletonList(caseUserRole));
             stubGetUsersByOrganisationInternal(usersByOrganisation(user(USER_ID_1), user(USER_ID_2)), ORG_2_ID);
             stubUnassignCase(singletonList(
                 new CaseUserRoleWithOrganisation(CASE_ID, USER_ID_2, ORG_POLICY_2_ROLE, ORG_2_ID)));

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import static java.util.Collections.emptyList;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

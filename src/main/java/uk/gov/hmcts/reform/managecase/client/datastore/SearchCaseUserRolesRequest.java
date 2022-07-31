@@ -18,4 +18,11 @@ public class SearchCaseUserRolesRequest {
     @JsonProperty("user_ids")
     private List<String> userIds;
 
+    public List<String> getCaseIds() {
+        return caseIds == null ? emptyList() : caseIds;
+    }
+
+    public List<String> getUserIds() {
+        return userIds == null ? emptyList() : userIds;
+    }
 }

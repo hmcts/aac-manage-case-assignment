@@ -39,6 +39,8 @@ import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -285,7 +287,8 @@ public class CaseAssignmentControllerTest {
                                              Charset.defaultCharset(), null
             );
             given(service.getCaseAssignments(List.of(caseIds)))
-                .willThrow(new FeignException.NotFound("404", request, "data store failure".getBytes()));
+                .willThrow(new FeignException.NotFound("404", request, "data store failure".getBytes(),
+                                                       new HashMap<String, Collection<String>>()));
 
             this.mockMvc.perform(get(CASE_ASSIGNMENTS_PATH)
                                      .queryParam("case_ids", caseIds))

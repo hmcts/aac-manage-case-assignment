@@ -12,7 +12,7 @@ def branchesToSync = ['demo', 'ithc', 'perftest']
 GradleBuilder builder = new GradleBuilder(this, product)
 
 // Variables to switch pipeline logic and wiring per type of build
-def definitionStoreDevelopPr = "PR-575"  // This doesn't change frequently, but when it does, only change this value.
+def definitionStoreDevelopPr = "PR-1265"  // This doesn't change frequently, but when it does, only change this value.
 def dataStoreApiDevelopPr    = "PR-2064" // This doesn't change frequently, but when it does, only change this value.
 def prsToUseAat             = "PR-148,PR-161,PR-167,PR-259,PR-264" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 

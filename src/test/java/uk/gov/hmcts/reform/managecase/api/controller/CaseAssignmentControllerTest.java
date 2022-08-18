@@ -11,6 +11,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.endpoint.web.WebEndpointsSupplier;
+import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -89,6 +91,12 @@ public class CaseAssignmentControllerTest {
 
         @MockBean
         protected CaseAssignmentService service;
+
+        @MockBean
+        protected WebEndpointsSupplier webEndpointsSupplier;
+
+        @MockBean
+        protected WebMvcEndpointHandlerMapping webMvcEndpointHandlerMapping;
 
         @Autowired
         protected ObjectMapper objectMapper;

@@ -10,6 +10,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
+import org.springframework.boot.actuate.endpoint.web.EndpointMediaTypes;
+import org.springframework.boot.actuate.endpoint.web.WebEndpointsSupplier;
+import org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpointsSupplier;
+import org.springframework.boot.actuate.endpoint.web.annotation.ServletEndpointsSupplier;
+import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -139,6 +146,27 @@ public class NoticeOfChangeControllerTest {
 
         @MockBean
         protected JacksonUtils jacksonUtils;
+
+        @MockBean
+        protected WebEndpointsSupplier webEndpointsSupplier;
+
+        @MockBean
+        protected ServletEndpointsSupplier servletEndpointsSupplier;
+
+        @MockBean
+        protected ControllerEndpointsSupplier controllerEndpointsSupplier;
+
+        @MockBean
+        protected EndpointMediaTypes endpointMediaTypes;
+
+        @MockBean
+        protected CorsEndpointProperties corsEndpointProperties;
+
+        @MockBean
+        protected WebEndpointProperties webEndpointProperties;
+
+        @MockBean
+        protected WebMvcEndpointHandlerMapping webMvcEndpointHandlerMapping;
 
         @Autowired
         protected ObjectMapper objectMapper;

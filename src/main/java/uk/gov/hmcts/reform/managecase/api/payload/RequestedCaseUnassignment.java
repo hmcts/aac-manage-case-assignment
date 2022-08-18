@@ -46,6 +46,12 @@ public class RequestedCaseUnassignment {
     private final List<@Pattern(regexp = "^\\[.+]$", message = ValidationError.CASE_ROLE_FORMAT_INVALID)
             String> caseRoles;
 
+    public RequestedCaseUnassignment() {
+        caseId = "1583841721773828";
+        assigneeId = "ecb5edf4-2f5f-4031-a0ec";
+        caseRoles = List.of("[Claimant]", "[Defendant]");
+    }
+
     @JsonIgnore
     public boolean hasCaseRoles() {
         return this.caseRoles != null && !this.caseRoles.isEmpty();

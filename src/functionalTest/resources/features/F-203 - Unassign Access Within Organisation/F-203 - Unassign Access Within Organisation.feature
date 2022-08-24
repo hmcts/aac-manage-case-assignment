@@ -8,7 +8,7 @@ Feature: F-203: Unassign Access Within Organisation
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 1
-  @S-203.1 @Ignore
+  @S-203.1
   Scenario: Solicitor successfully removing case access for another solicitor in their org (happy path)
 
     Given a user [Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation],
@@ -33,7 +33,7 @@ Feature: F-203: Unassign Access Within Organisation
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 2
-  @S-203.2 @Ignore
+  @S-203.2
   Scenario: CAA successfully removing case access for another solicitor in their org (happy path)
 
     Given a user [Becky - with a solicitor role in a particular jurisdiction within an organisation, to create a case],
@@ -58,7 +58,7 @@ Feature: F-203: Unassign Access Within Organisation
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 3
-  @S-203.3 @Ignore
+  @S-203.3
   Scenario: Solicitor successfully removing access to multiple cases for multiple solicitors in their org (happy path)
 
     Given a user [Becky - with a Solicitor role in a jurisdiction under an organisation to assign and Unassign a case role to a solicitor within the same organisation],
@@ -97,7 +97,7 @@ Feature: F-203: Unassign Access Within Organisation
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 4
-  @S-203.4 @Ignore
+  @S-203.4
   Scenario: Pui-caa successfully removing access to multiple cases for multiple solicitors in their org (happy path)
 
     Given a user [Becky - with a solicitor role in a particular jurisdiction within an organisation, to create a case],

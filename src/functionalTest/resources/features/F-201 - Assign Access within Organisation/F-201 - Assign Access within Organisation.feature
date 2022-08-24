@@ -7,7 +7,7 @@ Feature: F-201: Assign Access within Organisation
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.1 @Ignore
+  @S-201.1
   Scenario: Solicitor successfully sharing case access with another solicitor in their org (happy path)
 
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],
@@ -25,7 +25,7 @@ Feature: F-201: Assign Access within Organisation
       And a call [by S2 to access the case created by S1] will get the expected response as in [F-201_Case_Found].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.1b @Ignore
+  @S-201.1b
   Scenario: Solicitor successfully sharing case access with another solicitor in their org (happy path) called with use_user_token to fetch case details
 
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],
@@ -45,7 +45,7 @@ Feature: F-201: Assign Access within Organisation
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.2 @Ignore
+  @S-201.2
   Scenario: PUI CAA successfully sharing case access with another solicitor in their org (happy path)
 
     Given a user [S1 - a solicitor, to create a case under their organisation],
@@ -66,7 +66,7 @@ Feature: F-201: Assign Access within Organisation
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.2b @Ignore
+  @S-201.2b
   Scenario: Must return an error response if PUI CAA tries to share a case access with another solicitor in their org called with use_user_token, but has no case access
 
     Given a user [S1 - a solicitor, to create a case under their organisation],
@@ -86,7 +86,7 @@ Feature: F-201: Assign Access within Organisation
       And a call [by S2 to access the case created by S1] will get the expected response as in [F-201_Case_Not_Found]
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.3 @Ignore
+  @S-201.3
   Scenario: Must return an error response if assignee doesn't exist in invoker's organisation
 
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],

@@ -1,5 +1,5 @@
 #=================================================
-@F-203 @Ignore
+@F-203
 Feature: F-203: Unassign Access Within Organisation
 #=================================================
 
@@ -130,9 +130,10 @@ Feature: F-203: Unassign Access Within Organisation
       And a call [by Becky to access the case C1] will get the expected response as in [F-203_C1_Case_Not_Found_Becky],
       And a call [by Becky to access the case C2] will get the expected response as in [F-203_C2_Case_Not_Found_Becky],
       And a call [by Becky to access the case C3] will get the expected response as in [F-203_C3_Case_Not_Found_Becky].
+
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 5
-  @S-203.5 @Ignore
+  @S-203.5
   Scenario: Must return an error response if intended unassignee doesn't exist in invoker's organisation
 
     Given a user [Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation - O1],
@@ -153,7 +154,7 @@ Feature: F-203: Unassign Access Within Organisation
       And a call [by Benjamin to access the case C1 with separate organisation policies] will get the expected response as in [F-203_Separate_Org_Policies_Case_Found_Benjamin].
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 6
-  @S-203.6 @Ignore
+  @S-203.6
   Scenario: Must return an error response for a malformed Case ID
 
     Given a user [Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation],
@@ -174,7 +175,7 @@ Feature: F-203: Unassign Access Within Organisation
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 7
-  @S-203.7 @Ignore
+  @S-203.7
   Scenario: Must return an error response for a missing Case ID
 
     Given a user [Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation],
@@ -195,7 +196,7 @@ Feature: F-203: Unassign Access Within Organisation
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 8
-  @S-203.8 @Ignore
+  @S-203.8
   Scenario: Must return an error response for a malformed Case-Role
 
     Given a user [Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation],
@@ -216,7 +217,7 @@ Feature: F-203: Unassign Access Within Organisation
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 9 (Happy path)
-  @S-203.9 @Ignore
+  @S-203.9
   Scenario: Solicitor successfully removing access to multiple cases for multiple solicitors in their org with respect to a specific case role (happy path)
 
     Given a user [Becky - with a Solicitor role in a jurisdiction under an organisation to assign and Unassign a case role to a solicitor within the same organisation],
@@ -255,7 +256,7 @@ Feature: F-203: Unassign Access Within Organisation
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 10 (Happy path)
-  @S-203.10 @Ignore
+  @S-203.10
   Scenario: Pui-CAA successfully removing access to multiple cases for multiple solicitors in their org with respect to a specific case role (happy path)
 
     Given a user [Becky - with a Solicitor role in a jurisdiction under an organisation to assign and Unassign a case role to a solicitor within the same organisation],
@@ -294,7 +295,7 @@ Feature: F-203: Unassign Access Within Organisation
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-51 A/C 11
-  @S-203.11 @Ignore
+  @S-203.11
   Scenario: Must return an error response for a missing Assignee ID
 
     Given a user [Becky - with a Solicitor role for a particular jurisdiction under an organisation to create, assign and unassign access to a case for another solicitor in their organisation],

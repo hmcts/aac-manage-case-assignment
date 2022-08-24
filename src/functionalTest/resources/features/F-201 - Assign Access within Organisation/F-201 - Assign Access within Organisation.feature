@@ -134,7 +134,7 @@ Feature: F-201: Assign Access within Organisation
       And the response has all the details as expected,
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.6a @Ignore
+  @S-201.6a
   Scenario: Must return an error response for an assignee user who doesn't have a solicitor role for the jurisdiction of the case
 
     Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
@@ -149,7 +149,7 @@ Feature: F-201: Assign Access within Organisation
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.6b @Ignore
+  @S-201.6b
   Scenario: Must return an error response for an assignee user who doesn't have a valid solicitor role for the jurisdiction of the case
 
     Given a user [S1 - with a solicitor role under an organisation to assign a case role to another solicitor within the same organisation],
@@ -164,7 +164,7 @@ Feature: F-201: Assign Access within Organisation
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.7 @Ignore
+  @S-201.7
   Scenario: Must return a negative response when the case doesn't contain an assignment for the invoker's organisation
 
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],

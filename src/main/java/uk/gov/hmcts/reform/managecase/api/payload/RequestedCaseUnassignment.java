@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.LuhnCheck;
 
 import javax.validation.constraints.NotEmpty;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode
 @ApiModel("Requested Unassignment From Case")
 public class RequestedCaseUnassignment {
@@ -29,12 +31,12 @@ public class RequestedCaseUnassignment {
     @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID_LENGTH)
     @LuhnCheck(message = ValidationError.CASE_ID_INVALID)
     @ApiModelProperty(value = "Case ID to Unassign Access To", required = true, example = "1583841721773828")
-    private final String caseId;
+    private String caseId;
 
     @JsonProperty("assignee_id")
     @NotEmpty(message = ValidationError.ASSIGNEE_ID_EMPTY)
     @ApiModelProperty(value = "IDAM ID of the User to Unassign", required = true, example = "ecb5edf4-2f5f-4031-a0ec")
-    private final String assigneeId;
+    private String assigneeId;
 
     @JsonProperty("case_roles")
     @JsonSetter(nulls = AS_EMPTY)
@@ -43,14 +45,9 @@ public class RequestedCaseUnassignment {
         allowEmptyValue = true,
         example = "[ \"[Claimant]\", \"[Defendant]\" ]"
     )
-    private final List<@Pattern(regexp = "^\\[.+]$", message = ValidationError.CASE_ROLE_FORMAT_INVALID)
+    private List<@Pattern(regexp = "^\\[.+]$", message = ValidationError.CASE_ROLE_FORMAT_INVALID)
             String> caseRoles;
 
-    public RequestedCaseUnassignment() {
-        caseId = "1583841721773828";
-        assigneeId = "ecb5edf4-2f5f-4031-a0ec";
-        caseRoles = List.of("[Claimant]", "[Defendant]");
-    }
 
     @JsonIgnore
     public boolean hasCaseRoles() {

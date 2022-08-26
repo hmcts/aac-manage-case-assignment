@@ -13,9 +13,13 @@
 	},
 
 	"request": {
-		"queryParams": {
-			"case_ids": "${[scenarioContext][siblingContexts][F-201_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
-			"user_ids": "${[scenarioContext][testData][users][invokingUser][id]}"
+		"body": {
+			"case_ids": [
+				"${[scenarioContext][siblingContexts][F-201_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
+			],
+			"user_ids": [
+				"${[scenarioContext][testData][users][invokingUser][id]}"
+			]
 		}
 	},
 

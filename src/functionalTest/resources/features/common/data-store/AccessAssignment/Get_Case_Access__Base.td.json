@@ -4,11 +4,15 @@
 	"productName": "CCD Data Store",
 	"operationName": "Get Case-Assigned Users and Roles",
 
-	"method": "GET",
-	"uri": "{{CCD_DATA_STORE_API_BASE_URL}}/case-users",
+	"method": "POST",
+	"uri": "{{CCD_DATA_STORE_API_BASE_URL}}/case-users/search",
 
 	"request": {
-		"_extends_": "Common_Request"
+		"_extends_": "Common_Request",
+		"body": {
+			"case_ids": [],
+			"user_ids": []
+		}
 	},
 
 	"expectedResponse": {

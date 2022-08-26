@@ -77,7 +77,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
             return dataStoreApi.getCaseDetailsByCaseId(getUserAuthToken(), caseId);
         } catch (FeignException ex) {
             if (HttpStatus.NOT_FOUND.value() == ex.status()) {
-                throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
+                throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND + " For caseId: " + caseId);
             }
             throw ex;
         }
@@ -249,7 +249,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
             }
         } catch (FeignException e) {
             if (HttpStatus.NOT_FOUND.value() == e.status()) {
-                throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
+                throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND + " For caseId: " + caseId);
             }
             throw e;
         }

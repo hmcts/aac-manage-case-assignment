@@ -48,6 +48,13 @@ spring:
           oidc:
             client-id: internal
             client-secret: internal
+
+logging:
+  level:
+    root: DEBUG
+    org.springframework.web: DEBUG
+    com.github.tomakehurst: INFO
+
 #  cloud:
 #    discovery:
 #      client:

@@ -1,6 +1,6 @@
 {
 	"_guid_": "F-201_S2_Querying_No_Access_Over_C1",
-	"_extends_": "Case_Assigned_Users_Roles",
+	"_extends_": "Get_Case_Access__Base",
 	"title": "S2 Querying No Access Over C1",
 
 	"specs": [
@@ -14,7 +14,8 @@
 
 	"request": {
 		"queryParams": {
-			"case_ids": "${[scenarioContext][siblingContexts][F-201_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
+			"case_ids": "${[scenarioContext][siblingContexts][F-201_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}",
+			"user_ids": "${[scenarioContext][testData][users][invokingUser][id]}"
 		}
 	},
 

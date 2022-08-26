@@ -3,6 +3,9 @@
   "_extends_": "F_209_get_case_users_base",
 
 
+  "specs": [
+    "to verify that Richard and anyone else in Richard's organisation has had their access removed"
+  ],
 
 
   "request": {

@@ -1,0 +1,20 @@
+{
+	"_guid_": "Assign_Case_Access__Base",
+
+	"productName": "CCD Data Store",
+	"operationName": "Add Case-Assigned Users and Roles",
+
+	"method": "POST",
+	"uri": "{{CCD_DATA_STORE_API_BASE_URL}}/case-users",
+
+	"request": {
+		"_extends_": "Common_Request"
+	},
+
+	"expectedResponse": {
+		"_extends_" : "Common_201_Response",
+		"body": {
+			"status_message" : "Case-User-Role assignments created successfully"
+		}
+	}
+}

@@ -1,24 +1,12 @@
 {
   "_guid_": "F_209_get_case_users_base",
-  "title": "Assign Access to Case",
+  "_extends_": "Get_Case_Access__Base",
+  "title": "Verify Access to Case",
 
-  "productName": "Manage Case Assignment Microservice",
-  "operationName": "Assign Access within Organisation",
-
-  "method": "GET",
-  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/case-users",
 
   "s2sClientId": "aac_manage_case_assignment",
   "userTokenClientId": "xuiwebapp",
 
-  "specs": [
-    "to assign access for Richard to the previously created case",
-    "to assign users to the case",
-    "to verify that Richard and anyone else in Richard's organisation has had their access removed",
-    "to verify that Richard still has access to the case - C1",
-    "to verify that Richard still has access to the case and Dil does not have access - C1",
-    "to verify that Richard And anyone else in Richard's organisation have not had their access removed"
-  ],
 
   "users": {
     "invokingUser": {
@@ -27,15 +15,12 @@
   },
 
   "request": {
-    "_extends_": "Common_Request",
     "queryParams" : {
       "case_ids" : "${[scenarioContext][ParentContext][childContexts][F-209_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}"
     }
   },
 
   "expectedResponse": {
-    "_extends_" : "Common_Response",
-    "responseCode": 200,
     "body": {
       "case_users" : [ ]
     }

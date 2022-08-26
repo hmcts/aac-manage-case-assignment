@@ -1,12 +1,8 @@
 {
   "_guid_": "F-209.6_Delete_Creator_Role",
-  "title": "Assign Access to Case",
+  "_extends_": "Delete_Case_Access__Base",
+  "title": "Remove Access to Case",
 
-  "productName": "Manage Case Assignment Microservice",
-  "operationName": "Assign Access within Organisation",
-
-  "method": "DELETE",
-  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/case-users",
 
   "s2sClientId": "aac_manage_case_assignment",
   "userTokenClientId": "xuiwebapp",
@@ -35,14 +31,6 @@
           "user_id": "${[scenarioContext][testData][users][S1][id]}"
         }
       ]
-    }
-  },
-
-  "expectedResponse": {
-    "_extends_" : "Common_Response",
-    "responseCode": 200,
-    "body": {
-      "status_message" : "Case-User-Role assignments removed successfully"
     }
   }
 }

@@ -1,38 +1,16 @@
 {
   "_guid_": "F-209_Assign_Access_Base",
+  "_extends_": "Assign_Case_Access__Base",
   "title": "Assign Access to Case",
 
-  "productName": "Manage Case Assignment Microservice",
-  "operationName": "Assign Access within Organisation",
-
-  "method": "POST",
-  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/case-users",
-
+  
   "s2sClientId": "aac_manage_case_assignment",
   "userTokenClientId": "xuiwebapp",
 
 
-  "specs": [
-    "to assign access for Richard to the previously created case",
-    "to assign users to the case"
-  ],
-
   "users": {
     "invokingUser": {
       "_extends_": "ACA_Users_Caseworker_CAA"
-    }
-  },
-
-  "request": {
-    "_extends_": "Common_Request"
-
-  },
-
-  "expectedResponse": {
-    "_extends_" : "Common_Response",
-    "responseCode": 201,
-    "body": {
-      "status_message" : "Case-User-Role assignments created successfully"
     }
   }
 }

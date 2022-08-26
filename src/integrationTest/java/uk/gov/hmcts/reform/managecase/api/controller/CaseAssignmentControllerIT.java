@@ -249,7 +249,7 @@ public class CaseAssignmentControllerIT {
                                      .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE));
-            //    .andExpect(jsonPath("$.message", is(ValidationError.CASE_NOT_FOUND)));
+                //.andExpect(jsonPath("$.message", is(ValidationError.CASE_NOT_FOUND)));
 
             // ASSERT
             verify(exactly(0), deleteRequestedFor(urlEqualTo(CASE_USERS)));

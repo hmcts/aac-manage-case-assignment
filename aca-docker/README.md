@@ -55,6 +55,21 @@ see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
         ```bash
         ./bin/findPrdUserIds.sh
         ```
+        If you encounter an error like
+        ```
+        psql: unrecognized option `--csv'
+        Try "psql --help" for more information.
+        parse error: Unmatched ']' at line 1, column 13
+        *** Values in prd_users_organisation_01.json have been updated ***
+        ```
+        Then you have a old version of psql, for this its seems version 12+ is required, your version can be found by running the below command
+        ```
+        psql --version
+        ```
+        If you have installed psql using homebrew then you can try to simply update using command
+        ```
+        brew install postgresql
+        ```
 
         This script updates placeholders in: 
 
@@ -67,7 +82,7 @@ see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
         generate new GUIDs.
 
         The `aca-wiremock` container will need to be restarted to read in these new GUIDs
-
+        
         ```bash
         cd aca-docker
         docker-compose -f compose/aca.yml restart aca-wiremock

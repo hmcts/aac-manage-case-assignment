@@ -8,8 +8,6 @@ management:
       show-details: always
       cache:
         time-to-live: 10s
-#      probes:
-#        enabled: true
   endpoints:
     web:
       base-path: /
@@ -18,10 +16,6 @@ management:
   health:
     probes:
       enabled: true
-#    livenessState:
-#      enabled: true
-#    readinessState:
-#      enabled: true
 spring:
   # CCD-3509 CVE-2021-22044 spring.mvc.pathmatch.matching-strategy = ant_path_matcher
   # required to fix null pointers in integration tests, conflict in Springfox after Springboot 2.6.10 upgrade
@@ -48,18 +42,6 @@ spring:
           oidc:
             client-id: internal
             client-secret: internal
-
-logging:
-  level:
-    root: DEBUG
-    org.springframework.web: DEBUG
-    com.github.tomakehurst: INFO
-
-#  cloud:
-#    discovery:
-#      client:
-#        composite-indicator:
-#          enabled: true
 idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
@@ -147,8 +129,3 @@ aca:
     caseworker:
       role:
         regex: ${CASEWORKER_ROLE_REGEX:caseworker.+}
-
-#endpoints:
-#  health:
-#    sensitive: false
-

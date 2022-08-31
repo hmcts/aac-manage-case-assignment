@@ -60,6 +60,7 @@ public class CaseDetails {
     private String caseTypeId;
 
     @JsonProperty("case_data")
+    @JsonAlias("data")
     private Map<String, JsonNode> data;
     @JsonProperty("created_date")
     private LocalDateTime createdDate;

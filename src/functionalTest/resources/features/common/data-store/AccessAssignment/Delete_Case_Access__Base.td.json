@@ -1,0 +1,23 @@
+{
+	"_guid_": "Delete_Case_Access__Base",
+
+	"productName": "CCD Data Store",
+	"operationName": "Remove Case-Assigned Users and Roles",
+
+	"method": "DELETE",
+	"uri": "{{CCD_DATA_STORE_API_BASE_URL}}/case-users",
+
+	"request": {
+		"_extends_": "Common_Request",
+		"body": {
+			"case_users": []
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_" : "Common_200_Response",
+		"body": {
+			"status_message" : "Case-User-Role assignments removed successfully"
+		}
+	}
+}

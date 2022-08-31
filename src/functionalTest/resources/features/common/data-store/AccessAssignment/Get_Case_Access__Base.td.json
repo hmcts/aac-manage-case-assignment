@@ -1,16 +1,17 @@
 {
-	"_guid_": "Case_Assigned_Users_Roles",
+	"_guid_": "Get_Case_Access__Base",
 
 	"productName": "CCD Data Store",
 	"operationName": "Get Case-Assigned Users and Roles",
 
-	"method": "GET",
-	"uri": "{{CCD_DATA_STORE_API_BASE_URL}}/case-users",
+	"method": "POST",
+	"uri": "{{CCD_DATA_STORE_API_BASE_URL}}/case-users/search",
 
 	"request": {
 		"_extends_": "Common_Request",
-		"queryParams": {
-			"user_ids": "${[scenarioContext][testData][users][invokingUser][id]}"
+		"body": {
+			"case_ids": [],
+			"user_ids": []
 		}
 	},
 

@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-
 @Configuration
 public class SwaggerConfiguration {
 
@@ -103,7 +102,6 @@ public class SwaggerConfiguration {
                                                 new EndpointLinksResolver(allEndpoints, basePath),
                                                 shouldRegisterLinksMapping, null);
     }
-
 
     private boolean shouldRegisterLinksMapping(WebEndpointProperties webEndpointProperties, Environment environment,
                                                String basePath) {

@@ -7,11 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
-
-import java.util.List;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -28,6 +25,7 @@ public interface DataStoreApiClient {
 
     String CASES_WITH_ID = "/cases/{caseId}";
     String CASE_USERS = "/case-users";
+    String CASE_USERS_SEARCH = CASE_USERS + "/search";
     String INTERNAL_CASES = "/internal/cases/{caseId}";
     String START_EVENT_TRIGGER = INTERNAL_CASES + "/event-triggers/{eventId}";
     String SUBMIT_EVENT_FOR_CASE = CASES_WITH_ID + "/events";
@@ -37,9 +35,8 @@ public interface DataStoreApiClient {
     @PostMapping(value = CASE_USERS, consumes = APPLICATION_JSON_VALUE)
     void assignCase(@RequestBody CaseUserRolesRequest userRolesRequest);
 
-    @GetMapping(CASE_USERS)
-    CaseUserRoleResource getCaseAssignments(@RequestParam("case_ids") List<String> caseIds,
-                                            @RequestParam("user_ids") List<String> userIds);
+    @PostMapping(CASE_USERS_SEARCH)
+    CaseUserRoleResource searchCaseAssignments(@RequestBody SearchCaseUserRolesRequest searchRequest);
 
     @GetMapping(INTERNAL_CASES)
     CaseViewResource getCaseDetailsByCaseId(@RequestHeader(AUTHORIZATION) String userAuthorizationHeader,

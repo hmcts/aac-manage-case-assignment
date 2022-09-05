@@ -2,6 +2,13 @@
   "_guid_": "F_209_get_case_users_richard_assigned",
   "_extends_": "F_209_get_case_users_base",
 
+
+  "specs": [
+    "to verify that Richard And anyone else in Richard's organisation have not had their access removed",
+    "to verify that Richard still has access to the case and Dil does not have access - C1"
+  ],
+
+
   "request": {
     "_extends_": "Common_Request",
     "queryParams" : {

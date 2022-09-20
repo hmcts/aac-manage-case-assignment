@@ -2,7 +2,7 @@ plugins {
   id 'application'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.10.RELEASE'
-  id 'org.springframework.boot' version '2.4.4'
+  id 'org.springframework.boot' version '2.6.10'
   id 'uk.gov.hmcts.java' version '0.12.27'
   id 'com.github.ben-manes.versions' version '0.28.0'
   id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.23'
@@ -220,7 +220,7 @@ dependencyCheck {
 
 dependencyManagement {
   imports {
-    mavenBom "org.springframework.cloud:spring-cloud-dependencies:2020.0.1"
+    mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.3"
   }
   dependencies {
     dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
@@ -290,13 +290,13 @@ configurations.all {
 }
 
 dependencies {
-  compile 'com.google.code.gson:gson:2.8.9'
-  compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: '2.13.2'
-  compile "com.fasterxml.jackson.core:jackson-databind:2.13.2.2"
-  compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
-  compile group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.1.3'
-  compile group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.9.13'
-  compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.7.RELEASE'
+  implementation 'com.google.code.gson:gson:2.8.9'
+  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: '2.13.2'
+  implementation "com.fasterxml.jackson.core:jackson-databind:2.13.2.2"
+  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
+  implementation group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.1.3'
+  implementation group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.9.13'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.3'
 
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
   implementation group: 'commons-io', name: 'commons-io', version: '2.8.0'
@@ -337,9 +337,9 @@ dependencies {
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.5.14"
 
   implementation "io.github.openfeign:feign-httpclient:11.0"
-  testCompile 'io.github.openfeign:feign-jackson:10.7.0'
-  testCompile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
-  compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
+  testImplementation 'io.github.openfeign:feign-jackson:10.7.0'
+  testImplementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
+  implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
   implementation "com.github.ben-manes.caffeine:caffeine:2.7.0"
   implementation "org.apache.httpcomponents:httpclient:4.5.13"
 
@@ -369,7 +369,7 @@ dependencies {
   testImplementation 'org.mockito:mockito-inline:4.0.0'
 
   // https://mvnrepository.com/artifact/nl.jqno.equalsverifier/equalsverifier
-  testCompile group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '3.4.2'
+  testImplementation group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '3.4.2'
 
   // groovy v3.* added to avoid 'WARNING: Illegal reflective access by org.codehaus.groovy.reflection.CachedClass'
   // in groovy:2.5.* when running functional/befta tests
@@ -386,17 +386,17 @@ dependencies {
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
 
-  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
-  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
-  contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
-  contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
+  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
+  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
+  contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
+  contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
   contractTestImplementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'
 
-  contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
-  contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
-  contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
-  contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.0")
-  contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
+  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
+  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
+  contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
+  contractTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.0')
   contractTestRuntimeOnly "org.junit.platform:junit-platform-commons:1.7.0"
   contractTestImplementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamJavaClient
@@ -406,7 +406,7 @@ dependencies {
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.2.0:all'
 
 
 }

@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -162,7 +163,7 @@ class DataStoreRepositoryTest {
                                                    Request.create(Request.HttpMethod.GET, "someUrl", Map.of(),
                                                                   null, Charset.defaultCharset(),
                                                                   null
-                                                   ), null
+                                                   ), null, new HashMap<String, Collection<String>>()
             ));
 
         // ACT & ASSERT
@@ -212,7 +213,7 @@ class DataStoreRepositoryTest {
                                                    Request.create(Request.HttpMethod.GET, "someUrl", Map.of(),
                                                                   null, Charset.defaultCharset(),
                                                                   null
-                                                   ), null
+                                                   ), null, new HashMap<String, Collection<String>>()
             ));
 
         // ACT & ASSERT
@@ -328,11 +329,12 @@ class DataStoreRepositoryTest {
     @DisplayName("Should throw CaseCouldNotBeFoundException when Find case by caseId")
     void shouldThrowCaseNotFoundExceptionForFindCaseByCaseId() {
         // ARRANGE
-        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null, Charset.defaultCharset(),
-                                         null
+        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null,
+                                         Charset.defaultCharset(), null
         );
         given(dataStoreApi.getCaseDetailsByCaseId(anyString(), anyString()))
-            .willThrow(new FeignException.NotFound("404", request, null));
+            .willThrow(new FeignException.NotFound("404", request, null,
+                                                   new HashMap<String, Collection<String>>()));
 
         // ACT & ASSERT
         assertThatThrownBy(() -> repository.findCaseByCaseId(CASE_ID))
@@ -345,11 +347,12 @@ class DataStoreRepositoryTest {
     @DisplayName("Should throw FeignException  when Find case by caseId")
     void shouldThrowCFeignExceptionForFindCaseByCaseId() {
         // ARRANGE
-        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null, Charset.defaultCharset(),
-                                         null
+        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null,
+                                         Charset.defaultCharset(), null
         );
         given(dataStoreApi.getCaseDetailsByCaseId(anyString(), anyString()))
-            .willThrow(new FeignException.InternalServerError("500", request, null));
+            .willThrow(new FeignException.InternalServerError("500", request, null,
+                                                              new HashMap<String, Collection<String>>()));
 
         // ACT & ASSERT
         assertThatThrownBy(() -> repository.findCaseByCaseId(CASE_ID))

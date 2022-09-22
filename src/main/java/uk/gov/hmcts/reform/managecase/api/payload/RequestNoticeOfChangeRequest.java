@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.LuhnCheck;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
 import uk.gov.hmcts.reform.managecase.domain.SubmittedChallengeAnswer;
@@ -20,6 +21,7 @@ import static com.fasterxml.jackson.annotation.Nulls.AS_EMPTY;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @ApiModel("Request Notice Of Change Request")
 public class RequestNoticeOfChangeRequest {
     @JsonProperty("case_id")

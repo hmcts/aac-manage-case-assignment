@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -161,7 +163,7 @@ class DataStoreRepositoryTest {
                                                    Request.create(Request.HttpMethod.GET, "someUrl", Map.of(),
                                                                   null, Charset.defaultCharset(),
                                                                   null
-                                                   ), null
+                                                   ), null, new HashMap<String, Collection<String>>()
             ));
 
         // ACT & ASSERT
@@ -211,7 +213,7 @@ class DataStoreRepositoryTest {
                                                    Request.create(Request.HttpMethod.GET, "someUrl", Map.of(),
                                                                   null, Charset.defaultCharset(),
                                                                   null
-                                                   ), null
+                                                   ), null, new HashMap<String, Collection<String>>()
             ));
 
         // ACT & ASSERT
@@ -251,13 +253,14 @@ class DataStoreRepositoryTest {
         List<String> userIds = List.of(ASSIGNEE_ID);
 
         CaseUserRole inputRole = CaseUserRole.builder()
-                .caseId(CASE_ID)
-                .userId(ASSIGNEE_ID)
-                .caseRole(ROLE)
-                .build();
+            .caseId(CASE_ID)
+            .userId(ASSIGNEE_ID)
+            .caseRole(ROLE)
+            .build();
 
-        given(dataStoreApi.getCaseAssignments(caseIds, userIds))
-                .willReturn(new CaseUserRoleResource(List.of(inputRole)));
+        given(dataStoreApi.searchCaseAssignments(argThat(
+            searchRequest -> searchRequest.getCaseIds() == caseIds && searchRequest.getUserIds() == userIds)))
+            .willReturn(new CaseUserRoleResource(List.of(inputRole)));
 
         // ACT
         List<CaseUserRole> caseUserRoles = repository.getCaseAssignments(caseIds, userIds);
@@ -326,11 +329,12 @@ class DataStoreRepositoryTest {
     @DisplayName("Should throw CaseCouldNotBeFoundException when Find case by caseId")
     void shouldThrowCaseNotFoundExceptionForFindCaseByCaseId() {
         // ARRANGE
-        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null, Charset.defaultCharset(),
-                                         null
+        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null,
+                                         Charset.defaultCharset(), null
         );
         given(dataStoreApi.getCaseDetailsByCaseId(anyString(), anyString()))
-            .willThrow(new FeignException.NotFound("404", request, null));
+            .willThrow(new FeignException.NotFound("404", request, null,
+                                                   new HashMap<String, Collection<String>>()));
 
         // ACT & ASSERT
         assertThatThrownBy(() -> repository.findCaseByCaseId(CASE_ID))
@@ -343,11 +347,12 @@ class DataStoreRepositoryTest {
     @DisplayName("Should throw FeignException  when Find case by caseId")
     void shouldThrowCFeignExceptionForFindCaseByCaseId() {
         // ARRANGE
-        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null, Charset.defaultCharset(),
-                                         null
+        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null,
+                                         Charset.defaultCharset(), null
         );
         given(dataStoreApi.getCaseDetailsByCaseId(anyString(), anyString()))
-            .willThrow(new FeignException.InternalServerError("500", request, null));
+            .willThrow(new FeignException.InternalServerError("500", request, null,
+                                                              new HashMap<String, Collection<String>>()));
 
         // ACT & ASSERT
         assertThatThrownBy(() -> repository.findCaseByCaseId(CASE_ID))

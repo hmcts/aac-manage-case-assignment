@@ -45,7 +45,8 @@
 				},
 				"OrganisationPolicyField2": {
 					"OrgPolicyCaseAssignedRole": "[Defendant]"
-				}
+				},
+				"SearchCriteria" : {}
 			},
 			"security_classifications": {
 				"OrganisationPolicyField2": {
@@ -59,6 +60,10 @@
 					"value": {
 						"OrgPolicyCaseAssignedRole": "PUBLIC"
 					}
+				},
+				"SearchCriteria" : {
+					"classification" : "PUBLIC",
+					"value" : { }
 				}
 			},
 			"data_classification": {
@@ -73,6 +78,10 @@
 					"value": {
 						"OrgPolicyCaseAssignedRole": "PUBLIC"
 					}
+				},
+				"SearchCriteria" : {
+					"classification" : "PUBLIC",
+					"value" : { }
 				}
 			}
 		}

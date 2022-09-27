@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisat
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.Event;
+import uk.gov.hmcts.reform.managecase.client.datastore.SearchCaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdates;
@@ -97,7 +98,9 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
     @Override
     public List<CaseUserRole> getCaseAssignments(List<String> caseIds, List<String> userIds) {
-        CaseUserRoleResource response = dataStoreApi.getCaseAssignments(caseIds, userIds);
+        CaseUserRoleResource response = dataStoreApi.searchCaseAssignments(
+            new SearchCaseUserRolesRequest(caseIds, userIds)
+        );
         return response.getCaseUsers();
     }
 

@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
+import uk.gov.hmcts.reform.managecase.client.datastore.SearchCaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -44,6 +45,7 @@ import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient.CASE_USERS;
+import static uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient.CASE_USERS_SEARCH;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
 public class WiremockFixtures {
@@ -141,27 +143,16 @@ public class WiremockFixtures {
     }
 
     public static void stubGetCaseAssignments(List<String> caseIds, List<String> userIds,
-                                              List<CaseUserRole> caseUserRoles) {
-        stubFor(WireMock.get(urlPathEqualTo(CASE_USERS))
+                                              List<CaseUserRole> caseUserRoles) throws JsonProcessingException {
+        SearchCaseUserRolesRequest searchRequest = new SearchCaseUserRolesRequest(caseIds, userIds);
+        stubFor(WireMock.post(urlPathEqualTo(CASE_USERS_SEARCH))
                     .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
                     .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-                    .withQueryParam("case_ids", equalTo(caseIds.get(0)))
-                    .withQueryParam("user_ids", equalTo(userIds.get(0)))
+                    .withRequestBody(equalToJson(OBJECT_MAPPER.writeValueAsString(searchRequest)))
                     .willReturn(aResponse()
                                     .withStatus(HTTP_OK)
                                     .withBody(getJsonString(new CaseUserRoleResource(caseUserRoles)))
                                     .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
-    }
-
-    public static void stubGetCaseAssignments(List<String> caseIds, List<CaseUserRole> caseUserRoles) {
-        stubFor(WireMock.get(urlPathEqualTo(CASE_USERS))
-            .withHeader(AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-            .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-            .withQueryParam("case_ids", equalTo(caseIds.get(0)))
-            .willReturn(aResponse()
-                .withStatus(HTTP_OK)
-                .withBody(getJsonString(new CaseUserRoleResource(caseUserRoles)))
-                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 
     public static void stubGetCaseInternal(String caseId, CaseViewResource caseViewResource) {

@@ -5,12 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 
 import javax.validation.Valid;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @ApiModel("About To Submit Callback Request")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CallbackRequest {

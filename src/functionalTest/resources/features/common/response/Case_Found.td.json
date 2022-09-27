@@ -62,7 +62,8 @@
             "id": "[[ANYTHING_PRESENT]]",
             "value": "value in collection element - 2"
           }
-        ]
+        ],
+        "SearchCriteria" : {}
       },
       "data_classification": {
         "AddressField": {
@@ -138,6 +139,10 @@
             }
           ],
           "classification": "PUBLIC"
+        },
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : { }
         }
       }
     }

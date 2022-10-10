@@ -4,6 +4,7 @@
 
 import uk.gov.hmcts.contino.GradleBuilder
 import uk.gov.hmcts.contino.AppPipelineDsl
+import uk.gov.hmcts.contino.GithubAPI
 
 def product = "aac"
 def component = "manage-case-assignment"
@@ -116,6 +117,11 @@ withPipeline("java", product, component) {
   onPR {
     enableSlackNotifications('#ccd-pr-builds')
     enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
+
+    def githubApi = new GithubAPI(this)
+    if (!githubApi.getLabelsbyPattern(env.BRANCH_NAME, "keep-helm")) {
+      enableCleanupOfHelmReleaseOnSuccess()
+    }
   }
 
   // Check if the build should be wired to an environment higher than 'preview'.

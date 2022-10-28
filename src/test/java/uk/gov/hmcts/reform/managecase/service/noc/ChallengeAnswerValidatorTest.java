@@ -33,6 +33,7 @@ class ChallengeAnswerValidatorTest {
     public static final String QUESTION_ID_1 = "QuestionId1";
     public static final String QUESTION_ID_2 = "QuestionId2";
     public static final String QUESTION_ID_3 = "QuestionId3";
+    public static final String QUESTION_ID_4 = "QuestionId4";
     public static final String TEXT = "Text";
 
     @InjectMocks
@@ -60,15 +61,15 @@ class ChallengeAnswerValidatorTest {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
             challengeQuestion(QUESTION_ID_1, "${TextField}|${SomeOtherField}:[Claimant],${AnotherField}:[Defendant]",
-                fieldType(TEXT))
+                fieldType(TEXT), true)
         );
         challengeQuestions.add(
             challengeQuestion(QUESTION_ID_2, "${ComplexField.ComplexNestedField.NestedNumberField}:[Claimant],"
-                + "${AnotherField}:[Defendant]", fieldType("Number"))
+                + "${AnotherField}:[Defendant]", fieldType("Number"), true)
         );
         challengeQuestions.add(
             challengeQuestion(QUESTION_ID_3, "${AnotherField}:[Defendant],${NonExistingField}|${DateField}:[Claimant]",
-                fieldType("Date"))
+                fieldType("Date"),true)
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
@@ -82,10 +83,12 @@ class ChallengeAnswerValidatorTest {
     void shouldErrorWhenThereAreMoreAnswersThanQuestions() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
-            challengeQuestion(QUESTION_ID_1, "${Field1}:[Claimant],${Field1}:[Defendant]", fieldType(TEXT))
+            challengeQuestion(QUESTION_ID_1, "${Field1}:[Claimant],${Field1}:[Defendant]", fieldType(TEXT),
+                              true)
         );
         challengeQuestions.add(
-            challengeQuestion(QUESTION_ID_2, "${Field2}:[Claimant],${Field2}:[Defendant]", fieldType(TEXT))
+            challengeQuestion(QUESTION_ID_2, "${Field2}:[Claimant],${Field2}:[Defendant]", fieldType(TEXT),
+                              true)
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
@@ -103,13 +106,16 @@ class ChallengeAnswerValidatorTest {
     void shouldErrorWhenAQuestionHasNotBeenAnswered() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
-            challengeQuestion("OtherQuestionId1", "${Field1}:[Claimant]", fieldType(TEXT))
+            challengeQuestion("OtherQuestionId1", "${Field1}:[Claimant]", fieldType(TEXT),
+                              true)
         );
         challengeQuestions.add(
-            challengeQuestion("OtherQuestionId2", "${Field2}:[Claimant]", fieldType(TEXT))
+            challengeQuestion("OtherQuestionId2", "${Field2}:[Claimant]", fieldType(TEXT),
+                              true)
         );
         challengeQuestions.add(
-            challengeQuestion("OtherQuestionId3", "${Field3}:[Claimant]", fieldType(TEXT))
+            challengeQuestion("OtherQuestionId3", "${Field3}:[Claimant]", fieldType(TEXT),
+                              true)
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
@@ -125,14 +131,14 @@ class ChallengeAnswerValidatorTest {
     void shouldErrorWhenAnswersCannotUniquelyIdentifyRole() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
-            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${TextField}:[Defendant]", fieldType(TEXT))
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${TextField}:[Defendant]", fieldType(TEXT),true)
         );
         challengeQuestions.add(
             challengeQuestion(QUESTION_ID_2, "${ComplexField.ComplexNestedField.NestedNumberField}:[Claimant],"
-                + "${ComplexField.ComplexNestedField.NestedNumberField}:[Defendant]", fieldType("Number"))
+                + "${ComplexField.ComplexNestedField.NestedNumberField}:[Defendant]", fieldType("Number"),true)
         );
         challengeQuestions.add(
-            challengeQuestion(QUESTION_ID_3, "${DateField}:[Claimant],${DateField}:[Defendant]", fieldType("Date"))
+            challengeQuestion(QUESTION_ID_3, "${DateField}:[Claimant],${DateField}:[Defendant]", fieldType("Date"),true)
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
@@ -148,13 +154,13 @@ class ChallengeAnswerValidatorTest {
     void shouldErrorWhenAnswersDoNotMatchAnyRole() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
-            challengeQuestion(QUESTION_ID_1, "${PhoneUKField}:[Claimant]", fieldType(TEXT))
+            challengeQuestion(QUESTION_ID_1, "${PhoneUKField}:[Claimant]", fieldType(TEXT),true)
         );
         challengeQuestions.add(
-            challengeQuestion(QUESTION_ID_2, "${AddressUKField.County}:[Claimant]", fieldType(TEXT))
+            challengeQuestion(QUESTION_ID_2, "${AddressUKField.County}:[Claimant]", fieldType(TEXT),true)
         );
         challengeQuestions.add(
-            challengeQuestion(QUESTION_ID_3, "${YesOrNoField}:[Claimant]", fieldType("YesOrNo"))
+            challengeQuestion(QUESTION_ID_3, "${YesOrNoField}:[Claimant]", fieldType("YesOrNo"),true)
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
@@ -170,7 +176,7 @@ class ChallengeAnswerValidatorTest {
     void shouldSuccessfullyIdentifyRoleWhenFieldValueAndAnswerAreNull() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, null));
         List<ChallengeQuestion> challengeQuestions = singletonList(
-            challengeQuestion(QUESTION_ID_1, "${TextAreaField}:[Claimant]", fieldType(TEXT))
+            challengeQuestion(QUESTION_ID_1, "${TextAreaField}:[Claimant]", fieldType(TEXT),true)
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
@@ -184,7 +190,7 @@ class ChallengeAnswerValidatorTest {
     void shouldSuccessfullyIdentifyRoleWhenFieldIsNotPersistedAndAnswerIsNull() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, null));
         List<ChallengeQuestion> challengeQuestions = singletonList(
-            challengeQuestion(QUESTION_ID_1, "${NonExistingField}:[Claimant]", fieldType(TEXT))
+            challengeQuestion(QUESTION_ID_1, "${NonExistingField}:[Claimant]", fieldType(TEXT),true)
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
@@ -198,7 +204,7 @@ class ChallengeAnswerValidatorTest {
     void shouldErrorWhenFieldIsNullButAnswerProvided() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Answer"));
         List<ChallengeQuestion> challengeQuestions = singletonList(
-            challengeQuestion(QUESTION_ID_1, "${TextAreaField}:[Claimant]", fieldType(TEXT))
+            challengeQuestion(QUESTION_ID_1, "${TextAreaField}:[Claimant]", fieldType(TEXT),true)
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
@@ -210,11 +216,77 @@ class ChallengeAnswerValidatorTest {
         assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
     }
 
-    private ChallengeQuestion challengeQuestion(String questionId, String answerField, FieldType answerFieldType) {
+    @Test
+    void whenCaseFieldIsPresentAndAnwserIsNull_IgnoreNullFieldIsTrue() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${AnotherField1}:[Defendant]",
+                          fieldType(TEXT), true));
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        String result = challengeAnswerValidator
+            .getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails);
+
+        assertThat(result, is("[Defendant]"));
+    }
+
+    @Test
+    void shouldErrorwhenCaseFieldIsPresentAndAnswerIsNull_IgnoreNullFieldIsFalse() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${AnotherField1}:[Defendant]",
+                              fieldType(TEXT), false));
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+    @Test
+    void whenCaseFieldIsPresentAndAnwserIsNotNull_IgnoreNullFieldIsTrue() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${AnotherField1}:[Defendant]",
+                              fieldType(TEXT), true));
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+    @Test
+    void whenCaseFieldIsPresentAndAnwserIsNotNull_IgnoreNullFieldIsFalse() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${AnotherField1}:[Defendant]",
+                              fieldType(TEXT), false));
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+    private ChallengeQuestion challengeQuestion(String questionId, String answerField, FieldType answerFieldType,
+                                                boolean ignoreNullField) {
         ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
             .questionId(questionId)
             .answerFieldType(answerFieldType)
-            .ignoreNullFields(true)
+            .ignoreNullFields(ignoreNullField)
             .build();
         challengeQuestion.setAnswerField(answerField);
         return challengeQuestion;

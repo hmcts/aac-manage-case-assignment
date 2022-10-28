@@ -214,6 +214,7 @@ class ChallengeAnswerValidatorTest {
         ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
             .questionId(questionId)
             .answerFieldType(answerFieldType)
+            .ignoreNullFields(true)
             .build();
         challengeQuestion.setAnswerField(answerField);
         return challengeQuestion;

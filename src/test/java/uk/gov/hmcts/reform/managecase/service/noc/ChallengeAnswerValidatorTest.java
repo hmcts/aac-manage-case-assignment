@@ -276,7 +276,6 @@ class ChallengeAnswerValidatorTest {
 
         assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
     }
-    //case 2
 
     @Test
     void whenCaseFieldIsNotPresentAndAnswerIsNull_IgnoreNullFieldIsTrue() {
@@ -345,8 +344,6 @@ class ChallengeAnswerValidatorTest {
         assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
     }
 
-    //case 3
-
     @Test
     void whenAllCaseFieldsPresentAndAnswerIsNull_IgnoreNullFieldIsFalse() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
@@ -411,7 +408,6 @@ class ChallengeAnswerValidatorTest {
         assertThat(result, is("[Defendant]"));
     }
 
-    //case 4
     @Test
     void whenAllCaseFieldsNotPresentAndAnswerIsNull_IgnoreNullFieldIsTrue() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));

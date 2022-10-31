@@ -109,7 +109,7 @@ public class ChallengeAnswerValidator {
     private boolean isEqualAnswer(String expectedAnswer, String actualAnswer, FieldType fieldType,
                                   boolean ignoreNullFields) {
         if (isNullOrEmpty(expectedAnswer) || isNullOrEmpty(actualAnswer)) {
-            return isNullOrEmpty(expectedAnswer) && isNullOrEmpty(actualAnswer) && ignoreNullFields;
+            return isNullOrEmpty(expectedAnswer) && isNullOrEmpty(actualAnswer) && !ignoreNullFields;
         }
 
         if (fieldType.getType().equals(TEXT)) {

@@ -857,10 +857,12 @@ class ApplyNoCDecisionServiceTest {
     private String orgPolicyAsString(String organisationId,
                                      String organisationName,
                                      String orgPolicyReference,
-                                     String orgPolicyCaseAssignedRole, String CreatedBy) {
-        return String.format("{\"Organisation\":%s,\"OrgPolicyReference\":%s,\"OrgPolicyCaseAssignedRole\":%s,\"LastNoCRequestedBy\":%s}",
+                                     String orgPolicyCaseAssignedRole, String createdBy) {
+        return String.format("{\"Organisation\":%s,\"OrgPolicyReference\":%s,\"OrgPolicyCaseAssignedRole\":%s,"
+                             + "\"LastNoCRequestedBy\":%s}",
             organisationAsString(organisationId, organisationName),
-            stringValueAsJson(orgPolicyReference), stringValueAsJson(orgPolicyCaseAssignedRole), stringValueAsJson(CreatedBy));
+            stringValueAsJson(orgPolicyReference), stringValueAsJson(orgPolicyCaseAssignedRole),
+            stringValueAsJson(createdBy));
     }
 
     private String organisationAsString(String organisationId,

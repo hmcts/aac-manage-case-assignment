@@ -17,6 +17,7 @@ import javax.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -49,6 +50,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.UNKNOWN_NOC_APPROVAL_STATUS;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.APPROVAL_STATUS;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CASE_ROLE_ID;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CREATED_BY;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_ADD;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_REMOVE;
@@ -120,14 +122,17 @@ public class ApplyNoCDecisionService {
         JsonNode organisationToRemoveNode = changeOrganisationRequestField.get(ORGANISATION_TO_REMOVE);
         Organisation organisationToAdd = objectMapper.convertValue(organisationToAddNode, Organisation.class);
         Organisation organisationToRemove = objectMapper.convertValue(organisationToRemoveNode, Organisation.class);
+        JsonNode createdBy = changeOrganisationRequestField.get(CREATED_BY);
 
         List<CaseUserRole> existingCaseAssignments = dataStoreRepository
             .getCaseAssignments(singletonList(caseDetails.getId()), null);
 
         if (organisationToAdd == null || isNullOrEmpty(organisationToAdd.getOrganisationID())) {
+            ((ObjectNode) orgPolicyNode).putIfAbsent("LastNoCRequestedBy", null);
             applyRemoveRepresentationDecision(existingCaseAssignments, caseRoleId, orgPolicyNode, organisationToRemove,
                 caseDetails.getId());
         } else {
+            ((ObjectNode) orgPolicyNode).putIfAbsent("LastNoCRequestedBy", createdBy);
             applyAddOrReplaceRepresentationDecision(existingCaseAssignments, caseRoleId, orgPolicyNode,
                     organisationToAddNode, organisationToAdd, organisationToRemove, caseDetails.getId());
         }

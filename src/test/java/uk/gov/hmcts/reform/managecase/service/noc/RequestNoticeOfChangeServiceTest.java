@@ -114,7 +114,7 @@ class RequestNoticeOfChangeServiceTest {
         incumbentOrganisation = Organisation.builder().organisationID(INCUMBENT_ORGANISATION_ID).build();
         OrganisationPolicy organisationPolicy = new OrganisationPolicy(incumbentOrganisation,
                                                                        ORG_POLICY_REFERENCE, CASE_ASSIGNED_ROLE,
-                                                                       Lists.newArrayList());
+                                                                       Lists.newArrayList(), null);
 
         noCRequestDetails = NoCRequestDetails.builder()
             .caseViewResource(caseViewResource)
@@ -142,7 +142,7 @@ class RequestNoticeOfChangeServiceTest {
     void testGenerateNocRequestWithOutIncumbentOrganisation() {
         noCRequestDetails.setOrganisationPolicy(new OrganisationPolicy(null,
                                                                        ORG_POLICY_REFERENCE,
-                                                                       CASE_ASSIGNED_ROLE, Lists.newArrayList()));
+                                                                       CASE_ASSIGNED_ROLE, Lists.newArrayList(), null));
         final Organisation nullIncumbentOrganisation = null;
         service.requestNoticeOfChange(noCRequestDetails);
 
@@ -254,7 +254,7 @@ class RequestNoticeOfChangeServiceTest {
         OrganisationPolicy invokersOrganisationPolicy = new OrganisationPolicy(invokersOrganisation,
                                                                                ORG_POLICY_REFERENCE,
                                                                                CASE_ASSIGNED_ROLE,
-                                                                               Lists.newArrayList());
+                                                                               Lists.newArrayList(), null);
 
         updateCaseDetailsData(caseDetails, ORGANISATION_POLICY_KEY, invokersOrganisationPolicy);
 
@@ -345,7 +345,7 @@ class RequestNoticeOfChangeServiceTest {
             Organisation organisation = Organisation.builder().organisationID("OrganisationId").build();
             OrganisationPolicy organisationPolicy =
                 new OrganisationPolicy(organisation, ORG_POLICY_REFERENCE,
-                                       "CaseRole" + loopCounter, Lists.newArrayList());
+                                       "CaseRole" + loopCounter, Lists.newArrayList(), null);
             organisationPolicies.add(organisationPolicy);
             updateCaseDetailsData(caseDetails, "OrganisationPolicy" + loopCounter, organisationPolicy);
         }

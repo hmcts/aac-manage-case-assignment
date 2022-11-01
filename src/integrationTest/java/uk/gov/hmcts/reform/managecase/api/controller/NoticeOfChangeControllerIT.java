@@ -763,7 +763,7 @@ public class NoticeOfChangeControllerIT {
             OrganisationPolicy orgPolicy = new OrganisationPolicy(org,
                                                                   null,
                                                                   "Applicant",
-                                                                  Lists.newArrayList());
+                                                                  Lists.newArrayList(), null);
 
             caseFields.put("OrganisationPolicy", mapper.convertValue(orgPolicy,  JsonNode.class));
 

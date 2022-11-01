@@ -211,7 +211,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenCaseFieldIsPresentAndAnswerIsNull_IgnoreNullFieldIsTrue() {
+    void shouldErrorWhenCaseFieldIsPresentAndAnswerIsNull_IgnoreNullFieldIsTrue() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${AnotherField1}:[Defendant],"
@@ -229,7 +229,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void shouldErrorWhenCaseFieldIsPresentAndAnswerIsNull_IgnoreNullFieldIsFalse() {
+    void shouldPassWhenCaseFieldIsPresentAndAnswerIsNull_IgnoreNullFieldIsFalse() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${AnotherField1}:[Defendant],"
@@ -243,7 +243,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenCaseFieldIsPresentAndAnswerIsNotNull_IgnoreNullFieldIsTrue() {
+    void shouldErrorWhenCaseFieldIsPresentAndAnswerIsNotNull_IgnoreNullFieldIsTrue() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${AnotherField1}:[Defendant],"
@@ -261,7 +261,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenCaseFieldIsPresentAndAnswerIsNotNull_IgnoreNullFieldIsFalse() {
+    void shouldErrorWhenCaseFieldIsPresentAndAnswerIsNotNull_IgnoreNullFieldIsFalse() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${AnotherField1}:[Defendant],"
@@ -278,7 +278,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenCaseFieldIsNotPresentAndAnswerIsNull_IgnoreNullFieldIsTrue() {
+    void shouldErrorWhenCaseFieldIsNotPresentAndAnswerIsNull_IgnoreNullFieldIsTrue() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${ApplicantField}:[Defendant],"
@@ -296,7 +296,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenCaseFieldIsNotPresentAndAnswerIsNotNull_IgnoreNullFieldIsTrue() {
+    void shouldErrorWhenCaseFieldIsNotPresentAndAnswerIsNotNull_IgnoreNullFieldIsTrue() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${ApplicantField}:[Defendant],"
@@ -314,7 +314,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenCaseFieldIsNotPresentAndAnswerIsNull_IgnoreNullFieldIsFalse() {
+    void shouldPassWhenCaseFieldIsNotPresentAndAnswerIsNull_IgnoreNullFieldIsFalse() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${ApplicantField}:[Defendant],"
@@ -328,7 +328,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenCaseFieldIsNotPresentAndAnswerIsNotNull_IgnoreNullFieldIsFalse() {
+    void shouldErrorWhenCaseFieldIsNotPresentAndAnswerIsNotNull_IgnoreNullFieldIsFalse() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${ApplicantField}:[Defendant],"
@@ -345,7 +345,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenAllCaseFieldsPresentAndAnswerIsNull_IgnoreNullFieldIsFalse() {
+    void shouldErrorWhenAllCaseFieldsPresentAndAnswerIsNull_IgnoreNullFieldIsFalse() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${Applicant2Field}:[Defendant],"
@@ -362,7 +362,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenCaseFieldsPresentAndAnswerIsNotNull_IgnoreNullFieldIsFalse() {
+    void shouldPassWhenCaseFieldsPresentAndAnswerMatches_IgnoreNullFieldIsFalse() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${Applicant2Field}:[Defendant],"
@@ -376,7 +376,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenAllCaseFieldsPresentAndAnswerIsNull_IgnoreNullFieldIsTrue() {
+    void shouldErrorWhenAllCaseFieldsPresentAndAnswerIsNull_IgnoreNullFieldIsTrue() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${Applicant2Field}:[Defendant],"
@@ -394,7 +394,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenCaseFieldsPresentAndAnswerIsNotNull_IgnoreNullFieldIsTrue() {
+    void shouldPassWhenCaseFieldsPresentAndAnswerMatches_IgnoreNullFieldIsTrue() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${Applicant2Field}:[Defendant],"
@@ -409,7 +409,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenAllCaseFieldsNotPresentAndAnswerIsNull_IgnoreNullFieldIsTrue() {
+    void shouldErrorWhenAllCaseFieldsNotPresentAndAnswerIsNull_IgnoreNullFieldIsTrue() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${TextField}:[respondent2]",
@@ -427,7 +427,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenAllCaseFieldsNotPresentAndAnswerIsNotNull_IgnoreNullFieldIsTrue() {
+    void shouldErrorWhenAllCaseFieldsNotPresentAndAnswerIsNotNull_IgnoreNullFieldIsTrue() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${TextField}:[respondent2]",
@@ -445,7 +445,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenAllCaseFieldsNotPresentAndAnswerIsNull_IgnoreNullFieldIsFalse() {
+    void shouldErrorWhenAllCaseFieldsNotPresentAndAnswerIsNull_IgnoreNullFieldIsFalse() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${TextField}:[respondent2]",
@@ -462,7 +462,7 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
-    void whenAllCaseFieldsNotPresentAndAnswerIsNotNull_IgnoreNullFieldIsFalse() {
+    void shouldErrorWhenAllCaseFieldsNotPresentAndAnswerIsNotNull_IgnoreNullFieldIsFalse() {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${TextField}:[respondent2]",

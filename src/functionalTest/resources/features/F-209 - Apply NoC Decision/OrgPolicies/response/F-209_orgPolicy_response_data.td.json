@@ -21,6 +21,6 @@
           }
         }
       ],
-      "LastNoCRequestedBy" : null
+      "LastNoCRequestedBy" : "someUser"
     }
 }

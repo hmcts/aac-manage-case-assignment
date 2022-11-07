@@ -176,6 +176,7 @@ public class NoticeOfChangeControllerIT {
         Organisation organisationToAdd = Organisation.builder().organisationID("QUK822N").build();
         ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
             .organisationToAdd(organisationToAdd)
+            .createdBy("CreatedByUser")
             .build();
 
         OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
@@ -711,6 +712,7 @@ public class NoticeOfChangeControllerIT {
             Organisation organisationToAdd = Organisation.builder().organisationID(ORGANISATION_ID).build();
             ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
                 .organisationToAdd(organisationToAdd)
+                .createdBy("CreatedByUser")
                 .build();
 
             OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
@@ -763,7 +765,8 @@ public class NoticeOfChangeControllerIT {
             OrganisationPolicy orgPolicy = new OrganisationPolicy(org,
                                                                   null,
                                                                   "Applicant",
-                                                                  Lists.newArrayList(), null);
+                                                                  Lists.newArrayList(),
+                "createdByUser");
 
             caseFields.put("OrganisationPolicy", mapper.convertValue(orgPolicy,  JsonNode.class));
 

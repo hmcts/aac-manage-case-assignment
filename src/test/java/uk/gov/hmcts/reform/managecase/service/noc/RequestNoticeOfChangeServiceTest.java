@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.IdamUser;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
+import uk.gov.hmcts.reform.managecase.data.user.CachedUserRepository;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.DynamicList;
 import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
@@ -84,6 +86,8 @@ class RequestNoticeOfChangeServiceTest {
     private RequestNoticeOfChangeService service;
 
     @Mock
+    private CachedUserRepository cachedUserRepository;
+    @Mock
     private DataStoreRepository dataStoreRepository;
     @Mock
     private DefinitionStoreRepository definitionStoreRepository;
@@ -124,6 +128,10 @@ class RequestNoticeOfChangeServiceTest {
         caseDetails = CaseDetails.builder().id(CASE_ID).data(new HashMap<>()).build();
 
         given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(CASE_ID)).willReturn(caseDetails);
+
+        IdamUser idamUser = new IdamUser();
+        idamUser.setEmail("test@test.com");
+        given(cachedUserRepository.getUser()).willReturn(idamUser);
 
         List<CaseRole> caseRoles = List.of(CaseRole.builder().id(CASE_ASSIGNED_ROLE).name(DYNAMIC_LIST_LABEL).build());
         given(definitionStoreRepository.caseRoles(anyString(), anyString(), anyString())).willReturn(caseRoles);

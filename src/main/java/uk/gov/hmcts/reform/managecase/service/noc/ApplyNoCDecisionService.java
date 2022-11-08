@@ -50,6 +50,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.U
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.APPROVAL_STATUS;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CASE_ROLE_ID;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CREATED_BY;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.LAST_NOC_REQUESTED_BY;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_ADD;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_REMOVE;
@@ -127,13 +128,12 @@ public class ApplyNoCDecisionService {
             .getCaseAssignments(singletonList(caseDetails.getId()), null);
 
         if (organisationToAdd == null || isNullOrEmpty(organisationToAdd.getOrganisationID())) {
-            ((ObjectNode) orgPolicyNode).putIfAbsent("LastNoCRequestedBy", null);
             applyRemoveRepresentationDecision(existingCaseAssignments, caseRoleId, orgPolicyNode, organisationToRemove,
                 caseDetails.getId());
         } else {
-            ((ObjectNode) orgPolicyNode).putIfAbsent("LastNoCRequestedBy", createdBy);
             applyAddOrReplaceRepresentationDecision(existingCaseAssignments, caseRoleId, orgPolicyNode,
-                    organisationToAddNode, organisationToAdd, organisationToRemove, caseDetails.getId());
+                    organisationToAddNode, organisationToAdd, organisationToRemove, caseDetails.getId(),
+                createdBy);
         }
 
         setOrgPolicyPreviousOrganisations(caseDetails, organisationToAdd, organisationToRemove, orgPolicyNode);
@@ -152,10 +152,12 @@ public class ApplyNoCDecisionService {
                                                          JsonNode organisationToAddNode,
                                                          Organisation organisationToAdd,
                                                          Organisation organisationToRemove,
-                                                         String caseReference) {
+                                                         String caseReference, JsonNode createdBy) {
         setOrgPolicyOrganisation(orgPolicyNode, organisationToAddNode);
         Pair<List<CaseUserRole>, List<ProfessionalUser>> newAssignedUsers = assignAccessToOrganisationUsers(
             existingCaseAssignments, organisationToAdd, caseRoleId, caseReference);
+
+        ((ObjectNode) orgPolicyNode).put(LAST_NOC_REQUESTED_BY, createdBy);
 
         if (organisationToRemove != null && !isNullOrEmpty(organisationToRemove.getOrganisationID())) {
             List<CaseUserRole> filteredCaseAssignments =
@@ -179,6 +181,7 @@ public class ApplyNoCDecisionService {
                                                    Organisation organisationToRemove,
                                                    String caseReference) {
         nullifyNode(orgPolicyNode.get(ORGANISATION));
+        ((ObjectNode) orgPolicyNode).putNull(LAST_NOC_REQUESTED_BY);
         removeOrganisationUsersAccess(caseReference, existingCaseAssignments, organisationToRemove, caseRoleId);
     }
 

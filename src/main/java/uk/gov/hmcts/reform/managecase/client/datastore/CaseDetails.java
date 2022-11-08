@@ -34,6 +34,7 @@ public class CaseDetails {
 
     public static final String ORGANISATION_TO_ADD = "OrganisationToAdd";
     public static final String CREATED_BY = "CreatedBy";
+    public static final String LAST_NOC_REQUESTED_BY = "LastNoCRequestedBy";
     public static final String ORGANISATION_TO_REMOVE = "OrganisationToRemove";
     public static final String CASE_ROLE_ID = "CaseRoleId";
     public static final String ORGANISATION_REQUEST_TIMESTAMP = "RequestTimestamp";

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import feign.FeignException;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.validation.ValidationException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -132,7 +134,7 @@ public class ApplyNoCDecisionService {
                 caseDetails.getId());
         } else {
             applyAddOrReplaceRepresentationDecision(existingCaseAssignments, caseRoleId, orgPolicyNode,
-                    organisationToAddNode, organisationToAdd, organisationToRemove, caseDetails.getId(),
+                organisationToAddNode, organisationToAdd, organisationToRemove, caseDetails.getId(),
                 createdBy);
         }
 
@@ -141,7 +143,7 @@ public class ApplyNoCDecisionService {
 
     private void validateCorFieldOrganisations(JsonNode changeOrganisationRequestField) {
         if (!changeOrganisationRequestField.has(ORGANISATION_TO_ADD)
-                || !changeOrganisationRequestField.has(ORGANISATION_TO_REMOVE)) {
+            || !changeOrganisationRequestField.has(ORGANISATION_TO_REMOVE)) {
             throw new ValidationException(COR_MISSING_ORGANISATIONS);
         }
     }
@@ -155,7 +157,7 @@ public class ApplyNoCDecisionService {
                                                          Organisation organisationToRemove,
                                                          String caseReference, JsonNode createdBy) {
 
-        ((ObjectNode) orgPolicyNode).put(LAST_NOC_REQUESTED_BY, (createdBy == null)? null : createdBy.asText());
+        ((ObjectNode) orgPolicyNode).put(LAST_NOC_REQUESTED_BY, (createdBy == null) ? null : createdBy.asText());
 
         setOrgPolicyOrganisation(orgPolicyNode, organisationToAddNode);
         Pair<List<CaseUserRole>, List<ProfessionalUser>> newAssignedUsers = assignAccessToOrganisationUsers(
@@ -255,7 +257,7 @@ public class ApplyNoCDecisionService {
             String errorMessage = status == HttpStatus.NOT_FOUND
                 ? String.format("Organisation with ID '%s' can not be found.", organisationId)
                 : String.format("Error encountered while retrieving organisation users for organisation ID '%s': %s",
-                                organisationId, reasonPhrase);
+                organisationId, reasonPhrase);
 
             throw new ValidationException(errorMessage, e);
         }
@@ -281,10 +283,11 @@ public class ApplyNoCDecisionService {
     /**
      * Obtain the intersection of a list of case user role assignments and professional users.
      * Users are considered the same if their ID matches.
-     * @param caseUserRoles case use role assignments
+     *
+     * @param caseUserRoles     case use role assignments
      * @param professionalUsers professional users
      * @return the intersection - the list of filtered case user role assignments and
-     *         professional users for the intersection are both provided
+     * professional users for the intersection are both provided
      */
     private Pair<List<CaseUserRole>, List<ProfessionalUser>> getIntersection(List<CaseUserRole> caseUserRoles,
                                                                              List<ProfessionalUser> professionalUsers) {
@@ -308,11 +311,12 @@ public class ApplyNoCDecisionService {
     /**
      * Obtain the intersection of a list of case user role assignments matching case role ID and professional users.
      * Users are considered the same if their ID and case role both match.
-     * @param caseUserRoles case use role assignments
+     *
+     * @param caseUserRoles     case use role assignments
      * @param professionalUsers professional users
-     * @param caseRoleId case role identifier
+     * @param caseRoleId        case role identifier
      * @return the intersection - the list of filtered case user role assignments and
-     *         professional users for the intersection are both provided
+     * professional users for the intersection are both provided
      */
     private Pair<List<CaseUserRole>, List<ProfessionalUser>> getIntersection(List<CaseUserRole> caseUserRoles,
                                                                              List<ProfessionalUser> professionalUsers,
@@ -323,7 +327,7 @@ public class ApplyNoCDecisionService {
         professionalUsers.forEach(professionalUser -> {
             Optional<CaseUserRole> caseUserRoleOptional = caseUserRoles.stream()
                 .filter(caseUserRole -> caseUserRole.getUserId().equals(professionalUser.getUserIdentifier())
-                    && caseUserRole.getCaseRole().equals(caseRoleId))
+                                        && caseUserRole.getCaseRole().equals(caseRoleId))
                 .findFirst();
 
             caseUserRoleOptional.ifPresent(caseUserRole -> {
@@ -375,9 +379,9 @@ public class ApplyNoCDecisionService {
                                                             final FindOrganisationResponse response) {
         if (response.getContactInformation().size() > 1) {
             log.warn("More than one address received in the response for the organisation {},"
-                         + " using first address from the list.", response.getOrganisationIdentifier());
+                     + " using first address from the list.", response.getOrganisationIdentifier());
         }
-        AddressUK organisationAddress =  createOrganisationAddress(response.getContactInformation().get(0));
+        AddressUK organisationAddress = createOrganisationAddress(response.getContactInformation().get(0));
         return PreviousOrganisation
             .builder()
             .organisationName(response.getName())
@@ -409,7 +413,8 @@ public class ApplyNoCDecisionService {
                 return caseCreatedDate;
             }
             List<PreviousOrganisationCollectionItem> previousOrganisations = objectMapper
-                .readerFor(new TypeReference<List<PreviousOrganisationCollectionItem>>() {}).readValue(prevOrgsNode);
+                .readerFor(new TypeReference<List<PreviousOrganisationCollectionItem>>() {
+                }).readValue(prevOrgsNode);
             if (previousOrganisations.isEmpty()) {
                 return caseCreatedDate;
             }

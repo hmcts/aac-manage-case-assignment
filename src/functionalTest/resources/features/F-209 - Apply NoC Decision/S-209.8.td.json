@@ -102,7 +102,7 @@
               }
             }
           ],
-          "LastNoCRequestedBy" : null
+          "LastNoCRequestedBy" : "someUser"
         }
       }
     }

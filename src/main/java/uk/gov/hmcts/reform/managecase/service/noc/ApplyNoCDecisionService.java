@@ -146,6 +146,7 @@ public class ApplyNoCDecisionService {
         }
     }
 
+    @SuppressWarnings({"squid:S1075"})
     private void applyAddOrReplaceRepresentationDecision(List<CaseUserRole> existingCaseAssignments,
                                                          String caseRoleId,
                                                          JsonNode orgPolicyNode,
@@ -153,11 +154,11 @@ public class ApplyNoCDecisionService {
                                                          Organisation organisationToAdd,
                                                          Organisation organisationToRemove,
                                                          String caseReference, JsonNode createdBy) {
+        ((ObjectNode) orgPolicyNode).put(LAST_NOC_REQUESTED_BY, createdBy.asText());
+
         setOrgPolicyOrganisation(orgPolicyNode, organisationToAddNode);
         Pair<List<CaseUserRole>, List<ProfessionalUser>> newAssignedUsers = assignAccessToOrganisationUsers(
             existingCaseAssignments, organisationToAdd, caseRoleId, caseReference);
-
-        ((ObjectNode) orgPolicyNode).put(LAST_NOC_REQUESTED_BY, createdBy);
 
         if (organisationToRemove != null && !isNullOrEmpty(organisationToRemove.getOrganisationID())) {
             List<CaseUserRole> filteredCaseAssignments =

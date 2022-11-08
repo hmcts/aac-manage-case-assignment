@@ -283,11 +283,10 @@ public class ApplyNoCDecisionService {
     /**
      * Obtain the intersection of a list of case user role assignments and professional users.
      * Users are considered the same if their ID matches.
-     *
-     * @param caseUserRoles     case use role assignments
+     * @param caseUserRoles case use role assignments
      * @param professionalUsers professional users
      * @return the intersection - the list of filtered case user role assignments and
-     * professional users for the intersection are both provided
+     *         professional users for the intersection are both provided
      */
     private Pair<List<CaseUserRole>, List<ProfessionalUser>> getIntersection(List<CaseUserRole> caseUserRoles,
                                                                              List<ProfessionalUser> professionalUsers) {
@@ -311,12 +310,11 @@ public class ApplyNoCDecisionService {
     /**
      * Obtain the intersection of a list of case user role assignments matching case role ID and professional users.
      * Users are considered the same if their ID and case role both match.
-     *
-     * @param caseUserRoles     case use role assignments
+     * @param caseUserRoles case use role assignments
      * @param professionalUsers professional users
-     * @param caseRoleId        case role identifier
+     * @param caseRoleId case role identifier
      * @return the intersection - the list of filtered case user role assignments and
-     * professional users for the intersection are both provided
+     *         professional users for the intersection are both provided
      */
     private Pair<List<CaseUserRole>, List<ProfessionalUser>> getIntersection(List<CaseUserRole> caseUserRoles,
                                                                              List<ProfessionalUser> professionalUsers,

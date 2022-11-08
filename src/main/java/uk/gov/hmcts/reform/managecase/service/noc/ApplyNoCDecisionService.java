@@ -154,7 +154,8 @@ public class ApplyNoCDecisionService {
                                                          Organisation organisationToAdd,
                                                          Organisation organisationToRemove,
                                                          String caseReference, JsonNode createdBy) {
-        ((ObjectNode) orgPolicyNode).put(LAST_NOC_REQUESTED_BY, createdBy.asText());
+
+        ((ObjectNode) orgPolicyNode).put(LAST_NOC_REQUESTED_BY, (createdBy == null)? null : createdBy.asText());
 
         setOrgPolicyOrganisation(orgPolicyNode, organisationToAddNode);
         Pair<List<CaseUserRole>, List<ProfessionalUser>> newAssignedUsers = assignAccessToOrganisationUsers(

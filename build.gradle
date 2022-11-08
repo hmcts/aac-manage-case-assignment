@@ -10,7 +10,7 @@ plugins {
   id 'au.com.dius.pact' version '4.1.7'
 }
 
-ext['spring-security.version'] = '5.6.6'
+ext['spring-security.version'] = '5.6.9'
 ext['spring-framework.version'] = '5.3.20'
 ext['log4j2.version'] = '2.17.1'
 ext['jackson.version'] = '2.14.0-rc1'
@@ -332,8 +332,8 @@ dependencies {
   // Explicitly specify version of jakarta.el to be used to resolve CVE-2021-28170
   implementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.1'
 
-  implementation "org.springframework.security:spring-security-web:5.6.6"
-  implementation "org.springframework.security:spring-security-config:5.6.6"
+  implementation "org.springframework.security:spring-security-web"
+  implementation "org.springframework.security:spring-security-config"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.5.14"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.5.14"
 

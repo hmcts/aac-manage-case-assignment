@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
-import uk.gov.hmcts.reform.managecase.data.user.CachedUserRepository;
+import uk.gov.hmcts.reform.managecase.data.user.UserRepository;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.DynamicList;
 import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
@@ -86,7 +86,7 @@ class RequestNoticeOfChangeServiceTest {
     private RequestNoticeOfChangeService service;
 
     @Mock
-    private CachedUserRepository cachedUserRepository;
+    private UserRepository userRepository;
     @Mock
     private DataStoreRepository dataStoreRepository;
     @Mock
@@ -131,7 +131,7 @@ class RequestNoticeOfChangeServiceTest {
 
         IdamUser idamUser = new IdamUser();
         idamUser.setEmail("test@test.com");
-        given(cachedUserRepository.getUser()).willReturn(idamUser);
+        given(userRepository.getUser()).willReturn(idamUser);
 
         List<CaseRole> caseRoles = List.of(CaseRole.builder().id(CASE_ASSIGNED_ROLE).name(DYNAMIC_LIST_LABEL).build());
         given(definitionStoreRepository.caseRoles(anyString(), anyString(), anyString())).willReturn(caseRoles);

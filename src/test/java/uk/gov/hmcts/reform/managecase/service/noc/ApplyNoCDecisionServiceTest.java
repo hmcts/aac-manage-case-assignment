@@ -337,7 +337,7 @@ class ApplyNoCDecisionServiceTest {
                     ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null))),
             () -> assertThat(result.get(ORG_POLICY_2_FIELD).toString(),
                 is(orgPolicyAsString(ORG_3_ID, ORG_3_NAME,
-                    ORG_POLICY_2_REF, ORG_POLICY_2_ROLE, null)))
+                    ORG_POLICY_2_REF, ORG_POLICY_2_ROLE, "userEmail")))
         );
     }
 
@@ -880,7 +880,7 @@ class ApplyNoCDecisionServiceTest {
                + "\"ApprovalStatus\":null,\"RequestTimestamp\":null,\"OrganisationToAdd\":"
                + "{\"OrganisationID\":null,\"OrganisationName\":null},"
                + "\"OrganisationToRemove\":{\"OrganisationID\":null,\"OrganisationName\":null},"
-               + "\"ApprovalRejectionTimestamp\":null}";
+               + "\"ApprovalRejectionTimestamp\":null,\"CreatedBy\":null}";
     }
 
     private String caseRoleIdField(String selectedCode) {
@@ -918,7 +918,8 @@ class ApplyNoCDecisionServiceTest {
                                                                  + "        \"RequestTimestamp\": null,\n"
                                                                  + "        \"OrganisationToAdd\": %s,\n"
                                                                  + "        \"OrganisationToRemove\": %s,\n"
-                                                                 + "        \"ApprovalRejectionTimestamp\": null\n"
+                                                                 + "        \"ApprovalRejectionTimestamp\": null,\n"
+                                                                 + "        \"CreatedBy\": \"userEmail\"\n"
                                                                  + "    }\n"
                                                                  + "}", organisationPolicy1,
             organisationPolicy2, caseRoleIdField("[Claimant]"),

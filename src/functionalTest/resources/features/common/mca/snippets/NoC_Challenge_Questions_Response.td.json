@@ -43,7 +43,7 @@
       "challenge_question_id" : "NoCChallenge",
       "answer_field" : null,
       "question_id" : "NoC_Challenge_Name2",
-      "ignore_null_fields" : false
+      "ignore_null_fields" : true
     }
   ]
 }

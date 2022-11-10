@@ -379,9 +379,8 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.7-prerelease') {
-//    exclude group: 'com.github.hmcts.befta-fw', module: 'befta-fw'
-  }
+  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.7')
+
   testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.1'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
@@ -407,9 +406,7 @@ dependencies {
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation 'com.github.hmcts:fortify-client:1.2.0:all'
-
-
+  testImplementation 'com.github.hmcts:fortify-client:1.3.0:all'
 }
 
 mainClassName = 'uk.gov.hmcts.reform.managecase.Application'

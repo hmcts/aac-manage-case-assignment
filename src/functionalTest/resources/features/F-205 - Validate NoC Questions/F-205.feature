@@ -304,5 +304,5 @@ Feature: F-205 Validate Notice of Change Answers
       And the request [has one null and one non-null answer as expected],
       And it is submitted to call the [ValidateNoCQuestions] operation of [Case Assignment Microservice],
 
-     Then a negative response is received,
+     Then a positive response is received,
       And the response has all the details as expected.

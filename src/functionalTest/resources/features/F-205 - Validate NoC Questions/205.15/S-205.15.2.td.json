@@ -24,6 +24,15 @@
         }
       ]
     }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body" : {
+      "message" : "The answers did not match those for any litigant",
+      "code" : "answers-not-matched-any-litigant",
+      "errors" : [ ]
+    }
   }
 
 }

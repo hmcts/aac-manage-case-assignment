@@ -291,7 +291,7 @@ Feature: F-205 Validate Notice of Change Answers
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   @S-205.15.2
-  Scenario: NoC Answers must return an negative response for various correct answers
+  Scenario: NoC Answers must return an positive response for various correct answers
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction within a different organisation from Richard],
@@ -304,5 +304,5 @@ Feature: F-205 Validate Notice of Change Answers
       And the request [has one null and one non-null answer as expected],
       And it is submitted to call the [ValidateNoCQuestions] operation of [Case Assignment Microservice],
 
-     Then a negative response is received,
+     Then a positive response is received,
       And the response has all the details as expected.

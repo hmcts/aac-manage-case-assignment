@@ -1,6 +1,6 @@
 {
   "_guid_": "S-205.15.2",
-  "_extends_": "S-205.15.2_Test_Data_Base",
+  "_extends_": "S-205.15_Test_Data_Base",
 
   "title": "NoC Answers must return an positive response for various correct answers",
 
@@ -23,15 +23,6 @@
           "value": null
         }
       ]
-    }
-  },
-
-  "expectedResponse": {
-    "_extends_": "ACA_400_Response",
-    "body" : {
-      "message" : "The answers did not match those for any litigant",
-      "code" : "answers-not-matched-any-litigant",
-      "errors" : [ ]
     }
   }
 

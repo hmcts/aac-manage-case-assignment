@@ -29,21 +29,8 @@
           },
           "classification" : "PUBLIC"
         }
-      },
-
-      "security_classifications": {
-        "_extends_": "NoC_Case_Data_Classification_With_Org_Policies",
-
-        "respondentOrganisationPolicy": {
-          "value": {
-            "Organisation": "[[ANY_NULLABLE]]",
-            "OrgPolicyReference": "PUBLIC",
-            "OrgPolicyCaseAssignedRole": "PUBLIC",
-            "PreviousOrganisations": "[[ANY_NULLABLE]]"
-          },
-          "classification" : "PUBLIC"
-        }
       }
+
     }
   }
 }

@@ -59,6 +59,25 @@
             "OrganisationID": ""
           }
         }
+      },
+
+      "data_classification": {
+        "applicantOrganisationPolicy": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrgPolicyReference": "PUBLIC",
+            "OrgPolicyCaseAssignedRole": "PUBLIC",
+            "Organisation": "[[ANY_NULLABLE]]"
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrgPolicyReference": "PUBLIC",
+            "OrgPolicyCaseAssignedRole": "PUBLIC",
+            "Organisation": "[[ANY_NULLABLE]]"
+          }
+        }
       }
 
     }

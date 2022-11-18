@@ -52,6 +52,32 @@
             "OrganisationName": "CCD Solicitors Limited"
           }
         }
+      },
+      "data_classification": {
+        "OrganisationPolicyField2": {
+          "value": {
+            "OrgPolicyReference": "PUBLIC",
+            "Organisation": {
+              "classification": "PUBLIC",
+              "value": {
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
+              }
+            }
+          }
+        },
+        "OrganisationPolicyField1": {
+          "value": {
+            "OrgPolicyReference": "PUBLIC",
+            "Organisation": {
+              "classification": "PUBLIC",
+              "value": {
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
+              }
+            }
+          }
+        }
       }
     }
   }

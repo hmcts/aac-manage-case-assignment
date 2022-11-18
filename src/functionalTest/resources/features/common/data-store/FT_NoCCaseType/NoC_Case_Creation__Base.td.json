@@ -28,6 +28,10 @@
 
 			"case_data": {
 				"_extends_": "NoC_Case_Data__publicFields"
+			},
+
+			"data_classification": {
+				"_extends_": "NoC_Case_Data_Classification"
 			}
 
 		}

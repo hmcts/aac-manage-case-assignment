@@ -104,6 +104,54 @@
 						"id": "[[ANY_STRING_NOT_NULLABLE]]"
 					}
 				]
+			},
+			"data_classification": {
+				"AddressField": {
+					"classification": "PUBLIC",
+					"value": {
+						"AddressLine1": "PUBLIC",
+						"AddressLine2": "PUBLIC",
+						"AddressLine3": "PUBLIC",
+						"Country": "PUBLIC"
+					}
+				},
+				"AddressUKField": {
+					"classification": "PUBLIC",
+					"value": {
+						"AddressLine1": "PUBLIC",
+						"AddressLine2": "PUBLIC",
+						"AddressLine3": "PUBLIC",
+						"PostTown": "PUBLIC",
+						"County": "PUBLIC",
+						"PostCode": "PUBLIC",
+						"Country": "PUBLIC"
+					}
+				},
+				"DocumentField": "PUBLIC",
+				"MoneyField": "PUBLIC",
+				"DynamicList": "PUBLIC",
+				"MarritalStatus": "PUBLIC",
+				"NumberField": "PUBLIC",
+				"MultiSelectField": "PUBLIC",
+				"YesNoField": "PUBLIC",
+				"EmailField": "PUBLIC",
+				"TextField": "PUBLIC",
+				"PhoneField": "PUBLIC",
+				"DateField": "PUBLIC",
+				"TextAreaField": "PUBLIC",
+				"CollectionField": {
+					"classification": "PUBLIC",
+					"value": [
+						{
+							"id": "[[ANY_STRING_NOT_NULLABLE]]",
+							"classification": "PUBLIC"
+						},
+						{
+							"id": "[[ANY_STRING_NOT_NULLABLE]]",
+							"classification": "PUBLIC"
+						}
+					]
+				}
 			}
 		}
 	}

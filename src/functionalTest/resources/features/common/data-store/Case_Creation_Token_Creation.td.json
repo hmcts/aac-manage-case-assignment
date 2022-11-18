@@ -32,13 +32,11 @@
         "security_classification": null,
         "case_data": "[[ANYTHING_PRESENT]]",
         "supplementary_data" : null,
-        "data_classification": "[[ANYTHING_PRESENT]]",
         "after_submit_callback_response": null,
         "callback_response_status_code": null,
         "callback_response_status": null,
         "delete_draft_response_status_code": null,
-        "delete_draft_response_status": null,
-        "security_classifications": "[[ANYTHING_PRESENT]]"
+        "delete_draft_response_status": null
       }
     }
   }

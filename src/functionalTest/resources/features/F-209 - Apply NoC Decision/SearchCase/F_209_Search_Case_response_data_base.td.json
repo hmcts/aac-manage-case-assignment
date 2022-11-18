@@ -14,15 +14,9 @@
   "case_data" : {
     "_extends_": "F-209_Search_Case_Case_Data"
   },
-  "data_classification" : {
-    "_extends_" : "F-209_Search_Case_Data_Classification"
-  },
   "after_submit_callback_response" : null,
   "callback_response_status_code" : null,
   "callback_response_status" : null,
   "delete_draft_response_status_code" : null,
-  "delete_draft_response_status" : null,
-  "security_classifications" : {
-    "_extends_" : "F-209_Search_Case_Security_Classification"
-  }
+  "delete_draft_response_status" : null
 }

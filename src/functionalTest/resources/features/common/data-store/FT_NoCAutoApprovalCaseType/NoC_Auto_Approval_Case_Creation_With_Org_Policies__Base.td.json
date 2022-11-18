@@ -15,15 +15,8 @@
 		"body": {
 			"case_data": {
 				"_extends_": "NoC_Case_Data_With_Org_Policies__publicFields"
-			},
-
-			"data_classification": {
-				"_extends_": "NoC_Case_Data_Classification_With_Org_Policies"
-			},
-
-			"security_classifications": {
-				"_extends_": "NoC_Case_Data_Classification_With_Org_Policies"
 			}
+
 		}
 	}
 }

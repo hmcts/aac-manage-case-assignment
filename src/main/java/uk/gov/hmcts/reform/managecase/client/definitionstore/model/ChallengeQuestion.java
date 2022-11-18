@@ -32,6 +32,8 @@ public class ChallengeQuestion {
     private String answerField;
     @JsonProperty("question_id")
     private String questionId;
+    @JsonProperty("ignore_null_fields")
+    private boolean ignoreNullFields;
 
     @JsonIgnore
     private List<ChallengeAnswer> answers;
@@ -59,6 +61,7 @@ public class ChallengeQuestion {
             .displayContextParameter(challengeQuestion.getDisplayContextParameter())
             .challengeQuestionId(challengeQuestion.getChallengeQuestionId())
             .questionId(challengeQuestion.getQuestionId())
+            .ignoreNullFields(challengeQuestion.isIgnoreNullFields())
             .build();
     }
 }

@@ -79,7 +79,8 @@ public class ChallengeAnswerValidator {
                                           String submittedAnswer,
                                           List<String> acceptedValues) {
         return acceptedValues.stream()
-            .anyMatch(value -> isEqualAnswer(value, submittedAnswer, question.getAnswerFieldType()));
+            .anyMatch(value -> isEqualAnswer(value, submittedAnswer, question.getAnswerFieldType(),
+                                             question.isIgnoreNullFields()));
     }
 
     private void incrementCorrectAnswerCount(Map<String, Integer> caseRoleCorrectAnswers, ChallengeAnswer answer) {
@@ -105,9 +106,10 @@ public class ChallengeAnswerValidator {
                 NO_ANSWER_PROVIDED.getErrorMessage(), questionId)),NO_ANSWER_PROVIDED.getErrorCode()));
     }
 
-    private boolean isEqualAnswer(String expectedAnswer, String actualAnswer, FieldType fieldType) {
+    private boolean isEqualAnswer(String expectedAnswer, String actualAnswer, FieldType fieldType,
+                                  boolean ignoreNullFields) {
         if (isNullOrEmpty(expectedAnswer) || isNullOrEmpty(actualAnswer)) {
-            return isNullOrEmpty(expectedAnswer) && isNullOrEmpty(actualAnswer);
+            return isNullOrEmpty(expectedAnswer) && isNullOrEmpty(actualAnswer) && !ignoreNullFields;
         }
 
         if (fieldType.getType().equals(TEXT)) {

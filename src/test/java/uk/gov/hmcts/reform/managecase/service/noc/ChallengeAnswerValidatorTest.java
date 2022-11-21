@@ -210,6 +210,275 @@ class ChallengeAnswerValidatorTest {
         assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
     }
 
+    @Test
+    void shouldErrorWhenCaseFieldIsPresentAndAnswerIsNull_IgnoreNullFieldIsTrue() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${AnotherField1}:[Defendant],"
+                                  + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
+        challengeQuestions.get(0).setIgnoreNullFields(true);
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+    @Test
+    void shouldPassWhenCaseFieldIsPresentAndAnswerIsNull_IgnoreNullFieldIsFalse() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${AnotherField1}:[Defendant],"
+                                  + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        String result = challengeAnswerValidator
+            .getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails);
+
+        assertThat(result, is("[Defendant]"));
+    }
+
+    @Test
+    void shouldErrorWhenCaseFieldIsPresentAndAnswerIsNotNull_IgnoreNullFieldIsTrue() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${AnotherField1}:[Defendant],"
+                                  + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
+        challengeQuestions.get(0).setIgnoreNullFields(true);
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+    @Test
+    void shouldErrorWhenCaseFieldIsPresentAndAnswerIsNotNull_IgnoreNullFieldIsFalse() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${AnotherField1}:[Defendant],"
+                                  + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+    @Test
+    void shouldErrorWhenCaseFieldIsNotPresentAndAnswerIsNull_IgnoreNullFieldIsTrue() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${ApplicantField}:[Defendant],"
+                                  + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
+        challengeQuestions.get(0).setIgnoreNullFields(true);
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+    @Test
+    void shouldErrorWhenCaseFieldIsNotPresentAndAnswerIsNotNull_IgnoreNullFieldIsTrue() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${ApplicantField}:[Defendant],"
+                                  + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
+        challengeQuestions.get(0).setIgnoreNullFields(true);
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+    @Test
+    void shouldPassWhenCaseFieldIsNotPresentAndAnswerIsNull_IgnoreNullFieldIsFalse() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${ApplicantField}:[Defendant],"
+                                  + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        String result = challengeAnswerValidator
+            .getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails);
+
+        assertThat(result, is("[Defendant]"));
+    }
+
+    @Test
+    void shouldErrorWhenCaseFieldIsNotPresentAndAnswerIsNotNull_IgnoreNullFieldIsFalse() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${ApplicantField}:[Defendant],"
+                                  + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+    @Test
+    void shouldErrorWhenAllCaseFieldsPresentAndAnswerIsNull_IgnoreNullFieldIsFalse() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${Applicant2Field}:[Defendant],"
+                + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+    @Test
+    void shouldPassWhenCaseFieldsPresentAndAnswerMatches_IgnoreNullFieldIsFalse() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${Applicant2Field}:[Defendant],"
+                + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        String result = challengeAnswerValidator
+            .getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails);
+
+        assertThat(result, is("[Defendant]"));
+    }
+
+    @Test
+    void shouldErrorWhenAllCaseFieldsPresentAndAnswerIsNull_IgnoreNullFieldIsTrue() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${Applicant2Field}:[Defendant],"
+                + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
+        challengeQuestions.get(0).setIgnoreNullFields(true);
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+    @Test
+    void shouldPassWhenCaseFieldsPresentAndAnswerMatches_IgnoreNullFieldIsTrue() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${Applicant2Field}:[Defendant],"
+                + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
+        challengeQuestions.get(0).setIgnoreNullFields(true);
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        String result = challengeAnswerValidator
+            .getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails);
+
+        assertThat(result, is("[Defendant]"));
+    }
+
+    @Test
+    void shouldErrorWhenAllCaseFieldsNotPresentAndAnswerIsNull_IgnoreNullFieldIsTrue() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${TextField}:[respondent2]",
+                              fieldType(TEXT)));
+        challengeQuestions.get(0).setIgnoreNullFields(true);
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+    @Test
+    void shouldErrorWhenAllCaseFieldsNotPresentAndAnswerIsNotNull_IgnoreNullFieldIsTrue() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${TextField}:[respondent2]",
+                              fieldType(TEXT)));
+        challengeQuestions.get(0).setIgnoreNullFields(true);
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+    @Test
+    void shouldErrorWhenAllCaseFieldsNotPresentAndAnswerIsNull_IgnoreNullFieldIsFalse() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, ""));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${TextField}:[respondent2]",
+                              fieldType(TEXT)));
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+    @Test
+    void shouldErrorWhenAllCaseFieldsNotPresentAndAnswerIsNotNull_IgnoreNullFieldIsFalse() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Name2"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${TextField}:[respondent2]",
+                              fieldType(TEXT)));
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+                                              () -> challengeAnswerValidator.getMatchingCaseRole(
+                                                  challengeQuestionsResult, answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+
+        assertThat(exception.getErrorMessage(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorMessage()));
+    }
+
+
     private ChallengeQuestion challengeQuestion(String questionId, String answerField, FieldType answerFieldType) {
         ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
             .questionId(questionId)
@@ -235,6 +504,8 @@ class ChallengeAnswerValidatorTest {
         return "{\n"
             + "    \"DateField\": \"1985-07-25\",\n"
             + "    \"TextField\": \"TextValue\",\n"
+            + "    \"ApplicantField\": \"\",\n"
+            + "    \"Applicant2Field\": \"Name2\",\n"
             + "    \"EmailField\": \"test@email.com\",\n"
             + "    \"NumberField\": \"12345\",\n"
             + "    \"ComplexField\": {\n"

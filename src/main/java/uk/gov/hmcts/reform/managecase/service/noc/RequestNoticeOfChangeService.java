@@ -58,7 +58,7 @@ public class RequestNoticeOfChangeService {
                                         JacksonUtils jacksonUtils,
                                         SecurityUtils securityUtils,
                                         @Qualifier(CachedUserRepository.QUALIFIER)
-                                                UserRepository userRepository) {
+                                            final UserRepository userRepository) {
         this.dataStoreRepository = dataStoreRepository;
         this.definitionStoreRepository = definitionStoreRepository;
         this.prdRepository = prdRepository;
@@ -157,7 +157,7 @@ public class RequestNoticeOfChangeService {
             .organisationToAdd(invokersOrganisation)
             .organisationToRemove(incumbentOrganisation)
             .requestTimestamp(LocalDateTime.now())
-            .createdBy(userRepository.getUser().getEmail())
+            .createdBy(this.userRepository.getUser().getEmail())
             .build();
 
         // Submit the NoCRequest event + event token.  This action will trigger a submitted callback to the

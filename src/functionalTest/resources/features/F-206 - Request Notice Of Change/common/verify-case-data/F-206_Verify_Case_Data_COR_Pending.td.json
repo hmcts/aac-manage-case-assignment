@@ -19,7 +19,7 @@
 
       "data": {
         "changeOrganisationRequestField" : {
-          "CreatedBy" : "befta.master.solicitor.bill@gmail.com",
+          "CreatedBy" : "[[ANYTHING_PRESENT]]",
           "CaseRoleId" : {
             "value" : {
               "code" : "[RESPONDENTSOLICITOR]",

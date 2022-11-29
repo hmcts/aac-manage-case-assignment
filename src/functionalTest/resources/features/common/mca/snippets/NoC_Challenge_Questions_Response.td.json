@@ -22,7 +22,8 @@
       "display_context_parameter" : null,
       "challenge_question_id" : "NoCChallenge",
       "answer_field" : null,
-      "question_id" : "NoC_Challenge_Name"
+      "question_id" : "NoC_Challenge_Name",
+      "ignore_null_fields" : true
     },
     {
       "case_type_id" : "FT_NoCCaseType",
@@ -41,7 +42,8 @@
       "display_context_parameter" : "#DATETIMEENTRY(dd-MM-yyyy)",
       "challenge_question_id" : "NoCChallenge",
       "answer_field" : null,
-      "question_id" : "NoC_Challenge_Name2"
+      "question_id" : "NoC_Challenge_Name2",
+      "ignore_null_fields" : false
     }
   ]
 }

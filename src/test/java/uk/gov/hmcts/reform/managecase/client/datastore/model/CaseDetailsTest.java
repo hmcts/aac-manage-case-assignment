@@ -45,6 +45,7 @@ public class CaseDetailsTest {
             .organisationToAdd(organisationToAdd)
             .organisationToRemove(organisationToRemove)
             .approvalStatus(APPROVED.name())
+            .createdBy("userOne")
             .build();
 
         final String expectedChangeOrganisationRequestJson =
@@ -57,7 +58,8 @@ public class CaseDetailsTest {
             + "},"
             + "\"CaseRoleId\":" + objectMapper.writeValueAsString(dynamicList) + ","
             + "\"RequestTimestamp\":\"" + now + "\","
-            + "\"ApprovalStatus\":\"APPROVED\""
+            + "\"ApprovalStatus\":\"APPROVED\"" + ","
+            + "\"CreatedBy\":\"userOne\""
             + "}";
 
 

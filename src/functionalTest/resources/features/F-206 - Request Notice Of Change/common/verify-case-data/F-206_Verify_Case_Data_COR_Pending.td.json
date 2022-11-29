@@ -19,6 +19,7 @@
 
       "data": {
         "changeOrganisationRequestField" : {
+          "CreatedBy" : "[[ANYTHING_PRESENT]]",
           "CaseRoleId" : {
             "value" : {
               "code" : "[RESPONDENTSOLICITOR]",
@@ -41,6 +42,7 @@
       "data_classification": {
         "changeOrganisationRequestField" : {
           "value" : {
+            "CreatedBy": "PUBLIC",
             "CaseRoleId" : "PUBLIC",
             "ApprovalStatus" : "PUBLIC",
             "RequestTimestamp" : "PUBLIC",

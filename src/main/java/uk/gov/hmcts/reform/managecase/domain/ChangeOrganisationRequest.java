@@ -40,6 +40,9 @@ public class ChangeOrganisationRequest {
     @JsonProperty("ApprovalStatus")
     private String approvalStatus;
 
+    @JsonProperty("CreatedBy")
+    private String createdBy;
+
     public void validateChangeOrganisationRequest() {
         if (this.getCaseRoleId() == null
             || StringUtils.isBlank(this.getApprovalStatus())

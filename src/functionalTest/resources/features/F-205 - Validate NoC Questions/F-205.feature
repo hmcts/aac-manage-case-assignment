@@ -290,7 +290,7 @@ Feature: F-205 Validate Notice of Change Answers
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-205.15.2 @Ignore
+  @S-205.15.2
   Scenario: NoC Answers must return an positive response for various correct answers
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],

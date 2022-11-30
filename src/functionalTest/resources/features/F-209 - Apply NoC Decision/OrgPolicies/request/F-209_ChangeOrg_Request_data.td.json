@@ -16,6 +16,7 @@
     },
     "Reason": null,
     "ApprovalRejectionTimestamp": null,
-    "NotesReason": null
+    "NotesReason": null,
+    "CreatedBy" : "someUser"
   }
 }

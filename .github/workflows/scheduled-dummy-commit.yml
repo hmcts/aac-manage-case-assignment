@@ -1,12 +1,8 @@
 name: Scheduled Dummy Commit to develop Branch
 
-#on:
-#  schedule:
-#    - cron: "30 5 */3 * *"
 on:
-  push:
-    branches:
-      - CCD-3916_Github_Actions
+  schedule:
+    - cron: "30 5 */3 * *"
   workflow_dispatch:
 
 jobs:

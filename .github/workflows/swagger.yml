@@ -3,7 +3,7 @@ name: Publish Swagger Specs
 on:
   push:
     branches:
-      - CCD-3916_Github_Actions
+      - master
 
 jobs:
   build:

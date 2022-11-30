@@ -75,7 +75,7 @@ def vaultOverrides = [
 env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
 env.CCD_DATA_STORE_API_BASE_URL = "https://ccd-data-store-api-${dataStoreApiDevelopPr}.service.core-compute-preview.internal".toLowerCase()
 // NB: this is the callback URL used when testing NOC so its an internal call: data-store.preview -> mca.preview.
-env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${env.BRANCH_NAME}-java"
+env.MCA_API_BASE_URL = "https://aac-manage-case-assignment-pr-455.service.core-compute-preview.internal"
 
 // Other env variables needed for BEFTA.
 env.S2S_URL_BASE = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"

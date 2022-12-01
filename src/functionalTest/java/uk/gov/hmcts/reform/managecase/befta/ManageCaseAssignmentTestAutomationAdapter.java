@@ -5,6 +5,7 @@ import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
+import uk.gov.hmcts.befta.util.BeftaUtils;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
 
 import java.util.Arrays;
@@ -18,6 +19,13 @@ public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutoma
     protected BeftaTestDataLoader buildTestDataLoader() {
         return new DataLoaderToDefinitionStore(this,
                                                DataLoaderToDefinitionStore.VALID_CCD_TEST_DEFINITIONS_PATH) {
+
+            @Override
+            protected void createRoleAssignment(String resource, String filename) {
+                // Do not create role assignments.
+                BeftaUtils.defaultLog("Will NOT create role assignments!");
+            }
+
         };
     }
 

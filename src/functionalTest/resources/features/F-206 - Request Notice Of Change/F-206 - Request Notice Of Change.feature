@@ -31,7 +31,7 @@ Scenario: (Happy Path) Solicitor requests NoC to replace representation - no aut
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-2
-@S-206.2 @Ignore
+@S-206.2
 Scenario: (Happy Path) Solicitor requests NoC for a non-represented litigant - no auto-approval applies
 
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application],

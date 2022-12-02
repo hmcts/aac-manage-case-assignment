@@ -125,28 +125,6 @@
             }
           }
         }
-      },
-      "security_classifications": {
-        "changeOrganisationRequestField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "ApprovalStatus" : "PUBLIC",
-            "CaseRoleId" : "PUBLIC",
-            "RequestTimestamp" : "PUBLIC",
-            "OrganisationToAdd" : {
-              "classification" : "PUBLIC",
-              "value" : {
-                "OrganisationID" : "PUBLIC"
-              }
-            },
-            "OrganisationToRemove" : {
-              "classification" : "PUBLIC",
-              "value" : {
-                "OrganisationID" : "PUBLIC"
-              }
-            }
-          }
-        }
       }
     }
   }

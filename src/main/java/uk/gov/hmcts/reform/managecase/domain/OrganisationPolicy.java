@@ -21,5 +21,7 @@ public class OrganisationPolicy {
     private String orgPolicyCaseAssignedRole;
     @JsonProperty("PreviousOrganisations")
     private List<PreviousOrganisationCollectionItem> previousOrganisations;
+    @JsonProperty("LastNoCRequestedBy")
+    private String lastNoCRequestedBy;
 
 }

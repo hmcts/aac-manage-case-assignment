@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
+import uk.gov.hmcts.reform.managecase.data.user.CachedUserRepository;
+import uk.gov.hmcts.reform.managecase.data.user.UserRepository;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.DynamicList;
 import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
@@ -42,6 +44,7 @@ public class RequestNoticeOfChangeService {
 
     private final DataStoreRepository dataStoreRepository;
     private final DefinitionStoreRepository definitionStoreRepository;
+    private final UserRepository userRepository;
     private final PrdRepository prdRepository;
     private final JacksonUtils jacksonUtils;
     private final SecurityUtils securityUtils;
@@ -53,12 +56,15 @@ public class RequestNoticeOfChangeService {
                                         DefinitionStoreRepository definitionStoreRepository,
                                         PrdRepository prdRepository,
                                         JacksonUtils jacksonUtils,
-                                        SecurityUtils securityUtils) {
+                                        SecurityUtils securityUtils,
+                                        @Qualifier(CachedUserRepository.QUALIFIER)
+                                                UserRepository userRepository) {
         this.dataStoreRepository = dataStoreRepository;
         this.definitionStoreRepository = definitionStoreRepository;
         this.prdRepository = prdRepository;
         this.jacksonUtils = jacksonUtils;
         this.securityUtils = securityUtils;
+        this.userRepository = userRepository;
     }
 
     public RequestNoticeOfChangeResponse requestNoticeOfChange(NoCRequestDetails noCRequestDetails) {
@@ -151,6 +157,7 @@ public class RequestNoticeOfChangeService {
             .organisationToAdd(invokersOrganisation)
             .organisationToRemove(incumbentOrganisation)
             .requestTimestamp(LocalDateTime.now())
+            .createdBy(userRepository.getUser().getEmail())
             .build();
 
         // Submit the NoCRequest event + event token.  This action will trigger a submitted callback to the

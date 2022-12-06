@@ -11,6 +11,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.endpoint.web.WebEndpointsSupplier;
+import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,6 +41,8 @@ import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -87,6 +91,12 @@ public class CaseAssignmentControllerTest {
 
         @MockBean
         protected CaseAssignmentService service;
+
+        @MockBean
+        protected WebEndpointsSupplier webEndpointsSupplier;
+
+        @MockBean
+        protected WebMvcEndpointHandlerMapping webMvcEndpointHandlerMapping;
 
         @Autowired
         protected ObjectMapper objectMapper;
@@ -285,7 +295,8 @@ public class CaseAssignmentControllerTest {
                                              Charset.defaultCharset(), null
             );
             given(service.getCaseAssignments(List.of(caseIds)))
-                .willThrow(new FeignException.NotFound("404", request, "data store failure".getBytes()));
+                .willThrow(new FeignException.NotFound("404", request, "data store failure".getBytes(),
+                                                       new HashMap<String, Collection<String>>()));
 
             this.mockMvc.perform(get(CASE_ASSIGNMENTS_PATH)
                                      .queryParam("case_ids", caseIds))

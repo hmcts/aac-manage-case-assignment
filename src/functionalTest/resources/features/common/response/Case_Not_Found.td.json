@@ -1,0 +1,27 @@
+{
+  "_guid_": "Case_Not_Found",
+
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve a case by ID",
+
+  "method": "GET",
+  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/cases/{caseId}",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": "true"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_" : "Common_404_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+      "message" : "No case found for reference: ${[scenarioContext][testData][request][pathVariables][caseId]}",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

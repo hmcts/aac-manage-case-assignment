@@ -34,6 +34,7 @@ class AdditionalTestOfLombokAnnotationsTest {
             EqualsVerifier
                 .forClass(RequestedCaseUnassignment.class)
                 .suppress(Warning.STRICT_INHERITANCE)
+                .suppress(Warning.NONFINAL_FIELDS)
                 .verify();
         }
 
@@ -54,6 +55,7 @@ class AdditionalTestOfLombokAnnotationsTest {
             EqualsVerifier.forClass(RequestedCaseUnassignment.class)
                 .withRedefinedSuperclass()
                 .withRedefinedSubclass(SubRequestedCaseUnassignment.class)
+                .suppress(Warning.NONFINAL_FIELDS)
                 .verify();
         }
     }

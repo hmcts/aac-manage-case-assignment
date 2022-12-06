@@ -81,7 +81,8 @@
           "OrganisationToRemove": {
             "OrganisationID": "Org1"
           },
-          "ApprovalStatus": "0"
+          "ApprovalStatus": "0",
+          "CreatedBy" : null
         },
         "applicantOrganisationPolicy": {
           "OrgPolicyReference": "ApplicantPolicy",

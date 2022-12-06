@@ -1,0 +1,19 @@
+{
+  "_guid_": "F_209_get_case_users_richard_not_assigned",
+  "_extends_": "F_209_get_case_users_base",
+
+
+  "specs": [
+    "to verify that Richard and anyone else in Richard's organisation has had their access removed"
+  ],
+
+
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams" : {
+      "case_ids" : "${[scenarioContext][ParentContext][childContexts][F-209_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}"
+    }
+  }
+
+
+}

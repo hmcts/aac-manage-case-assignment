@@ -176,6 +176,7 @@ public class NoticeOfChangeControllerIT {
         Organisation organisationToAdd = Organisation.builder().organisationID("QUK822N").build();
         ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
             .organisationToAdd(organisationToAdd)
+            .createdBy("CreatedByUser")
             .build();
 
         OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
@@ -338,7 +339,7 @@ public class NoticeOfChangeControllerIT {
                 .userId(USER_ID_2)
                 .caseRole(ORG_POLICY_2_ROLE)
                 .build();
-            stubGetCaseAssignments(singletonList(CASE_ID), singletonList(caseUserRole));
+            stubGetCaseAssignments(singletonList(CASE_ID), null, singletonList(caseUserRole));
             stubGetUsersByOrganisationInternal(usersByOrganisation(user(USER_ID_1), user(USER_ID_2)), ORG_2_ID);
             stubUnassignCase(singletonList(
                 new CaseUserRoleWithOrganisation(CASE_ID, USER_ID_2, ORG_POLICY_2_ROLE, ORG_2_ID)));
@@ -711,6 +712,7 @@ public class NoticeOfChangeControllerIT {
             Organisation organisationToAdd = Organisation.builder().organisationID(ORGANISATION_ID).build();
             ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
                 .organisationToAdd(organisationToAdd)
+                .createdBy("CreatedByUser")
                 .build();
 
             OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
@@ -763,7 +765,8 @@ public class NoticeOfChangeControllerIT {
             OrganisationPolicy orgPolicy = new OrganisationPolicy(org,
                                                                   null,
                                                                   "Applicant",
-                                                                  Lists.newArrayList());
+                                                                  Lists.newArrayList(),
+                "createdByUser");
 
             caseFields.put("OrganisationPolicy", mapper.convertValue(orgPolicy,  JsonNode.class));
 

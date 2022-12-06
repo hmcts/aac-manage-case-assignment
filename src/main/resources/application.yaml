@@ -5,7 +5,7 @@ server:
 management:
   endpoint:
     health:
-      show-details: "always"
+      show-details: always
       cache:
         time-to-live: 10s
   endpoints:
@@ -17,6 +17,11 @@ management:
     probes:
       enabled: true
 spring:
+  # CCD-3509 CVE-2021-22044 spring.mvc.pathmatch.matching-strategy = ant_path_matcher
+  # required to fix null pointers in integration tests, conflict in Springfox after Springboot 2.6.10 upgrade
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   application:
     name: Manage Case Assignment
   banner:
@@ -57,7 +62,7 @@ idam:
     totp_secret: ${MANAGE_CASE_S2S_KEY:AAAAAAAAAAAAAAAA}
     url: ${S2S_URL:http://localhost:4502}
   s2s-authorised:
-    services: ${MANAGE_CASE_S2S_AUTHORISED_SERVICES:xui_webapp,ccd_data,finrem_case_orchestration}
+    services: ${MANAGE_CASE_S2S_AUTHORISED_SERVICES:xui_webapp,ccd_data,finrem_case_orchestration,prl_cos_api}
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 

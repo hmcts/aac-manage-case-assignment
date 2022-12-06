@@ -39,9 +39,11 @@ class PrdFeignClientTest {
             .body("Successful", StandardCharsets.UTF_8)
             .build();
         Response response = prdFeignClient.checkResponse(defaultResponse);
+        byte[] responseBodyByteArray = response.body().asInputStream().readAllBytes();
+        String responseBodyString = new String(responseBodyByteArray, StandardCharsets.UTF_8);
         assertEquals(200, response.status());
         assertNotNull(response.body());
-        assertEquals("Successful", response.body().toString());
+        assertEquals("Successful", responseBodyString);
     }
 
     @Test
@@ -77,9 +79,11 @@ class PrdFeignClientTest {
             .body("Successful", StandardCharsets.UTF_8)
             .build();
         Response response = prdFeignClient.checkResponse(defaultResponse);
+        byte[] responseBodyByteArray = response.body().asInputStream().readAllBytes();
+        String responseBodyString = new String(responseBodyByteArray, StandardCharsets.UTF_8);
         assertEquals(400, response.status());
         assertNotNull(response.body());
-        assertEquals("Successful", response.body().toString());
+        assertEquals("Successful", responseBodyString);
     }
 
     @Test

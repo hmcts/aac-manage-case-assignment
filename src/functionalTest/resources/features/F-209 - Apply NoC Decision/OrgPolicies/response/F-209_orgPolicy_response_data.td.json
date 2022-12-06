@@ -1,0 +1,26 @@
+{
+  "_guid_" : "F-209_orgPolicy_response_data",
+  "_extends_" : "F-209_orgPolicy_response_data_no_previous_org",
+    "applicantOrganisationPolicy": {
+      "PreviousOrganisations": [
+        {
+          "id": null,
+          "value": {
+            "OrganisationName": "BEFTA Organisation2",
+            "FromTimestamp": null,
+            "ToTimestamp": "[[ANYTHING_PRESENT]]",
+            "OrganisationAddress": {
+              "AddressLine1": "Org 2 Line 1",
+              "AddressLine2": "Org 2 Line 2",
+              "AddressLine3": null,
+              "PostTown": "London",
+              "County": null,
+              "Country": null,
+              "PostCode": "SW1H 9GL"
+            }
+          }
+        }
+      ],
+      "LastNoCRequestedBy" : "someUser"
+    }
+}

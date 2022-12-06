@@ -1,0 +1,30 @@
+{
+  "_guid_": "F_209_get_case_users_base",
+  "_extends_": "Get_Case_Access__Base",
+  "title": "Verify Access to Case",
+
+
+  "s2sClientId": "aac_manage_case_assignment",
+  "userTokenClientId": "xuiwebapp",
+
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
+  "request": {
+    "body" : {
+      "case_ids": [
+        "${[scenarioContext][ParentContext][childContexts][F-209_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}"
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_users" : [ ]
+    }
+  }
+}

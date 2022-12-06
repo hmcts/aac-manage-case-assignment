@@ -1,0 +1,35 @@
+{
+  "_guid_": "F-209_Delete_Creator_Role",
+  "_extends_": "Delete_Case_Access__Base",
+  "title": "Remove Access to Case",
+
+
+  "s2sClientId": "aac_manage_case_assignment",
+  "userTokenClientId": "xuiwebapp",
+
+
+  "specs": [
+    "to remove CREATOR assigned CaseRole"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    },
+      "S1": {
+        "_extends_": "ACA_Users_Richard"
+      }
+  },
+
+  "request": {
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][ParentContext][childContexts][F-209_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}",
+          "case_role": "[CREATOR]",
+          "user_id": "${[scenarioContext][testData][users][S1][id]}"
+        }
+      ]
+    }
+  }
+}

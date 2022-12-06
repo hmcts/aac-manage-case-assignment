@@ -1,0 +1,16 @@
+{
+  "_guid_": "F-209_Assign_Access_Base",
+  "_extends_": "Assign_Case_Access__Base",
+  "title": "Assign Access to Case",
+
+  
+  "s2sClientId": "aac_manage_case_assignment",
+  "userTokenClientId": "xuiwebapp",
+
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  }
+}

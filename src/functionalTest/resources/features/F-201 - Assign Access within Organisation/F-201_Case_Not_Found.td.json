@@ -1,0 +1,27 @@
+{
+  "_guid_": "F-201_Case_Not_Found",
+  "_extends_": "Case_Not_Found",
+
+  "specs" : [
+    "by S2 to access the case created by S1"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Benjamin"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][parentContext][childContexts][F-201_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "path" : "/cases/${[scenarioContext][parentContext][childContexts][F-201_Prerequisite_Case_Creation_C1][testData][actualResponse][body][id]}"
+    }
+  }
+}
+

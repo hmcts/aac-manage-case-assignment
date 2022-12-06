@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Lists;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.validation.ValidationException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -137,10 +139,10 @@ class ApplyNoCDecisionServiceTest {
             () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
             () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
                 is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
-                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
+                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null))),
             () -> assertThat(result.get(ORG_POLICY_2_FIELD).toString(),
                 is(orgPolicyAsString(null, null,
-                    ORG_POLICY_2_REF, ORG_POLICY_2_ROLE)))
+                    ORG_POLICY_2_REF, ORG_POLICY_2_ROLE, null)))
         );
     }
 
@@ -189,12 +191,50 @@ class ApplyNoCDecisionServiceTest {
     }
 
     @Test
+    void shouldRemoveOneExistingOrgUsersWithAccessWhenRemoveDecisionIsApplied() throws JsonProcessingException {
+        CaseDetails caseDetails = CaseDetails.builder()
+            .data(createSingleOrgData())
+            .id(CASE_ID)
+            .build();
+
+        List<CaseUserRole> existingCaseAssignments = List.of(
+            new CaseUserRole(CASE_ID, USER_ID_1, ORG_POLICY_1_ROLE),
+            new CaseUserRole(CASE_ID, USER_ID_1, ORG_POLICY_2_ROLE)
+        );
+        when(dataStoreRepository.getCaseAssignments(singletonList(CASE_ID), null))
+            .thenReturn(existingCaseAssignments);
+
+        FindUsersByOrganisationResponse usersByOrganisation = new FindUsersByOrganisationResponse(List.of(
+            prdUser(1)), ORG_1_ID);
+        when(prdRepository.findUsersByOrganisation(ORG_1_ID)).thenReturn(usersByOrganisation);
+
+        ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
+
+        applyNoCDecisionService.applyNoCDecision(request);
+
+        assertAll(
+            () -> verify(dataStoreRepository).removeCaseUserRoles(caseUserRolesCaptor.capture(),
+                Mockito.eq(ORG_1_ID)),
+            () -> assertThat(caseUserRolesCaptor.getValue().size(), is(1)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getUserId(), is(USER_ID_1)),
+            () -> assertThat(caseUserRolesCaptor.getValue().get(0).getCaseRole(), is(ORG_POLICY_2_ROLE)),
+            () -> verify(notifyService).sendEmail(emailRequestsCaptor.capture()),
+            () -> assertThat(emailRequestsCaptor.getValue().size(), is(1)),
+            () -> assertThat(emailRequestsCaptor.getValue().get(0).getCaseId(), is(CASE_ID)),
+            () -> assertThat(emailRequestsCaptor.getValue().get(0).getEmailAddress(), is("User1Email")),
+            () -> verify(dataStoreRepository, never())
+                .assignCase(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())
+        );
+    }
+
+    @Test
     void shouldUpdateCaseDataWhenAddDecisionIsApplied() throws JsonProcessingException {
         LocalDateTime dateTime = LocalDateTime.now();
         CaseDetails caseDetails = CaseDetails.builder()
             .data(createData(
-                orgPolicyAsString(null, null, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
-                orgPolicyAsString(null, null, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
+                orgPolicyAsString(null, null, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null),
+                orgPolicyAsString(null, null, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE, null),
                 organisationAsString(ORG_3_ID, ORG_3_NAME),
                 organisationAsString(null, null)
             ))
@@ -215,7 +255,7 @@ class ApplyNoCDecisionServiceTest {
             () -> assertThat(
                 result.get(ORG_POLICY_1_FIELD).toString(),
                 is(orgPolicyAsString(null, null,
-                                     ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
+                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null))),
             () -> assertNotNull(arrayNode),
             () -> assertThat(arrayNode.size(), is(1)),
             () -> assertFalse(arrayNode.get(0).findValue("ToTimestamp").isNull()),
@@ -229,8 +269,8 @@ class ApplyNoCDecisionServiceTest {
     void shouldUpdateOrgUsersAccessWhenAddDecisionIsApplied() throws JsonProcessingException {
         CaseDetails caseDetails = CaseDetails.builder()
             .data(createData(
-                orgPolicyAsString(null, null, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
-                orgPolicyAsString(null, null, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
+                orgPolicyAsString(null, null, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null),
+                orgPolicyAsString(null, null, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE, null),
                 organisationAsString(ORG_3_ID, ORG_3_NAME),
                 organisationAsString(null, null)
             ))
@@ -272,8 +312,8 @@ class ApplyNoCDecisionServiceTest {
     void shouldUpdateCaseDataWhenReplaceDecisionIsApplied() throws JsonProcessingException {
         CaseDetails caseDetails = CaseDetails.builder()
             .data(createData(
-                orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
-                orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
+                orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null),
+                orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE, null),
                 organisationAsString(ORG_3_ID, ORG_3_NAME),
                 organisationAsString(ORG_2_ID, ORG_2_NAME)
             ))
@@ -294,10 +334,10 @@ class ApplyNoCDecisionServiceTest {
             () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
             () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
                 is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
-                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
+                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null))),
             () -> assertThat(result.get(ORG_POLICY_2_FIELD).toString(),
                 is(orgPolicyAsString(ORG_3_ID, ORG_3_NAME,
-                    ORG_POLICY_2_REF, ORG_POLICY_2_ROLE)))
+                    ORG_POLICY_2_REF, ORG_POLICY_2_ROLE, "userEmail")))
         );
     }
 
@@ -305,8 +345,8 @@ class ApplyNoCDecisionServiceTest {
     void shouldUpdateOrgUsersAccessWhenReplaceDecisionIsApplied1() throws JsonProcessingException {
         CaseDetails caseDetails = CaseDetails.builder()
             .data(createData(
-                orgPolicyAsString(null, null, null, null),
-                orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
+                orgPolicyAsString(null, null, null, null, "userOne"),
+                orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE, "userOne"),
                 organisationAsString(ORG_3_ID, ORG_3_NAME),
                 organisationAsString(ORG_2_ID, ORG_2_NAME)
             ))
@@ -356,8 +396,8 @@ class ApplyNoCDecisionServiceTest {
     void shouldUpdateOrgUsersAccessWhenReplaceDecisionIsApplied2() throws JsonProcessingException {
         CaseDetails caseDetails = CaseDetails.builder()
             .data(createData(
-                orgPolicyAsString(null, null, null, null),
-                orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
+                orgPolicyAsString(null, null, null, null, null),
+                orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE, null),
                 organisationAsString(ORG_1_ID, ORG_1_NAME),
                 organisationAsString(ORG_2_ID, ORG_2_NAME)
             ))
@@ -418,10 +458,10 @@ class ApplyNoCDecisionServiceTest {
             () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
             () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
                 is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
-                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
+                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null))),
             () -> assertThat(result.get(ORG_POLICY_2_FIELD).toString(),
                 is(orgPolicyAsString(ORG_2_ID, ORG_2_NAME,
-                    ORG_POLICY_2_REF, ORG_POLICY_2_ROLE)))
+                    ORG_POLICY_2_REF, ORG_POLICY_2_ROLE, null)))
         );
     }
 
@@ -579,7 +619,7 @@ class ApplyNoCDecisionServiceTest {
         assertAll(
             () -> assertThat(exception.getMessage(),
                 is("Fields of type ChangeOrganisationRequest must include both "
-                    + "an OrganisationToAdd and OrganisationToRemove field."))
+                   + "an OrganisationToAdd and OrganisationToRemove field."))
         );
     }
 
@@ -614,7 +654,7 @@ class ApplyNoCDecisionServiceTest {
 
         when(prdRepository.findOrganisationAddress(ORG_2_ID))
             .thenReturn(new FindOrganisationResponse(Lists.newArrayList(orgContactInformation()),
-                                                     ORG_2_ID, ORG_2_NAME));
+                ORG_2_ID, ORG_2_NAME));
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
@@ -624,8 +664,8 @@ class ApplyNoCDecisionServiceTest {
         assertAll(
             () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
             () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
-                             is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
-                                                  ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
+                is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
+                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null))),
             () -> assertNotNull(arrayNode),
             () -> assertNotNull(arrayNode.get(0).findValue("FromTimestamp")),
             () -> assertNotNull(arrayNode.get(0).findValue("ToTimestamp")),
@@ -650,7 +690,7 @@ class ApplyNoCDecisionServiceTest {
 
         when(prdRepository.findOrganisationAddress(ORG_2_ID))
             .thenReturn(new FindOrganisationResponse(Lists.newArrayList(orgContactInformation()),
-                                                     ORG_2_ID, ORG_2_NAME));
+                ORG_2_ID, ORG_2_NAME));
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
@@ -662,7 +702,7 @@ class ApplyNoCDecisionServiceTest {
             () -> assertThat(
                 result.get(ORG_POLICY_1_FIELD).toString(),
                 is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
-                                     ORG_POLICY_1_REF, ORG_POLICY_1_ROLE
+                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null
                 ))
             ),
             () -> assertNotNull(arrayNode),
@@ -697,7 +737,7 @@ class ApplyNoCDecisionServiceTest {
             () -> assertThat(
                 result.get(ORG_POLICY_1_FIELD).toString(),
                 is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
-                                     ORG_POLICY_1_REF, ORG_POLICY_1_ROLE
+                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null
                 ))
             ),
             () -> assertNotNull(arrayNode),
@@ -718,7 +758,7 @@ class ApplyNoCDecisionServiceTest {
         LocalDate toDate2 = LocalDate.of(2020, Month.DECEMBER, 3);
         CaseDetails caseDetails = CaseDetails.builder()
             .data(createPreviousOrgData(Lists.newArrayList(createPreviousOrganisation(fromDate, toDate),
-                                                           createPreviousOrganisation(fromDate2, toDate2))))
+                createPreviousOrganisation(fromDate2, toDate2))))
             .createdDate(LocalDateTime.now())
             .id(CASE_ID)
             .build();
@@ -729,7 +769,7 @@ class ApplyNoCDecisionServiceTest {
 
         when(prdRepository.findOrganisationAddress(ORG_2_ID))
             .thenReturn(new FindOrganisationResponse(Lists.newArrayList(orgContactInformation()),
-                                                     ORG_2_ID, ORG_2_NAME));
+                ORG_2_ID, ORG_2_NAME));
 
         ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(caseDetails);
 
@@ -737,14 +777,15 @@ class ApplyNoCDecisionServiceTest {
 
         JsonNode prevOrgsNode = result.get(ORG_POLICY_2_FIELD).findValue(PREVIOUS_ORGANISATIONS);
         List<PreviousOrganisationCollectionItem> previousOrganisations = mapper
-            .readerFor(new TypeReference<List<PreviousOrganisationCollectionItem>>() {}).readValue(prevOrgsNode);
+            .readerFor(new TypeReference<List<PreviousOrganisationCollectionItem>>() {
+            }).readValue(prevOrgsNode);
         LocalDate localDate = LocalDate.now();
 
         assertAll(
             () -> assertThat(result.get(CHANGE_ORG_REQUEST_FIELD).toString(), is(emptyChangeOrgRequestField())),
             () -> assertThat(result.get(ORG_POLICY_1_FIELD).toString(),
-                             is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
-                                                  ORG_POLICY_1_REF, ORG_POLICY_1_ROLE))),
+                is(orgPolicyAsString(ORG_1_ID, ORG_1_NAME,
+                    ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null))),
             () -> assertNotNull(previousOrganisations),
             () -> assertThat(previousOrganisations.size(), is(3)),
             () -> assertNotNull(previousOrganisations.get(0).getValue().getFromTimestamp()),
@@ -752,7 +793,7 @@ class ApplyNoCDecisionServiceTest {
             () -> assertNotNull(previousOrganisations.get(0).getValue().getOrganisationAddress()),
             () -> assertThat(previousOrganisations.get(0).getValue().getFromTimestamp().getDayOfMonth(), is(3)),
             () -> assertThat(previousOrganisations.get(0).getValue().getToTimestamp().getDayOfMonth(),
-                             is(localDate.getDayOfMonth()))
+                is(localDate.getDayOfMonth()))
         );
     }
 
@@ -788,7 +829,8 @@ class ApplyNoCDecisionServiceTest {
     }
 
     private ProfessionalUser prdUser(int id) {
-        return new ProfessionalUser("UserId" + id, "fn" + id, "ln5" + id, String.format("User%sEmail", id), "active");
+        return new ProfessionalUser("UserId" + id, "fn" + id, "ln5" + id,
+            String.format("User%sEmail", id), "active");
     }
 
     private String orgPolicyAsStringWithPreviousOrg(String organisationId,
@@ -797,11 +839,11 @@ class ApplyNoCDecisionServiceTest {
                                                     String orgPolicyCaseAssignedRole,
                                                     List<PreviousOrganisationCollectionItem> previousOrganisations) {
         return String.format("{\"Organisation\":%s,\"OrgPolicyReference\":%s,\"OrgPolicyCaseAssignedRole\":%s, "
-                                 + "\"PreviousOrganisations\":%s}",
-                             organisationAsString(organisationId, organisationName),
-                             stringValueAsJson(orgPolicyReference),
-                             stringValueAsJson(orgPolicyCaseAssignedRole),
-                             listValueAsJson(previousOrganisations));
+                             + "\"PreviousOrganisations\":%s}",
+            organisationAsString(organisationId, organisationName),
+            stringValueAsJson(orgPolicyReference),
+            stringValueAsJson(orgPolicyCaseAssignedRole),
+            listValueAsJson(previousOrganisations));
     }
 
     private String listValueAsJson(List<PreviousOrganisationCollectionItem> previousOrganisations) {
@@ -815,10 +857,12 @@ class ApplyNoCDecisionServiceTest {
     private String orgPolicyAsString(String organisationId,
                                      String organisationName,
                                      String orgPolicyReference,
-                                     String orgPolicyCaseAssignedRole) {
-        return String.format("{\"Organisation\":%s,\"OrgPolicyReference\":%s,\"OrgPolicyCaseAssignedRole\":%s}",
+                                     String orgPolicyCaseAssignedRole, String createdBy) {
+        return String.format("{\"Organisation\":%s,\"OrgPolicyReference\":%s,\"OrgPolicyCaseAssignedRole\":%s,"
+                             + "\"LastNoCRequestedBy\":%s}",
             organisationAsString(organisationId, organisationName),
-            stringValueAsJson(orgPolicyReference), stringValueAsJson(orgPolicyCaseAssignedRole));
+            stringValueAsJson(orgPolicyReference), stringValueAsJson(orgPolicyCaseAssignedRole),
+            stringValueAsJson(createdBy));
     }
 
     private String organisationAsString(String organisationId,
@@ -833,28 +877,29 @@ class ApplyNoCDecisionServiceTest {
 
     private String emptyChangeOrgRequestField() {
         return "{\"Reason\":null,\"CaseRoleId\":null,\"NotesReason\":null,"
-            + "\"ApprovalStatus\":null,\"RequestTimestamp\":null,\"OrganisationToAdd\":"
-            + "{\"OrganisationID\":null,\"OrganisationName\":null},\"OrganisationToRemove\":"
-            + "{\"OrganisationID\":null,\"OrganisationName\":null},\"ApprovalRejectionTimestamp\":null}";
+               + "\"ApprovalStatus\":null,\"RequestTimestamp\":null,\"OrganisationToAdd\":"
+               + "{\"OrganisationID\":null,\"OrganisationName\":null},"
+               + "\"OrganisationToRemove\":{\"OrganisationID\":null,\"OrganisationName\":null},"
+               + "\"ApprovalRejectionTimestamp\":null,\"CreatedBy\":null}";
     }
 
     private String caseRoleIdField(String selectedCode) {
         return String.format("{\n"
-            + "\"value\":  {\n"
-            + "     \"code\": \"%s\",\n"
-            + "     \"label\": \"SomeLabel (Not used)\"\n"
-            + "},\n"
-            + "\"list_items\" : [\n"
-            + "     {\n"
-            + "         \"code\": \"[Defendant]\",\n"
-            + "         \"label\": \"Defendant\"\n"
-            + "     },\n"
-            + "     {\n"
-            + "         \"code\": \"[Claimant]\",\n"
-            + "         \"label\": \"Claimant\"\n"
-            + "     }\n"
-            + "]\n"
-            + "}\n", selectedCode);
+                             + "\"value\":  {\n"
+                             + "     \"code\": \"%s\",\n"
+                             + "     \"label\": \"SomeLabel (Not used)\"\n"
+                             + "},\n"
+                             + "\"list_items\" : [\n"
+                             + "     {\n"
+                             + "         \"code\": \"[Defendant]\",\n"
+                             + "         \"label\": \"Defendant\"\n"
+                             + "     },\n"
+                             + "     {\n"
+                             + "         \"code\": \"[Claimant]\",\n"
+                             + "         \"label\": \"Claimant\"\n"
+                             + "     }\n"
+                             + "]\n"
+                             + "}\n", selectedCode);
     }
 
     private Map<String, JsonNode> createData(String organisationPolicy1,
@@ -862,28 +907,37 @@ class ApplyNoCDecisionServiceTest {
                                              String organisationToAdd,
                                              String organisationToRemove) throws JsonProcessingException {
         return mapper.convertValue(mapper.readTree(String.format("{\n"
-                + "    \"TextField\": \"TextFieldValue\",\n"
-                + "    \"OrganisationPolicyField1\": %s,\n"
-                + "    \"OrganisationPolicyField2\": %s,\n"
-                + "    \"ChangeOrganisationRequestField\": {\n"
-                + "        \"Reason\": null,\n"
-                + "        \"CaseRoleId\": %s,\n"
-                + "        \"NotesReason\": \"a\",\n"
-                + "        \"ApprovalStatus\": 1,\n"
-                + "        \"RequestTimestamp\": null,\n"
-                + "        \"OrganisationToAdd\": %s,\n"
-                + "        \"OrganisationToRemove\": %s,\n"
-                + "        \"ApprovalRejectionTimestamp\": null\n"
-                + "    }\n"
-                + "}", organisationPolicy1, organisationPolicy2, caseRoleIdField("[Claimant]"),
+                                                                 + "    \"TextField\": \"TextFieldValue\",\n"
+                                                                 + "    \"OrganisationPolicyField1\": %s,\n"
+                                                                 + "    \"OrganisationPolicyField2\": %s,\n"
+                                                                 + "    \"ChangeOrganisationRequestField\": {\n"
+                                                                 + "        \"Reason\": null,\n"
+                                                                 + "        \"CaseRoleId\": %s,\n"
+                                                                 + "        \"NotesReason\": \"a\",\n"
+                                                                 + "        \"ApprovalStatus\": 1,\n"
+                                                                 + "        \"RequestTimestamp\": null,\n"
+                                                                 + "        \"OrganisationToAdd\": %s,\n"
+                                                                 + "        \"OrganisationToRemove\": %s,\n"
+                                                                 + "        \"ApprovalRejectionTimestamp\": null,\n"
+                                                                 + "        \"CreatedBy\": \"userEmail\"\n"
+                                                                 + "    }\n"
+                                                                 + "}", organisationPolicy1,
+            organisationPolicy2, caseRoleIdField("[Claimant]"),
             organisationToAdd, organisationToRemove)), getHashMapTypeReference());
     }
 
     private Map<String, JsonNode> createData() throws JsonProcessingException {
-        return createData(orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
-            orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE),
+        return createData(orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null),
+            orgPolicyAsString(ORG_2_ID, ORG_2_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE, null),
             organisationAsString(null, null),
             organisationAsString(ORG_2_ID, ORG_2_NAME));
+    }
+
+    private Map<String, JsonNode> createSingleOrgData() throws JsonProcessingException {
+        return createData(orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null),
+            orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_2_REF, ORG_POLICY_2_ROLE, null),
+            organisationAsString(null, null),
+            organisationAsString(ORG_1_ID, ORG_1_NAME));
     }
 
     private Map<String, JsonNode> createPreviousOrgData(List<PreviousOrganisation> previousOrganisations)
@@ -894,23 +948,23 @@ class ApplyNoCDecisionServiceTest {
             .map(org -> new PreviousOrganisationCollectionItem(UUID.randomUUID().toString(), org))
             .collect(Collectors.toList());
 
-        return createData(orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
-                      orgPolicyAsStringWithPreviousOrg(ORG_2_ID, ORG_2_NAME,
-                                                       ORG_POLICY_2_REF,
-                                                       ORG_POLICY_2_ROLE,
-                                                       previousOrganisationsCollection),
-                      organisationAsString(null, null),
-                      organisationAsString(ORG_2_ID, ORG_2_NAME));
+        return createData(orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null),
+            orgPolicyAsStringWithPreviousOrg(ORG_2_ID, ORG_2_NAME,
+                ORG_POLICY_2_REF,
+                ORG_POLICY_2_ROLE,
+                previousOrganisationsCollection),
+            organisationAsString(null, null),
+            organisationAsString(ORG_2_ID, ORG_2_NAME));
     }
 
     private Map<String, JsonNode> createAddOrgData()
         throws JsonProcessingException {
-        return createData(orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE),
-                          orgPolicyAsString(ORG_2_ID, ORG_2_NAME,
-                                                           ORG_POLICY_2_REF,
-                                                           ORG_POLICY_2_ROLE),
-                          organisationAsString(ORG_2_ID, ORG_2_NAME),
-                          organisationAsString(null, null));
+        return createData(orgPolicyAsString(ORG_1_ID, ORG_1_NAME, ORG_POLICY_1_REF, ORG_POLICY_1_ROLE, null),
+            orgPolicyAsString(ORG_2_ID, ORG_2_NAME,
+                ORG_POLICY_2_REF,
+                ORG_POLICY_2_ROLE, null),
+            organisationAsString(ORG_2_ID, ORG_2_NAME),
+            organisationAsString(null, null));
     }
 
     private TypeReference<HashMap<String, JsonNode>> getHashMapTypeReference() {

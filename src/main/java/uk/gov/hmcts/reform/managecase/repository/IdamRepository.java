@@ -33,11 +33,11 @@ public class IdamRepository {
     public String getCaaSystemUserAccessToken() {
         String caaUserId = appParams.getCaaSystemUserId();
         String caaPassword = appParams.getCaaSystemUserPassword();
-        LOG.info(String.format("JCDEBUG: IdamRepository: getCaaSystemUserAccessToken: %s  %s", caaUserId, caaPassword));
+        LOG.info("JCDEBUG: IdamRepository: getCaaSystemUserAccessToken: {}  {}", caaUserId, caaPassword);
         try {
             return idamClient.getAccessToken(appParams.getCaaSystemUserId(), appParams.getCaaSystemUserPassword());
         } catch (Exception e) {
-            throw new RuntimeException(String.format("JCDEBUG: IdamRepository: EXCEPTION: %s", e.getMessage(), e));
+            throw new SecurityException(String.format("JCDEBUG: IdamRepository: EXCEPTION: %s", e.getMessage()));
         }
     }
 

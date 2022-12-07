@@ -32,10 +32,6 @@ public class SecurityUtils {
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamRepository idamRepository;
 
-    private void jcdebug(String message) {
-        LOG.info("JCDEBUG: SecurityUtils: " + message);
-    }
-
     @Autowired
     public SecurityUtils(final AuthTokenGenerator authTokenGenerator, IdamRepository idamRepository) {
         this.authTokenGenerator = authTokenGenerator;
@@ -47,7 +43,7 @@ public class SecurityUtils {
     }
 
     public String getCaaSystemUserToken() {
-        jcdebug("getCaaSystemUserToken --> getCaaSystemUserAccessToken");
+        LOG.info("JCDEBUG: SecurityUtils: getCaaSystemUserToken --> getCaaSystemUserAccessToken");
         return idamRepository.getCaaSystemUserAccessToken();
     }
 

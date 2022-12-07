@@ -18,10 +18,6 @@ public class IdamRepository {
     private final IdamClient idamClient;
     private final ApplicationParams appParams;
 
-    private void jcdebug(String message) {
-        LOG.info("JCDEBUG: IdamRepository: " + message);
-    }
-
     @Autowired
     public IdamRepository(IdamClient idamClient, ApplicationParams applicationParams) {
         this.idamClient = idamClient;
@@ -37,12 +33,12 @@ public class IdamRepository {
     public String getCaaSystemUserAccessToken() {
         String caaUserId = appParams.getCaaSystemUserId();
         String caaPassword = appParams.getCaaSystemUserPassword();
-        jcdebug("getCaaSystemUserAccessToken: " + (caaUserId == null ? "NULL" : caaUserId) + "  "
-                    + (caaPassword == null ? "NULL" : caaPassword));
+        LOG.info("JCDEBUG: IdamRepository: getCaaSystemUserAccessToken: " + (caaUserId == null ? "NULL" : caaUserId)
+                     + "  " + (caaPassword == null ? "NULL" : caaPassword));
         try {
             return idamClient.getAccessToken(appParams.getCaaSystemUserId(), appParams.getCaaSystemUserPassword());
         } catch (Exception e) {
-            jcdebug("EXCEPTION: " + e.getMessage());
+            LOG.info("JCDEBUG: IdamRepository: EXCEPTION: " + e.getMessage());
             throw e;
         }
     }

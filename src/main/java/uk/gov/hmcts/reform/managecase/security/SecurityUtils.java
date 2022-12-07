@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.managecase.security;
 
 import com.auth0.jwt.JWT;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 public class SecurityUtils {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityUtils.class);
+
     private static final Pattern SOLICITOR_ROLE = Pattern.compile(".+-solicitor$", Pattern.CASE_INSENSITIVE);
 
     public static final String BEARER = "Bearer ";
@@ -27,6 +31,10 @@ public class SecurityUtils {
 
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamRepository idamRepository;
+
+    private void jcdebug(String message) {
+        LOG.info("JCDEBUG: SecurityUtils: " + message);
+    }
 
     @Autowired
     public SecurityUtils(final AuthTokenGenerator authTokenGenerator, IdamRepository idamRepository) {
@@ -39,6 +47,7 @@ public class SecurityUtils {
     }
 
     public String getCaaSystemUserToken() {
+        jcdebug("getCaaSystemUserToken --> getCaaSystemUserAccessToken");
         return idamRepository.getCaaSystemUserAccessToken();
     }
 

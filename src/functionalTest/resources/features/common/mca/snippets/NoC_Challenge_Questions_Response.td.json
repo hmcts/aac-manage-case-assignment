@@ -23,7 +23,7 @@
       "challenge_question_id" : "NoCChallenge",
       "answer_field" : null,
       "question_id" : "NoC_Challenge_Name",
-      "ignore_null_fields" : false
+      "ignore_null_fields" : true
     },
     {
       "case_type_id" : "FT_NoCCaseType",

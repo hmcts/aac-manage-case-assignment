@@ -15,7 +15,8 @@ GradleBuilder builder = new GradleBuilder(this, product)
 // Variables to switch pipeline logic and wiring per type of build
 def definitionStoreDevelopPr = "PR-1174"  // This doesn't change frequently, but when it does, only change this value.
 def dataStoreApiDevelopPr    = "PR-2163" // This doesn't change frequently, but when it does, only change this value.
-def prsToUseAat             = "PR-148,PR-161,PR-167,PR-259,PR-264" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
+def prsToUseAat              = "PR-148,PR-161,PR-167,PR-259,PR-264" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
+def prsRunningInIsolation    = "PR-455" // Set this value to a PR number, or add it as a comma-separated value, if PRs for MCA, Data-Store and Def-Store are all configured to run in isolation from other PRs.
 
 def secrets = [
   'rpx-${env}': [
@@ -71,17 +72,17 @@ def vaultOverrides = [
 ]
 
 // vars needed for functional tests
-// Assume a feature build branched off 'develop', with dependencies develop-to-develop.
+// Assume a feature build branched off 'develop', with dependencies develop-to-develop, and URLs below represent jenkins-to-preview.
 env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
 env.CCD_DATA_STORE_API_BASE_URL = "https://ccd-data-store-api-${dataStoreApiDevelopPr}.service.core-compute-preview.internal".toLowerCase()
-env.CALLBACK_FTA_ENABLED = "true"
-
-// NB: this is the callback URL used when testing NOC so its an internal call: data-store.preview -> mca.preview.
-if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
+if (prsRunningInIsolation.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
+  // NB: should only enable CALLBACK tests if PRs for MCA, Data-Store and Def-Store are all configured to run as one isolated group.
   env.CALLBACK_FTA_ENABLED = "true"
-  env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-aat.service.core-compute-aat.internal"
-} else if (env.CALLBACK_FTA_ENABLED == true) {
+  // NB: this is the callback URL used when testing NOC so its an internal call: data-store.preview -> mca.preview.
   env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${env.BRANCH_NAME}-java.aac"
+
+} else {
+  env.CALLBACK_FTA_ENABLED = "false" // in PREVIEW turn off the callback tests as other running pipelines may reset the published callback URLs.
 }
 
 // Other env variables needed for BEFTA.
@@ -133,14 +134,15 @@ withPipeline("java", product, component) {
 
   // Check if the build should be wired to an environment higher than 'preview'.
   if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
-      environmentOfDependencies = env.BRANCH_NAME
-      // use aat environment for dependencies of master and CI/CD builds.
-      if (env.BRANCH_NAME.startsWith("PR") || env.BRANCH_NAME == 'master') {
-          environmentOfDependencies = "aat"
-      }
+    environmentOfDependencies = env.BRANCH_NAME
+    // use aat environment for dependencies of master and CI/CD builds.
+    if (env.BRANCH_NAME.startsWith("PR") || env.BRANCH_NAME == 'master') {
+        environmentOfDependencies = "aat"
+    }
     env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
     env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
     env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
+    env.CALLBACK_FTA_ENABLED = "true" // NB: safe to enable outside of preview as the above URLs provide a naturally isolated set of services.
   }
 
   echo "FTA will use Definition Store: ${env.DEFINITION_STORE_URL_BASE}"

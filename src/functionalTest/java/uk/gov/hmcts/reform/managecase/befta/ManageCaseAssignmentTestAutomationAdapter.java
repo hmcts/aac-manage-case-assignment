@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.managecase.befta;
 
+import io.cucumber.java.Before;
+import org.junit.AssumptionViolatedException;
 import uk.gov.hmcts.befta.BeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
@@ -13,7 +15,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Optional.ofNullable;
+
 public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutomationAdapter {
+
+    @Before("@callbackTests")
+    public void skipCallbackTestsIfNotEnabled() {
+        if (!ofNullable(System.getenv("CALLBACK_FTA_ENABLED")).map(Boolean::valueOf).orElse(false)) {
+            throw new AssumptionViolatedException("Callback tests not Enabled");
+        }
+    }
 
     @Override
     protected BeftaTestDataLoader buildTestDataLoader() {

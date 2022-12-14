@@ -8,7 +8,7 @@ Background:
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-85 / AC-1
-@S-207.1
+@S-207.1 @callbackTests
 Scenario: (Happy Path) Successful verification that checks a NoCRequest has been auto-approved (Solicitor)
 
   Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
@@ -26,7 +26,7 @@ Scenario: (Happy Path) Successful verification that checks a NoCRequest has been
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-85 / AC-2
-  @S-207.2
+  @S-207.2 @callbackTests
   Scenario: (Happy Path) Successful verification that checks a NoCRequest has been auto-approved - Case has not been configured with auto-approval (0).
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],

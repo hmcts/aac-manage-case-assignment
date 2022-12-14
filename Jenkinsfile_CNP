@@ -79,7 +79,7 @@ env.CCD_DATA_STORE_API_BASE_URL = "https://ccd-data-store-api-${dataStoreApiDeve
 if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
   env.CALLBACK_FTA_ENABLED = "true"
   env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-aat.service.core-compute-aat.internal"
-} else if (env.CALLBACK_FTA_ENABLED = "true") {
+} else if (env.CALLBACK_FTA_ENABLED == true) {
   env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${env.BRANCH_NAME}-java.aac"
 }
 

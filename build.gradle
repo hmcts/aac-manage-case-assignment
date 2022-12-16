@@ -376,9 +376,9 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.10-prerelease')
+  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.19.10')
 
-  testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.6'
+  testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.9'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath

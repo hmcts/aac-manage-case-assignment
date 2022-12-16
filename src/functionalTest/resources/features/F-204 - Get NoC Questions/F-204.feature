@@ -7,7 +7,7 @@ Feature: F-204 Get Notice of Change Questions
     Given an appropriate test context as detailed in the test data source,
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-204.1
+  @S-204.1 @Ignore #CCD-4090
   Scenario: NoC questions successfully returned for a Solicitor user
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
@@ -26,7 +26,7 @@ Feature: F-204 Get Notice of Change Questions
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-204.2
+  @S-204.2 @Ignore #CCD-4090
   Scenario: NoC questions successfully returned for a Case Access Adminisrator
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
@@ -45,7 +45,7 @@ Feature: F-204 Get Notice of Change Questions
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-204.3
+  @S-204.3  @Ignore #CCD-4090
   Scenario: NoC questions successfully returned for a Case Access Administrator and a Solicitor (but the solicitor role is not for the jurisdiction of the case)
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],

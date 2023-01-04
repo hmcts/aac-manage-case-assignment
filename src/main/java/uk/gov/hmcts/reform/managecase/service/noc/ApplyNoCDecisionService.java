@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import feign.FeignException;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.validation.ValidationException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -49,6 +51,8 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.UNKNOWN_NOC_APPROVAL_STATUS;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.APPROVAL_STATUS;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CASE_ROLE_ID;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.CREATED_BY;
+import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.LAST_NOC_REQUESTED_BY;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_ADD;
 import static uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails.ORGANISATION_TO_REMOVE;
@@ -120,6 +124,7 @@ public class ApplyNoCDecisionService {
         JsonNode organisationToRemoveNode = changeOrganisationRequestField.get(ORGANISATION_TO_REMOVE);
         Organisation organisationToAdd = objectMapper.convertValue(organisationToAddNode, Organisation.class);
         Organisation organisationToRemove = objectMapper.convertValue(organisationToRemoveNode, Organisation.class);
+        JsonNode createdBy = changeOrganisationRequestField.get(CREATED_BY);
 
         List<CaseUserRole> existingCaseAssignments = dataStoreRepository
             .getCaseAssignments(singletonList(caseDetails.getId()), null);
@@ -129,7 +134,8 @@ public class ApplyNoCDecisionService {
                 caseDetails.getId());
         } else {
             applyAddOrReplaceRepresentationDecision(existingCaseAssignments, caseRoleId, orgPolicyNode,
-                    organisationToAddNode, organisationToAdd, organisationToRemove, caseDetails.getId());
+                organisationToAddNode, organisationToAdd, organisationToRemove, caseDetails.getId(),
+                createdBy);
         }
 
         setOrgPolicyPreviousOrganisations(caseDetails, organisationToAdd, organisationToRemove, orgPolicyNode);
@@ -137,18 +143,22 @@ public class ApplyNoCDecisionService {
 
     private void validateCorFieldOrganisations(JsonNode changeOrganisationRequestField) {
         if (!changeOrganisationRequestField.has(ORGANISATION_TO_ADD)
-                || !changeOrganisationRequestField.has(ORGANISATION_TO_REMOVE)) {
+            || !changeOrganisationRequestField.has(ORGANISATION_TO_REMOVE)) {
             throw new ValidationException(COR_MISSING_ORGANISATIONS);
         }
     }
 
+    @SuppressWarnings({"squid:S1075"})
     private void applyAddOrReplaceRepresentationDecision(List<CaseUserRole> existingCaseAssignments,
                                                          String caseRoleId,
                                                          JsonNode orgPolicyNode,
                                                          JsonNode organisationToAddNode,
                                                          Organisation organisationToAdd,
                                                          Organisation organisationToRemove,
-                                                         String caseReference) {
+                                                         String caseReference, JsonNode createdBy) {
+
+        ((ObjectNode) orgPolicyNode).put(LAST_NOC_REQUESTED_BY, (createdBy == null) ? null : createdBy.asText());
+
         setOrgPolicyOrganisation(orgPolicyNode, organisationToAddNode);
         Pair<List<CaseUserRole>, List<ProfessionalUser>> newAssignedUsers = assignAccessToOrganisationUsers(
             existingCaseAssignments, organisationToAdd, caseRoleId, caseReference);
@@ -175,6 +185,7 @@ public class ApplyNoCDecisionService {
                                                    Organisation organisationToRemove,
                                                    String caseReference) {
         nullifyNode(orgPolicyNode.get(ORGANISATION));
+        ((ObjectNode) orgPolicyNode).putNull(LAST_NOC_REQUESTED_BY);
         removeOrganisationUsersAccess(caseReference, existingCaseAssignments, organisationToRemove, caseRoleId);
     }
 
@@ -246,7 +257,7 @@ public class ApplyNoCDecisionService {
             String errorMessage = status == HttpStatus.NOT_FOUND
                 ? String.format("Organisation with ID '%s' can not be found.", organisationId)
                 : String.format("Error encountered while retrieving organisation users for organisation ID '%s': %s",
-                                organisationId, reasonPhrase);
+                organisationId, reasonPhrase);
 
             throw new ValidationException(errorMessage, e);
         }
@@ -314,7 +325,7 @@ public class ApplyNoCDecisionService {
         professionalUsers.forEach(professionalUser -> {
             Optional<CaseUserRole> caseUserRoleOptional = caseUserRoles.stream()
                 .filter(caseUserRole -> caseUserRole.getUserId().equals(professionalUser.getUserIdentifier())
-                    && caseUserRole.getCaseRole().equals(caseRoleId))
+                                        && caseUserRole.getCaseRole().equals(caseRoleId))
                 .findFirst();
 
             caseUserRoleOptional.ifPresent(caseUserRole -> {
@@ -366,9 +377,9 @@ public class ApplyNoCDecisionService {
                                                             final FindOrganisationResponse response) {
         if (response.getContactInformation().size() > 1) {
             log.warn("More than one address received in the response for the organisation {},"
-                         + " using first address from the list.", response.getOrganisationIdentifier());
+                     + " using first address from the list.", response.getOrganisationIdentifier());
         }
-        AddressUK organisationAddress =  createOrganisationAddress(response.getContactInformation().get(0));
+        AddressUK organisationAddress = createOrganisationAddress(response.getContactInformation().get(0));
         return PreviousOrganisation
             .builder()
             .organisationName(response.getName())
@@ -400,7 +411,8 @@ public class ApplyNoCDecisionService {
                 return caseCreatedDate;
             }
             List<PreviousOrganisationCollectionItem> previousOrganisations = objectMapper
-                .readerFor(new TypeReference<List<PreviousOrganisationCollectionItem>>() {}).readValue(prevOrgsNode);
+                .readerFor(new TypeReference<List<PreviousOrganisationCollectionItem>>() {
+                }).readValue(prevOrgsNode);
             if (previousOrganisations.isEmpty()) {
                 return caseCreatedDate;
             }

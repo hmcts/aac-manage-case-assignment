@@ -32,11 +32,8 @@
 
 			"data_classification": {
 				"_extends_": "NoC_Case_Data_Classification"
-			},
-
-			"security_classifications": {
-				"_extends_": "NoC_Case_Data_Classification"
 			}
+
 		}
 	}
 }

@@ -95,6 +95,7 @@ task smoke(type: Test) {
     generateCucumberReports.enabled = true
     cucumberReports.outputDir = file("${project.buildDir}/reports/tests/befta/smoke")
     cucumberReports.reports = files("${cucumberReports.outputDir}/cucumber.json")
+    cucumberReports.notFailingStatuses = ["skipped", "passed"]
 
     javaexec {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
@@ -103,7 +104,8 @@ task smoke(type: Test) {
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
               '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
               '--tags', '@Smoke and not @Ignore',
-              '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
+              '--glue', 'uk.gov.hmcts.befta.player', 
+              '--glue', 'uk.gov.hmcts.reform.managecase.befta', 'src/functionalTest/resources/features'
       ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
@@ -125,6 +127,7 @@ task functional(type: Test) {
     generateCucumberReports.enabled = true
     cucumberReports.outputDir = file("${project.buildDir}/reports/tests/befta/functional")
     cucumberReports.reports = files("${cucumberReports.outputDir}/cucumber.json")
+    cucumberReports.notFailingStatuses = ["skipped", "passed"]
 
     javaexec {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
@@ -134,7 +137,8 @@ task functional(type: Test) {
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
               '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
               '--tags', 'not @Ignore',
-              '--glue', 'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features'
+              '--glue', 'uk.gov.hmcts.befta.player',
+              '--glue', 'uk.gov.hmcts.reform.managecase.befta', 'src/functionalTest/resources/features'
       ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
@@ -186,7 +190,7 @@ def getCheckedOutGitCommitHash() {
 pact {
   publish {
     pactDirectory = 'pacts'
-    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    pactBrokerUrl = System.getenv("PACT_BROKER_URL") ?: 'http://localhost:80'
     tags = [System.getenv("PACT_BRANCH_NAME") ?:'Dev']
     version = project.pactVersion
   }

@@ -19,6 +19,7 @@
 
       "data": {
         "respondentOrganisationPolicy" : {
+          "LastNoCRequestedBy" : "[[ANYTHING_PRESENT]]",
           "OrgPolicyReference": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][respondentOrganisationPolicy][OrgPolicyReference]}",
           "OrgPolicyCaseAssignedRole": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][respondentOrganisationPolicy][OrgPolicyCaseAssignedRole]}",
           "Organisation" : {
@@ -27,6 +28,7 @@
         },
 
         "changeOrganisationRequestField" : {
+          "CreatedBy" : null,
           "CaseRoleId": null,
           "ApprovalStatus": null,
           "RequestTimestamp": null,
@@ -43,6 +45,7 @@
         "respondentOrganisationPolicy": {
           "value": {
             "Organisation": "[[ANY_NULLABLE]]",
+            "LastNoCRequestedBy" : "PUBLIC",
             "OrgPolicyReference": "PUBLIC",
             "OrgPolicyCaseAssignedRole": "PUBLIC",
             "PreviousOrganisations": "[[ANY_NULLABLE]]"
@@ -52,6 +55,7 @@
 
         "changeOrganisationRequestField" : {
           "value" : {
+            "CreatedBy" : "PUBLIC",
             "CaseRoleId" : "PUBLIC",
             "ApprovalStatus" : "PUBLIC",
             "RequestTimestamp" : "PUBLIC",
@@ -71,7 +75,6 @@
           "classification" : "PUBLIC"
         }
       }
-
     }
   }
 }

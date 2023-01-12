@@ -29,3 +29,6 @@ definition_files/
 /aca-docker/mocks/wiremock/__files/prd_users*.json
 !/aca-docker/mocks/wiremock/__files/prd_users_template_*.json
 /bin/
+
+### Remote run configs
+.*-remote-env

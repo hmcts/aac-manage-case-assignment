@@ -143,7 +143,7 @@ Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) reque
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-7
-@S-206.7 @Ignore
+@S-206.7 @callbackTests
 Scenario: (Happy Path) Solicitor requests NoC to replace representation - auto-approval applies
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
@@ -166,7 +166,7 @@ Scenario: (Happy Path) Solicitor requests NoC to replace representation - auto-a
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-8
-@S-206.8 @Ignore
+@S-206.8 @callbackTests
 Scenario: (Happy Path) Solicitor requests NoC for a non-represented litigant - auto-approval applies
 
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application],
@@ -188,7 +188,7 @@ Scenario: (Happy Path) Solicitor requests NoC for a non-represented litigant - a
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-9
-@S-206.9 @Ignore
+@S-206.9 @callbackTests
 Scenario: (Happy Path) CAA requests NoC to replace representation - auto-approval applies
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
@@ -211,7 +211,7 @@ Scenario: (Happy Path) CAA requests NoC to replace representation - auto-approva
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-10
-@S-206.10 @Ignore
+@S-206.10 @callbackTests
 Scenario: (Happy Path) CAA requests NoC for a non-represented litigant - auto-approval applies
 
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application],
@@ -233,7 +233,7 @@ Scenario: (Happy Path) CAA requests NoC for a non-represented litigant - auto-ap
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-11
-@S-206.11 @Ignore
+@S-206.11 @callbackTests
 Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) requests NoC to replace representation - auto-approval applies
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
@@ -256,7 +256,7 @@ Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) reque
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-12
-@S-206.12 @Ignore
+@S-206.12 @callbackTests
 Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) requests NoC for a non-represented litigant - auto-approval applies
 
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application],
@@ -278,7 +278,7 @@ Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) reque
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-13
-@S-206.13 @Ignore
+@S-206.13 @callbackTests
 Scenario: (Happy Path) CAA (also a solicitor for the same jurisdiction) requests NoC to replace representation - auto-approval applies
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
@@ -301,7 +301,7 @@ Scenario: (Happy Path) CAA (also a solicitor for the same jurisdiction) requests
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # ACA-68 / AC-14
-@S-206.14 @Ignore
+@S-206.14 @callbackTests
 Scenario: (Happy Path) CAA (also a solicitor for the same jurisdiction) requests NoC for a non-represented litigant - auto-approval applies
 
     Given a user [Mario - to initiate a case on his own behalf via a citizen facing application],

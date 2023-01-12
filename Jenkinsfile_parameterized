@@ -17,7 +17,7 @@ properties([
 GradleBuilder builder = new GradleBuilder(this, "aac")
 
 withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {
-  after('test') {
+  afterAlways('test') {
     builder.gradle('integration')
   }
   enableSlackNotifications('#ccd-master-builds')

@@ -1,23 +1,43 @@
 package uk.gov.hmcts.reform.managecase.befta;
 
+import io.cucumber.java.Before;
+import org.junit.AssumptionViolatedException;
 import uk.gov.hmcts.befta.BeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
-import uk.gov.hmcts.befta.DefaultBeftaTestDataLoader;
+import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
+import uk.gov.hmcts.befta.util.BeftaUtils;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
-import uk.gov.hmcts.befta.dse.ccd.CcdEnvironment;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Optional.ofNullable;
+
 public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutomationAdapter {
+
+    @Before("@callbackTests")
+    public void skipCallbackTestsIfNotEnabled() {
+        if (!ofNullable(System.getenv("CALLBACK_FTA_ENABLED")).map(Boolean::valueOf).orElse(false)) {
+            throw new AssumptionViolatedException("Callback tests not Enabled");
+        }
+    }
 
     @Override
     protected BeftaTestDataLoader buildTestDataLoader() {
-        return new DefaultBeftaTestDataLoader(CcdEnvironment.AAT);
+        return new DataLoaderToDefinitionStore(this,
+                                               DataLoaderToDefinitionStore.VALID_CCD_TEST_DEFINITIONS_PATH) {
+
+            @Override
+            protected void createRoleAssignment(String resource, String filename) {
+                // Do not create role assignments.
+                BeftaUtils.defaultLog("Will NOT create role assignments!");
+            }
+
+        };
     }
 
     @Override

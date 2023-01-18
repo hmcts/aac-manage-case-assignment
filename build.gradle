@@ -104,7 +104,7 @@ task smoke(type: Test) {
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
               '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
               '--tags', '@Smoke and not @Ignore',
-              '--glue', 'uk.gov.hmcts.befta.player', 
+              '--glue', 'uk.gov.hmcts.befta.player',
               '--glue', 'uk.gov.hmcts.reform.managecase.befta', 'src/functionalTest/resources/features'
       ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
@@ -320,7 +320,6 @@ dependencies {
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
-  implementation group: 'com.github.hmcts', name: 'properties-volume-spring-boot-starter', version: '0.0.4'
 
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.serviceAuthVersion

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseRoleAccessException;
 import uk.gov.hmcts.reform.managecase.api.payload.OrganisationAssignedUsersResetResponse;
@@ -137,7 +136,7 @@ public class OrganisationAssignedUsersController {
 
     private void validateRequest(String clientS2SToken) {
         String clientServiceName = securityUtils.getServiceNameFromS2SToken(clientS2SToken);
-        if (!authorisedServicesForOrganisationAssignedUsers.contains(clientServiceName)) {
+        if (!this.authorisedServicesForOrganisationAssignedUsers.contains(clientServiceName)) {
             throw new CaseRoleAccessException(CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
         }
     }

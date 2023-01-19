@@ -7,6 +7,7 @@ import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.managecase.service.OrganisationAssignedUsersService;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -42,18 +44,18 @@ import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTH
 @ConditionalOnProperty(value = "mca.conditional-apis.organisation-counts.enabled", havingValue = "true")
 public class OrganisationAssignedUsersController {
 
+    @Value("#{'${ccd.s2s-authorised.services.organisation_assigned_users}'.split(',')}")
+    private List<String> authorisedServicesForOrganisationAssignedUsers;
+
     @SuppressWarnings({"squid:S1075"})
     public static final String RESET_ORG_COUNT_PATH = "/reset-for-case";
 
-    private final ApplicationParams applicationParams;
     private final OrganisationAssignedUsersService organisationAssignedUsersService;
     private final SecurityUtils securityUtils;
 
     @Autowired
-    public OrganisationAssignedUsersController(ApplicationParams applicationParams,
-                                               OrganisationAssignedUsersService organisationAssignedUsersService,
+    public OrganisationAssignedUsersController(OrganisationAssignedUsersService organisationAssignedUsersService,
                                                SecurityUtils securityUtils) {
-        this.applicationParams = applicationParams;
         this.organisationAssignedUsersService = organisationAssignedUsersService;
         this.securityUtils = securityUtils;
     }
@@ -135,7 +137,7 @@ public class OrganisationAssignedUsersController {
 
     private void validateRequest(String clientS2SToken) {
         String clientServiceName = securityUtils.getServiceNameFromS2SToken(clientS2SToken);
-        if (!applicationParams.getAuthorisedServicesForOrganisationAssignedUsers().contains(clientServiceName)) {
+        if (!authorisedServicesForOrganisationAssignedUsers.contains(clientServiceName)) {
             throw new CaseRoleAccessException(CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
         }
     }

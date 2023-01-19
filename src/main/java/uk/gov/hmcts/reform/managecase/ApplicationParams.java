@@ -38,8 +38,6 @@ public class ApplicationParams {
     private String acaAccessControlCaseworkerRoleRegex;
     @Value("#{'${ccd.s2s-authorised.services.case_user_roles}'.split(',')}")
     private List<String> authorisedServicesForCaseUserRoles;
-    @Value("#{'${ccd.s2s-authorised.services.organisation_assigned_users}'.split(',')}")
-    private List<String> authorisedServicesForOrganisationAssignedUsers;
 
     public String getCaaSystemUserId() {
         return caaSystemUserId;
@@ -103,9 +101,5 @@ public class ApplicationParams {
 
     public List<String> getAuthorisedServicesForCaseUserRoles() {
         return authorisedServicesForCaseUserRoles;
-    }
-
-    public List<String> getAuthorisedServicesForOrganisationAssignedUsers() {
-        return authorisedServicesForOrganisationAssignedUsers;
     }
 }

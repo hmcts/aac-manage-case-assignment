@@ -203,7 +203,7 @@ sonarqube {
     property "sonar.projectName", "Reform::manage-case-assignment"
     property "sonar.projectKey", "uk.gov.hmcts.reform:manage-case-assignment"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions","**/api/controller/OrganisationAssignedUsersController.java,**/api/payload/OrganisationAssignedUsersResetResponse.java,**/service/OrganisationAssignedUsersService.java"
+    property "sonar.coverage.exclusions","**/api/controller/OrganisationAssignedUsersController.java,**/api/payload/OrganisationAssignedUsersResetResponse.java,**/domain/OrganisationAssignedUsersCountData.java,**/service/OrganisationAssignedUsersService.java"
   }
 }
 

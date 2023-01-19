@@ -5,8 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.Map;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationAssignedUsersCountData;
 
 @Getter
 @Builder
@@ -15,6 +14,6 @@ public class OrganisationAssignedUsersResetResponse {
 
     @JsonProperty("organisation_user_counts")
     @ApiModelProperty(value = "Organisation user counts", required = true)
-    private final Map<String, Long> orgUserCounts;
+    private final OrganisationAssignedUsersCountData orgUserCounts;
 
 }

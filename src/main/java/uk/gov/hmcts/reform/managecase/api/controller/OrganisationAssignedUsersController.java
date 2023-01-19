@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseRoleAccessException;
 import uk.gov.hmcts.reform.managecase.api.payload.OrganisationAssignedUsersResetResponse;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationAssignedUsersCountData;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.service.OrganisationAssignedUsersService;
 
@@ -27,7 +28,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
@@ -122,15 +122,15 @@ public class OrganisationAssignedUsersController {
     ) {
         validateRequest(clientS2SToken);
 
-        Map<String, Long> orgUserCounts
+        OrganisationAssignedUsersCountData countData
             = organisationAssignedUsersService.calculateOrganisationAssignedUsersCountOnCase(caseId);
 
-        if (!dryRun && !orgUserCounts.isEmpty()) {
-            organisationAssignedUsersService.saveOrganisationUserCount(caseId, orgUserCounts);
+        if (!dryRun && !countData.getOrgsAssignedUsers().isEmpty()) {
+            organisationAssignedUsersService.saveOrganisationUserCount(countData);
         }
 
         return OrganisationAssignedUsersResetResponse.builder()
-            .orgUserCounts(orgUserCounts)
+            .orgUserCounts(countData)
             .build();
     }
 

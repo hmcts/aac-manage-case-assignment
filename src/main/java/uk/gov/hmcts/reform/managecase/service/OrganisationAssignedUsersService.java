@@ -8,14 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.ResourceNotFoundException;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.ServiceException;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdates;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationAssignedUsersCountData;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
@@ -64,11 +63,11 @@ public class OrganisationAssignedUsersService {
         this.dataStoreApi = dataStoreApi;
     }
 
-    public Map<String, Long> calculateOrganisationAssignedUsersCountOnCase(String caseId) {
+    public OrganisationAssignedUsersCountData calculateOrganisationAssignedUsersCountOnCase(String caseId) {
         CaseDetails caseDetails = dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(caseId);
         List<OrganisationPolicy> policies = findPolicies(caseDetails);
 
-        List<String> failedOrgIds = new ArrayList<>();
+        Map<String, String> failedOrgs = new HashMap<>();
 
         Set<String> orgIds = policies.stream()
             .filter(policy -> policy.getOrganisation() != null)
@@ -84,8 +83,8 @@ public class OrganisationAssignedUsersService {
 
                 userIds.addAll(usersForOrg);
                 userIdsByOrg.put(orgId, usersForOrg);
-            } catch (ResourceNotFoundException e) {
-                failedOrgIds.add(orgId);
+            } catch (FeignException ex) {
+                failedOrgs.put(orgId, formatSkipMessageFromException(orgId, ex));
             }
         });
 
@@ -96,7 +95,7 @@ public class OrganisationAssignedUsersService {
         // generate counts
         Map<String, Long> orgUserCounts = new HashMap<>();
         orgIds.forEach(orgId -> {
-            if (failedOrgIds.contains(orgId)) {
+            if (failedOrgs.containsKey(orgId)) {
                 LOG.warn("Skipping OrgID: {} for Case: {}", orgId, caseId);
             } else {
                 Set<String> usersForOrg = userIdsByOrg.getOrDefault(orgId, Collections.emptySet());
@@ -108,62 +107,70 @@ public class OrganisationAssignedUsersService {
                         .count();
                 }
                 orgUserCounts.put(orgId, userCount);
-                LOG.debug("resetOrgUserCountOnCase.orgCounts: {}: {}", orgId, userCount);
             }
         });
 
-        return orgUserCounts;
+        return OrganisationAssignedUsersCountData.builder()
+            .caseId(caseId)
+            .orgsAssignedUsers(orgUserCounts)
+            .skippedOrgs(failedOrgs)
+            .build();
     }
 
-    public void saveOrganisationUserCount(String caseId, Map<String, Long> orgUserCounts) {
+    public void saveOrganisationUserCount(OrganisationAssignedUsersCountData countData) {
         SupplementaryDataUpdates updateRequest = new SupplementaryDataUpdates();
 
         Map<String, Object> formattedOrgToCountMap = new HashMap<>();
-        for (Map.Entry<String, Long> orgUserCount : orgUserCounts.entrySet()) {
+        for (Map.Entry<String, Long> orgsAssignedUsers : countData.getOrgsAssignedUsers().entrySet()) {
 
             // NB: skip zero count records
-            if (orgUserCount.getValue() > 0) {
+            if (orgsAssignedUsers.getValue() > 0) {
                 formattedOrgToCountMap.put(
-                    ORGS_ASSIGNED_USERS_PATH + orgUserCount.getKey(),
-                    orgUserCount.getValue()
+                    ORGS_ASSIGNED_USERS_PATH + orgsAssignedUsers.getKey(),
+                    orgsAssignedUsers.getValue()
                 );
             }
         }
 
         // NB: skip save if nothing to save
         if (!formattedOrgToCountMap.isEmpty()) {
+
+            LOG.info("Saving `orgs_assigned_users` data for case : {} : {} ",
+                     countData.getCaseId(), formattedOrgToCountMap);
+
             updateRequest.setSetMap(formattedOrgToCountMap);
             SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest();
             request.setSupplementaryDataUpdates(updateRequest);
             dataStoreApi.updateCaseSupplementaryData(
                 securityUtils.getCaaSystemUserToken(),
-                caseId,
+                countData.getCaseId(),
                 request
             );
         }
     }
 
     private Set<String> findUsersByOrganisation(String orgId) {
-        try {
-            return prdRepository.findUsersByOrganisation(orgId).getUsers().stream()
-                .map(ProfessionalUser::getUserIdentifier)
-                .collect(Collectors.toSet());
+        return prdRepository.findUsersByOrganisation(orgId).getUsers().stream()
+            .map(ProfessionalUser::getUserIdentifier)
+            .collect(Collectors.toSet());
+    }
 
-        } catch (FeignException e) {
-            HttpStatus status = HttpStatus.resolve(e.status());
-            String reasonPhrase = status == null ? e.getMessage() : status.getReasonPhrase();
+    private String formatSkipMessageFromException(String orgId, FeignException ex) {
+        HttpStatus status = HttpStatus.resolve(ex.status());
+        String reasonPhrase = status == null ? ex.getMessage() : status.getReasonPhrase();
 
-            if (status == HttpStatus.NOT_FOUND) {
-                String errorMessage = String.format("Organisation with ID '%s' can not be found.", orgId);
-                throw new ResourceNotFoundException(errorMessage, e);
-            } else {
-                String errorMessage = String.format(
-                    "Error encountered while retrieving organisation users for organisation ID '%s': %s",
-                    orgId,
-                    reasonPhrase
-                );
-                throw new ServiceException(errorMessage, e);
-            }
+        if (status == HttpStatus.NOT_FOUND) {
+            String warningMessage = String.format("Organisation not found: ID '%s': %s", orgId, reasonPhrase);
+            LOG.warn(warningMessage);
+            return warningMessage;
+        } else {
+            String errorMessage = String.format(
+                "Error encountered while retrieving organisation users for organisation ID '%s': %s",
+                orgId,
+                reasonPhrase
+            );
+            LOG.error(errorMessage, ex);
+            return errorMessage;
         }
     }
 

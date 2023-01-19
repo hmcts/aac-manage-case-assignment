@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import feign.FeignException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,7 @@ public class OrganisationAssignedUsersService {
         Map<String, String> failedOrgs = new HashMap<>();
 
         Set<String> orgIds = policies.stream()
-            .filter(policy -> policy.getOrganisation() != null)
+            .filter(this::checkIfPolicyHasOrganisationAssigned)
             .map(policy -> policy.getOrganisation().getOrganisationID())
             .collect(Collectors.toSet());
 
@@ -188,6 +189,12 @@ public class OrganisationAssignedUsersService {
                                                                                              .getOrganisationID()))
             .map(OrganisationPolicy::getOrgPolicyCaseAssignedRole)
             .collect(toList());
+    }
+
+    private boolean checkIfPolicyHasOrganisationAssigned(OrganisationPolicy policy) {
+        return policy != null
+            && policy.getOrganisation() != null
+            && StringUtils.isNotEmpty(policy.getOrganisation().getOrganisationID());
     }
 
     private boolean checkIfUserHasAnyGivenRole(List<CaseAssignedUserRole> cauRoles, String userId, List<String> roles) {

@@ -1,12 +1,29 @@
 @F-210
-Feature: F-219: Organisations Assigned Users
+Feature: F-210: Organisations Assigned Users
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #  SINGLE CASE
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+  @S-210.00
+  Scenario: SINGLE CASE: Forbidden response when wrong service
+
+    Given an appropriate test context as detailed in the test data source,
+      And a user [INVOKER - with access to case],
+
+     When a request is prepared with appropriate values,
+      And the request [is made with a valid case id],
+      And the request [is made using a service not authorised to perform operation],
+      And it is submitted to call the [OrganisationsAssignedUsers-ResetForCase] operation of [Manage Case Assignment Microservice],
+
+     Then a negative response is received,
+      And the response [has the 403 return code],
+      And the response has all the details as expected
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
   @S-210.01
-  Scenario: Dry Run, 2 Orgs with assigned users
+  Scenario: SINGLE CASE: Dry Run, 2 Orgs with assigned users
 
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
@@ -38,7 +55,7 @@ Feature: F-219: Organisations Assigned Users
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-210.01_with_save
-  Scenario: Save, 2 Orgs with assigned users
+  Scenario: SINGLE CASE: Save, 2 Orgs with assigned users
 
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
@@ -65,19 +82,19 @@ Feature: F-219: Organisations Assigned Users
       And the response [has Org 1 count with 2 users],
       And the response [has Org 2 count with 1 user],
 
-      And a successful call [to verify the supplimentary data's org counts have been updated for C1] as in [F-210_Check_Orgs_Assigned_Users__Both_Assigned__C1]
+      And a successful call [to verify the supplimentary data's org counts have been updated for C1] as in [F-210_Check_Orgs_Assigned_Users__Both_Assigned__C1],
 
       #--- verify impact of unassign: i.e. does unassign stil work and is count updated correctly
-      And a successful call [to unassign users to the case with update OrgCount - only 1 of 2 users] as in [F-210_Delete_Access_With_OrgId_C1_Org1_QUK822N]
-      And a successful call [to unassign users to the case with update OrgCount - 1 user but only only 1 of 2 roles] as in [F-210_Delete_Access_With_OrgId_C1_Org2_LESTKK0]
+      And a successful call [to unassign users to the case with update OrgCount - only 1 of 2 users] as in [F-210_Delete_Access_With_OrgId_C1_Org1_QUK822N],
+      And a successful call [to unassign users to the case with update OrgCount - 1 user but only only 1 of 2 roles] as in [F-210_Delete_Access_With_OrgId_C1_Org2_LESTKK0],
       And a successful call [to verify the supplimentary data's org counts have been updated after unassign for C1] as in [F-210_Check_Orgs_Assigned_Users__After_Unassign__C1],
 
-      And a successful call [repeat call after unassign] as in [S-210.01_repeat_after_unassign],
+      And a successful call [repeat call after unassign] as in [S-210.01_repeat_after_unassign]
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-210.02
-  Scenario: No assigned organisations
+  Scenario: SINGLE CASE: No assigned organisations
 
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
@@ -93,7 +110,7 @@ Feature: F-219: Organisations Assigned Users
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And the response [has no org counts]
+      And the response [has no org counts],
 
       And a successful call [to workarround $inc by zero issue in Supplementary Data for C2] as in [F-210_Supplementary_Data__WorkArround__C2],
       And a successful call [to verify the supplimentary data's org counts are unchanged for C2] as in [F-210_Check_Orgs_Assigned_Users__Not_Assigned__C2]
@@ -101,7 +118,7 @@ Feature: F-219: Organisations Assigned Users
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-210.03
-  Scenario: Dry Run, 1 GOOD Org with assigned users, 1 BAD org
+  Scenario: SINGLE CASE: Dry Run, 1 GOOD Org with assigned users, 1 BAD org
 
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
@@ -129,7 +146,7 @@ Feature: F-219: Organisations Assigned Users
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-210.04
-  Scenario: Save (but no counts found), 1 Org with no assigned users
+  Scenario: SINGLE CASE: Save (but no counts found), 1 Org with no assigned users
 
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
@@ -156,8 +173,25 @@ Feature: F-219: Organisations Assigned Users
 #  MULTIPLE CASE
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+  @S-210.10
+  Scenario: MULTIPLE CASE: Forbidden response when wrong service
+
+    Given an appropriate test context as detailed in the test data source,
+      And a user [INVOKER - with access to case],
+
+     When a request is prepared with appropriate values,
+      And the request [is made with a valid case id],
+      And the request [is made using a service not authorised to perform operation],
+      And it is submitted to call the [OrganisationsAssignedUsers-ResetForCases] operation of [Manage Case Assignment Microservice],
+
+     Then a negative response is received,
+      And the response [has the 403 return code],
+      And the response has all the details as expected
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
   @S-210.11
-  Scenario: Dry Run, 4 cases + 1 not found
+  Scenario: MULTIPLE CASE: Dry Run, 4 cases + 1 not found
 
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
@@ -193,23 +227,23 @@ Feature: F-219: Organisations Assigned Users
       And the response [has C2 no org counts],
       And the response [has C3 Org 2 count with 1 user],
       And the response [has C3 error for BAD Org],
-      And the response [has C4 Org 2 count with ZERO users]
-      And the response [has error for not found case]
+      And the response [has C4 Org 2 count with ZERO users],
+      And the response [has error for not found case],
 
       And a successful call [to workarround $inc by zero issue in Supplementary Data for C1] as in [F-210_Supplementary_Data__WorkArround__C1],
       And a successful call [to workarround $inc by zero issue in Supplementary Data for C2] as in [F-210_Supplementary_Data__WorkArround__C2],
       And a successful call [to workarround $inc by zero issue in Supplementary Data for C3] as in [F-210_Supplementary_Data__WorkArround__C3],
       And a successful call [to workarround $inc by zero issue in Supplementary Data for C4] as in [F-210_Supplementary_Data__WorkArround__C4],
 
-      And a successful call [to verify the supplimentary data's org counts are unchanged for C1] as in [F-210_Check_Orgs_Assigned_Users__Not_Assigned__C1]
-      And a successful call [to verify the supplimentary data's org counts are unchanged for C2] as in [F-210_Check_Orgs_Assigned_Users__Not_Assigned__C2]
-      And a successful call [to verify the supplimentary data's org counts are unchanged for C3] as in [F-210_Check_Orgs_Assigned_Users__Not_Assigned__C3]
+      And a successful call [to verify the supplimentary data's org counts are unchanged for C1] as in [F-210_Check_Orgs_Assigned_Users__Not_Assigned__C1],
+      And a successful call [to verify the supplimentary data's org counts are unchanged for C2] as in [F-210_Check_Orgs_Assigned_Users__Not_Assigned__C2],
+      And a successful call [to verify the supplimentary data's org counts are unchanged for C3] as in [F-210_Check_Orgs_Assigned_Users__Not_Assigned__C3],
       And a successful call [to verify the supplimentary data's org counts are unchanged for C4] as in [F-210_Check_Orgs_Assigned_Users__Not_Assigned__C4]
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @S-210.11_with_save
-  Scenario: Save, 4 cases + 1 not found
+  Scenario: MULTIPLE CASE: Save, 4 cases + 1 not found
 
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
@@ -246,15 +280,17 @@ Feature: F-219: Organisations Assigned Users
       And the response [has C2 no org counts],
       And the response [has C3 Org 2 count with 1 user],
       And the response [has C3 error for BAD Org],
-      And the response [has C4 Org 2 count with ZERO users]
-      And the response [has error for not found case]
+      And the response [has C4 Org 2 count with ZERO users],
+      And the response [has error for not found case],
 
       And a successful call [to workarround $inc by zero issue in Supplementary Data for C1] as in [F-210_Supplementary_Data__WorkArround__C1],
       And a successful call [to workarround $inc by zero issue in Supplementary Data for C2] as in [F-210_Supplementary_Data__WorkArround__C2],
       And a successful call [to workarround $inc by zero issue in Supplementary Data for C3] as in [F-210_Supplementary_Data__WorkArround__C3],
       And a successful call [to workarround $inc by zero issue in Supplementary Data for C4] as in [F-210_Supplementary_Data__WorkArround__C4],
 
-      And a successful call [to verify the supplimentary data's org counts have been updated for C1] as in [F-210_Check_Orgs_Assigned_Users__Both_Assigned__C1]
-      And a successful call [to verify the supplimentary data's org counts are unchanged for C2] as in [F-210_Check_Orgs_Assigned_Users__Not_Assigned__C2]
-      And a successful call [to verify the supplimentary data's org counts have been updated for C3] as in [F-210_Check_Orgs_Assigned_Users__One_Assigned__C3]
+      And a successful call [to verify the supplimentary data's org counts have been updated for C1] as in [F-210_Check_Orgs_Assigned_Users__Both_Assigned__C1],
+      And a successful call [to verify the supplimentary data's org counts are unchanged for C2] as in [F-210_Check_Orgs_Assigned_Users__Not_Assigned__C2],
+      And a successful call [to verify the supplimentary data's org counts have been updated for C3] as in [F-210_Check_Orgs_Assigned_Users__One_Assigned__C3],
       And a successful call [to verify the supplimentary data's org counts are unchanged for C4] as in [F-210_Check_Orgs_Assigned_Users__Not_Assigned__C4]
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

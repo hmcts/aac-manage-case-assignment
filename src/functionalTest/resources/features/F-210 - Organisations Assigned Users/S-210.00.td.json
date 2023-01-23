@@ -1,0 +1,36 @@
+{
+  "_guid_" : "S-210.00",
+  "_extends_" : "OrganisationsAssignedUsers_ResetForCase__Base",
+
+  "title": "SINGLE CASE: Forbidden response when wrong service",
+
+  "specs": [
+    "INVOKER - with access to case",
+
+    "is made with a valid case id",
+    "is made using a service not authorised to perform operation",
+
+    "has the 403 return code"
+  ],
+
+  "s2sClientId": "ccd_gw",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
+
+  "request" : {
+    "queryParams": {
+      "case_id": "4444333322221111",
+      "dry_run": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_403_Response"
+  }
+
+}

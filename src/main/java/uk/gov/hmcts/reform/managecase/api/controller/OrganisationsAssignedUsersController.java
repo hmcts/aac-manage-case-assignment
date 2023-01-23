@@ -23,11 +23,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseRoleAccessException;
-import uk.gov.hmcts.reform.managecase.api.payload.OrganisationAssignedUsersResetRequest;
-import uk.gov.hmcts.reform.managecase.api.payload.OrganisationAssignedUsersResetResponse;
-import uk.gov.hmcts.reform.managecase.domain.OrganisationAssignedUsersCountData;
+import uk.gov.hmcts.reform.managecase.api.payload.OrganisationsAssignedUsersResetRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.OrganisationsAssignedUsersResetResponse;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationsAssignedUsersCountData;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
-import uk.gov.hmcts.reform.managecase.service.OrganisationAssignedUsersService;
+import uk.gov.hmcts.reform.managecase.service.OrganisationsAssignedUsersService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationAssignedUsersController.ORG_ASSIGNED_USERS_PATH;
+import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.ORGS_ASSIGNED_USERS_PATH;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
@@ -47,45 +47,45 @@ import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTH
 
 @RestController
 @Validated
-@RequestMapping(path = ORG_ASSIGNED_USERS_PATH)
-@ConditionalOnProperty(value = "mca.conditional-apis.organisation-counts.enabled", havingValue = "true")
-public class OrganisationAssignedUsersController {
-    private static final Logger LOG = LoggerFactory.getLogger(OrganisationAssignedUsersController.class);
+@RequestMapping(path = ORGS_ASSIGNED_USERS_PATH)
+@ConditionalOnProperty(value = "mca.conditional-apis.organisations-assigned-users.enabled", havingValue = "true")
+public class OrganisationsAssignedUsersController {
+    private static final Logger LOG = LoggerFactory.getLogger(OrganisationsAssignedUsersController.class);
 
-    @Value("#{'${ccd.s2s-authorised.services.organisation_assigned_users}'.split(',')}")
-    private List<String> authorisedServicesForOrganisationAssignedUsers;
+    @Value("#{'${ccd.s2s-authorised.services.organisations_assigned_users}'.split(',')}")
+    private List<String> authorisedServicesForOrganisationsAssignedUsers;
 
     public static final String PARAM_CASE_ID = "case_id";
     public static final String PARAM_CASE_LIST = "case_ids";
     public static final String PARAM_DRY_RUN_FLAG = "dry_run";
 
     @SuppressWarnings({"squid:S1075"})
-    public static final String ORG_ASSIGNED_USERS_PATH = "/organisation-assigned-users";
+    public static final String ORGS_ASSIGNED_USERS_PATH = "/organisations-assigned-users";
     @SuppressWarnings({"squid:S1075"})
-    public static final String RESET_ORG_COUNT_PATH = "/reset-for-case";
+    public static final String RESET_FOR_A_CASE_PATH = "/reset-for-case";
     @SuppressWarnings({"squid:S1075"})
-    public static final String RESET_ORG_COUNTS_PATH = "/reset-for-cases";
+    public static final String RESET_FOR_MULTIPLE_CASES_PATH = "/reset-for-cases";
 
-    private final OrganisationAssignedUsersService organisationAssignedUsersService;
+    private final OrganisationsAssignedUsersService organisationsAssignedUsersService;
     private final SecurityUtils securityUtils;
 
     @Autowired
-    public OrganisationAssignedUsersController(OrganisationAssignedUsersService organisationAssignedUsersService,
-                                               SecurityUtils securityUtils) {
-        this.organisationAssignedUsersService = organisationAssignedUsersService;
+    public OrganisationsAssignedUsersController(OrganisationsAssignedUsersService organisationsAssignedUsersService,
+                                                SecurityUtils securityUtils) {
+        this.organisationsAssignedUsersService = organisationsAssignedUsersService;
         this.securityUtils = securityUtils;
     }
 
-    @PostMapping(path = RESET_ORG_COUNT_PATH, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(path = RESET_FOR_A_CASE_PATH, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
-        value = "Reset organisation user counts for a case",
-        notes = "Reset organisation user counts for a case."
+        value = "Reset the Organisations Assigned Users count information for a case",
+        notes = "Reset the Organisations Assigned Users count information for a case."
     )
     @ApiResponses({
         @ApiResponse(
             code = 200,
-            message = "Organisation user counts have been reset for case"
+            message = "The Organisations Assigned Users count information has been reset for case"
         ),
         @ApiResponse(
             code = 400,
@@ -98,7 +98,7 @@ public class OrganisationAssignedUsersController {
                 @ExampleProperty(
                     value = "{\n"
                         + "   \"status\": \"BAD_REQUEST\",\n"
-                        + "   \"message\": \"restOrganisationCountForCase.caseId\",\n"
+                        + "   \"message\": \"restOrganisationsAssignedUsersCountDataForACase.caseId\",\n"
                         + "   \"errors\": [ \"" + CASE_ID_INVALID + "\" ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
@@ -129,7 +129,7 @@ public class OrganisationAssignedUsersController {
             })
         )
     })
-    public OrganisationAssignedUsersCountData restOrganisationCountForCase(
+    public OrganisationsAssignedUsersCountData restOrganisationsAssignedUsersCountDataForACase(
         @ApiParam(value = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
         @RequestHeader(SERVICE_AUTHORIZATION)
         String clientS2SToken,
@@ -146,19 +146,19 @@ public class OrganisationAssignedUsersController {
     ) {
         validateRequest(clientS2SToken);
 
-        return resetOrganisationAssignedUsersCountForCase(dryRun, caseId);
+        return resetOrganisationsAssignedUsersCountForACase(dryRun, caseId);
     }
 
-    @PostMapping(path = RESET_ORG_COUNTS_PATH, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(path = RESET_FOR_MULTIPLE_CASES_PATH, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
-        value = "Reset organisation user counts for a number of cases",
-        notes = "Reset organisation user counts for a number of cases."
+        value = "Reset the Organisations Assigned Users count information for a number of cases",
+        notes = "Reset the Organisations Assigned Users count information for a number of cases."
     )
     @ApiResponses({
         @ApiResponse(
             code = 200,
-            message = "Organisation user counts have been reset for the cases"
+            message = "The Organisations Assigned Users count information has been reset for the cases"
         ),
         @ApiResponse(
             code = 400,
@@ -172,7 +172,7 @@ public class OrganisationAssignedUsersController {
                 @ExampleProperty(
                     value = "{\n"
                         + "   \"status\": \"BAD_REQUEST\",\n"
-                        + "   \"message\": \"restOrganisationCountForMultipleCases.caseId\",\n"
+                        + "   \"message\": \"restOrganisationsAssignedUsersCountDataForMultipleCases.caseId\",\n"
                         + "   \"errors\": [ \"" + CASE_ID_INVALID + "\" ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
@@ -189,42 +189,42 @@ public class OrganisationAssignedUsersController {
                 + "2. " + CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."
         )
     })
-    public OrganisationAssignedUsersResetResponse restOrganisationCountForMultipleCases(
+    public OrganisationsAssignedUsersResetResponse restOrganisationsAssignedUsersCountDataForMultipleCases(
         @ApiParam(value = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
         @RequestHeader(SERVICE_AUTHORIZATION) String clientS2SToken,
         @ApiParam(value = "List of cases to process", required = true)
         @Valid @RequestBody
-        OrganisationAssignedUsersResetRequest request
+        OrganisationsAssignedUsersResetRequest request
     ) {
         validateRequest(clientS2SToken);
 
-        List<OrganisationAssignedUsersCountData> results = new ArrayList<>();
+        List<OrganisationsAssignedUsersCountData> countData = new ArrayList<>();
 
         request.getCaseIds().forEach(caseId -> {
             try {
-                results.add(resetOrganisationAssignedUsersCountForCase(request.isDryRun(), caseId));
+                countData.add(resetOrganisationsAssignedUsersCountForACase(request.isDryRun(), caseId));
             } catch (Exception ex) {
                 String message = String.format("Error resetting Organisation Count for case: %s", caseId);
                 LOG.error(message, ex);
-                results.add(OrganisationAssignedUsersCountData.builder()
-                                .caseId(caseId)
-                                .error(message + ": " + ex.getMessage())
-                                .build());
+                countData.add(OrganisationsAssignedUsersCountData.builder()
+                                  .caseId(caseId)
+                                  .error(message + ": " + ex.getMessage())
+                                  .build());
             }
         });
 
-        return OrganisationAssignedUsersResetResponse.builder()
-            .orgUserCounts(results)
+        return OrganisationsAssignedUsersResetResponse.builder()
+            .countData(countData)
             .build();
     }
 
-    private OrganisationAssignedUsersCountData  resetOrganisationAssignedUsersCountForCase(boolean dryRun,
-                                                                                           String caseId) {
-        OrganisationAssignedUsersCountData countData
-            = organisationAssignedUsersService.calculateOrganisationAssignedUsersCountOnCase(caseId);
+    private OrganisationsAssignedUsersCountData resetOrganisationsAssignedUsersCountForACase(boolean dryRun,
+                                                                                             String caseId) {
+        OrganisationsAssignedUsersCountData countData
+            = organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(caseId);
 
         if (!dryRun && (countData.getOrgsAssignedUsers() != null) && !countData.getOrgsAssignedUsers().isEmpty()) {
-            organisationAssignedUsersService.saveOrganisationUserCount(countData);
+            organisationsAssignedUsersService.saveOrganisationUserCount(countData);
         }
 
         return countData;
@@ -232,7 +232,7 @@ public class OrganisationAssignedUsersController {
 
     private void validateRequest(String clientS2SToken) {
         String clientServiceName = securityUtils.getServiceNameFromS2SToken(clientS2SToken);
-        if (!this.authorisedServicesForOrganisationAssignedUsers.contains(clientServiceName)) {
+        if (!this.authorisedServicesForOrganisationsAssignedUsers.contains(clientServiceName)) {
             throw new CaseRoleAccessException(CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
         }
     }

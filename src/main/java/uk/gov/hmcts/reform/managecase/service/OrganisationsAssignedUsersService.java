@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdates;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
-import uk.gov.hmcts.reform.managecase.domain.OrganisationAssignedUsersCountData;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationsAssignedUsersCountData;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
@@ -36,8 +36,8 @@ import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.ORGS_ASSIGNED_USERS_PATH;
 
 @Service
-public class OrganisationAssignedUsersService {
-    private static final Logger LOG = LoggerFactory.getLogger(OrganisationAssignedUsersService.class);
+public class OrganisationsAssignedUsersService {
+    private static final Logger LOG = LoggerFactory.getLogger(OrganisationsAssignedUsersService.class);
 
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
@@ -48,13 +48,13 @@ public class OrganisationAssignedUsersService {
     private final DataStoreApiClient dataStoreApi;
 
     @Autowired
-    public OrganisationAssignedUsersService(PrdRepository prdRepository,
-                                            @Qualifier("defaultDataStoreRepository")
-                                            DataStoreRepository dataStoreRepository,
-                                            JacksonUtils jacksonUtils,
-                                            RoleAssignmentService roleAssignmentService,
-                                            SecurityUtils securityUtils,
-                                            DataStoreApiClient dataStoreApi) {
+    public OrganisationsAssignedUsersService(PrdRepository prdRepository,
+                                             @Qualifier("defaultDataStoreRepository")
+                                             DataStoreRepository dataStoreRepository,
+                                             JacksonUtils jacksonUtils,
+                                             RoleAssignmentService roleAssignmentService,
+                                             SecurityUtils securityUtils,
+                                             DataStoreApiClient dataStoreApi) {
         this.dataStoreRepository = dataStoreRepository;
         this.prdRepository = prdRepository;
         this.jacksonUtils = jacksonUtils;
@@ -64,7 +64,7 @@ public class OrganisationAssignedUsersService {
         this.dataStoreApi = dataStoreApi;
     }
 
-    public OrganisationAssignedUsersCountData calculateOrganisationAssignedUsersCountOnCase(String caseId) {
+    public OrganisationsAssignedUsersCountData calculateOrganisationsAssignedUsersCountData(String caseId) {
         CaseDetails caseDetails = dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(caseId);
         List<OrganisationPolicy> policies = findPolicies(caseDetails);
 
@@ -111,14 +111,14 @@ public class OrganisationAssignedUsersService {
             }
         });
 
-        return OrganisationAssignedUsersCountData.builder()
+        return OrganisationsAssignedUsersCountData.builder()
             .caseId(caseId)
             .orgsAssignedUsers(orgUserCounts)
             .skippedOrgs(failedOrgs)
             .build();
     }
 
-    public void saveOrganisationUserCount(OrganisationAssignedUsersCountData countData) {
+    public void saveOrganisationUserCount(OrganisationsAssignedUsersCountData countData) {
         SupplementaryDataUpdates updateRequest = new SupplementaryDataUpdates();
 
         Map<String, Object> formattedOrgToCountMap = new HashMap<>();

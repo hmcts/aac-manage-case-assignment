@@ -17,7 +17,7 @@ services:
       ROLE_ASSIGNMENT_URL: "${ROLE_ASSIGNMENT_URL:-http://am-role-assignment-service:4096}"
       PRD_HOST: http://aca-wiremock:8080
       NOTIFY_MCA_API_KEY: "notify-test-api-key"
-      MCA_CONDITIONAL_APIS_ORG_COUNT_ENABLED: true
+      MCA_CONDITIONAL_APIS_ORGS_ASSIGNED_USERS_ENABLED: true
       # Uncomment this line to enable JVM debugging and uncomment the port mapping below
       # JAVA_TOOL_OPTIONS: '-XX:InitialRAMPercentage=30.0 -XX:MaxRAMPercentage=65.0 -XX:MinRAMPercentage=30.0 -XX:+UseConcMarkSweepGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'
     ports:

@@ -5,17 +5,17 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
-import uk.gov.hmcts.reform.managecase.domain.OrganisationAssignedUsersCountData;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationsAssignedUsersCountData;
 
 import java.util.List;
 
 @Getter
 @Builder
-@ApiModel("Organisation Assigned Users Reset Response")
-public class OrganisationAssignedUsersResetResponse {
+@ApiModel("Organisations Assigned Users Reset Response")
+public class OrganisationsAssignedUsersResetResponse {
 
-    @JsonProperty("organisation_user_counts")
-    @ApiModelProperty(value = "Organisation user counts", required = true)
-    private final List<OrganisationAssignedUsersCountData> orgUserCounts;
+    @JsonProperty("count_data")
+    @ApiModelProperty(value = "List of Organisations Assigned Users count data", required = true)
+    private final List<OrganisationsAssignedUsersCountData> countData;
 
 }

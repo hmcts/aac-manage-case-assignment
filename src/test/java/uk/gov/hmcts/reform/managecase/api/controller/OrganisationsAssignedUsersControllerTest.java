@@ -12,10 +12,10 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseRoleAccessException;
-import uk.gov.hmcts.reform.managecase.api.payload.OrganisationAssignedUsersResetRequest;
-import uk.gov.hmcts.reform.managecase.domain.OrganisationAssignedUsersCountData;
+import uk.gov.hmcts.reform.managecase.api.payload.OrganisationsAssignedUsersResetRequest;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationsAssignedUsersCountData;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
-import uk.gov.hmcts.reform.managecase.service.OrganisationAssignedUsersService;
+import uk.gov.hmcts.reform.managecase.service.OrganisationsAssignedUsersService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION;
 
-public class OrganisationAssignedUsersControllerTest {
+public class OrganisationsAssignedUsersControllerTest {
 
     private static final String CASE_ID_GOOD = "4444333322221111";
     private static final String CASE_ID_NOT_FOUND = "1111222233334444";
@@ -45,13 +45,13 @@ public class OrganisationAssignedUsersControllerTest {
     private static final String S2S_SERVICE_BAD = "S2S_SERVICE_BAD";
 
     @Mock
-    private OrganisationAssignedUsersService organisationAssignedUsersService;
+    private OrganisationsAssignedUsersService organisationsAssignedUsersService;
 
     @Mock
     private SecurityUtils securityUtils;
 
     @InjectMocks
-    OrganisationAssignedUsersController controller;
+    OrganisationsAssignedUsersController controller;
 
     @BeforeEach
     void setUp() {
@@ -59,13 +59,13 @@ public class OrganisationAssignedUsersControllerTest {
 
         ReflectionTestUtils.setField(
             controller,
-            "authorisedServicesForOrganisationAssignedUsers",
+            "authorisedServicesForOrganisationsAssignedUsers",
             List.of(S2S_SERVICE_GOOD)
         );
     }
 
     @Nested
-    class RestOrganisationCountForCase {
+    class RestOrganisationsAssignedUsersCountDataForACase {
 
         @DisplayName("Should verify S2S token and throw exception when service not authorised")
         @Test
@@ -76,9 +76,12 @@ public class OrganisationAssignedUsersControllerTest {
 
             // WHEN
             CaseRoleAccessException exception = assertThrows(
-                CaseRoleAccessException.class, () -> controller.restOrganisationCountForCase(CLIENT_S2S_TOKEN,
-                                                                                             CASE_ID_GOOD,
-                                                                                             true));
+                CaseRoleAccessException.class, () -> controller.restOrganisationsAssignedUsersCountDataForACase(
+                    CLIENT_S2S_TOKEN,
+                    CASE_ID_GOOD,
+                    true
+                )
+            );
 
             // THEN
             verify(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN);
@@ -94,11 +97,11 @@ public class OrganisationAssignedUsersControllerTest {
             setUpGoodS2sToken();
 
             // WHEN
-            controller.restOrganisationCountForCase(CLIENT_S2S_TOKEN, CASE_ID_GOOD, true);
+            controller.restOrganisationsAssignedUsersCountDataForACase(CLIENT_S2S_TOKEN, CASE_ID_GOOD, true);
 
             // THEN
             verify(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN);
-            verify(organisationAssignedUsersService).calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD);
+            verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
 
         }
 
@@ -108,59 +111,59 @@ public class OrganisationAssignedUsersControllerTest {
 
             // GIVEN
             setUpGoodS2sToken();
-            OrganisationAssignedUsersCountData dataFromService = generateOrgCountWithResults();
-            when(organisationAssignedUsersService.calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD))
+            OrganisationsAssignedUsersCountData dataFromService = generateCountDataWithResults();
+            when(organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD))
                 .thenReturn(dataFromService);
 
             // WHEN
-            controller.restOrganisationCountForCase(CLIENT_S2S_TOKEN, CASE_ID_GOOD, true);
+            controller.restOrganisationsAssignedUsersCountDataForACase(CLIENT_S2S_TOKEN, CASE_ID_GOOD, true);
 
             // THEN
-            verify(organisationAssignedUsersService).calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD);
-            verify(organisationAssignedUsersService, never()).saveOrganisationUserCount(any());
+            verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
+            verify(organisationsAssignedUsersService, never()).saveOrganisationUserCount(any());
 
         }
 
-        @DisplayName("should call service then if NOT dry run should call save if org count data returned")
+        @DisplayName("should call service then if NOT dry run should call save if count data returned")
         @Test
-        void shouldCallService_thenIfNotDryRun_callSaveIfOrgCountDataReturned() {
+        void shouldCallService_thenIfNotDryRun_callSaveIfCountDataReturned() {
 
             // GIVEN
             setUpGoodS2sToken();
-            OrganisationAssignedUsersCountData dataFromService = generateOrgCountWithResults();
-            when(organisationAssignedUsersService.calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD))
+            OrganisationsAssignedUsersCountData dataFromService = generateCountDataWithResults();
+            when(organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD))
                 .thenReturn(dataFromService);
 
             // WHEN
-            controller.restOrganisationCountForCase(CLIENT_S2S_TOKEN, CASE_ID_GOOD, false);
+            controller.restOrganisationsAssignedUsersCountDataForACase(CLIENT_S2S_TOKEN, CASE_ID_GOOD, false);
 
             // THEN
-            verify(organisationAssignedUsersService).calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD);
-            verify(organisationAssignedUsersService).saveOrganisationUserCount(dataFromService);
+            verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
+            verify(organisationsAssignedUsersService).saveOrganisationUserCount(dataFromService);
 
         }
 
         @ParameterizedTest(
-            name = "should call service then if NOT dry run should skip save if NO org count data returned: {0}"
+            name = "should call service then if NOT dry run should skip save if NO count data returned: {0}"
         )
         @NullAndEmptySource
-        void shouldCallService_thenIfNotDryRun_skipSaveIfNoOrgCountDataReturned(Map<String, Long> orgAssignedUsers) {
+        void shouldCallService_thenIfNotDryRun_skipSaveIfNoCountDataReturned(Map<String, Long> orgAssignedUsers) {
 
             // GIVEN
             setUpGoodS2sToken();
-            OrganisationAssignedUsersCountData dataFromService = OrganisationAssignedUsersCountData.builder()
+            OrganisationsAssignedUsersCountData dataFromService = OrganisationsAssignedUsersCountData.builder()
                 .caseId(CASE_ID_GOOD)
                 .orgsAssignedUsers(orgAssignedUsers)
                 .build();
-            when(organisationAssignedUsersService.calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD))
+            when(organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD))
                 .thenReturn(dataFromService);
 
             // WHEN
-            controller.restOrganisationCountForCase(CLIENT_S2S_TOKEN, CASE_ID_GOOD, false);
+            controller.restOrganisationsAssignedUsersCountDataForACase(CLIENT_S2S_TOKEN, CASE_ID_GOOD, false);
 
             // THEN
-            verify(organisationAssignedUsersService).calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD);
-            verify(organisationAssignedUsersService, never()).saveOrganisationUserCount(dataFromService);
+            verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
+            verify(organisationsAssignedUsersService, never()).saveOrganisationUserCount(dataFromService);
 
         }
 
@@ -170,12 +173,16 @@ public class OrganisationAssignedUsersControllerTest {
 
             // GIVEN
             setUpGoodS2sToken();
-            OrganisationAssignedUsersCountData dataFromService = generateOrgCountWithResults();
-            when(organisationAssignedUsersService.calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD))
+            OrganisationsAssignedUsersCountData dataFromService = generateCountDataWithResults();
+            when(organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD))
                 .thenReturn(dataFromService);
 
             // WHEN
-            var response = controller.restOrganisationCountForCase(CLIENT_S2S_TOKEN, CASE_ID_GOOD, true);
+            var response = controller.restOrganisationsAssignedUsersCountDataForACase(
+                CLIENT_S2S_TOKEN,
+                CASE_ID_GOOD,
+                true
+            );
 
             // THEN
             assertEquals(dataFromService, response);
@@ -185,7 +192,7 @@ public class OrganisationAssignedUsersControllerTest {
     }
 
     @Nested
-    class RestOrganisationCountForMultipleCases {
+    class RestOrganisationsAssignedUsersCountDataForMultipleCases {
 
         @DisplayName("Should verify S2S token and throw exception when service not authorised")
         @Test
@@ -194,15 +201,18 @@ public class OrganisationAssignedUsersControllerTest {
             // GIVEN
             setUpBadS2sToken();
 
-            OrganisationAssignedUsersResetRequest request = new OrganisationAssignedUsersResetRequest(
+            OrganisationsAssignedUsersResetRequest request = new OrganisationsAssignedUsersResetRequest(
                 List.of(CASE_ID_GOOD),
                 true
             );
 
             // WHEN
             CaseRoleAccessException exception = assertThrows(
-                CaseRoleAccessException.class, () -> controller.restOrganisationCountForMultipleCases(CLIENT_S2S_TOKEN,
-                                                                                                      request));
+                CaseRoleAccessException.class, () -> controller.restOrganisationsAssignedUsersCountDataForMultipleCases(
+                    CLIENT_S2S_TOKEN,
+                    request
+                )
+            );
 
             // THEN
             verify(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN);
@@ -217,17 +227,17 @@ public class OrganisationAssignedUsersControllerTest {
             // GIVEN
             setUpGoodS2sToken();
 
-            OrganisationAssignedUsersResetRequest request = new OrganisationAssignedUsersResetRequest(
+            OrganisationsAssignedUsersResetRequest request = new OrganisationsAssignedUsersResetRequest(
                 List.of(CASE_ID_GOOD),
                 true
             );
 
             // WHEN
-            controller.restOrganisationCountForMultipleCases(CLIENT_S2S_TOKEN, request);
+            controller.restOrganisationsAssignedUsersCountDataForMultipleCases(CLIENT_S2S_TOKEN, request);
 
             // THEN
             verify(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN);
-            verify(organisationAssignedUsersService).calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD);
+            verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
 
         }
 
@@ -238,76 +248,76 @@ public class OrganisationAssignedUsersControllerTest {
             // GIVEN
             setUpGoodS2sToken();
 
-            OrganisationAssignedUsersResetRequest request = new OrganisationAssignedUsersResetRequest(
+            OrganisationsAssignedUsersResetRequest request = new OrganisationsAssignedUsersResetRequest(
                 List.of(CASE_ID_GOOD),
                 true
             );
 
-            OrganisationAssignedUsersCountData dataFromService = generateOrgCountWithResults();
-            when(organisationAssignedUsersService.calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD))
+            OrganisationsAssignedUsersCountData dataFromService = generateCountDataWithResults();
+            when(organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD))
                 .thenReturn(dataFromService);
 
             // WHEN
-            controller.restOrganisationCountForMultipleCases(CLIENT_S2S_TOKEN, request);
+            controller.restOrganisationsAssignedUsersCountDataForMultipleCases(CLIENT_S2S_TOKEN, request);
 
             // THEN
-            verify(organisationAssignedUsersService).calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD);
-            verify(organisationAssignedUsersService, never()).saveOrganisationUserCount(any());
+            verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
+            verify(organisationsAssignedUsersService, never()).saveOrganisationUserCount(any());
 
         }
 
-        @DisplayName("should call service then if NOT dry run should call save if org count data returned")
+        @DisplayName("should call service then if NOT dry run should call save if count data returned")
         @Test
-        void shouldCallService_thenIfNotDryRun_callSaveIfOrgCountDataReturned() {
+        void shouldCallService_thenIfNotDryRun_callSaveIfCountDataReturned() {
 
             // GIVEN
             setUpGoodS2sToken();
 
-            OrganisationAssignedUsersResetRequest request = new OrganisationAssignedUsersResetRequest(
+            OrganisationsAssignedUsersResetRequest request = new OrganisationsAssignedUsersResetRequest(
                 List.of(CASE_ID_GOOD),
                 false
             );
 
-            OrganisationAssignedUsersCountData dataFromService = generateOrgCountWithResults();
-            when(organisationAssignedUsersService.calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD))
+            OrganisationsAssignedUsersCountData dataFromService = generateCountDataWithResults();
+            when(organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD))
                 .thenReturn(dataFromService);
 
             // WHEN
-            controller.restOrganisationCountForMultipleCases(CLIENT_S2S_TOKEN, request);
+            controller.restOrganisationsAssignedUsersCountDataForMultipleCases(CLIENT_S2S_TOKEN, request);
 
             // THEN
-            verify(organisationAssignedUsersService).calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD);
-            verify(organisationAssignedUsersService).saveOrganisationUserCount(dataFromService);
+            verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
+            verify(organisationsAssignedUsersService).saveOrganisationUserCount(dataFromService);
 
         }
 
         @ParameterizedTest(
-            name = "should call service then if NOT dry run should skip save if NO org count data returned: {0}"
+            name = "should call service then if NOT dry run should skip save if NO count data returned: {0}"
         )
         @NullAndEmptySource
-        void shouldCallService_thenIfNotDryRun_skipSaveIfNoOrgCountDataReturned(Map<String, Long> orgAssignedUsers) {
+        void shouldCallService_thenIfNotDryRun_skipSaveIfNoCountDataReturned(Map<String, Long> orgAssignedUsers) {
 
             // GIVEN
             setUpGoodS2sToken();
 
-            OrganisationAssignedUsersResetRequest request = new OrganisationAssignedUsersResetRequest(
+            OrganisationsAssignedUsersResetRequest request = new OrganisationsAssignedUsersResetRequest(
                 List.of(CASE_ID_GOOD),
                 false
             );
 
-            OrganisationAssignedUsersCountData dataFromService = OrganisationAssignedUsersCountData.builder()
+            OrganisationsAssignedUsersCountData dataFromService = OrganisationsAssignedUsersCountData.builder()
                 .caseId(CASE_ID_GOOD)
                 .orgsAssignedUsers(orgAssignedUsers)
                 .build();
-            when(organisationAssignedUsersService.calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD))
+            when(organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD))
                 .thenReturn(dataFromService);
 
             // WHEN
-            controller.restOrganisationCountForMultipleCases(CLIENT_S2S_TOKEN, request);
+            controller.restOrganisationsAssignedUsersCountDataForMultipleCases(CLIENT_S2S_TOKEN, request);
 
             // THEN
-            verify(organisationAssignedUsersService).calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD);
-            verify(organisationAssignedUsersService, never()).saveOrganisationUserCount(dataFromService);
+            verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
+            verify(organisationsAssignedUsersService, never()).saveOrganisationUserCount(dataFromService);
 
         }
 
@@ -318,21 +328,24 @@ public class OrganisationAssignedUsersControllerTest {
             // GIVEN
             setUpGoodS2sToken();
 
-            OrganisationAssignedUsersResetRequest request = new OrganisationAssignedUsersResetRequest(
+            OrganisationsAssignedUsersResetRequest request = new OrganisationsAssignedUsersResetRequest(
                 List.of(CASE_ID_GOOD),
                 true
             );
 
-            OrganisationAssignedUsersCountData dataFromService = generateOrgCountWithResults();
-            when(organisationAssignedUsersService.calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD))
+            OrganisationsAssignedUsersCountData dataFromService = generateCountDataWithResults();
+            when(organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD))
                 .thenReturn(dataFromService);
 
             // WHEN
-            var response = controller.restOrganisationCountForMultipleCases(CLIENT_S2S_TOKEN, request);
+            var response = controller.restOrganisationsAssignedUsersCountDataForMultipleCases(
+                CLIENT_S2S_TOKEN,
+                request
+            );
 
             // THEN
-            assertEquals(1, response.getOrgUserCounts().size());
-            assertEquals(dataFromService, response.getOrgUserCounts().get(0));
+            assertEquals(1, response.getCountData().size());
+            assertEquals(dataFromService, response.getCountData().get(0));
 
         }
 
@@ -343,22 +356,25 @@ public class OrganisationAssignedUsersControllerTest {
             // GIVEN
             setUpGoodS2sToken();
 
-            OrganisationAssignedUsersResetRequest request = new OrganisationAssignedUsersResetRequest(
+            OrganisationsAssignedUsersResetRequest request = new OrganisationsAssignedUsersResetRequest(
                 List.of(CASE_ID_NOT_FOUND),
                 true
             );
 
-            when(organisationAssignedUsersService.calculateOrganisationAssignedUsersCountOnCase(CASE_ID_NOT_FOUND))
+            when(organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(CASE_ID_NOT_FOUND))
                 .thenThrow(new CaseCouldNotBeFoundException(CASE_NOT_FOUND));
 
             // WHEN
-            var response = controller.restOrganisationCountForMultipleCases(CLIENT_S2S_TOKEN, request);
+            var response = controller.restOrganisationsAssignedUsersCountDataForMultipleCases(
+                CLIENT_S2S_TOKEN,
+                request
+            );
 
             // THEN
-            assertEquals(1, response.getOrgUserCounts().size());
-            var orgCountData = response.getOrgUserCounts().get(0);
-            assertEquals(CASE_ID_NOT_FOUND, orgCountData.getCaseId());
-            assertTrue(orgCountData.getError().contains(CASE_NOT_FOUND));
+            assertEquals(1, response.getCountData().size());
+            var countData = response.getCountData().get(0);
+            assertEquals(CASE_ID_NOT_FOUND, countData.getCaseId());
+            assertTrue(countData.getError().contains(CASE_NOT_FOUND));
 
         }
 
@@ -369,47 +385,50 @@ public class OrganisationAssignedUsersControllerTest {
             // GIVEN
             setUpGoodS2sToken();
 
-            OrganisationAssignedUsersResetRequest request = new OrganisationAssignedUsersResetRequest(
+            OrganisationsAssignedUsersResetRequest request = new OrganisationsAssignedUsersResetRequest(
                 List.of(CASE_ID_GOOD, CASE_ID_NOT_FOUND),
                 true
             );
 
-            OrganisationAssignedUsersCountData dataFromService1 = generateOrgCountWithResults();
-            when(organisationAssignedUsersService.calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD))
+            OrganisationsAssignedUsersCountData dataFromService1 = generateCountDataWithResults();
+            when(organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD))
                 .thenReturn(dataFromService1);
-            when(organisationAssignedUsersService.calculateOrganisationAssignedUsersCountOnCase(CASE_ID_NOT_FOUND))
+            when(organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(CASE_ID_NOT_FOUND))
                 .thenThrow(new CaseCouldNotBeFoundException(CASE_NOT_FOUND));
 
             // WHEN
-            var response = controller.restOrganisationCountForMultipleCases(CLIENT_S2S_TOKEN, request);
+            var response = controller.restOrganisationsAssignedUsersCountDataForMultipleCases(
+                CLIENT_S2S_TOKEN,
+                request
+            );
 
             // THEN
-            verify(organisationAssignedUsersService).calculateOrganisationAssignedUsersCountOnCase(CASE_ID_GOOD);
-            verify(organisationAssignedUsersService).calculateOrganisationAssignedUsersCountOnCase(CASE_ID_NOT_FOUND);
+            verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
+            verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_NOT_FOUND);
 
-            assertEquals(2, response.getOrgUserCounts().size());
+            assertEquals(2, response.getCountData().size());
 
-            var orgCountData1 = response.getOrgUserCounts().stream()
+            var countData1 = response.getCountData().stream()
                 .filter(data -> CASE_ID_GOOD.equals(data.getCaseId()))
                 .findFirst();
-            assertTrue(orgCountData1.isPresent());
-            assertEquals(dataFromService1, orgCountData1.get());
+            assertTrue(countData1.isPresent());
+            assertEquals(dataFromService1, countData1.get());
 
-            var orgCountData2 = response.getOrgUserCounts().stream()
+            var countData2 = response.getCountData().stream()
                 .filter(data -> CASE_ID_NOT_FOUND.equals(data.getCaseId()))
                 .findFirst();
-            assertTrue(orgCountData2.isPresent());
-            assertEquals(CASE_ID_NOT_FOUND, orgCountData2.get().getCaseId());
-            assertTrue(orgCountData2.get().getError().contains(CASE_NOT_FOUND));
+            assertTrue(countData2.isPresent());
+            assertEquals(CASE_ID_NOT_FOUND, countData2.get().getCaseId());
+            assertTrue(countData2.get().getError().contains(CASE_NOT_FOUND));
 
         }
 
     }
 
-    private OrganisationAssignedUsersCountData generateOrgCountWithResults() {
+    private OrganisationsAssignedUsersCountData generateCountDataWithResults() {
         Map<String, Long> orgAssignedUsers = new HashMap<>();
         orgAssignedUsers.put("OrgId1", 2L);
-        return OrganisationAssignedUsersCountData.builder()
+        return OrganisationsAssignedUsersCountData.builder()
             .caseId(CASE_ID_GOOD)
             .orgsAssignedUsers(orgAssignedUsers)
             .build();

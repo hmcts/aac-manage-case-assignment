@@ -1,5 +1,6 @@
 plugins {
   id 'application'
+  id 'idea'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.10.RELEASE'
   id 'org.springframework.boot' version '2.6.10'
@@ -51,6 +52,18 @@ sourceSets {
     resources.srcDir file('src/contractTest/resources')
   }
 
+}
+
+idea {
+  module {
+    // config to allow Intellij to mark test source and resource files correctly to help linting tools
+    testSourceDirs += project.sourceSets.contractTest.java.srcDirs
+    testSourceDirs += project.sourceSets.functionalTest.java.srcDirs
+    testSourceDirs += project.sourceSets.integrationTest.java.srcDirs
+    testResourceDirs += project.sourceSets.contractTest.resources.srcDirs
+    testResourceDirs += project.sourceSets.functionalTest.resources.srcDirs
+    testResourceDirs += project.sourceSets.integrationTest.resources.srcDirs
+  }
 }
 
 tasks.withType(JavaCompile) {
@@ -203,7 +216,7 @@ sonarqube {
     property "sonar.projectName", "Reform::manage-case-assignment"
     property "sonar.projectKey", "uk.gov.hmcts.reform:manage-case-assignment"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions","**/api/controller/OrganisationAssignedUsersController.java,**/api/payload/OrganisationAssignedUsersResetResponse.java,**/domain/OrganisationAssignedUsersCountData.java,**/service/OrganisationAssignedUsersService.java"
+    property "sonar.coverage.exclusions","**/service/OrganisationsAssignedUsersService.java"
   }
 }
 

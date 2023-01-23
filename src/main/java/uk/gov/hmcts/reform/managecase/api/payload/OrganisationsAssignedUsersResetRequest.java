@@ -14,8 +14,8 @@ import javax.validation.constraints.Size;
 
 import java.util.List;
 
-import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationAssignedUsersController.PARAM_CASE_LIST;
-import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationAssignedUsersController.PARAM_DRY_RUN_FLAG;
+import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PARAM_CASE_LIST;
+import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PARAM_DRY_RUN_FLAG;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
@@ -24,8 +24,8 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.E
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ApiModel("Organisation Assigned Users Reset Request")
-public class OrganisationAssignedUsersResetRequest {
+@ApiModel("Organisations Assigned Users Reset Request")
+public class OrganisationsAssignedUsersResetRequest {
 
     @JsonProperty(PARAM_CASE_LIST)
     @Valid

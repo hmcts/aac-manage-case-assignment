@@ -12,7 +12,7 @@ import java.util.Map;
 @Getter
 @Builder
 @ApiModel("Count of each organisation's assigned users for single case")
-public class OrganisationAssignedUsersCountData {
+public class OrganisationsAssignedUsersCountData {
 
     @JsonProperty("case_id")
     @ApiModelProperty(name = "Case ID", example = "1674129395329972")

@@ -18,4 +18,4 @@ java:
     CCD_DEFINITION_STORE_API_BASE_URL: http://ccd-definition-store-api-pr-575-java.ccd
     ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
     MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp,ccd_data,finrem_case_orchestration,divorce_frontend,iac,nfdiv_cos,fpl_case_service,civil_service,prl_cos_api
-    MCA_CONDITIONAL_APIS_ORG_COUNT_ENABLED: true
+    MCA_CONDITIONAL_APIS_ORGS_ASSIGNED_USERS_ENABLED: true

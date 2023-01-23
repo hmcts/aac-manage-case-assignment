@@ -108,7 +108,7 @@ notify:
 role:
   assignment:
     api:
-      host: ${ROLE_ASSIGNMENT_URL:http://localhost:5555}
+      host: ${ROLE_ASSIGNMENT_URL:http://localhost:4096}
 
 http:
   client:

@@ -1,0 +1,54 @@
+{
+  "_guid_" : "S-210.01",
+  "_extends_" : "OrganisationsAssignedUsers_ResetForCase__PositiveResponse__Base",
+
+  "title": "Dry Run, 2 Orgs with assigned users",
+
+  "specs": [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)",
+    "Bill - with a solicitor role for the same jurisdiction within a different organisation (Org1) from Richard",
+    "Benjamin - with a solicitor role for the same jurisdiction within a different organisation (Org1) from Richard",
+    "INVOKER - with access to case",
+
+    "is made after roles assigned to Org 1 - 2 users with same role",
+    "is made after roles assigned to Org 2 - 1 user with 2 roles",
+    "is made for the case record for C1",
+
+    "has Org 1 count with 2 users",
+    "has Org 2 count with 1 user"
+  ],
+
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "Bill": {
+      "_extends_": "ACA_Users_Bill"
+    },
+    "Benjamin": {
+      "_extends_": "ACA_Users_Benjamin"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
+
+  "request" : {
+    "queryParams": {
+      "case_id": "${[scenarioContext][childContexts][F-210_Case_Creation_C1_With_Org_Policies_Both_Orgs][testData][actualResponse][body][id]}",
+      "dry_run": true
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "orgs_assigned_users": {
+        "QUK822N": 2,
+        "LESTKK0": 1
+      }
+    }
+  }
+
+}

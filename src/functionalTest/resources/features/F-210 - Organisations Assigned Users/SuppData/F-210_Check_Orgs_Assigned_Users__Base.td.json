@@ -1,0 +1,23 @@
+{
+  "_guid_": "F-210_Check_Orgs_Assigned_Users__Base",
+  "_extends_": "Case_Supplementary_Data__Base",
+
+  "title": "Check orgs_assigned_users counter",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
+  "request": {
+    "body": {
+      "supplementary_data_updates": {
+        "$inc" : {
+          "orgs_assigned_users.QUK822N" : 0,
+          "orgs_assigned_users.LESTKK0" : 0
+        }
+      }
+    }
+  }
+}

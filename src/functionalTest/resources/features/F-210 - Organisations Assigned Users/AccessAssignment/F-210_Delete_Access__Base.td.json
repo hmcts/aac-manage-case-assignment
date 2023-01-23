@@ -1,0 +1,15 @@
+{
+  "_guid_": "F-210_Delete_Access__Base",
+  "_extends_": "Delete_Case_Access__Base",
+
+  "title": "Delete Access to Case",
+
+  "s2sClientId": "aac_manage_case_assignment",
+  "userTokenClientId": "xuiwebapp",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  }
+}

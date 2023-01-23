@@ -1,0 +1,9 @@
+{
+  "_guid_" : "OrganisationsAssignedUsers_ResetForCases__PositiveResponse__Base",
+  "_extends_": "OrganisationsAssignedUsers_ResetForCases__Base",
+
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response"
+  }
+}

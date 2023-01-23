@@ -1,0 +1,33 @@
+{
+  "_guid_": "F-210_Assign_Access_Without_OrgId_C1_Org2_LESTKK0",
+  "_extends_": "F-210_Assign_Access__Base",
+
+  "specs": [
+    "to assign users to the case but not update OrgCount - 1 user with 2 roles"
+  ],
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][siblingContexts][F-210_Case_Creation_C1_With_Org_Policies_Both_Orgs][testData][actualResponse][body][id]}",
+          "case_role": "[RespondentSolicitor]",
+          "user_id": "${[scenarioContext][testData][users][Richard][id]}"
+        },
+        {
+          "case_id": "${[scenarioContext][siblingContexts][F-210_Case_Creation_C1_With_Org_Policies_Both_Orgs][testData][actualResponse][body][id]}",
+          "case_role": "[OtherPartySolicitor]",
+          "user_id": "${[scenarioContext][testData][users][Richard][id]}"
+        }
+      ]
+    }
+  }
+
+}

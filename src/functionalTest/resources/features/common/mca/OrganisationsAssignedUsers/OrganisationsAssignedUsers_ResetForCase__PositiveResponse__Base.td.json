@@ -1,0 +1,12 @@
+{
+  "_guid_" : "OrganisationsAssignedUsers_ResetForCase__PositiveResponse__Base",
+  "_extends_": "OrganisationsAssignedUsers_ResetForCase__Base",
+
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "case_id": "${}${[scenarioContext][testData][request][queryParams][case_id]}"
+    }
+  }
+}

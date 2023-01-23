@@ -1,0 +1,54 @@
+{
+  "_guid_": "F-210_Case_Creation_C3_With_Org_Policies_Assigned_Good_Org_Bad_Org",
+  "_extends_": "NoC_Case_Creation_With_Org_Policies__Base",
+
+  "specs": [
+    "By Richard to create a case - C3 - is assigned to one GOOD org and 1 BAD org (i.e. unknown OrgID)"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Richard"
+    }
+  },
+
+  "prerequisites": [
+    {
+      "Token_Creation": "F-210_Case_Creation_Token_Creation"
+    }
+  ],
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+
+      "data": {
+        "applicantOrganisationPolicy": {
+          "_extends_" : "F-210_Organisation_OrgID_Unknown"
+        },
+        "respondentOrganisationPolicy": {
+          "_extends_" : "F-210_Organisation_Org2_LESTKK0"
+        },
+        "otherPartyOrganisationPolicy": {
+          "_extends_" : "F-210_Organisation_Org2_LESTKK0"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "applicantOrganisationPolicy": {
+          "_extends_" : "F-210_Organisation_OrgID_Unknown"
+        },
+        "respondentOrganisationPolicy": {
+          "_extends_" : "F-210_Organisation_Org2_LESTKK0"
+        },
+        "otherPartyOrganisationPolicy": {
+          "_extends_" : "F-210_Organisation_Org2_LESTKK0"
+        }
+      }
+    }
+  }
+}

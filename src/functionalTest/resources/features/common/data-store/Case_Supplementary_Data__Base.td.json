@@ -1,0 +1,37 @@
+{
+  "_guid_": "Case_Supplementary_Data__Base",
+
+  "title": "Case Supplementary Data Update",
+
+  "productName": "CCD Data Store",
+  "operationName": "Update Case Supplementary Data",
+
+  "method": "POST",
+  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/cases/{cid}/supplementary-data",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "OVERRIDE"
+    },
+    "body": {
+      "supplementary_data_updates": {
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANYTHING_PRESENT]]"
+    },
+
+    "body" : {
+      "supplementary_data" : {
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "_guid_": "F-210_Delete_Creator_Role_C4",
+  "_extends_": "F-210_Delete_Creator_Role__Base",
+
+  "specs": [
+    "to remove CREATOR assigned CaseRole for C4"
+  ],
+
+  "request": {
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][SiblingContexts][F-210_Case_Creation_C4_With_Org_Policies_Assigned_To_1_Org][testData][actualResponse][body][id]}",
+          "case_role": "[CREATOR]",
+          "user_id": "${[scenarioContext][testData][users][Richard][id]}"
+        }
+      ]
+    }
+  }
+}

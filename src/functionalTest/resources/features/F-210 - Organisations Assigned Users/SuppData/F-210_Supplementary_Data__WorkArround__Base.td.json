@@ -1,0 +1,30 @@
+{
+  "_guid_": "F-210_Supplementary_Data__WorkArround__Base",
+  "_extends_": "Case_Supplementary_Data__Base",
+
+  "title": "Workarround $inc by zero issue in Supplementary Data",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
+  "request": {
+    "body": {
+      "supplementary_data_updates": {
+        "$inc" : {
+          "orgs_assigned_users.WorkArround" : 999
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "supplementary_data" : {
+        "orgs_assigned_users.WorkArround": 999
+      }
+    }
+  }
+}

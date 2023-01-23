@@ -1,0 +1,54 @@
+{
+  "_guid_": "F-210_Case_Creation_C4_With_Org_Policies_Assigned_To_1_Org",
+  "_extends_": "NoC_Case_Creation_With_Org_Policies__Base",
+
+  "specs": [
+    "By Richard to create a case - C4 - is assigned to one org"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Richard"
+    }
+  },
+
+  "prerequisites": [
+    {
+      "Token_Creation": "F-210_Case_Creation_Token_Creation"
+    }
+  ],
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+
+      "data": {
+        "applicantOrganisationPolicy": {
+          "_extends_" : "F-210_Organisation_OrgID_Null"
+        },
+        "respondentOrganisationPolicy": {
+          "_extends_" : "F-210_Organisation_Org2_LESTKK0"
+        },
+        "otherPartyOrganisationPolicy": {
+          "_extends_" : "F-210_Organisation_Org2_LESTKK0"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "applicantOrganisationPolicy": {
+          "_extends_" : "F-210_Organisation_OrgID_Null"
+        },
+        "respondentOrganisationPolicy": {
+          "_extends_" : "F-210_Organisation_Org2_LESTKK0"
+        },
+        "otherPartyOrganisationPolicy": {
+          "_extends_" : "F-210_Organisation_Org2_LESTKK0"
+        }
+      }
+    }
+  }
+}

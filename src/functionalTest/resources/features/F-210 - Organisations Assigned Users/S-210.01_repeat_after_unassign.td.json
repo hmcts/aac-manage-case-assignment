@@ -1,0 +1,25 @@
+{
+  "_guid_" : "S-210.01_repeat_after_unassign",
+  "_extends_" : "S-210.01",
+
+  "specs": [
+    "repeat call after unassign"
+  ],
+
+  "request" : {
+    "queryParams": {
+      "case_id": "${[scenarioContext][ParentContext][testData][request][queryParams][case_id]}",
+      "dry_run": false
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "orgs_assigned_users": {
+        "QUK822N": 1,
+        "LESTKK0": 1
+      }
+    }
+  }
+
+}

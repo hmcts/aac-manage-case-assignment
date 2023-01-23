@@ -37,6 +37,7 @@ import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.ORGS_ASSIGNED_USERS_PATH;
+import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PROPERTY_CONTROLLER_ENABLED;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
@@ -48,12 +49,17 @@ import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTH
 @RestController
 @Validated
 @RequestMapping(path = ORGS_ASSIGNED_USERS_PATH)
-@ConditionalOnProperty(value = "mca.conditional-apis.organisations-assigned-users.enabled", havingValue = "true")
+@ConditionalOnProperty(value = PROPERTY_CONTROLLER_ENABLED, havingValue = "true")
 public class OrganisationsAssignedUsersController {
     private static final Logger LOG = LoggerFactory.getLogger(OrganisationsAssignedUsersController.class);
 
-    @Value("#{'${ccd.s2s-authorised.services.organisations_assigned_users}'.split(',')}")
-    private List<String> authorisedServicesForOrganisationsAssignedUsers;
+    public static final String PROPERTY_CONTROLLER_ENABLED
+        = "mca.conditional-apis.organisations-assigned-users.enabled";
+    public static final String PROPERTY_S2S_AUTHORISED_SERVICES
+        = "ccd.s2s-authorised.services.organisations_assigned_users";
+
+    @Value("#{'${" + PROPERTY_S2S_AUTHORISED_SERVICES + "}'.split(',')}")
+    protected List<String> authorisedServicesForOrganisationsAssignedUsers;
 
     public static final String PARAM_CASE_ID = "case_id";
     public static final String PARAM_CASE_LIST = "case_ids";

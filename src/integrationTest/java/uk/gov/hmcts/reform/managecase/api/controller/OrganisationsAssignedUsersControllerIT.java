@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -9,13 +10,17 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.managecase.BaseTest;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.OrganisationsAssignedUsersResetRequest;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -27,13 +32,15 @@ import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssigne
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PARAM_CASE_ID;
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PARAM_CASE_LIST;
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PARAM_DRY_RUN_FLAG;
-import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.RESET_FOR_MULTIPLE_CASES_PATH;
+import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PROPERTY_CONTROLLER_ENABLED;
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.RESET_FOR_A_CASE_PATH;
+import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.RESET_FOR_MULTIPLE_CASES_PATH;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.S2S_TOKEN;
 import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @SuppressWarnings({"squid:S100"})
-public class OrganisationsAssignedUsersControllerIT {
+@TestPropertySource(properties = {PROPERTY_CONTROLLER_ENABLED + "=true"})
+public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
     private static final String JSON_PATH_ERRORS = "$.errors";
 
@@ -41,15 +48,74 @@ public class OrganisationsAssignedUsersControllerIT {
     private static final String CASE_ID_INVALID_LENGTH = "8010964826";
     private static final String CASE_ID_INVALID_LUHN = "4444333322221112";
 
+    @Inject
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper mapper;
+
+
+    @Nested
+    @DisplayName("OrganisationsAssignedUsers Endpoint Disabled")
+    @TestPropertySource(properties = {PROPERTY_CONTROLLER_ENABLED + "=false"})
+    class OrganisationsAssignedUsersEndpointDisabled {
+
+        @Inject // NB: using a fresh WAC instance, so it loads using new test.properties
+        private WebApplicationContext wac;
+
+        @BeforeEach
+        public void setUp() {
+            setUpMvc(wac);
+        }
+
+        @Test
+        @DisplayName("Should return NOT_FOUND for RESET_FOR_A_CASE_PATH if controller is disabled")
+        void shouldReturn404_forResetForACase_whenControllerIsDisabled() throws Exception {
+
+            // GIVEN
+            MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+            queryParams.add(PARAM_CASE_ID, CASE_ID_GOOD);
+            queryParams.add(PARAM_DRY_RUN_FLAG, "true");
+
+            // WHEN
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .queryParams(queryParams)
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
+                .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @DisplayName("Should return NOT_FOUND for RESET_FOR_MULTIPLE_CASES_PATH if controller is disabled")
+        void shouldReturn404_forResetForMultipleCases_whenControllerIsDisabled() throws Exception {
+
+            // GIVEN
+            OrganisationsAssignedUsersResetRequest request = new OrganisationsAssignedUsersResetRequest(
+                List.of(CASE_ID_GOOD),
+                true
+            );
+
+            // WHEN
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .content(mapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
+                .andExpect(status().isNotFound());
+        }
+    }
+
     @Nested
     @DisplayName("POST " + ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
-    class RestOrganisationsAssignedUsersCountDataForACase extends BaseTest {
+    class RestOrganisationsAssignedUsersCountDataForACase {
 
-        @Autowired
-        private MockMvc mockMvc;
-
-        @Autowired
-        private ObjectMapper objectMapper;
+        @BeforeEach
+        public void setUp() {
+            setUpMvc(wac);
+        }
 
         @ParameterizedTest(name = "Should return 400 when bad Case ID passed: {0}")
         @MethodSource(BAD_CASE_IDS_AND_ERRORS)
@@ -61,10 +127,11 @@ public class OrganisationsAssignedUsersControllerIT {
             queryParams.add(PARAM_DRY_RUN_FLAG, "true");
 
             // WHEN
-            this.mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
-                                     .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
-                                     .queryParams(queryParams)
-                                     .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .queryParams(queryParams)
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath(JSON_PATH_ERRORS, hasItem(expectedError)));
         }
@@ -78,10 +145,11 @@ public class OrganisationsAssignedUsersControllerIT {
             queryParams.add(PARAM_DRY_RUN_FLAG, "bad-value");
 
             // WHEN
-            this.mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
-                                     .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
-                                     .queryParams(queryParams)
-                                     .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .queryParams(queryParams)
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
                 .andExpect(status().isBadRequest());
         }
 
@@ -94,10 +162,11 @@ public class OrganisationsAssignedUsersControllerIT {
             queryParams.add(PARAM_DRY_RUN_FLAG, "true");
 
             // WHEN
-            this.mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
-                                     .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
-                                     .queryParams(queryParams)
-                                     .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .queryParams(queryParams)
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
                 .andExpect(status().isBadRequest());
         }
 
@@ -110,23 +179,23 @@ public class OrganisationsAssignedUsersControllerIT {
             queryParams.add(PARAM_CASE_ID, CASE_ID_GOOD);
 
             // WHEN
-            this.mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
-                                     .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
-                                     .queryParams(queryParams)
-                                     .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .queryParams(queryParams)
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
                 .andExpect(status().isBadRequest());
         }
     }
 
     @Nested
     @DisplayName("POST " + ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
-    class RestOrganisationsAssignedUsersCountDataForMultipleCases extends BaseTest {
+    class RestOrganisationsAssignedUsersCountDataForMultipleCases {
 
-        @Autowired
-        private MockMvc mockMvc;
-
-        @Autowired
-        private ObjectMapper mapper;
+        @BeforeEach
+        public void setUp() {
+            setUpMvc(wac);
+        }
 
         @ParameterizedTest(name = "Should return 400 when bad Case List value passed: {0}")
         @MethodSource(BAD_CASE_IDS_AND_ERRORS)
@@ -139,10 +208,11 @@ public class OrganisationsAssignedUsersControllerIT {
             );
 
             // WHEN
-            this.mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
-                                     .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
-                                     .content(mapper.writeValueAsString(request))
-                                     .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .content(mapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath(JSON_PATH_ERRORS, hasItem(expectedError)));
         }
@@ -156,10 +226,11 @@ public class OrganisationsAssignedUsersControllerIT {
                 + "\"" + PARAM_DRY_RUN_FLAG + "\": \"bad-value\" }";
 
             // WHEN
-            this.mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
-                                     .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
-                                     .content(request)
-                                     .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .content(request)
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
                 .andExpect(status().isBadRequest());
         }
 
@@ -174,10 +245,11 @@ public class OrganisationsAssignedUsersControllerIT {
             );
 
             // WHEN
-            this.mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
-                                     .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
-                                     .content(mapper.writeValueAsString(request))
-                                     .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .content(mapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath(JSON_PATH_ERRORS, hasItem(ValidationError.EMPTY_CASE_ID_LIST)));
         }
@@ -190,10 +262,11 @@ public class OrganisationsAssignedUsersControllerIT {
             String request = "{ \"" + PARAM_DRY_RUN_FLAG + "\": \"true\" }";
 
             // WHEN
-            this.mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
-                                     .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
-                                     .content(request)
-                                     .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .content(request)
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
                 .andExpect(status().isBadRequest());
         }
 
@@ -205,10 +278,11 @@ public class OrganisationsAssignedUsersControllerIT {
             String request = "{ \"" + PARAM_CASE_LIST + "\": [ \"" + CASE_ID_GOOD + "\" ] }";
 
             // WHEN
-            this.mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
-                                     .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
-                                     .content(mapper.writeValueAsString(request))
-                                     .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .content(mapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
                 .andExpect(status().isBadRequest());
         }
     }
@@ -226,6 +300,10 @@ public class OrganisationsAssignedUsersControllerIT {
             Arguments.of(CASE_ID_INVALID_LENGTH, ValidationError.CASE_ID_INVALID_LENGTH),
             Arguments.of(CASE_ID_INVALID_LUHN, ValidationError.CASE_ID_INVALID)
         );
+    }
+
+    private void setUpMvc(WebApplicationContext wac) {
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
 }

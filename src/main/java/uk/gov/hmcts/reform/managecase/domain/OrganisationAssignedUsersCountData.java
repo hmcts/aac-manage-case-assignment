@@ -15,11 +15,12 @@ import java.util.Map;
 public class OrganisationAssignedUsersCountData {
 
     @JsonProperty("case_id")
-    @ApiModelProperty(name = "Case ID", required = true, example = "1674129395329972")
+    @ApiModelProperty(name = "Case ID", example = "1674129395329972")
     private final String caseId;
 
     @JsonProperty("orgs_assigned_users")
-    @ApiModelProperty(name = "Each organisation's assigned user count", required = true, example = "{\n"
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @ApiModelProperty(name = "Each organisation's assigned user count", example = "{\n"
         + "   \"QUK822N\": 2,\n"
         + "   \"LESTKK0\": 1\n"
         + "}")
@@ -31,5 +32,9 @@ public class OrganisationAssignedUsersCountData {
         + "}")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private final Map<String, String> skippedOrgs;
+
+    @JsonProperty("error")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private final String error;
 
 }

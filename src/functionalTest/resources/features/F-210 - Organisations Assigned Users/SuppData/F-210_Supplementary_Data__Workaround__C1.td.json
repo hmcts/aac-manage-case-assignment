@@ -1,9 +1,9 @@
 {
-  "_guid_": "F-210_Supplementary_Data__WorkArround__C1",
-  "_extends_": "F-210_Supplementary_Data__WorkArround__Base",
+  "_guid_": "F-210_Supplementary_Data__Workaround__C1",
+  "_extends_": "F-210_Supplementary_Data__Workaround__Base",
 
   "specs": [
-    "to workarround $inc by zero issue in Supplementary Data for C1"
+    "to workaround $inc by zero issue in Supplementary Data for C1"
   ],
 
   "request": {

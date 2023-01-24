@@ -1,0 +1,10 @@
+{
+	"_guid_": "ACA_403_Response_S2S_Not_Authorised_For_API",
+	"_extends_": "ACA_403_Response",
+
+	"body": {
+		"status" : "FORBIDDEN",
+		"message" : "Client service not authorised to perform operation"
+	}
+
+}

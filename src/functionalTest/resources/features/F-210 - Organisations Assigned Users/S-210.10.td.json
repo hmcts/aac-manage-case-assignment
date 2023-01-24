@@ -13,7 +13,7 @@
     "has the 403 return code"
   ],
 
-  "s2sClientId": "ccd_gw",
+  "s2sClientId": "xui_webapp",
 
   "users": {
     "invokingUser": {
@@ -32,7 +32,7 @@
   },
 
   "expectedResponse": {
-    "_extends_": "ACA_403_Response"
+    "_extends_": "ACA_403_Response_S2S_Not_Authorised_For_API"
   }
 
 }

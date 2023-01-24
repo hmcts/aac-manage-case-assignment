@@ -14,6 +14,7 @@ export CCD_BEFTA_SOLICITOR_4_PWD=Pa55word11
 export TEST_URL=http://localhost:4454
 export MCA_API_BASE_URL=http://host.docker.internal:4454
 export MCA_CONDITIONAL_APIS_ORGS_ASSIGNED_USERS_ENABLED=true
+export MCA_CONDITIONAL_APIS_ORGS_ASSIGNED_USERS_SAVE_ALLOWED=true
 
 export BEFTA_IDAM_CAA_USERNAME=master.caa@gmail.com
 export BEFTA_IDAM_CAA_PASSWORD=Pa55word11

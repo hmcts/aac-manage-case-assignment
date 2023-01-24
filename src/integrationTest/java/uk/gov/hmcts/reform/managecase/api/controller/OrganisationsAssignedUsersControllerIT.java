@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,16 +34,22 @@ import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssigne
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PARAM_CASE_LIST;
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PARAM_DRY_RUN_FLAG;
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PROPERTY_CONTROLLER_ENABLED;
+import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PROPERTY_CONTROLLER_SAVE_ALLOWED;
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.RESET_FOR_A_CASE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.RESET_FOR_MULTIPLE_CASES_PATH;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.SAVE_NOT_ALLOWED;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.S2S_TOKEN;
 import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @SuppressWarnings({"squid:S100"})
-@TestPropertySource(properties = {PROPERTY_CONTROLLER_ENABLED + "=true"})
+@TestPropertySource(properties = {
+    PROPERTY_CONTROLLER_ENABLED + "=true",
+    PROPERTY_CONTROLLER_SAVE_ALLOWED + "=true"
+})
 public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
     private static final String JSON_PATH_ERRORS = "$.errors";
+    private static final String JSON_PATH_MESSAGE = "$.message";
 
     private static final String CASE_ID_GOOD = "4444333322221111";
     private static final String CASE_ID_INVALID_LENGTH = "8010964826";
@@ -59,7 +66,10 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
     @Nested
     @DisplayName("OrganisationsAssignedUsers Endpoint Disabled")
-    @TestPropertySource(properties = {PROPERTY_CONTROLLER_ENABLED + "=false"})
+    @TestPropertySource(properties = {
+        PROPERTY_CONTROLLER_ENABLED + "=false",
+        PROPERTY_CONTROLLER_SAVE_ALLOWED + "=true"
+    })
     class OrganisationsAssignedUsersEndpointDisabled {
 
         @Inject // NB: using a fresh WAC instance, so it loads using new test.properties
@@ -107,6 +117,64 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
                 .andExpect(status().isNotFound());
         }
     }
+
+
+    @Nested
+    @DisplayName("OrganisationsAssignedUsers Endpoint Disabled")
+    @TestPropertySource(properties = {
+        PROPERTY_CONTROLLER_ENABLED + "=true",
+        PROPERTY_CONTROLLER_SAVE_ALLOWED + "=false"
+    })
+    class OrganisationsAssignedUsersSaveDisabled {
+
+        @Inject // NB: using a fresh WAC instance, so it loads using new test.properties
+        private WebApplicationContext wac;
+
+        @BeforeEach
+        public void setUp() {
+            setUpMvc(wac);
+        }
+
+        @Test
+        @DisplayName("Should return FORBIDDEN for RESET_FOR_A_CASE_PATH if not a dry run but save is disabled")
+        void shouldReturn403_forResetForACase_whenNotDryRunButSaveDisabled() throws Exception {
+
+            // GIVEN
+            MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+            queryParams.add(PARAM_CASE_ID, CASE_ID_GOOD);
+            queryParams.add(PARAM_DRY_RUN_FLAG, "false");
+
+            // WHEN
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .queryParams(queryParams)
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath(JSON_PATH_MESSAGE, is(SAVE_NOT_ALLOWED)));
+        }
+
+        @Test
+        @DisplayName("Should return FORBIDDEN for RESET_FOR_MULTIPLE_CASES_PATH if not a dry run but save is disabled")
+        void shouldReturn403_forResetForMultipleCases_whenNotDryRunButSaveDisabled() throws Exception {
+
+            // GIVEN
+            OrganisationsAssignedUsersResetRequest request = new OrganisationsAssignedUsersResetRequest(
+                List.of(CASE_ID_GOOD),
+                false
+            );
+
+            // WHEN
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .content(mapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath(JSON_PATH_MESSAGE, is(SAVE_NOT_ALLOWED)));
+        }
+    }
+
 
     @Nested
     @DisplayName("POST " + ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
@@ -187,6 +255,7 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
                 .andExpect(status().isBadRequest());
         }
     }
+
 
     @Nested
     @DisplayName("POST " + ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
@@ -286,6 +355,7 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
                 .andExpect(status().isBadRequest());
         }
     }
+
 
     private static final String BAD_CASE_IDS_AND_ERRORS
         = "uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersControllerIT#badCaseIdAndErrors";

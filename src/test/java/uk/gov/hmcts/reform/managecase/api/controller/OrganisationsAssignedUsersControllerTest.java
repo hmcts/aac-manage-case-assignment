@@ -4,14 +4,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseRoleAccessException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.OrganisationsAssignedUsersAccessException;
 import uk.gov.hmcts.reform.managecase.api.payload.OrganisationsAssignedUsersResetRequest;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationsAssignedUsersCountData;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
@@ -33,7 +34,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.SAVE_NOT_ALLOWED;
 
+@ExtendWith(MockitoExtension.class)
 public class OrganisationsAssignedUsersControllerTest {
 
     private static final String CASE_ID_GOOD = "4444333322221111";
@@ -55,13 +58,13 @@ public class OrganisationsAssignedUsersControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
         ReflectionTestUtils.setField(
             controller,
             "authorisedServicesForOrganisationsAssignedUsers",
             List.of(S2S_SERVICE_GOOD)
         );
+
+        setUpIsSaveAllowed(true); // NB: default for most tests
     }
 
     @Nested
@@ -75,8 +78,9 @@ public class OrganisationsAssignedUsersControllerTest {
             setUpBadS2sToken();
 
             // WHEN
-            CaseRoleAccessException exception = assertThrows(
-                CaseRoleAccessException.class, () -> controller.restOrganisationsAssignedUsersCountDataForACase(
+            OrganisationsAssignedUsersAccessException exception = assertThrows(
+                OrganisationsAssignedUsersAccessException.class,
+                () -> controller.restOrganisationsAssignedUsersCountDataForACase(
                     CLIENT_S2S_TOKEN,
                     CASE_ID_GOOD,
                     true
@@ -189,6 +193,54 @@ public class OrganisationsAssignedUsersControllerTest {
 
         }
 
+        @DisplayName("Should throw exception when not a dry run and save is not allowed in config")
+        @Test
+        void shouldThrowExceptionWhenNotADryRunAndSaveIsNotAllowedInConfig() {
+
+            // GIVEN
+            setUpIsSaveAllowed(false);
+
+            setUpGoodS2sToken();
+
+            // WHEN
+            OrganisationsAssignedUsersAccessException exception = assertThrows(
+                OrganisationsAssignedUsersAccessException.class,
+                () -> controller.restOrganisationsAssignedUsersCountDataForACase(
+                    CLIENT_S2S_TOKEN,
+                    CASE_ID_GOOD,
+                    false // i.e. not a dry run
+                )
+            );
+
+            // THEN
+            assertThat(exception.getMessage(), containsString(SAVE_NOT_ALLOWED));
+
+        }
+
+        @DisplayName("Should permit call when dry run and save is not allowed in config")
+        @Test
+        void shouldPermitCallWhenDryRunAndSaveIsNotAllowedInConfig() {
+
+            // GIVEN
+            setUpIsSaveAllowed(false);
+
+            setUpGoodS2sToken();
+            OrganisationsAssignedUsersCountData dataFromService = generateCountDataWithResults();
+            when(organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD))
+                .thenReturn(dataFromService);
+
+            // WHEN
+            var response = controller.restOrganisationsAssignedUsersCountDataForACase(
+                CLIENT_S2S_TOKEN,
+                CASE_ID_GOOD,
+                true // i.e. is dry run
+            );
+
+            // THEN
+            assertEquals(dataFromService, response);
+
+        }
+
     }
 
     @Nested
@@ -207,8 +259,9 @@ public class OrganisationsAssignedUsersControllerTest {
             );
 
             // WHEN
-            CaseRoleAccessException exception = assertThrows(
-                CaseRoleAccessException.class, () -> controller.restOrganisationsAssignedUsersCountDataForMultipleCases(
+            OrganisationsAssignedUsersAccessException exception = assertThrows(
+                OrganisationsAssignedUsersAccessException.class,
+                () -> controller.restOrganisationsAssignedUsersCountDataForMultipleCases(
                     CLIENT_S2S_TOKEN,
                     request
                 )
@@ -423,6 +476,67 @@ public class OrganisationsAssignedUsersControllerTest {
 
         }
 
+        @DisplayName("Should throw exception when not a dry run and save is not allowed in config")
+        @Test
+        void shouldThrowExceptionWhenNotADryRunAndSaveIsNotAllowedInConfig() {
+
+            // GIVEN
+            setUpIsSaveAllowed(false);
+
+            setUpGoodS2sToken();
+
+            OrganisationsAssignedUsersResetRequest request = new OrganisationsAssignedUsersResetRequest(
+                List.of(CASE_ID_GOOD),
+                false // i.e. not a dry run
+            );
+
+            // WHEN
+            OrganisationsAssignedUsersAccessException exception = assertThrows(
+                OrganisationsAssignedUsersAccessException.class,
+                () -> controller.restOrganisationsAssignedUsersCountDataForMultipleCases(
+                    CLIENT_S2S_TOKEN,
+                    request
+                )
+            );
+
+            // THEN
+            assertThat(exception.getMessage(), containsString(SAVE_NOT_ALLOWED));
+
+        }
+
+        @DisplayName("Should permit call when dry run and save is not allowed in config")
+        @Test
+        void shouldPermitCallWhenDryRunAndSaveIsNotAllowedInConfig() {
+
+            // GIVEN
+            setUpIsSaveAllowed(false);
+
+            setUpGoodS2sToken();
+
+            OrganisationsAssignedUsersResetRequest request = new OrganisationsAssignedUsersResetRequest(
+                List.of(CASE_ID_GOOD, CASE_ID_NOT_FOUND),
+                true // i.e. is dry run
+            );
+
+            OrganisationsAssignedUsersCountData dataFromService1 = generateCountDataWithResults();
+            when(organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD))
+                .thenReturn(dataFromService1);
+
+            // WHEN
+            var response = controller.restOrganisationsAssignedUsersCountDataForMultipleCases(
+                CLIENT_S2S_TOKEN,
+                request
+            );
+
+            // THEN
+            var countData1 = response.getCountData().stream()
+                .filter(data -> CASE_ID_GOOD.equals(data.getCaseId()))
+                .findFirst();
+            assertTrue(countData1.isPresent());
+            assertEquals(dataFromService1, countData1.get());
+
+        }
+
     }
 
     private OrganisationsAssignedUsersCountData generateCountDataWithResults() {
@@ -442,4 +556,11 @@ public class OrganisationsAssignedUsersControllerTest {
         doReturn(S2S_SERVICE_GOOD).when(securityUtils).getServiceNameFromS2SToken(CLIENT_S2S_TOKEN);
     }
 
+    private void setUpIsSaveAllowed(boolean saveAllowed) {
+        ReflectionTestUtils.setField(
+            controller,
+            "isSaveAllowed",
+            saveAllowed
+        );
+    }
 }

@@ -100,6 +100,7 @@ mca:
       enabled: ${MCA_CONDITIONAL_APIS_CASE_ASSIGNMENTS_ENABLED:true}
     organisations-assigned-users:
       enabled: ${MCA_CONDITIONAL_APIS_ORGS_ASSIGNED_USERS_ENABLED:false}
+      save-allowed: ${MCA_CONDITIONAL_APIS_ORGS_ASSIGNED_USERS_SAVE_ALLOWED:false}
 
 notify:
   api-key: ${NOTIFY_MCA_API_KEY:notify-test-api-key}

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ApiError;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseRoleAccessException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.OrganisationsAssignedUsersAccessException;
 import uk.gov.hmcts.reform.managecase.api.payload.OrganisationsAssignedUsersResetRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.OrganisationsAssignedUsersResetResponse;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationsAssignedUsersCountData;
@@ -38,12 +38,15 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.ORGS_ASSIGNED_USERS_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PROPERTY_CONTROLLER_ENABLED;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError.AUTHENTICATION_TOKEN_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError.UNAUTHORISED_S2S_SERVICE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.EMPTY_CASE_ID_LIST;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.SAVE_NOT_ALLOWED;
 import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @RestController
@@ -55,11 +58,16 @@ public class OrganisationsAssignedUsersController {
 
     public static final String PROPERTY_CONTROLLER_ENABLED
         = "mca.conditional-apis.organisations-assigned-users.enabled";
+    public static final String PROPERTY_CONTROLLER_SAVE_ALLOWED
+        = "mca.conditional-apis.organisations-assigned-users.save-allowed";
     public static final String PROPERTY_S2S_AUTHORISED_SERVICES
         = "ccd.s2s-authorised.services.organisations_assigned_users";
 
     @Value("#{'${" + PROPERTY_S2S_AUTHORISED_SERVICES + "}'.split(',')}")
     protected List<String> authorisedServicesForOrganisationsAssignedUsers;
+
+    @Value("${" + PROPERTY_CONTROLLER_SAVE_ALLOWED + "}")
+    protected boolean isSaveAllowed;
 
     public static final String PARAM_CASE_ID = "case_id";
     public static final String PARAM_CASE_LIST = "case_ids";
@@ -96,9 +104,9 @@ public class OrganisationsAssignedUsersController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                + "\n1) " + CASE_ID_EMPTY
-                + "\n2) " + CASE_ID_INVALID_LENGTH
-                + "\n3) " + CASE_ID_INVALID,
+                + "\n1. " + CASE_ID_EMPTY + "."
+                + "\n2. " + CASE_ID_INVALID_LENGTH + "."
+                + "\n3. " + CASE_ID_INVALID + ".",
             response = ApiError.class,
             examples = @Example({
                 @ExampleProperty(
@@ -112,13 +120,14 @@ public class OrganisationsAssignedUsersController {
         ),
         @ApiResponse(
             code = 401,
-            message = "Authentication failure due to invalid / expired tokens (IDAM / S2S)."
+            message = AUTHENTICATION_TOKEN_INVALID
         ),
         @ApiResponse(
             code = 403,
-            message = "One of the following reasons:\n"
-                + "1. Unauthorised S2S service \n"
-                + "2. " + CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."
+            message = "One of the following reasons:"
+                + "\n1. " + UNAUTHORISED_S2S_SERVICE + "."
+                + "\n2. " + CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."
+                + "\n3. " + SAVE_NOT_ALLOWED + "."
         ),
         @ApiResponse(
             code = 404,
@@ -150,7 +159,7 @@ public class OrganisationsAssignedUsersController {
         @RequestParam(name = PARAM_DRY_RUN_FLAG)
         boolean dryRun
     ) {
-        validateRequest(clientS2SToken);
+        validateRequest(clientS2SToken, dryRun);
 
         return resetOrganisationsAssignedUsersCountForACase(dryRun, caseId);
     }
@@ -169,10 +178,10 @@ public class OrganisationsAssignedUsersController {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                + "\n1) " + EMPTY_CASE_ID_LIST
-                + "\n2) " + CASE_ID_EMPTY
-                + "\n3) " + CASE_ID_INVALID_LENGTH
-                + "\n4) " + CASE_ID_INVALID,
+                + "\n1. " + EMPTY_CASE_ID_LIST + "."
+                + "\n2. " + CASE_ID_EMPTY + "."
+                + "\n3. " + CASE_ID_INVALID_LENGTH + "."
+                + "\n4. " + CASE_ID_INVALID + ".",
             response = ApiError.class,
             examples = @Example({
                 @ExampleProperty(
@@ -186,13 +195,14 @@ public class OrganisationsAssignedUsersController {
         ),
         @ApiResponse(
             code = 401,
-            message = "Authentication failure due to invalid / expired tokens (IDAM / S2S)."
+            message = AUTHENTICATION_TOKEN_INVALID
         ),
         @ApiResponse(
             code = 403,
-            message = "One of the following reasons:\n"
-                + "1. Unauthorised S2S service \n"
-                + "2. " + CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."
+            message = "One of the following reasons:"
+                + "\n1. " + UNAUTHORISED_S2S_SERVICE + "."
+                + "\n2. " + CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."
+                + "\n3. " + SAVE_NOT_ALLOWED + "."
         )
     })
     public OrganisationsAssignedUsersResetResponse restOrganisationsAssignedUsersCountDataForMultipleCases(
@@ -202,7 +212,7 @@ public class OrganisationsAssignedUsersController {
         @Valid @RequestBody
         OrganisationsAssignedUsersResetRequest request
     ) {
-        validateRequest(clientS2SToken);
+        validateRequest(clientS2SToken, request.isDryRun());
 
         List<OrganisationsAssignedUsersCountData> countData = new ArrayList<>();
 
@@ -236,10 +246,15 @@ public class OrganisationsAssignedUsersController {
         return countData;
     }
 
-    private void validateRequest(String clientS2SToken) {
+    private void validateRequest(String clientS2SToken, boolean dryRun) {
         String clientServiceName = securityUtils.getServiceNameFromS2SToken(clientS2SToken);
         if (!this.authorisedServicesForOrganisationsAssignedUsers.contains(clientServiceName)) {
-            throw new CaseRoleAccessException(CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
+            throw new OrganisationsAssignedUsersAccessException(CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
+        }
+
+        // if save not allowed but save has been requested (i.e. not a dry run)
+        if (!this.isSaveAllowed && !dryRun) {
+            throw new OrganisationsAssignedUsersAccessException(SAVE_NOT_ALLOWED);
         }
     }
 }

@@ -74,6 +74,8 @@ public final class ValidationError {
     public static final String ROLE_ASSIGNMENT_SERVICE_ERROR =
         "Problem %s Role Assignments from Role Assignment Service because of %s";
 
+    public static final String SAVE_NOT_ALLOWED = "Save not allowed due to service configuration";
+
     // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     private ValidationError() {
     }

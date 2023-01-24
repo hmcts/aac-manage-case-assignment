@@ -26,6 +26,8 @@ spring:
     name: Manage Case Assignment
   banner:
     location: classpath:manage-case-assignment-banner.txt
+  config:
+    import: "optional:configtree:/mnt/secrets/aac/"
   main:
     allow-bean-definition-overriding: true
   cache:

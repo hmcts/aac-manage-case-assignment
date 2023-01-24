@@ -230,7 +230,7 @@ public class OrganisationsAssignedUsersController {
             = organisationsAssignedUsersService.calculateOrganisationsAssignedUsersCountData(caseId);
 
         if (!dryRun && (countData.getOrgsAssignedUsers() != null) && !countData.getOrgsAssignedUsers().isEmpty()) {
-            organisationsAssignedUsersService.saveOrganisationUserCount(countData);
+            organisationsAssignedUsersService.saveCountData(countData);
         }
 
         return countData;

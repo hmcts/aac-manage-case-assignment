@@ -120,7 +120,7 @@ public class OrganisationsAssignedUsersControllerTest {
 
             // THEN
             verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
-            verify(organisationsAssignedUsersService, never()).saveOrganisationUserCount(any());
+            verify(organisationsAssignedUsersService, never()).saveCountData(any());
 
         }
 
@@ -139,7 +139,7 @@ public class OrganisationsAssignedUsersControllerTest {
 
             // THEN
             verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
-            verify(organisationsAssignedUsersService).saveOrganisationUserCount(dataFromService);
+            verify(organisationsAssignedUsersService).saveCountData(dataFromService);
 
         }
 
@@ -163,7 +163,7 @@ public class OrganisationsAssignedUsersControllerTest {
 
             // THEN
             verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
-            verify(organisationsAssignedUsersService, never()).saveOrganisationUserCount(dataFromService);
+            verify(organisationsAssignedUsersService, never()).saveCountData(dataFromService);
 
         }
 
@@ -262,7 +262,7 @@ public class OrganisationsAssignedUsersControllerTest {
 
             // THEN
             verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
-            verify(organisationsAssignedUsersService, never()).saveOrganisationUserCount(any());
+            verify(organisationsAssignedUsersService, never()).saveCountData(any());
 
         }
 
@@ -287,7 +287,7 @@ public class OrganisationsAssignedUsersControllerTest {
 
             // THEN
             verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
-            verify(organisationsAssignedUsersService).saveOrganisationUserCount(dataFromService);
+            verify(organisationsAssignedUsersService).saveCountData(dataFromService);
 
         }
 
@@ -317,7 +317,7 @@ public class OrganisationsAssignedUsersControllerTest {
 
             // THEN
             verify(organisationsAssignedUsersService).calculateOrganisationsAssignedUsersCountData(CASE_ID_GOOD);
-            verify(organisationsAssignedUsersService, never()).saveOrganisationUserCount(dataFromService);
+            verify(organisationsAssignedUsersService, never()).saveCountData(dataFromService);
 
         }
 

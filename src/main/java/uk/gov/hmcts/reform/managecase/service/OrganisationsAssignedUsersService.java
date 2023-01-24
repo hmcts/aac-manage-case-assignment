@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.managecase.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import feign.FeignException;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,24 +13,22 @@ import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdates;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
-import uk.gov.hmcts.reform.managecase.domain.OrganisationsAssignedUsersCountData;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationsAssignedUsersCountData;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentService;
-import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
+import uk.gov.hmcts.reform.managecase.util.OrganisationPolicyUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.ORGS_ASSIGNED_USERS_PATH;
 
 @Service
@@ -41,84 +37,55 @@ public class OrganisationsAssignedUsersService {
 
     private final DataStoreRepository dataStoreRepository;
     private final PrdRepository prdRepository;
-    private final JacksonUtils jacksonUtils;
+    private final OrganisationPolicyUtils organisationPolicyUtils;
     private final RoleAssignmentService roleAssignmentService;
     private final SecurityUtils securityUtils;
-
     private final DataStoreApiClient dataStoreApi;
 
     @Autowired
     public OrganisationsAssignedUsersService(PrdRepository prdRepository,
                                              @Qualifier("defaultDataStoreRepository")
                                              DataStoreRepository dataStoreRepository,
-                                             JacksonUtils jacksonUtils,
+                                             OrganisationPolicyUtils organisationPolicyUtils,
                                              RoleAssignmentService roleAssignmentService,
                                              SecurityUtils securityUtils,
                                              DataStoreApiClient dataStoreApi) {
         this.dataStoreRepository = dataStoreRepository;
         this.prdRepository = prdRepository;
-        this.jacksonUtils = jacksonUtils;
+        this.organisationPolicyUtils = organisationPolicyUtils;
         this.roleAssignmentService = roleAssignmentService;
         this.securityUtils = securityUtils;
-
         this.dataStoreApi = dataStoreApi;
     }
 
     public OrganisationsAssignedUsersCountData calculateOrganisationsAssignedUsersCountData(String caseId) {
         CaseDetails caseDetails = dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(caseId);
-        List<OrganisationPolicy> policies = findPolicies(caseDetails);
+        List<OrganisationPolicy> policies = organisationPolicyUtils.findPolicies(caseDetails);
 
         Map<String, String> failedOrgs = new HashMap<>();
 
         Set<String> orgIds = policies.stream()
-            .filter(this::checkIfPolicyHasOrganisationAssigned)
+            .filter(organisationPolicyUtils::checkIfPolicyHasOrganisationAssigned)
             .map(policy -> policy.getOrganisation().getOrganisationID())
             .collect(Collectors.toSet());
 
-        // find all users we are interested in
-        Set<String> userIds = new HashSet<>();
         Map<String, Set<String>> userIdsByOrg = new HashMap<>();
         orgIds.forEach(orgId -> {
             try {
-                Set<String> usersForOrg = findUsersByOrganisation(orgId);
-
-                userIds.addAll(usersForOrg);
-                userIdsByOrg.put(orgId, usersForOrg);
+                userIdsByOrg.put(orgId, findUsersByOrganisation(orgId));
             } catch (FeignException ex) {
                 failedOrgs.put(orgId, formatSkipMessageFromException(orgId, ex));
             }
         });
 
-        // find all active assigned roles for case
-        List<CaseAssignedUserRole> allCauRoles
-            = roleAssignmentService.findRoleAssignmentsByCasesAndUsers(List.of(caseId), new ArrayList<>(userIds));
-
-        // generate counts
-        Map<String, Long> orgUserCounts = new HashMap<>();
-        orgIds.forEach(orgId -> {
-            if (failedOrgs.containsKey(orgId)) {
-                LOG.warn("Skipping OrgID: {} for Case: {}", orgId, caseId);
-            } else {
-                Set<String> usersForOrg = userIdsByOrg.getOrDefault(orgId, Collections.emptySet());
-                List<String> rolesForOrg = findRolesForOrg(policies, orgId);
-                long userCount = 0;
-                if (!usersForOrg.isEmpty() && !rolesForOrg.isEmpty()) {
-                    userCount = usersForOrg.stream()
-                        .filter(userId -> checkIfUserHasAnyGivenRole(allCauRoles, userId, rolesForOrg))
-                        .count();
-                }
-                orgUserCounts.put(orgId, userCount);
-            }
-        });
-
         return OrganisationsAssignedUsersCountData.builder()
             .caseId(caseId)
-            .orgsAssignedUsers(orgUserCounts)
+            .orgsAssignedUsers(generateOrgsAssignedUsersMap(caseId, policies, userIdsByOrg))
             .skippedOrgs(failedOrgs)
             .build();
     }
 
-    public void saveOrganisationUserCount(OrganisationsAssignedUsersCountData countData) {
+    public void saveCountData(OrganisationsAssignedUsersCountData countData) {
         SupplementaryDataUpdates updateRequest = new SupplementaryDataUpdates();
 
         Map<String, Object> formattedOrgToCountMap = new HashMap<>();
@@ -150,6 +117,13 @@ public class OrganisationsAssignedUsersService {
         }
     }
 
+    private boolean checkIfUserHasAnyGivenRole(List<CaseAssignedUserRole> cauRoles, String userId, List<String> roles) {
+        return cauRoles.stream()
+            .anyMatch(cauRole ->
+                          userId.equalsIgnoreCase(cauRole.getUserId())
+                              && roles.stream().anyMatch(role -> role.equalsIgnoreCase(cauRole.getCaseRole())));
+    }
+
     private Set<String> findUsersByOrganisation(String orgId) {
         return prdRepository.findUsersByOrganisation(orgId).getUsers().stream()
             .map(ProfessionalUser::getUserIdentifier)
@@ -175,33 +149,40 @@ public class OrganisationsAssignedUsersService {
         }
     }
 
-    private List<OrganisationPolicy> findPolicies(CaseDetails caseDetails) {
-        List<JsonNode> policyNodes = caseDetails.findOrganisationPolicyNodes();
-        return policyNodes.stream()
-            .map(node -> jacksonUtils.convertValue(node, OrganisationPolicy.class))
-            .collect(toList());
-    }
+    private Map<String, Long> generateOrgsAssignedUsersMap(String caseId,
+                                                           List<OrganisationPolicy> policies,
+                                                           Map<String, Set<String>> userIdsByOrg) {
+        // find all users we are interested in
+        Set<String> userIds = userIdsByOrg.entrySet()
+            .stream()
+            .flatMap(entry -> entry.getValue().stream())
+            .collect(Collectors.toSet());
+        Set<String> orgIds = userIdsByOrg.keySet();
 
-    private List<String> findRolesForOrg(List<OrganisationPolicy> policies, String orgId) {
-        return policies.stream()
-            .filter(policy -> policy.getOrganisation() != null && orgId.equalsIgnoreCase(policy
-                                                                                             .getOrganisation()
-                                                                                             .getOrganisationID()))
-            .map(OrganisationPolicy::getOrgPolicyCaseAssignedRole)
-            .collect(toList());
-    }
+        // NB: skip remaining process if no organisations or users found
+        if (orgIds.isEmpty() || userIds.isEmpty()) {
+            LOG.info("No `orgs_assigned_users` data generated for case : {}", caseId);
+            return Collections.emptyMap();
 
-    private boolean checkIfPolicyHasOrganisationAssigned(OrganisationPolicy policy) {
-        return policy != null
-            && policy.getOrganisation() != null
-            && StringUtils.isNotEmpty(policy.getOrganisation().getOrganisationID());
-    }
+        } else {
+            // find all active assigned roles for case
+            List<CaseAssignedUserRole> allCauRoles
+                = roleAssignmentService.findRoleAssignmentsByCasesAndUsers(List.of(caseId), new ArrayList<>(userIds));
 
-    private boolean checkIfUserHasAnyGivenRole(List<CaseAssignedUserRole> cauRoles, String userId, List<String> roles) {
-        return cauRoles.stream()
-            .anyMatch(cauRole ->
-                          userId.equalsIgnoreCase(cauRole.getUserId())
-                              && roles.stream().anyMatch(role -> role.equalsIgnoreCase(cauRole.getCaseRole())));
+            Map<String, Long> orgsAssignedUsers = new HashMap<>();
+
+            // generate counts
+            orgIds.forEach(orgId -> {
+                Set<String> usersForOrg = userIdsByOrg.getOrDefault(orgId, Collections.emptySet());
+                List<String> rolesForOrg = organisationPolicyUtils.findRolesForOrg(policies, orgId);
+                long userCount = usersForOrg.stream()
+                    .filter(userId -> checkIfUserHasAnyGivenRole(allCauRoles, userId, rolesForOrg))
+                    .count();
+                orgsAssignedUsers.put(orgId, userCount);
+            });
+
+            return orgsAssignedUsers;
+        }
     }
 
 }

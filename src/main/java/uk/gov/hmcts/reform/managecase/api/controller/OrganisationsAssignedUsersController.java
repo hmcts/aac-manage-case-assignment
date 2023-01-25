@@ -60,10 +60,10 @@ public class OrganisationsAssignedUsersController {
         = "mca.conditional-apis.organisations-assigned-users.enabled";
     public static final String PROPERTY_CONTROLLER_SAVE_ALLOWED
         = "mca.conditional-apis.organisations-assigned-users.save-allowed";
-    public static final String PROPERTY_S2S_AUTHORISED_SERVICES
+    public static final String PROPERTY_S2S_AUTHORISED_FOR_ENDPOINT
         = "ccd.s2s-authorised.services.organisations_assigned_users";
 
-    @Value("#{'${" + PROPERTY_S2S_AUTHORISED_SERVICES + "}'.split(',')}")
+    @Value("#{'${" + PROPERTY_S2S_AUTHORISED_FOR_ENDPOINT + "}'.split(',')}")
     protected List<String> authorisedServicesForOrganisationsAssignedUsers;
 
     @Value("${" + PROPERTY_CONTROLLER_SAVE_ALLOWED + "}")

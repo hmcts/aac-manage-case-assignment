@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.managecase;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.TextCodec;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +37,7 @@ import uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -113,4 +117,13 @@ public class BaseTest {
             .collect(Collectors.toCollection(ArrayList::new));
         when(authentication.getAuthorities()).thenAnswer(invocationOnMock -> authorityCollection);
     }
+
+    protected static String generateS2SToken(String serviceName, long ttlMillis) {
+        return Jwts.builder()
+            .setSubject(serviceName)
+            .setExpiration(new Date(System.currentTimeMillis() + ttlMillis))
+            .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+            .compact();
+    }
+
 }

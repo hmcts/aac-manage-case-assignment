@@ -35,16 +35,18 @@ import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssigne
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PARAM_DRY_RUN_FLAG;
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PROPERTY_CONTROLLER_ENABLED;
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PROPERTY_CONTROLLER_SAVE_ALLOWED;
+import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.PROPERTY_S2S_AUTHORISED_FOR_ENDPOINT;
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.RESET_FOR_A_CASE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersController.RESET_FOR_MULTIPLE_CASES_PATH;
+import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssignedUsersControllerIT.S2S_AUTHORISED_FOR_ENDPOINT;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.SAVE_NOT_ALLOWED;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.S2S_TOKEN;
 import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @SuppressWarnings({"squid:S100"})
 @TestPropertySource(properties = {
     PROPERTY_CONTROLLER_ENABLED + "=true",
-    PROPERTY_CONTROLLER_SAVE_ALLOWED + "=true"
+    PROPERTY_CONTROLLER_SAVE_ALLOWED + "=true",
+    PROPERTY_S2S_AUTHORISED_FOR_ENDPOINT + "=" +  S2S_AUTHORISED_FOR_ENDPOINT + ",another_service_name"
 })
 public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
@@ -54,6 +56,13 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
     private static final String CASE_ID_GOOD = "4444333322221111";
     private static final String CASE_ID_INVALID_LENGTH = "8010964826";
     private static final String CASE_ID_INVALID_LUHN = "4444333322221112";
+
+    protected static final String S2S_AUTHORISED_FOR_ENDPOINT = "service_and_endpoint";
+    protected static final String S2S_NOT_AUTHORISED_FOR_ENDPOINT = "service_only";
+
+    private static final String S2S_TOKEN_GOOD = generateS2SToken(S2S_AUTHORISED_FOR_ENDPOINT, 10000);
+    private static final String S2S_TOKEN_BAD_ENDPOINT = generateS2SToken(S2S_NOT_AUTHORISED_FOR_ENDPOINT, 20000);
+
 
     @Inject
     private WebApplicationContext wac;
@@ -91,7 +100,7 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
             // WHEN
             mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
-                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_GOOD)
                                 .queryParams(queryParams)
                                 .contentType(MediaType.APPLICATION_JSON))
                 // THEN
@@ -110,7 +119,7 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
             // WHEN
             mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
-                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_GOOD)
                                 .content(mapper.writeValueAsString(request))
                                 .contentType(MediaType.APPLICATION_JSON))
                 // THEN
@@ -142,11 +151,11 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
             // GIVEN
             MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
             queryParams.add(PARAM_CASE_ID, CASE_ID_GOOD);
-            queryParams.add(PARAM_DRY_RUN_FLAG, "false");
+            queryParams.add(PARAM_DRY_RUN_FLAG, "false"); // i.e. not a dry run
 
             // WHEN
             mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
-                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_GOOD)
                                 .queryParams(queryParams)
                                 .contentType(MediaType.APPLICATION_JSON))
                 // THEN
@@ -161,17 +170,69 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
             // GIVEN
             OrganisationsAssignedUsersResetRequest request = new OrganisationsAssignedUsersResetRequest(
                 List.of(CASE_ID_GOOD),
-                false
+                false // i.e. not a dry run
             );
 
             // WHEN
             mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
-                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_GOOD)
                                 .content(mapper.writeValueAsString(request))
                                 .contentType(MediaType.APPLICATION_JSON))
                 // THEN
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath(JSON_PATH_MESSAGE, is(SAVE_NOT_ALLOWED)));
+        }
+    }
+
+    @Nested
+    @DisplayName("OrganisationsAssignedUsers Service Not Authorised For Endpoint")
+    class OrganisationsAssignedUsersServiceNotAuthorised {
+
+        @Inject // NB: using a fresh WAC instance, so it loads using new test.properties
+        private WebApplicationContext wac;
+
+        @BeforeEach
+        public void setUp() {
+            setUpMvc(wac);
+        }
+
+        @Test
+        @DisplayName("Should return FORBIDDEN for RESET_FOR_A_CASE_PATH when service not authorised for endpoint")
+        void shouldReturn403_forResetForACase_whenServiceNotAuthorised() throws Exception {
+
+            // GIVEN
+            MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+            queryParams.add(PARAM_CASE_ID, CASE_ID_GOOD);
+            queryParams.add(PARAM_DRY_RUN_FLAG, "true");
+
+            // WHEN
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_BAD_ENDPOINT)
+                                .queryParams(queryParams)
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
+                .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @DisplayName(
+            "Should return FORBIDDEN for RESET_FOR_MULTIPLE_CASES_PATH when service not authorised for endpoint"
+        )
+        void shouldReturn403_forResetForMultipleCases_whenServiceNotAuthorised() throws Exception {
+
+            // GIVEN
+            OrganisationsAssignedUsersResetRequest request = new OrganisationsAssignedUsersResetRequest(
+                List.of(CASE_ID_GOOD),
+                true
+            );
+
+            // WHEN
+            mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_BAD_ENDPOINT)
+                                .content(mapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON))
+                // THEN
+                .andExpect(status().isForbidden());
         }
     }
 
@@ -196,7 +257,7 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
             // WHEN
             mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
-                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_GOOD)
                                 .queryParams(queryParams)
                                 .contentType(MediaType.APPLICATION_JSON))
                 // THEN
@@ -214,7 +275,7 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
             // WHEN
             mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
-                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_GOOD)
                                 .queryParams(queryParams)
                                 .contentType(MediaType.APPLICATION_JSON))
                 // THEN
@@ -231,7 +292,7 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
             // WHEN
             mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
-                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_GOOD)
                                 .queryParams(queryParams)
                                 .contentType(MediaType.APPLICATION_JSON))
                 // THEN
@@ -248,7 +309,7 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
             // WHEN
             mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_A_CASE_PATH)
-                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_GOOD)
                                 .queryParams(queryParams)
                                 .contentType(MediaType.APPLICATION_JSON))
                 // THEN
@@ -278,7 +339,7 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
             // WHEN
             mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
-                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_GOOD)
                                 .content(mapper.writeValueAsString(request))
                                 .contentType(MediaType.APPLICATION_JSON))
                 // THEN
@@ -296,7 +357,7 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
             // WHEN
             mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
-                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_GOOD)
                                 .content(request)
                                 .contentType(MediaType.APPLICATION_JSON))
                 // THEN
@@ -315,7 +376,7 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
             // WHEN
             mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
-                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_GOOD)
                                 .content(mapper.writeValueAsString(request))
                                 .contentType(MediaType.APPLICATION_JSON))
                 // THEN
@@ -332,7 +393,7 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
             // WHEN
             mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
-                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_GOOD)
                                 .content(request)
                                 .contentType(MediaType.APPLICATION_JSON))
                 // THEN
@@ -348,7 +409,7 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
             // WHEN
             mockMvc.perform(post(ORGS_ASSIGNED_USERS_PATH + RESET_FOR_MULTIPLE_CASES_PATH)
-                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN)
+                                .header(SERVICE_AUTHORIZATION, S2S_TOKEN_GOOD)
                                 .content(mapper.writeValueAsString(request))
                                 .contentType(MediaType.APPLICATION_JSON))
                 // THEN

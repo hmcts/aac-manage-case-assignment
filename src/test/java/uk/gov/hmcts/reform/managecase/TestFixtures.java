@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.assertj.core.util.Maps;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentAttributesResource;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResource;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition;
@@ -15,13 +18,16 @@ import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignedUsers;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.managecase.domain.GrantType;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.UserDetails;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -127,7 +133,12 @@ public class TestFixtures {
         }
 
         public static FindUsersByOrganisationResponse usersByOrganisation(ProfessionalUser... users) {
-            return new FindUsersByOrganisationResponse(List.of(users), ORGANIZATION_ID);
+            return usersByOrganisation(ORGANIZATION_ID, List.of(users));
+        }
+
+        public static FindUsersByOrganisationResponse usersByOrganisation(String organisationId,
+                                                                          List<ProfessionalUser> users) {
+            return new FindUsersByOrganisationResponse(users, organisationId);
         }
 
         public static ProfessionalUser user(String userIdentifier) {
@@ -138,6 +149,35 @@ public class TestFixtures {
                     .email(EMAIL)
                     .idamStatus(IDAM_STATUS)
                     .build();
+        }
+    }
+
+    public static class RoleAssignmentsFixture {
+
+        private RoleAssignmentsFixture() {
+        }
+
+        public static RoleAssignmentResponse roleAssignmentResponse(RoleAssignmentResource... roleAssignments) {
+            return RoleAssignmentResponse.builder()
+                .roleAssignments(List.of(roleAssignments))
+                .build();
+        }
+
+        public static RoleAssignmentResource roleAssignment(String caseId, String userId, String roleName) {
+            return RoleAssignmentResource.builder()
+                .actorIdType("IDAM")
+                .actorId(userId)
+                .roleType("CASE")
+                .roleName(roleName)
+                .classification("PUBLIC")
+                .grantType(GrantType.SPECIFIC.name())
+                .roleCategory("PROFESSIONAL")
+                .readOnly(true)
+                .authorisations(Collections.emptyList())
+                .attributes(RoleAssignmentAttributesResource.builder()
+                                .caseId(Optional.of(caseId))
+                                .build())
+                .build();
         }
 
     }

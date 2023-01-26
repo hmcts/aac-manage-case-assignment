@@ -62,7 +62,7 @@ public class OrganisationsAssignedUsersService {
         CaseDetails caseDetails = dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(caseId);
         List<OrganisationPolicy> policies = organisationPolicyUtils.findPolicies(caseDetails);
 
-        Map<String, String> failedOrgs = new HashMap<>();
+        Map<String, String> skippedOrgs = new HashMap<>();
 
         Set<String> orgIds = policies.stream()
             .filter(organisationPolicyUtils::checkIfPolicyHasOrganisationAssigned)
@@ -74,14 +74,14 @@ public class OrganisationsAssignedUsersService {
             try {
                 userIdsByOrg.put(orgId, findUsersByOrganisation(orgId));
             } catch (FeignException ex) {
-                failedOrgs.put(orgId, formatSkipMessageFromException(orgId, ex));
+                skippedOrgs.put(orgId, formatSkipMessageFromException(orgId, ex));
             }
         });
 
         return OrganisationsAssignedUsersCountData.builder()
             .caseId(caseId)
             .orgsAssignedUsers(generateOrgsAssignedUsersMap(caseId, policies, userIdsByOrg))
-            .skippedOrgs(failedOrgs)
+            .skippedOrgs(skippedOrgs)
             .build();
     }
 
@@ -161,8 +161,9 @@ public class OrganisationsAssignedUsersService {
 
         // NB: skip remaining process if no organisations or users found
         if (orgIds.isEmpty() || userIds.isEmpty()) {
-            LOG.info("No `orgs_assigned_users` data generated for case : {}", caseId);
-            return Collections.emptyMap();
+            // just return zeros for each org (if any) as no users found for any
+            return orgIds.stream()
+                .collect(Collectors.toMap(orgId -> orgId, orgId -> 0L));
 
         } else {
             // find all active assigned roles for case

@@ -168,6 +168,49 @@ Feature: F-210: Organisations Assigned Users
       And a successful call [to workaround $inc by zero issue in Supplementary Data for C4] as in [F-210_Supplementary_Data__Workaround__C4],
       And a successful call [to verify the supplimentary data's org counts are unchanged for C4] as in [F-210_Check_Orgs_Assigned_Users__Not_Assigned__C4]
 
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  @S-210.05
+  Scenario: SINGLE CASE: Dry Run, 2 Orgs with no assigned users to case
+
+    Given an appropriate test context as detailed in the test data source,
+      And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
+      And a user [INVOKER - with access to case],
+
+      And a successful call [by Richard to create a case - C1 - is auto-assigned to both orgs] as in [F-210_Case_Creation_C1_With_Org_Policies_Both_Orgs],
+      And a successful call [to set HMCTSServiceId in Supplementary Data for C1] as in [F-210_Supplementary_Data__HMCTSServiceId__C1],
+      And a successful call [to remove CREATOR assigned CaseRole for C1] as in [F-210_Delete_Creator_Role_C1],
+
+     When a request is prepared with appropriate values,
+      And the request [is made when no users assigned to case],
+      And the request [is made for the case record for C1],
+      And it is submitted to call the [OrganisationsAssignedUsers-ResetForCase] operation of [Manage Case Assignment Microservice],
+
+     Then a positive response is received,
+      And the response has all the details as expected,
+      And the response [has Org 1 count with 0 users],
+      And the response [has Org 2 count with 0 users],
+
+      And a successful call [to workaround $inc by zero issue in Supplementary Data for C1] as in [F-210_Supplementary_Data__Workaround__C1],
+      And a successful call [to verify the supplimentary data's org counts are unchanged for C1] as in [F-210_Check_Orgs_Assigned_Users__Not_Assigned__C1]
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  @S-210.06
+  Scenario: SINGLE CASE: Not found response when case not found
+
+    Given an appropriate test context as detailed in the test data source,
+      And a user [INVOKER - with access to case],
+
+     When a request is prepared with appropriate values,
+      And the request [is made for a case record that does not exist],
+      And it is submitted to call the [OrganisationsAssignedUsers-ResetForCase] operation of [Manage Case Assignment Microservice],
+
+     Then a negative response is received,
+      And the response [has the 404 return code],
+      And the response has all the details as expected
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #  MULTIPLE CASE

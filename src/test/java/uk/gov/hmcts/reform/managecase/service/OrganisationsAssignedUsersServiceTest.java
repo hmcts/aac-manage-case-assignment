@@ -12,13 +12,12 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.managecase.TestFixtures;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
-import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
-import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationsAssignedUsersCountData;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
@@ -51,6 +50,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CASE_ID;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.usersByOrganisation;
 import static uk.gov.hmcts.reform.managecase.repository.DefaultDataStoreRepository.ORGS_ASSIGNED_USERS_PATH;
 
 @ExtendWith(MockitoExtension.class)
@@ -196,10 +197,12 @@ class OrganisationsAssignedUsersServiceTest {
                 classUnderTest.calculateOrganisationsAssignedUsersCountData(CASE_ID);
 
             // THEN
-            // ... verify no role assingment lookup made
+            // ... verify no role assignment lookup made
             verify(roleAssignmentService, never()).findRoleAssignmentsByCasesAndUsers(any(), any());
-            // ... verfiy response has no count data to save
-            assertTrue(response.getOrgsAssignedUsers().isEmpty());
+            // ... verify response has only zero count data to save
+            Map<String, Long> orgsAssignedUsers = response.getOrgsAssignedUsers();
+            assertEquals(1, orgsAssignedUsers.size());
+            assertEquals(0L, orgsAssignedUsers.get(ORGANISATION_ID_1).longValue());
         }
 
         @DisplayName("should generate count data")
@@ -333,10 +336,7 @@ class OrganisationsAssignedUsersServiceTest {
         private void generateAndRegisterOrganisationPolicy(String organisationID,
                                                                          String caseAssignedRole) {
 
-            OrganisationPolicy policy = OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(caseAssignedRole)
-                .organisation(Organisation.builder().organisationID(organisationID).build())
-                .build();
+            OrganisationPolicy policy = organisationPolicy(organisationID, caseAssignedRole);
 
             // register in response
             policies.add(policy);
@@ -361,11 +361,11 @@ class OrganisationsAssignedUsersServiceTest {
 
         private void registerUserLookupForOrg(String organisationID, List<String> userIds) {
             List<ProfessionalUser> users = userIds.stream()
-                .map(userId -> ProfessionalUser.builder().userIdentifier(userId).build())
+                .map(TestFixtures.ProfessionalUserFixture::user)
                 .collect(Collectors.toList());
 
             when(prdRepository.findUsersByOrganisation(organisationID)).thenReturn(
-                new FindUsersByOrganisationResponse(users, organisationID)
+                usersByOrganisation(organisationID, users)
             );
         }
     }

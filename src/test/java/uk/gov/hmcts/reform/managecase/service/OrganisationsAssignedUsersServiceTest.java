@@ -154,7 +154,7 @@ class OrganisationsAssignedUsersServiceTest {
             // ... verify only the two lookups for the two orgs
             verify(prdRepository, atMostOnce()).findUsersByOrganisation(ORGANISATION_ID_1);
             verify(prdRepository, atMostOnce()).findUsersByOrganisation(ORGANISATION_ID_2);
-            verifyNoMoreInteractions(prdRepository); // i.e. no ore lookups
+            verifyNoMoreInteractions(prdRepository); // i.e. no more lookups
         }
 
         @DisplayName("should look up role assignments for case + users if found")
@@ -333,8 +333,7 @@ class OrganisationsAssignedUsersServiceTest {
             );
         }
 
-        private void generateAndRegisterOrganisationPolicy(String organisationID,
-                                                                         String caseAssignedRole) {
+        private void generateAndRegisterOrganisationPolicy(String organisationID, String caseAssignedRole) {
 
             OrganisationPolicy policy = organisationPolicy(organisationID, caseAssignedRole);
 

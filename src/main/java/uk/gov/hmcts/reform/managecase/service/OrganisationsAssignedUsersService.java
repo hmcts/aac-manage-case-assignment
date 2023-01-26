@@ -86,7 +86,6 @@ public class OrganisationsAssignedUsersService {
     }
 
     public void saveCountData(OrganisationsAssignedUsersCountData countData) {
-        SupplementaryDataUpdates updateRequest = new SupplementaryDataUpdates();
 
         Map<String, Object> formattedOrgToCountMap = new HashMap<>();
         for (Map.Entry<String, Long> orgsAssignedUsers : countData.getOrgsAssignedUsers().entrySet()) {
@@ -106,9 +105,12 @@ public class OrganisationsAssignedUsersService {
             LOG.info("Saving `orgs_assigned_users` data for case : {} : {} ",
                      countData.getCaseId(), formattedOrgToCountMap);
 
+            SupplementaryDataUpdates updateRequest = new SupplementaryDataUpdates();
             updateRequest.setSetMap(formattedOrgToCountMap);
+
             SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest();
             request.setSupplementaryDataUpdates(updateRequest);
+
             dataStoreApi.updateCaseSupplementaryData(
                 securityUtils.getCaaSystemUserToken(),
                 countData.getCaseId(),

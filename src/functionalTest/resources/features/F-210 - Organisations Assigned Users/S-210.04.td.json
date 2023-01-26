@@ -8,6 +8,7 @@
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)",
     "INVOKER - with access to case",
 
+    "is made when no users assigned to case",
     "is made for the case record for C4",
     "is made with save, i.e. dry_run=false",
 

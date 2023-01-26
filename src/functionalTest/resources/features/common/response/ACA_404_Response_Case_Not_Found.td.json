@@ -1,0 +1,9 @@
+{
+  "_guid_": "ACA_404_Response_Case_Not_Found",
+  "_extends_": "ACA_404_Response",
+
+  "body": {
+    "message": "Case could not be found",
+    "errors": []
+  }
+}

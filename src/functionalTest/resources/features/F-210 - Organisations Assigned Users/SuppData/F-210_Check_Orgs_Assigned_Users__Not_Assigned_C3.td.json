@@ -1,9 +1,9 @@
 {
-  "_guid_": "F-210_Supplementary_Data__HMCTSServiceId__C3",
-  "_extends_": "F-210_Supplementary_Data__HMCTSServiceId__Base",
+  "_guid_": "F-210_Check_Orgs_Assigned_Users__Not_Assigned_C3",
+  "_extends_": "F-210_Check_Orgs_Assigned_Users__Not_Assigned__Base",
 
   "specs": [
-    "to set HMCTSServiceId in Supplementary Data for C3"
+    "to verify the supplimentary data's org counts are unchanged for C3"
   ],
 
   "request": {

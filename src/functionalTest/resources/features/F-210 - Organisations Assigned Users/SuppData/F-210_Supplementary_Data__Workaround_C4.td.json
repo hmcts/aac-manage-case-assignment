@@ -1,9 +1,9 @@
 {
-  "_guid_": "F-210_Supplementary_Data__HMCTSServiceId__C4",
-  "_extends_": "F-210_Supplementary_Data__HMCTSServiceId__Base",
+  "_guid_": "F-210_Supplementary_Data__Workaround_C4",
+  "_extends_": "F-210_Supplementary_Data__Workaround__Base",
 
   "specs": [
-    "to set HMCTSServiceId in Supplementary Data for C4"
+    "to workaround $inc by zero issue in Supplementary Data for C4"
   ],
 
   "request": {

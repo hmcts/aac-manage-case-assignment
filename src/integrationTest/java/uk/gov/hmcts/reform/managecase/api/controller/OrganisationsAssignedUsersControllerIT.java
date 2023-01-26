@@ -508,9 +508,9 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
                 ));
         }
 
-        @DisplayName("Should return 200 with generated `orgsAssignedUsers` and no save as dry run")
+        @DisplayName("Should return 200 with generated `orgsAssignedUsers` and no save when dry run")
         @Test
-        void shouldReturn200_withOrgsAssignedUsersGenerated_andNoSaveAsDryRun() throws Exception {
+        void shouldReturn200_withOrgsAssignedUsersGenerated_andNoSaveWhenDryRun() throws Exception {
 
             // GIVEN
             stubCaseDetails(CASE_ID_GOOD, List.of(
@@ -574,9 +574,9 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
 
         }
 
-        @DisplayName("Should return 200 with generated `orgsAssignedUsers` and save as not a dry run")
+        @DisplayName("Should return 200 with generated `orgsAssignedUsers` and save when not a dry run")
         @Test
-        void shouldReturn200_withOrgsAssignedUsersGenerated_andSaveAsNotADryRun() throws Exception {
+        void shouldReturn200_withOrgsAssignedUsersGenerated_andSaveWhenNotADryRun() throws Exception {
 
             // GIVEN
             stubCaseDetails(CASE_ID_GOOD, List.of(
@@ -783,9 +783,9 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
                 );
         }
 
-        @DisplayName("Should return 200 with multiple generated `orgsAssignedUsers` and no save as dry run")
+        @DisplayName("Should return 200 with multiple generated `orgsAssignedUsers` and no save when dry run")
         @Test
-        void shouldReturn200_withMultipleOrgsAssignedUsersGenerated_andNoSaveAsDryRun() throws Exception {
+        void shouldReturn200_withMultipleOrgsAssignedUsersGenerated_andNoSaveWhenDryRun() throws Exception {
 
             // GIVEN
             stubCaseDetails(CASE_ID_GOOD, List.of(
@@ -861,9 +861,9 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
             ));
         }
 
-        @DisplayName("Should return 200 with multiple generated `orgsAssignedUsers` and save as not a dry run")
+        @DisplayName("Should return 200 with multiple generated `orgsAssignedUsers` and save when not a dry run")
         @Test
-        void shouldReturn200_withMultipleOrgsAssignedUsersGenerated_andSaveAsNotADryRun() throws Exception {
+        void shouldReturn200_withMultipleOrgsAssignedUsersGenerated_andSaveWhenNotADryRun() throws Exception {
 
             // GIVEN
             stubCaseDetails(CASE_ID_GOOD, List.of(

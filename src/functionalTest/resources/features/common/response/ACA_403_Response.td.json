@@ -1,13 +1,13 @@
 {
-	"_guid_": "ACA_403_Response",
-	"_extends_": "Common_Response",
+  "_guid_": "ACA_403_Response",
+  "_extends_": "Common_Response",
 
-	"responseCode": 403,
-	"responseMessage": "Forbidden",
+  "responseCode": 403,
+  "responseMessage": "Forbidden",
 
-	"headers": {
-		"_extends_": "Common_403_Response_Headers"
-	},
+  "headers": {
+    "_extends_": "Common_403_Response_Headers"
+  },
 
-	"body": null
+  "body": null
 }

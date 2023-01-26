@@ -1,9 +1,9 @@
 {
-  "_guid_": "F-210_Check_Orgs_Assigned_Users__Both_Assigned__C1",
+  "_guid_": "F-210_Check_Orgs_Assigned_Users__After_Unassign_C1",
   "_extends_": "F-210_Check_Orgs_Assigned_Users__Base",
 
   "specs": [
-    "to verify the supplimentary data's org counts have been updated for C1"
+    "to verify the supplimentary data's org counts have been updated after unassign for C1"
   ],
 
   "request": {
@@ -15,7 +15,7 @@
   "expectedResponse": {
     "body": {
       "supplementary_data" : {
-        "orgs_assigned_users.QUK822N" : 2,
+        "orgs_assigned_users.QUK822N" : 1,
         "orgs_assigned_users.LESTKK0" : 1
       }
     }

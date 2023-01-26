@@ -3,7 +3,7 @@
   "_extends_": "F-210_Delete_Access__Base",
 
   "specs": [
-    "to unassign users to the case with update OrgCount - 1 user but only only 1 of 2 roles"
+    "to unassign users to the case C1 with update OrgCount - 1 user but only only 1 of 2 roles"
   ],
 
   "users": {

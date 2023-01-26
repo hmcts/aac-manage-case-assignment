@@ -3,7 +3,7 @@
   "_extends_": "F-210_Assign_Access__Base",
 
   "specs": [
-    "to assign users to the case but not update OrgCount - 1 user with 2 roles"
+    "to assign users to the case C1 but not update OrgCount - 1 user with 2 roles"
   ],
 
   "users": {

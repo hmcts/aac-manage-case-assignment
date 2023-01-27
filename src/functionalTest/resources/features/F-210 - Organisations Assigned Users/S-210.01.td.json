@@ -8,7 +8,7 @@
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)",
     "Bill - with a solicitor role for the same jurisdiction within a different organisation (Org1) from Richard",
     "Benjamin - with a solicitor role for the same jurisdiction within a different organisation (Org1) from Richard",
-    "INVOKER - with access to case",
+    "INVOKER - caseworker with access to case",
 
     "is made after roles assigned to Org 1 - 2 users with same role",
     "is made after roles assigned to Org 2 - 1 user with 2 roles",
@@ -30,7 +30,7 @@
       "_extends_": "ACA_Users_Benjamin"
     },
     "invokingUser": {
-      "_extends_": "ACA_Users_Caseworker_CAA"
+      "_extends_": "ACA_Users_Befta_Master_Caseworker"
     }
   },
 

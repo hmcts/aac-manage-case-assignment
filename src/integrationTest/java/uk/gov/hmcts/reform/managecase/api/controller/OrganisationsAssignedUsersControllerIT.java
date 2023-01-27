@@ -70,7 +70,7 @@ import static uk.gov.hmcts.reform.managecase.api.controller.OrganisationsAssigne
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.SAVE_NOT_ALLOWED;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubFindRoleAssignmentsByCasesAndUsers;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseViaExternalApi;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisationInternal;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisationInternalAsApprover;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubUpdateSupplementaryData;
 import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
@@ -439,8 +439,8 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
                 organisationPolicy(ORGANISATION_ID_1, ROLE_1),
                 organisationPolicy(ORGANISATION_ID_BAD_1, ROLE_2) // to be skipped
             ));
-            stubGetUsersByOrganisationInternal(usersByOrganisation(), ORGANISATION_ID_1); // i.e. no users for org
-            stubGetUsersByOrganisationInternal(notFound(), ORGANISATION_ID_BAD_1); // i.e to be skipped
+            stubGetUsersByOrganisationInternalAsApprover(usersByOrganisation(), ORGANISATION_ID_1); // i.e. no users
+            stubGetUsersByOrganisationInternalAsApprover(notFound(), ORGANISATION_ID_BAD_1); // i.e to be skipped
 
             MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
             queryParams.add(PARAM_CASE_ID, CASE_ID_GOOD);
@@ -477,8 +477,8 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
                 organisationPolicy(ORGANISATION_ID_BAD_1, ROLE_1),
                 organisationPolicy(ORGANISATION_ID_BAD_2, ROLE_2)
             ));
-            stubGetUsersByOrganisationInternal(notFound(), ORGANISATION_ID_BAD_1);
-            stubGetUsersByOrganisationInternal(serviceUnavailable(), ORGANISATION_ID_BAD_2);
+            stubGetUsersByOrganisationInternalAsApprover(notFound(), ORGANISATION_ID_BAD_1);
+            stubGetUsersByOrganisationInternalAsApprover(serviceUnavailable(), ORGANISATION_ID_BAD_2);
 
             MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
             queryParams.add(PARAM_CASE_ID, CASE_ID_GOOD);
@@ -519,11 +519,11 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
                 organisationPolicy(null, ROLE_BAD),
                 organisationPolicy(ORGANISATION_ID_1, ROLE_3) // NB: duplicate org
             ));
-            stubGetUsersByOrganisationInternal(
+            stubGetUsersByOrganisationInternalAsApprover(
                 usersByOrganisation(user(USER_ID_1), user(USER_ID_2), user(USER_ID_BAD_1)),
                 ORGANISATION_ID_1
             );
-            stubGetUsersByOrganisationInternal(
+            stubGetUsersByOrganisationInternalAsApprover(
                 usersByOrganisation(user(USER_ID_1), user(USER_ID_BAD_2)), // i.e. user 1 both orgs
                 ORGANISATION_ID_2
             );
@@ -584,8 +584,11 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
                 organisationPolicy(ORGANISATION_ID_2, ROLE_2),
                 organisationPolicy(ORGANISATION_ID_1, ROLE_3) // NB: duplicate org
             ));
-            stubGetUsersByOrganisationInternal(usersByOrganisation(user(USER_ID_1), user(USER_ID_2)),ORGANISATION_ID_1);
-            stubGetUsersByOrganisationInternal(usersByOrganisation(user(USER_ID_1)), ORGANISATION_ID_2);
+            stubGetUsersByOrganisationInternalAsApprover(
+                usersByOrganisation(user(USER_ID_1), user(USER_ID_2)),
+                ORGANISATION_ID_1
+            );
+            stubGetUsersByOrganisationInternalAsApprover(usersByOrganisation(user(USER_ID_1)), ORGANISATION_ID_2);
 
             stubFindRoleAssignmentsByCasesAndUsers(
                 List.of(CASE_ID_GOOD),
@@ -796,10 +799,11 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
                 organisationPolicy(ORGANISATION_ID_3, ROLE_3)
             ));
 
-            stubGetUsersByOrganisationInternal(usersByOrganisation(user(USER_ID_1)), ORGANISATION_ID_1);
-            stubGetUsersByOrganisationInternal(usersByOrganisation(user(USER_ID_2)), ORGANISATION_ID_2);
-            stubGetUsersByOrganisationInternal(
-                usersByOrganisation(user(USER_ID_3), user(USER_ID_4)), ORGANISATION_ID_3
+            stubGetUsersByOrganisationInternalAsApprover(usersByOrganisation(user(USER_ID_1)), ORGANISATION_ID_1);
+            stubGetUsersByOrganisationInternalAsApprover(usersByOrganisation(user(USER_ID_2)), ORGANISATION_ID_2);
+            stubGetUsersByOrganisationInternalAsApprover(
+                usersByOrganisation(user(USER_ID_3), user(USER_ID_4)),
+                ORGANISATION_ID_3
             );
 
             stubFindRoleAssignmentsByCasesAndUsers(
@@ -882,14 +886,16 @@ public class OrganisationsAssignedUsersControllerIT extends BaseTest {
             ));
             stubGetCaseViaExternalApi(CASE_ID_NOT_FOUND, notFound());
 
-            stubGetUsersByOrganisationInternal(
-                usersByOrganisation(user(USER_ID_1), user(USER_ID_2)), ORGANISATION_ID_1
+            stubGetUsersByOrganisationInternalAsApprover(
+                usersByOrganisation(user(USER_ID_1), user(USER_ID_2)),
+                ORGANISATION_ID_1
             );
-            stubGetUsersByOrganisationInternal(
-                usersByOrganisation(user(USER_ID_3), user(USER_ID_4)), ORGANISATION_ID_2
+            stubGetUsersByOrganisationInternalAsApprover(
+                usersByOrganisation(user(USER_ID_3), user(USER_ID_4)),
+                ORGANISATION_ID_2
             );
-            stubGetUsersByOrganisationInternal(notFound(), ORGANISATION_ID_BAD_1); // i.e to be skipped
-            stubGetUsersByOrganisationInternal(serviceUnavailable(), ORGANISATION_ID_BAD_2); // i.e to be skipped
+            stubGetUsersByOrganisationInternalAsApprover(notFound(), ORGANISATION_ID_BAD_1); // i.e skipped
+            stubGetUsersByOrganisationInternalAsApprover(serviceUnavailable(), ORGANISATION_ID_BAD_2); // i.e skipped
 
             stubFindRoleAssignmentsByCasesAndUsers(
                 List.of(CASE_ID_GOOD),

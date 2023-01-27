@@ -6,7 +6,7 @@
 
   "specs": [
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)",
-    "INVOKER - with access to case",
+    "INVOKER - caseworker with access to case",
 
     "is made when no users assigned to case",
     "is made for the case record for C1",
@@ -21,7 +21,7 @@
       "_extends_": "ACA_Users_Richard"
     },
     "invokingUser": {
-      "_extends_": "ACA_Users_Caseworker_CAA"
+      "_extends_": "ACA_Users_Befta_Master_Caseworker"
     }
   },
 

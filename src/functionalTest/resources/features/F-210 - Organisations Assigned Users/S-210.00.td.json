@@ -5,7 +5,7 @@
   "title": "SINGLE CASE: Forbidden response when wrong service",
 
   "specs": [
-    "INVOKER - with access to case",
+    "INVOKER - caseworker with access to case",
 
     "is made with a valid case id",
     "is made using a service not authorised to perform operation",
@@ -17,7 +17,7 @@
 
   "users": {
     "invokingUser": {
-      "_extends_": "ACA_Users_Caseworker_CAA"
+      "_extends_": "ACA_Users_Befta_Master_Caseworker"
     }
   },
 

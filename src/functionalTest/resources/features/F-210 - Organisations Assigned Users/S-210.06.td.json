@@ -5,7 +5,7 @@
   "title": "SINGLE CASE: Not found response when case not found",
 
   "specs": [
-    "INVOKER - with access to case",
+    "INVOKER - caseworker with access to case",
 
     "is made for a case record that does not exist",
 
@@ -15,7 +15,7 @@
 
   "users": {
     "invokingUser": {
-      "_extends_": "ACA_Users_Caseworker_CAA"
+      "_extends_": "ACA_Users_Befta_Master_Caseworker"
     }
   },
 

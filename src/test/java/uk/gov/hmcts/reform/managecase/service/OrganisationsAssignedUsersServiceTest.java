@@ -73,6 +73,7 @@ class OrganisationsAssignedUsersServiceTest {
     private static final String USER_ID_BAD_2 = "User BAD 2";
 
     private static final String SYSTEM_USER_TOKEN = "SYSTEM_TOKEN";
+    private static final String APPROVER_USER_TOKEN = "APPROVER_USER_TOKEN";
 
     @Mock
     private DataStoreRepository dataStoreRepository;
@@ -140,6 +141,7 @@ class OrganisationsAssignedUsersServiceTest {
             generateAndRegisterOrganisationPolicyUnassigned(ROLE_BAD);
             generateAndRegisterOrganisationPolicy(ORGANISATION_ID_1, ROLE_3); // NB: duplicate org
 
+            setUpNocApproverSystemUserTokenCall();
             registerUserLookupForOrg(ORGANISATION_ID_1, List.of(USER_ID_1));
             registerUserLookupForOrg(ORGANISATION_ID_2, List.of(USER_ID_2));
 
@@ -152,8 +154,8 @@ class OrganisationsAssignedUsersServiceTest {
                 .checkIfPolicyHasOrganisationAssigned(any());
 
             // ... verify only the two lookups for the two orgs
-            verify(prdRepository, atMostOnce()).findUsersByOrganisation(ORGANISATION_ID_1);
-            verify(prdRepository, atMostOnce()).findUsersByOrganisation(ORGANISATION_ID_2);
+            verify(prdRepository, atMostOnce()).findUsersByOrganisation(APPROVER_USER_TOKEN, ORGANISATION_ID_1);
+            verify(prdRepository, atMostOnce()).findUsersByOrganisation(APPROVER_USER_TOKEN, ORGANISATION_ID_2);
             verifyNoMoreInteractions(prdRepository); // i.e. no more lookups
         }
 
@@ -165,6 +167,7 @@ class OrganisationsAssignedUsersServiceTest {
             generateAndRegisterOrganisationPolicy(ORGANISATION_ID_1, ROLE_1);
             generateAndRegisterOrganisationPolicy(ORGANISATION_ID_2, ROLE_2);
 
+            setUpNocApproverSystemUserTokenCall();
             registerUserLookupForOrg(ORGANISATION_ID_1, List.of(USER_ID_1));
             registerUserLookupForOrg(ORGANISATION_ID_2, List.of(USER_ID_1, USER_ID_2)); // i.e. user 1 both orgs
 
@@ -190,6 +193,7 @@ class OrganisationsAssignedUsersServiceTest {
             // GIVEN
             generateAndRegisterOrganisationPolicy(ORGANISATION_ID_1, ROLE_1);
 
+            setUpNocApproverSystemUserTokenCall();
             registerUserLookupForOrg(ORGANISATION_ID_1, Collections.emptyList()); // i.e. no users for org
 
             // WHEN
@@ -215,6 +219,7 @@ class OrganisationsAssignedUsersServiceTest {
             generateAndRegisterOrganisationPolicyUnassigned(ROLE_BAD);
             generateAndRegisterOrganisationPolicy(ORGANISATION_ID_1, ROLE_3); // NB: duplicate org
 
+            setUpNocApproverSystemUserTokenCall();
             registerUserLookupForOrg(ORGANISATION_ID_1, List.of(USER_ID_1, USER_ID_2, USER_ID_BAD_1));
             registerUserLookupForOrg(ORGANISATION_ID_2, List.of(USER_ID_1, USER_ID_BAD_2)); // i.e. user 1 both orgs
 
@@ -266,9 +271,10 @@ class OrganisationsAssignedUsersServiceTest {
             generateAndRegisterOrganisationPolicy(ORGANISATION_ID_BAD_2, ROLE_3);
             generateAndRegisterOrganisationPolicy(ORGANISATION_ID_BAD_3, ROLE_4);
 
+            setUpNocApproverSystemUserTokenCall();
             registerUserLookupForOrg(ORGANISATION_ID_1, List.of(USER_ID_1));
             // register BAD user look ups
-            when(prdRepository.findUsersByOrganisation(ORGANISATION_ID_BAD_1)).thenThrow(
+            when(prdRepository.findUsersByOrganisation(APPROVER_USER_TOKEN, ORGANISATION_ID_BAD_1)).thenThrow(
                 new FeignException.NotFound(
                     "BAD org 1 not found",
                     createRequestForFeignException(),
@@ -276,7 +282,7 @@ class OrganisationsAssignedUsersServiceTest {
                     null
                 )
             );
-            when(prdRepository.findUsersByOrganisation(ORGANISATION_ID_BAD_2)).thenThrow(
+            when(prdRepository.findUsersByOrganisation(APPROVER_USER_TOKEN, ORGANISATION_ID_BAD_2)).thenThrow(
                 new FeignException.ServiceUnavailable(
                     "BAD org 2 error",
                     createRequestForFeignException(),
@@ -286,7 +292,7 @@ class OrganisationsAssignedUsersServiceTest {
             );
             // unresolvable status
             String unresolvableStatusMessage = "unresolvable status";
-            when(prdRepository.findUsersByOrganisation(ORGANISATION_ID_BAD_3)).thenThrow(
+            when(prdRepository.findUsersByOrganisation(APPROVER_USER_TOKEN, ORGANISATION_ID_BAD_3)).thenThrow(
                 new FeignException.FeignServerException(
                     999,
                     unresolvableStatusMessage,
@@ -363,9 +369,13 @@ class OrganisationsAssignedUsersServiceTest {
                 .map(TestFixtures.ProfessionalUserFixture::user)
                 .collect(Collectors.toList());
 
-            when(prdRepository.findUsersByOrganisation(organisationID)).thenReturn(
+            when(prdRepository.findUsersByOrganisation(APPROVER_USER_TOKEN, organisationID)).thenReturn(
                 usersByOrganisation(organisationID, users)
             );
+        }
+
+        private void setUpNocApproverSystemUserTokenCall() {
+            when(securityUtils.getNocApproverSystemUserAccessToken()).thenReturn(APPROVER_USER_TOKEN);
         }
     }
 
@@ -473,6 +483,7 @@ class OrganisationsAssignedUsersServiceTest {
         private void setUpSystemUserTokenCall() {
             when(securityUtils.getCaaSystemUserToken()).thenReturn(SYSTEM_USER_TOKEN);
         }
+
     }
 
 }

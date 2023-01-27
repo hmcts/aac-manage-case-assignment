@@ -9,5 +9,7 @@ public interface PrdRepository {
 
     FindUsersByOrganisationResponse findUsersByOrganisation(String organisationId);
 
+    FindUsersByOrganisationResponse findUsersByOrganisation(String userAuthorizationHeader, String organisationId);
+
     FindOrganisationResponse findOrganisationAddress(String organisationId);
 }

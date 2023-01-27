@@ -9,7 +9,7 @@ Feature: F-210: Organisations Assigned Users
   Scenario: SINGLE CASE: Forbidden response when wrong service
 
     Given an appropriate test context as detailed in the test data source,
-      And a user [INVOKER - with access to case],
+      And a user [INVOKER - caseworker with access to case],
 
      When a request is prepared with appropriate values,
       And the request [is made with a valid case id],
@@ -29,7 +29,7 @@ Feature: F-210: Organisations Assigned Users
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
       And a user [Bill - with a solicitor role for the same jurisdiction within a different organisation (Org1) from Richard],
       And a user [Benjamin - with a solicitor role for the same jurisdiction within a different organisation (Org1) from Richard],
-      And a user [INVOKER - with access to case],
+      And a user [INVOKER - caseworker with access to case],
 
       And a successful call [by Richard to create a case - C1 - is auto-assigned to both orgs] as in [F-210_Case_Creation_C1_With_Org_Policies_Both_Orgs],
       And a successful call [to set HMCTSServiceId in Supplementary Data for C1] as in [F-210_Supplementary_Data__HMCTSServiceId_C1],
@@ -61,7 +61,7 @@ Feature: F-210: Organisations Assigned Users
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
       And a user [Bill - with a solicitor role for the same jurisdiction within a different organisation (Org1) from Richard],
       And a user [Benjamin - with a solicitor role for the same jurisdiction within a different organisation (Org1) from Richard],
-      And a user [INVOKER - with access to case],
+      And a user [INVOKER - caseworker with access to case],
 
       And a successful call [by Richard to create a case - C1 - is auto-assigned to both orgs] as in [F-210_Case_Creation_C1_With_Org_Policies_Both_Orgs],
       And a successful call [to set HMCTSServiceId in Supplementary Data for C1] as in [F-210_Supplementary_Data__HMCTSServiceId_C1],
@@ -98,7 +98,7 @@ Feature: F-210: Organisations Assigned Users
 
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
-      And a user [INVOKER - with access to case],
+      And a user [INVOKER - caseworker with access to case],
 
       And a successful call [by Richard to create a case - C2 - is not assigned to any orgs] as in [F-210_Case_Creation_C2_With_Org_Policies_Unassigned],
       And a successful call [to set HMCTSServiceId in Supplementary Data for C2] as in [F-210_Supplementary_Data__HMCTSServiceId_C2],
@@ -122,7 +122,7 @@ Feature: F-210: Organisations Assigned Users
 
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
-      And a user [INVOKER - with access to case],
+      And a user [INVOKER - caseworker with access to case],
 
       And a successful call [By Richard to create a case - C3 - is assigned to one GOOD org and 1 BAD org (i.e. unknown OrgID)] as in [F-210_Case_Creation_C3_With_Org_Policies_Assigned_Good_Org_Bad_Org],
       And a successful call [to set HMCTSServiceId in Supplementary Data for C3] as in [F-210_Supplementary_Data__HMCTSServiceId_C3],
@@ -150,7 +150,7 @@ Feature: F-210: Organisations Assigned Users
 
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
-      And a user [INVOKER - with access to case],
+      And a user [INVOKER - caseworker with access to case],
 
       And a successful call [By Richard to create a case - C4 - is assigned to one org] as in [F-210_Case_Creation_C4_With_Org_Policies_Assigned_To_1_Org],
       And a successful call [to set HMCTSServiceId in Supplementary Data for C4] as in [F-210_Supplementary_Data__HMCTSServiceId_C4],
@@ -176,7 +176,7 @@ Feature: F-210: Organisations Assigned Users
 
     Given an appropriate test context as detailed in the test data source,
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
-      And a user [INVOKER - with access to case],
+      And a user [INVOKER - caseworker with access to case],
 
       And a successful call [by Richard to create a case - C1 - is auto-assigned to both orgs] as in [F-210_Case_Creation_C1_With_Org_Policies_Both_Orgs],
       And a successful call [to set HMCTSServiceId in Supplementary Data for C1] as in [F-210_Supplementary_Data__HMCTSServiceId_C1],
@@ -201,7 +201,7 @@ Feature: F-210: Organisations Assigned Users
   Scenario: SINGLE CASE: Not found response when case not found
 
     Given an appropriate test context as detailed in the test data source,
-      And a user [INVOKER - with access to case],
+      And a user [INVOKER - caseworker with access to case],
 
      When a request is prepared with appropriate values,
       And the request [is made for a case record that does not exist],
@@ -221,7 +221,7 @@ Feature: F-210: Organisations Assigned Users
   Scenario: MULTIPLE CASE: Forbidden response when wrong service
 
     Given an appropriate test context as detailed in the test data source,
-      And a user [INVOKER - with access to case],
+      And a user [INVOKER - caseworker with access to case],
 
      When a request is prepared with appropriate values,
       And the request [is made with a valid case id],
@@ -241,7 +241,7 @@ Feature: F-210: Organisations Assigned Users
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
       And a user [Bill - with a solicitor role for the same jurisdiction within a different organisation (Org1) from Richard],
       And a user [Benjamin - with a solicitor role for the same jurisdiction within a different organisation (Org1) from Richard],
-      And a user [INVOKER - with access to case],
+      And a user [INVOKER - caseworker with access to case],
 
       And a successful call [by Richard to create a case - C1 - is auto-assigned to both orgs] as in [F-210_Case_Creation_C1_With_Org_Policies_Both_Orgs],
       And a successful call [by Richard to create a case - C2 - is not assigned to any orgs] as in [F-210_Case_Creation_C2_With_Org_Policies_Unassigned],
@@ -293,7 +293,7 @@ Feature: F-210: Organisations Assigned Users
       And a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)],
       And a user [Bill - with a solicitor role for the same jurisdiction within a different organisation (Org1) from Richard],
       And a user [Benjamin - with a solicitor role for the same jurisdiction within a different organisation (Org1) from Richard],
-      And a user [INVOKER - with access to case],
+      And a user [INVOKER - caseworker with access to case],
 
       And a successful call [by Richard to create a case - C1 - is auto-assigned to both orgs] as in [F-210_Case_Creation_C1_With_Org_Policies_Both_Orgs],
       And a successful call [by Richard to create a case - C2 - is not assigned to any orgs] as in [F-210_Case_Creation_C2_With_Org_Policies_Unassigned],

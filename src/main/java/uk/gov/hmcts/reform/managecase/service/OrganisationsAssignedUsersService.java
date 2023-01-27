@@ -127,7 +127,8 @@ public class OrganisationsAssignedUsersService {
     }
 
     private Set<String> findUsersByOrganisation(String orgId) {
-        return prdRepository.findUsersByOrganisation(orgId).getUsers().stream()
+        return prdRepository.findUsersByOrganisation(securityUtils.getNocApproverSystemUserAccessToken(),
+                                                     orgId).getUsers().stream()
             .map(ProfessionalUser::getUserIdentifier)
             .collect(Collectors.toSet());
     }

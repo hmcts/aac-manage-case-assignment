@@ -95,12 +95,22 @@ public class WiremockFixtures {
     }
 
     public static void stubGetUsersByOrganisationInternal(FindUsersByOrganisationResponse response, String orgId) {
-        stubGetUsersByOrganisationInternal(okForJson(response), orgId);
+        stubFor(WireMock.get(urlEqualTo(String.format("/refdata/internal/v1/organisations/%s/users?returnRoles=false",
+                                                      orgId))).willReturn(okForJson(response)));
     }
 
-    public static void stubGetUsersByOrganisationInternal(ResponseDefinitionBuilder responseBuilder, String orgId) {
+    public static void stubGetUsersByOrganisationInternalAsApprover(FindUsersByOrganisationResponse response,
+                                                                    String orgId) {
+        stubGetUsersByOrganisationInternalAsApprover(okForJson(response), orgId);
+    }
+
+    public static void stubGetUsersByOrganisationInternalAsApprover(ResponseDefinitionBuilder responseBuilder,
+                                                                    String orgId) {
         stubFor(WireMock.get(urlEqualTo(String.format("/refdata/internal/v1/organisations/%s/users?returnRoles=false",
-                                                      orgId))).willReturn(responseBuilder));
+                                                      orgId)))
+                    .withHeader(AUTHORIZATION, equalTo(APPROVER_USER_TOKEN))
+                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
+                    .willReturn(responseBuilder));
     }
 
     public static void stubSearchCaseWithPrefix(String caseTypeId, String searchQuery,

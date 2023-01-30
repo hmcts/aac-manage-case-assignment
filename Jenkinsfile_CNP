@@ -105,7 +105,10 @@ env.BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP = "profile openid roles manage-use
 // temporary workaround for platform changes: turn BEFTA header checks to warning mode
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 
-env.PACT_BROKER_URL = 'https://pact-broker.platform.hmcts.net'
+env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
+env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
+env.PACT_BROKER_PORT = "443"
+env.PACT_BROKER_SCHEME = "https"
 
 withPipeline("java", product, component) {
   afterAlways('test') {

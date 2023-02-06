@@ -104,7 +104,7 @@ task smoke(type: Test) {
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
               '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
               '--tags', '@Smoke and not @Ignore',
-              '--glue', 'uk.gov.hmcts.befta.player', 
+              '--glue', 'uk.gov.hmcts.befta.player',
               '--glue', 'uk.gov.hmcts.reform.managecase.befta', 'src/functionalTest/resources/features'
       ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
@@ -236,7 +236,7 @@ dependencyManagement {
     }
 
     // CVE-2021-23181
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.68') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.69') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'

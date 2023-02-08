@@ -40,9 +40,9 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixtur
 
 @ExtendWith(SpringExtension.class)
 @Provider("acc_manageCaseAssignment")
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-    host = "${PACT_BROKER_URL:localhost}",
-    port = "${PACT_BROKER_PORT:80}",
+@PactBroker(scheme = "${PACT_BROKER_SCHEME:https}",
+    host = "${PACT_BROKER_URL:pact-broker.platform.hmcts.net}",
+    port = "${PACT_BROKER_PORT:443}",
     consumerVersionSelectors = {@VersionSelector(tag = "master")})
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
 @IgnoreNoPactsToVerify
@@ -100,12 +100,12 @@ public class CasesAssignmentControllerProviderTest {
     public void toAssignUserToCase() throws IOException {
 
         given(prdRepository.findUsersByOrganisation())
-            .willReturn(usersByOrganisation(user(ASSIGNEE_ID), user(ASSIGNEE_ID3)));
+            .willReturn(usersByOrganisation(user(ASSIGNEE_ID), user(ASSIGNEE_ID3), user(ASSIGNEE_ID2)));
         given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(ASSIGNEE_ID))
             .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
         given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(ASSIGNEE_ID2))
             .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
-        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(ASSIGNEE_ID3))
+        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi("1583841721773828"))
             .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID,  ORG_POLICY_ROLE3,
                                                                     ORG_POLICY_ROLE4));
 
@@ -121,6 +121,7 @@ public class CasesAssignmentControllerProviderTest {
         given(idamRepository.getCaaSystemUserAccessToken()).willReturn(BEAR_TOKEN);
         given(idamRepository.getNocApproverSystemUserAccessToken()).willReturn(BEAR_TOKEN);
         given(idamRepository.getUserByUserId(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
+        given(idamRepository.getUserByUserId(ASSIGNEE_ID3, BEAR_TOKEN)).willReturn(userDetails);
 
         given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
             .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE))

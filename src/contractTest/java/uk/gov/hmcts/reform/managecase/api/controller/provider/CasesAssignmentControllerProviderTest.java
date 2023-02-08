@@ -57,6 +57,7 @@ public class CasesAssignmentControllerProviderTest {
     private static final String BEAR_TOKEN = "TestBearToken";
 
     private static final String ASSIGNEE_ID2 = "38130f09-0010-4c12-afd1-2563bb25d1d3";
+    private static final String ASSIGNEE_ID3 = "userId";
     private static final String CASE_ID = "12345678";
     private static final String CASE_ID2 = "87654321";
     private static final String CASE_ROLE = "[CR1]";
@@ -99,9 +100,15 @@ public class CasesAssignmentControllerProviderTest {
     public void toAssignUserToCase() throws IOException {
 
         given(prdRepository.findUsersByOrganisation())
-            .willReturn(usersByOrganisation(user(ASSIGNEE_ID)));
-        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(anyString()))
+            .willReturn(usersByOrganisation(user(ASSIGNEE_ID), user(ASSIGNEE_ID3)));
+        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(ASSIGNEE_ID))
             .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
+        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(ASSIGNEE_ID2))
+            .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
+        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(ASSIGNEE_ID3))
+            .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID,  ORG_POLICY_ROLE3,
+                                                                    ORG_POLICY_ROLE4));
+
         given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(anyString()))
             .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE3,
                                                                     ORG_POLICY_ROLE4));

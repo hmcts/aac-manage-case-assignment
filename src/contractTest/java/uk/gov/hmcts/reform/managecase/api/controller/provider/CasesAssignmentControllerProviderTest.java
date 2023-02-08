@@ -100,16 +100,14 @@ public class CasesAssignmentControllerProviderTest {
     public void toAssignUserToCase() throws IOException {
 
         given(prdRepository.findUsersByOrganisation())
-            .willReturn(usersByOrganisation(user(ASSIGNEE_ID), user(ASSIGNEE_ID3), user(ASSIGNEE_ID2)));
-        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(ASSIGNEE_ID))
-            .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
-        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(ASSIGNEE_ID2))
-            .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
-        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi("1583841721773828"))
+            .willReturn(usersByOrganisation(user(ASSIGNEE_ID), user(ASSIGNEE_ID2), user(ASSIGNEE_ID3)));
+
+        //use_user_token=true mock
+        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(TestFixtures.CASE_ID))
             .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID,  ORG_POLICY_ROLE3,
                                                                     ORG_POLICY_ROLE4));
-
-        given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(anyString()))
+        //use_user_token=false or not present mock
+        given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(TestFixtures.CASE_ID))
             .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE3,
                                                                     ORG_POLICY_ROLE4));
 

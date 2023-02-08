@@ -50,6 +50,8 @@ public class CasesAssignmentControllerProviderTest {
 
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
     private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";
+    private static final String ORG_POLICY_ROLE3 = "Role1";
+    private static final String ORG_POLICY_ROLE4 = "Role2";
     private static final String ORGANIZATION_ID = "TEST_ORG";
     private static final String ASSIGNEE_ID = "0a5874a4-3f38-4bbd-ba4c";
     private static final String BEAR_TOKEN = "TestBearToken";
@@ -100,6 +102,9 @@ public class CasesAssignmentControllerProviderTest {
             .willReturn(usersByOrganisation(user(ASSIGNEE_ID)));
         given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(anyString()))
             .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
+        given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(anyString()))
+            .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE3,
+                                                                    ORG_POLICY_ROLE4));
 
         given(securityUtils.hasSolicitorRole(anyList())).willReturn(true);
         given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), anyString())).willReturn(true);

@@ -40,9 +40,9 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixtur
 
 @ExtendWith(SpringExtension.class)
 @Provider("acc_manageCaseAssignment")
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:https}",
-    host = "${PACT_BROKER_URL:pact-broker.platform.hmcts.net}",
-    port = "${PACT_BROKER_PORT:443}",
+@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
+    host = "${PACT_BROKER_URL:localhost}",
+    port = "${PACT_BROKER_PORT:80}",
     consumerVersionSelectors = {@VersionSelector(tag = "master")})
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
 @IgnoreNoPactsToVerify
@@ -89,7 +89,7 @@ public class CasesAssignmentControllerProviderTest {
     @BeforeEach
     void before(PactVerificationContext context) {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
+        //System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(caseAssignmentController);
         if (context != null) {
             context.setTarget(testTarget);

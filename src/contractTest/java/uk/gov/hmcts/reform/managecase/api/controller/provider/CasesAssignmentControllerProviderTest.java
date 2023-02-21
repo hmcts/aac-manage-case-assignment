@@ -50,11 +50,14 @@ public class CasesAssignmentControllerProviderTest {
 
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
     private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";
+    private static final String ORG_POLICY_ROLE3 = "Role1";
+    private static final String ORG_POLICY_ROLE4 = "Role2";
     private static final String ORGANIZATION_ID = "TEST_ORG";
     private static final String ASSIGNEE_ID = "0a5874a4-3f38-4bbd-ba4c";
     private static final String BEAR_TOKEN = "TestBearToken";
 
     private static final String ASSIGNEE_ID2 = "38130f09-0010-4c12-afd1-2563bb25d1d3";
+    private static final String ASSIGNEE_ID3 = "userId";
     private static final String CASE_ID = "12345678";
     private static final String CASE_ID2 = "87654321";
     private static final String CASE_ROLE = "[CR1]";
@@ -97,9 +100,16 @@ public class CasesAssignmentControllerProviderTest {
     public void toAssignUserToCase() throws IOException {
 
         given(prdRepository.findUsersByOrganisation())
-            .willReturn(usersByOrganisation(user(ASSIGNEE_ID)));
-        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(anyString()))
-            .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
+            .willReturn(usersByOrganisation(user(ASSIGNEE_ID), user(ASSIGNEE_ID2), user(ASSIGNEE_ID3)));
+
+        //use_user_token=true mock
+        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(TestFixtures.CASE_ID))
+            .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID,  ORG_POLICY_ROLE3,
+                                                                    ORG_POLICY_ROLE4));
+        //use_user_token=false or not present mock
+        given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(TestFixtures.CASE_ID))
+            .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE3,
+                                                                    ORG_POLICY_ROLE4));
 
         given(securityUtils.hasSolicitorRole(anyList())).willReturn(true);
         given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), anyString())).willReturn(true);
@@ -109,6 +119,7 @@ public class CasesAssignmentControllerProviderTest {
         given(idamRepository.getCaaSystemUserAccessToken()).willReturn(BEAR_TOKEN);
         given(idamRepository.getNocApproverSystemUserAccessToken()).willReturn(BEAR_TOKEN);
         given(idamRepository.getUserByUserId(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
+        given(idamRepository.getUserByUserId(ASSIGNEE_ID3, BEAR_TOKEN)).willReturn(userDetails);
 
         given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
             .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE))

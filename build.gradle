@@ -320,7 +320,6 @@ dependencies {
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
-  implementation group: 'com.github.hmcts', name: 'properties-volume-spring-boot-starter', version: '0.0.4'
 
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.serviceAuthVersion

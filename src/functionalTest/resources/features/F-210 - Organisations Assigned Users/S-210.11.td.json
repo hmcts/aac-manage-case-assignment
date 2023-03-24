@@ -1,0 +1,99 @@
+{
+  "_guid_" : "S-210.11",
+  "_extends_" : "OrganisationsAssignedUsers_ResetForCases__PositiveResponse__Base",
+
+  "title": "MULTIPLE CASE: Dry Run, 4 cases + 1 not founds",
+
+  "specs": [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation (Org2)",
+    "Bill - with a solicitor role for the same jurisdiction within a different organisation (Org1) from Richard",
+    "Benjamin - with a solicitor role for the same jurisdiction within a different organisation (Org1) from Richard",
+    "INVOKER - caseworker with access to case",
+
+    "is made after roles assigned to C1 Org 1 - 2 users with same role",
+    "is made after roles assigned to C1 Org 2 - 1 user with 2 roles",
+    "is made after roles assigned to C3 Org 2 - 1 user with 2 roles",
+    "is made for the case record for C1,C2,C3,C4,NotFoundCase",
+
+    "has C1 Org 1 count with 2 users",
+    "has C1 Org 2 count with 1 user",
+    "has C2 no org counts",
+    "has C3 Org 2 count with 1 user",
+    "has C3 error for BAD Org",
+    "has C4 Org 2 count with ZERO users",
+    "has error for not found case"
+  ],
+
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    },
+    "Bill": {
+      "_extends_": "ACA_Users_Bill"
+    },
+    "Benjamin": {
+      "_extends_": "ACA_Users_Benjamin"
+    },
+    "invokingUser": {
+      "_extends_": "ACA_Users_Befta_Master_Caseworker"
+    }
+  },
+
+
+  "request" : {
+    "body": {
+      "case_ids": [
+        "${}${[scenarioContext][childContexts][F-210_Case_Creation_C1_With_Org_Policies_Both_Orgs][testData][actualResponse][body][id]}",
+        "${}${[scenarioContext][childContexts][F-210_Case_Creation_C2_With_Org_Policies_Unassigned][testData][actualResponse][body][id]}",
+        "${}${[scenarioContext][childContexts][F-210_Case_Creation_C3_With_Org_Policies_Assigned_Good_Org_Bad_Org][testData][actualResponse][body][id]}",
+        "${}${[scenarioContext][childContexts][F-210_Case_Creation_C4_With_Org_Policies_Assigned_To_1_Org][testData][actualResponse][body][id]}",
+        "4444333322221111"
+      ],
+      "dry_run": true
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "count_data" : [
+        {
+          "__ordering__": "unordered",
+          "__elementId__": "case_id"
+        },
+        {
+          "case_id": "${}${[scenarioContext][childContexts][F-210_Case_Creation_C1_With_Org_Policies_Both_Orgs][testData][actualResponse][body][id]}",
+          "orgs_assigned_users": {
+            "QUK822N": 2,
+            "LESTKK0": 1
+          }
+        },
+        {
+          "case_id": "${}${[scenarioContext][childContexts][F-210_Case_Creation_C2_With_Org_Policies_Unassigned][testData][actualResponse][body][id]}",
+          "orgs_assigned_users": {
+          }
+        },
+        {
+          "case_id": "${}${[scenarioContext][childContexts][F-210_Case_Creation_C3_With_Org_Policies_Assigned_Good_Org_Bad_Org][testData][actualResponse][body][id]}",
+          "orgs_assigned_users": {
+            "LESTKK0": 1
+          },
+          "skipped_organisations":    {
+              "Unknown-OrgId": "[[ANY_STRING_NOT_NULLABLE]]"
+          }
+        },
+        {
+          "case_id": "${}${[scenarioContext][childContexts][F-210_Case_Creation_C4_With_Org_Policies_Assigned_To_1_Org][testData][actualResponse][body][id]}",
+          "orgs_assigned_users": {
+            "LESTKK0": 0
+          }
+        },
+        {
+          "case_id": "4444333322221111",
+          "error": "[[ANY_STRING_NOT_NULLABLE]]"
+        }
+      ]
+    }
+  }
+
+}

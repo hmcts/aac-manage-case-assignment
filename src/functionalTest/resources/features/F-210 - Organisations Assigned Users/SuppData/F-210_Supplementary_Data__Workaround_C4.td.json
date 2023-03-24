@@ -1,0 +1,14 @@
+{
+  "_guid_": "F-210_Supplementary_Data__Workaround_C4",
+  "_extends_": "F-210_Supplementary_Data__Workaround__Base",
+
+  "specs": [
+    "to workaround $inc by zero issue in Supplementary Data for C4"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-210_Case_Creation_C4_With_Org_Policies_Assigned_To_1_Org][testData][actualResponse][body][id]}"
+    }
+  }
+}

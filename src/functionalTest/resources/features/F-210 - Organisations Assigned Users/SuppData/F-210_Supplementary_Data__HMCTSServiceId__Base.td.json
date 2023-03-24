@@ -1,0 +1,31 @@
+{
+  "_guid_": "F-210_Supplementary_Data__HMCTSServiceId__Base",
+  "_extends_": "Case_Supplementary_Data__Base",
+
+  "title": "Set HMCTSServiceId in Supplementary Data",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
+  "request": {
+    "body": {
+      "supplementary_data_updates": {
+        "$set" : {
+          "HMCTSServiceId": "AAA1"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "supplementary_data" : {
+        "HMCTSServiceId" : "AAA1"
+      }
+    }
+  }
+}
+

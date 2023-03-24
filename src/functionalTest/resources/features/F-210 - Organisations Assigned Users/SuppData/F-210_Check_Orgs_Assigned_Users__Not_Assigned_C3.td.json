@@ -1,0 +1,14 @@
+{
+  "_guid_": "F-210_Check_Orgs_Assigned_Users__Not_Assigned_C3",
+  "_extends_": "F-210_Check_Orgs_Assigned_Users__Not_Assigned__Base",
+
+  "specs": [
+    "to verify the supplimentary data's org counts are unchanged for C3"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-210_Case_Creation_C3_With_Org_Policies_Assigned_Good_Org_Bad_Org][testData][actualResponse][body][id]}"
+    }
+  }
+}

@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.managecase.client.prd;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @FeignClient(
@@ -21,6 +23,12 @@ public interface PrdApiClient {
     @GetMapping(value = "/refdata/internal/v1/organisations/{orgId}/users?returnRoles=false",
             consumes = APPLICATION_JSON_VALUE)
     FindUsersByOrganisationResponse findActiveUsersByOrganisation(@PathVariable("orgId") String organisationId);
+
+    @GetMapping(value = "/refdata/internal/v1/organisations/{orgId}/users?returnRoles=false",
+        consumes = APPLICATION_JSON_VALUE)
+    FindUsersByOrganisationResponse findActiveUsersByOrganisation(@RequestHeader(AUTHORIZATION)
+                                                                  String userAuthorizationHeader,
+                                                                  @PathVariable("orgId") String organisationId);
 
     @GetMapping(value = "/refdata/internal/v1/organisations",
         consumes = APPLICATION_JSON_VALUE)

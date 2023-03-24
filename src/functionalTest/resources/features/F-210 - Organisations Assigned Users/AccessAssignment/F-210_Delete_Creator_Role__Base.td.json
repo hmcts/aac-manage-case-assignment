@@ -1,0 +1,23 @@
+{
+  "_guid_": "F-210_Delete_Creator_Role__Base",
+  "_extends_": "F-210_Delete_Access__Base",
+
+  "title": "Remove Access to Case",
+
+  "specs": [
+    "to remove CREATOR assigned CaseRole"
+  ],
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    }
+  },
+
+  "request": {
+    "body": {
+      "case_users": [
+      ]
+    }
+  }
+}

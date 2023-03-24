@@ -31,7 +31,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   cache:
-    cache-names: userInfoCache,usersByOrganisationExternal,usersByOrganisationInternal,organisationAddressById,systemUserAccessTokenCache,caaAccessTokenCache,nocApproverAccessTokenCache,caseRoles,challengeQuestions
+    cache-names: userInfoCache,usersByOrganisationExternal,usersByOrganisationInternal,usersByOrganisationInternalWithAuthHeader,organisationAddressById,systemUserAccessTokenCache,caaAccessTokenCache,nocApproverAccessTokenCache,caseRoles,challengeQuestions
     caffeine:
       spec: expireAfterWrite=1800s
   security:
@@ -80,6 +80,7 @@ ccd:
   s2s-authorised:
     services:
       case_user_roles: aac_manage_case_assignment,xui_webapp
+      organisations_assigned_users: aac_manage_case_assignment,ccd_data
 
 zuul:
   routes:
@@ -99,6 +100,9 @@ mca:
   conditional-apis:
     case-assignments:
       enabled: ${MCA_CONDITIONAL_APIS_CASE_ASSIGNMENTS_ENABLED:true}
+    organisations-assigned-users:
+      enabled: ${MCA_CONDITIONAL_APIS_ORGS_ASSIGNED_USERS_ENABLED:false}
+      save-allowed: ${MCA_CONDITIONAL_APIS_ORGS_ASSIGNED_USERS_SAVE_ALLOWED:false}
 
 notify:
   api-key: ${NOTIFY_MCA_API_KEY:notify-test-api-key}
@@ -107,7 +111,7 @@ notify:
 role:
   assignment:
     api:
-      host: ${ROLE_ASSIGNMENT_URL:http://localhost:5555}
+      host: ${ROLE_ASSIGNMENT_URL:http://localhost:4096}
 
 http:
   client:

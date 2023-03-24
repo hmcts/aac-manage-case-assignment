@@ -1,0 +1,36 @@
+{
+  "_guid_" : "S-210.00",
+  "_extends_" : "OrganisationsAssignedUsers_ResetForCase__Base",
+
+  "title": "SINGLE CASE: Forbidden response when wrong service",
+
+  "specs": [
+    "INVOKER - caseworker with access to case",
+
+    "is made with a valid case id",
+    "is made using a service not authorised to perform operation",
+
+    "has the 403 return code"
+  ],
+
+  "s2sClientId": "xui_webapp",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Befta_Master_Caseworker"
+    }
+  },
+
+
+  "request" : {
+    "queryParams": {
+      "case_id": "4444333322221111",
+      "dry_run": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_403_Response_S2S_Not_Authorised_For_API"
+  }
+
+}

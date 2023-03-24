@@ -1,0 +1,14 @@
+{
+  "_guid_": "F-210_Check_Orgs_Assigned_Users__Not_Assigned_C2",
+  "_extends_": "F-210_Check_Orgs_Assigned_Users__Not_Assigned__Base",
+
+  "specs": [
+    "to verify the supplimentary data's org counts are unchanged for C2"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-210_Case_Creation_C2_With_Org_Policies_Unassigned][testData][actualResponse][body][id]}"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "_guid_" : "S-210.06",
+  "_extends_" : "OrganisationsAssignedUsers_ResetForCase__Base",
+
+  "title": "SINGLE CASE: Not found response when case not found",
+
+  "specs": [
+    "INVOKER - caseworker with access to case",
+
+    "is made for a case record that does not exist",
+
+    "has the 404 return code"
+  ],
+
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Befta_Master_Caseworker"
+    }
+  },
+
+
+  "request" : {
+    "queryParams": {
+      "case_id": "4444333322221111",
+      "dry_run": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_404_Response_Case_Not_Found"
+  }
+
+}

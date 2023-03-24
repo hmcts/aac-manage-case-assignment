@@ -1,0 +1,21 @@
+{
+  "_guid_" : "OrganisationsAssignedUsers_ResetForCase__Base",
+
+  "productName": "Manage Case Assignment Microservice",
+  "operationName": "OrganisationsAssignedUsers-ResetForCase",
+
+  "method": "POST",
+  "uri": "/organisations-assigned-users/reset-for-case",
+
+  "s2sClientId": "ccd_data",
+  "userTokenClientId": "xuiwebapp",
+
+  "request" : {
+    "_extends_": "Common_Request",
+
+    "queryParams": {
+      "case_id": "OVERRIDE",
+      "dry_run": "OVERRIDE"
+    }
+  }
+}

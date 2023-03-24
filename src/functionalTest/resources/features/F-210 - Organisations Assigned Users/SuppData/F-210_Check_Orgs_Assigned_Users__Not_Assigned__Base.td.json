@@ -1,0 +1,13 @@
+{
+  "_guid_": "F-210_Check_Orgs_Assigned_Users__Not_Assigned__Base",
+  "_extends_": "F-210_Check_Orgs_Assigned_Users__Base",
+
+  "expectedResponse": {
+    "body": {
+      "supplementary_data" : {
+        "orgs_assigned_users.QUK822N" : 0,
+        "orgs_assigned_users.LESTKK0" : 0
+      }
+    }
+  }
+}

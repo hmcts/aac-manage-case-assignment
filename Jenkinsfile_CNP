@@ -73,8 +73,8 @@ def vaultOverrides = [
 
 // vars needed for functional tests
 // Assume a feature build branched off 'develop', with dependencies develop-to-develop, and URLs below represent jenkins-to-preview.
-env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
-env.CCD_DATA_STORE_API_BASE_URL = "https://ccd-data-store-api-${dataStoreApiDevelopPr}.service.core-compute-preview.internal".toLowerCase()
+env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.preview.platform.hmcts.net".toLowerCase()
+env.CCD_DATA_STORE_API_BASE_URL = "https://ccd-data-store-api-${dataStoreApiDevelopPr}.preview.platform.hmcts.net".toLowerCase()
 if (prsRunningInIsolation.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
   // NB: should only enable CALLBACK tests if PRs for MCA, Data-Store and Def-Store are all configured to run as one isolated group.
   env.CALLBACK_FTA_ENABLED = "true"

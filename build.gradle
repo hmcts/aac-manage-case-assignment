@@ -18,11 +18,9 @@ ext['snakeyaml.version'] = '1.32'
 
 group = 'uk.gov.hmcts.reform'
 
-allprojects {
-  java {
-    toolchain {
-      languageVersion = JavaLanguageVersion.of(17)
-    }
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(17)
   }
 }
 

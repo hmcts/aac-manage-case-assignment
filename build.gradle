@@ -386,7 +386,7 @@ dependencies {
   testImplementation 'org.mockito:mockito-inline:4.0.0'
 
   // https://mvnrepository.com/artifact/nl.jqno.equalsverifier/equalsverifier
-  testImplementation group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '3.4.2'
+  testImplementation group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '3.14.3'
 
   // groovy v3.* added to avoid 'WARNING: Illegal reflective access by org.codehaus.groovy.reflection.CachedClass'
   // in groovy:2.5.* when running functional/befta tests

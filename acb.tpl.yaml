@@ -1,8 +1,7 @@
 version: 1.0-preview-1
 steps:
   - id: pull-base-image-amd64
-    cmd: docker pull --platform linux/amd64 hmctspublic.azurecr.io/base/java:17-distroless && docker tag hmctspublic.azurecr.io/base/java:17-distroless hmctspublic.azurecr.io/base/java/linux/amd64:11-distroless
-    when: ["-"]
+    cmd: docker pull --platform linux/amd64 hmctspublic.azurecr.io/base/java:17-distroless && docker tag hmctspublic.azurecr.io/base/java:17-distroless hmctspublic.azurecr.io/base/java/linux/amd64:17-distroless && docker pull --platform linux/amd64 eclipse-temurin:17 && docker tag eclipse-temurin:17 eclipse-temurin/linux/amd64:17
     keep: true
 
   - id: runtime-amd64
@@ -16,7 +15,7 @@ steps:
     keep: true
 
   - id: pull-base-image-arm64
-    cmd: docker pull --platform linux/arm64 hmctspublic.azurecr.io/base/java:17-distroless && docker tag hmctspublic.azurecr.io/base/java:17-distroless hmctspublic.azurecr.io/base/java/linux/arm64:11-distroless
+    cmd: docker pull --platform linux/arm64 hmctspublic.azurecr.io/base/java:17-distroless && docker tag hmctspublic.azurecr.io/base/java:17-distroless hmctspublic.azurecr.io/base/java/linux/arm64:17-distroless && docker pull --platform linux/arm64 eclipse-temurin:17 && docker tag eclipse-temurin:17 eclipse-temurin/linux/arm64:17
     when:
       - pull-base-image-amd64
     keep: true

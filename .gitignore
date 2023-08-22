@@ -2,8 +2,8 @@
 /build/
 !gradle/wrapper/gradle-wrapper.jar
 *.class
-applicationinsights-agent-*.jar
-*.log
+lib/applicationinsights-agent-*.jar
+lib/applicationinsights.log
 
 # BEFTA temp locations
 target/

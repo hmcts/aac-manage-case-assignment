@@ -139,7 +139,7 @@ task functional(type: Test) {
     cucumberReports.notFailingStatuses = ["skipped", "passed"]
 
     javaexec {
-      mainClass = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
+      main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
       args = [
               '--threads', '1',

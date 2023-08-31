@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.constraints.NotEmpty;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -65,8 +64,7 @@ public class CaseAssignmentController {
     @ApiResponses({
         @ApiResponse(
             code = 201,
-            message = "Role from the organisation policy successfully assigned to the assignee."
-        ),
+            message = "Role from the organisation policy successfully assigned to the assignee."),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
@@ -80,27 +78,23 @@ public class CaseAssignmentController {
                 + "\n8) " + ValidationError.ASSIGNEE_ROLE_ERROR,
             response = ApiError.class,
             examples = @Example({
-                    @ExampleProperty(
-                        value = "{\n"
-                            + "   \"status\": \"BAD_REQUEST\",\n"
-                            + "   \"message\": \"" + ValidationError.ASSIGNEE_ORGANISATION_ERROR + "\",\n"
-                            + "   \"errors\": [ ]\n"
-                            + "}",
-                        mediaType = APPLICATION_JSON_VALUE)
-            })
-        ),
+                @ExampleProperty(
+                    value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"message\": \"" + ValidationError.ASSIGNEE_ORGANISATION_ERROR + "\",\n"
+                        + "   \"errors\": [ ]\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })),
         @ApiResponse(
             code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID
-        ),
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID),
         @ApiResponse(
             code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE
-        ),
+            message = AuthError.UNAUTHORISED_S2S_SERVICE),
         @ApiResponse(
             code = 404,
-            message = ValidationError.CASE_NOT_FOUND
-        )
+            message = ValidationError.CASE_NOT_FOUND)
     })
     public CaseAssignmentResponse assignAccessWithinOrganisation(
             @Valid @RequestBody CaseAssignmentRequest requestPayload,
@@ -114,54 +108,50 @@ public class CaseAssignmentController {
     @ApiOperation(value = "Get Case Assignments in My Organisation", notes = "Get Assignments in My Organisation")
     @ResponseStatus(HttpStatus.OK)
     @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "Case-User-Role assignments returned successfully.",
-                    response = GetCaseAssignmentsResponse.class,
-                    examples = @Example({
-                            @ExampleProperty(
-                                    value = "{\n"
-                                            + "  \"status_message\": \"Case-User-Role assignments returned "
-                                            + "successfully\",\n"
-                                            + "  \"case_assignments\": [\n"
-                                            + "    {\n"
-                                            + "      \"case_id\": \"1588234985453946\",\n"
-                                            + "      \"shared_with\": [\n"
-                                            + "        {\n"
-                                            + "          \"idam_id\": \"221a2877-e1ab-4dc4-a9ff-f9424ad58738\",\n"
-                                            + "          \"first_name\": \"Bill\",\n"
-                                            + "          \"last_name\": \"Roberts\",\n"
-                                            + "          \"email\": \"bill.roberts@greatbrsolicitors.co.uk\",\n"
-                                            + "          \"case_roles\": [\n"
-                                            + "            \"[Claimant]\",\n"
-                                            + "            \"[Defendant]\"\n"
-                                            + "          ]\n"
-                                            + "        }\n"
-                                            + "      ]\n"
-                                            + "    }    \n"
-                                            + "  ]\n"
-                                            + "}",
-                                    mediaType = APPLICATION_JSON_VALUE)
-                    })
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "case_ids must be a non-empty list of proper case ids.",
-                    examples = @Example({
-                            @ExampleProperty(
-                                    value = "{\"message\": \"case_ids must be a non-empty list of proper case ids\","
-                                            + " \"status\": \"BAD_REQUEST\" }",
-                                    mediaType = APPLICATION_JSON_VALUE)
-                    })
-            ),
-            @ApiResponse(
-                    code = 401,
-                    message = AuthError.AUTHENTICATION_TOKEN_INVALID
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = AuthError.UNAUTHORISED_S2S_SERVICE
-            )
+        @ApiResponse(
+            code = 200,
+            message = "Case-User-Role assignments returned successfully.",
+            response = GetCaseAssignmentsResponse.class,
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\n"
+                        + "  \"status_message\": \"Case-User-Role assignments returned "
+                        + "successfully\",\n"
+                        + "  \"case_assignments\": [\n"
+                        + "    {\n"
+                        + "      \"case_id\": \"1588234985453946\",\n"
+                        + "      \"shared_with\": [\n"
+                        + "        {\n"
+                        + "          \"idam_id\": \"221a2877-e1ab-4dc4-a9ff-f9424ad58738\",\n"
+                        + "          \"first_name\": \"Bill\",\n"
+                        + "          \"last_name\": \"Roberts\",\n"
+                        + "          \"email\": \"bill.roberts@greatbrsolicitors.co.uk\",\n"
+                        + "          \"case_roles\": [\n"
+                        + "            \"[Claimant]\",\n"
+                        + "            \"[Defendant]\"\n"
+                        + "          ]\n"
+                        + "        }\n"
+                        + "      ]\n"
+                        + "    }    \n"
+                        + "  ]\n"
+                        + "}",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })),
+        @ApiResponse(
+            code = 400,
+            message = "case_ids must be a non-empty list of proper case ids.",
+            examples = @Example({
+                @ExampleProperty(
+                    value = "{\"message\": \"case_ids must be a non-empty list of proper case ids\","
+                        + " \"status\": \"BAD_REQUEST\" }",
+                    mediaType = APPLICATION_JSON_VALUE)
+            })),
+        @ApiResponse(
+            code = 401,
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID),
+        @ApiResponse(
+            code = 403,
+            message = AuthError.UNAUTHORISED_S2S_SERVICE)
     })
     public GetCaseAssignmentsResponse getCaseAssignments(@RequestParam("case_ids")
             @Valid @NotEmpty(message = "case_ids must be a non-empty list of proper case ids.") List<String> caseIds) {
@@ -176,8 +166,7 @@ public class CaseAssignmentController {
     @ApiResponses({
         @ApiResponse(
             code = 200,
-            message = UNASSIGN_ACCESS_MESSAGE
-        ),
+            message = UNASSIGN_ACCESS_MESSAGE),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
@@ -198,18 +187,14 @@ public class CaseAssignmentController {
                         + "      \"" + ValidationError.CASE_ROLE_FORMAT_INVALID + "\"\n"
                         + "   ]\n"
                         + "}",
-                    mediaType = APPLICATION_JSON_VALUE
-                )
-            })
-        ),
+                    mediaType = APPLICATION_JSON_VALUE)
+            })),
         @ApiResponse(
             code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID
-        ),
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID),
         @ApiResponse(
             code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE
-        )
+            message = AuthError.UNAUTHORISED_S2S_SERVICE)
     })
     public CaseUnassignmentResponse unassignAccessWithinOrganisation(
         @Valid @RequestBody CaseUnassignmentRequest requestPayload) {

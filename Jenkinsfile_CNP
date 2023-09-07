@@ -8,7 +8,7 @@ import uk.gov.hmcts.contino.GithubAPI
 
 def product = "aac"
 def component = "manage-case-assignment"
-def branchesToSync = ['demo', 'ithc', 'perftest']
+def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
 
 GradleBuilder builder = new GradleBuilder(this, product)
 
@@ -73,8 +73,8 @@ def vaultOverrides = [
 
 // vars needed for functional tests
 // Assume a feature build branched off 'develop', with dependencies develop-to-develop, and URLs below represent jenkins-to-preview.
-env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
-env.CCD_DATA_STORE_API_BASE_URL = "https://ccd-data-store-api-${dataStoreApiDevelopPr}.service.core-compute-preview.internal".toLowerCase()
+env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-${definitionStoreDevelopPr}.preview.platform.hmcts.net".toLowerCase()
+env.CCD_DATA_STORE_API_BASE_URL = "https://ccd-data-store-api-${dataStoreApiDevelopPr}.preview.platform.hmcts.net".toLowerCase()
 if (prsRunningInIsolation.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
   // NB: should only enable CALLBACK tests if PRs for MCA, Data-Store and Def-Store are all configured to run as one isolated group.
   env.CALLBACK_FTA_ENABLED = "true"
@@ -105,7 +105,10 @@ env.BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP = "profile openid roles manage-use
 // temporary workaround for platform changes: turn BEFTA header checks to warning mode
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 
-env.PACT_BROKER_URL = 'https://pact-broker.platform.hmcts.net'
+env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
+env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
+env.PACT_BROKER_PORT = "443"
+env.PACT_BROKER_SCHEME = "https"
 
 withPipeline("java", product, component) {
   afterAlways('test') {

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.api.errorhandling;
 import com.google.common.collect.ImmutableList;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,25 +40,24 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        log.error("Method argument not valid: {}", ex.getLocalizedMessage());
         String[] errors = ex.getBindingResult().getFieldErrors().stream()
-            .map(e -> e.getDefaultMessage())
+            .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .toArray(String[]::new);
-        log.debug("MethodArgumentNotValidException:{}", ex.getLocalizedMessage());
         return toResponseEntity(status, null, errors);
     }
 
     @ExceptionHandler({CaseAssignedUserRoleException.class})
     @ResponseBody
     public ResponseEntity<Object> handleApiException(final CaseAssignedUserRoleException ex) {
-
-        log.error("CaseAssignedUserRoles exception:", ex.getMessage(), ex);
+        log.error("Case assigned user roles: {}", ex.getLocalizedMessage());
         var responseStatus = ex.getClass().getAnnotation(ResponseStatus.class);
-        return toResponseEntity(getHttpStatus(responseStatus), ex.getLocalizedMessage(), null);
+        return toResponseEntity(getHttpStatus(responseStatus), ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
-        log.debug("ConstraintViolationException exception:", ex);
+        log.error("Constraint violation: {}", ex.getLocalizedMessage());
         String[] errors = ex.getConstraintViolations().stream()
             .map(ConstraintViolation::getMessage)
             .toArray(String[]::new);
@@ -66,26 +66,26 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
-        log.warn("Access denied due to:", ex);
+        log.error("Access denied due to: {}", ex.getLocalizedMessage());
         return toResponseEntity(HttpStatus.FORBIDDEN, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<Object> handleValidationException(ValidationException ex) {
-        log.error("Validation exception:", ex);
+        log.error("Validation exception: {}", ex.getLocalizedMessage());
         return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(CaseCouldNotBeFoundException.class)
     public ResponseEntity<Object> handleCaseCouldNotBeFoundException(CaseCouldNotBeFoundException ex) {
-        log.error("Case could not be found: {}", ex.getMessage(), ex);
+        log.error("Case could not be found: {}", ex.getLocalizedMessage());
         return toResponseEntity(HttpStatus.NOT_FOUND, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(NoCException.class)
     public ResponseEntity<Object> handleNoCException(NoCException ex) {
-        log.debug("NoC Validation exception: {}", ex.getMessage(), ex);
-        return toNoCResponseEntity(HttpStatus.BAD_REQUEST, ex.getErrorMessage(), ex.getErrorCode());
+        log.error("NoC Validation:", ex);
+        return toNoCResponseEntity(ex.getErrorMessage(), ex.getErrorCode());
     }
 
     @ExceptionHandler(FeignException.class)
@@ -93,7 +93,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String errorMessage = ex.responseBody()
             .map(res -> new String(res.array(), StandardCharsets.UTF_8))
             .orElse(ex.getMessage());
-        log.error("Downstream service errors: {}", errorMessage, ex);
+        log.error("Downstream service errors: {}", errorMessage);
         return toResponseEntity(HttpStatus.BAD_GATEWAY, errorMessage);
     }
 
@@ -102,8 +102,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.error(ex.getMessage(), ex);
         return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
     }
-
-
 
     private String[] convertNoCErrors(String[] errors) {
         List<String> errorList = Arrays.asList(errors);
@@ -143,10 +141,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
-    private ResponseEntity<Object> toNoCResponseEntity(HttpStatus status, String message, String code,
+    private ResponseEntity<Object> toNoCResponseEntity(String message, String code,
                                                        String... errors) {
-        NoCApiError apiError = new NoCApiError(status, message, code, errors == null ? null : List.of(errors)
-        );
+        NoCApiError apiError = new NoCApiError(HttpStatus.BAD_REQUEST, message, code,
+                                               errors == null ? null : List.of(errors));
         return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
     }
 

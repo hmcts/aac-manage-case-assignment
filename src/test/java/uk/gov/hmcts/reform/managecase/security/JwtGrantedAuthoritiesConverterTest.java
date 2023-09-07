@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.managecase.security;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,6 +10,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -41,7 +42,7 @@ class JwtGrantedAuthoritiesConverterTest {
     @Test
     @DisplayName("No Claims should return empty authorities")
     void shouldReturnEmptyAuthoritiesWhenClaimNotAvailable() {
-        when(jwt.containsClaim(TOKEN_NAME)).thenReturn(false);
+        when(jwt.hasClaim(TOKEN_NAME)).thenReturn(false);
         Collection<GrantedAuthority> authorities = converter.convert(jwt);
         assertEquals(0, authorities.size(), "size must be empty");
     }
@@ -49,7 +50,7 @@ class JwtGrantedAuthoritiesConverterTest {
     @Test
     @DisplayName("Should return empty authorities when claim value is not access_token")
     void shouldReturnEmptyAuthoritiesWhenClaimValueNotEquals() {
-        when(jwt.containsClaim(TOKEN_NAME)).thenReturn(true);
+        when(jwt.hasClaim(TOKEN_NAME)).thenReturn(true);
         when(jwt.getClaim(TOKEN_NAME)).thenReturn("Test");
         Collection<GrantedAuthority> authorities = converter.convert(jwt);
         assertEquals(0, authorities.size(), "size must be empty");
@@ -58,7 +59,7 @@ class JwtGrantedAuthoritiesConverterTest {
     @Test
     @DisplayName("Should return empty authorities when roles are empty")
     void shouldReturnEmptyAuthoritiesWhenIdamReturnsNoUsers() {
-        when(jwt.containsClaim(TOKEN_NAME)).thenReturn(true);
+        when(jwt.hasClaim(TOKEN_NAME)).thenReturn(true);
         when(jwt.getClaim(TOKEN_NAME)).thenReturn(ACCESS_TOKEN);
         when(jwt.getTokenValue()).thenReturn(ACCESS_TOKEN);
         UserInfo userInfo = mock(UserInfo.class);
@@ -72,7 +73,7 @@ class JwtGrantedAuthoritiesConverterTest {
     @Test
     @DisplayName("Should return authorities as per roles")
     void shouldReturnAuthoritiesWhenIdamReturnsUserRoles() {
-        when(jwt.containsClaim(TOKEN_NAME)).thenReturn(true);
+        when(jwt.hasClaim(TOKEN_NAME)).thenReturn(true);
         when(jwt.getClaim(TOKEN_NAME)).thenReturn(ACCESS_TOKEN);
         when(jwt.getTokenValue()).thenReturn(ACCESS_TOKEN);
         UserInfo userInfo = mock(UserInfo.class);

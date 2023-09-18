@@ -132,9 +132,6 @@ withPipeline("java", product, component) {
     enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
 
     def githubApi = new GithubAPI(this)
-    if (!githubApi.getLabelsbyPattern(env.BRANCH_NAME, "keep-helm")) {
-      enableCleanupOfHelmReleaseOnSuccess()
-    }
   }
 
   // Check if the build should be wired to an environment higher than 'preview'.

@@ -44,6 +44,11 @@ spring:
           oidc:
             client-id: internal
             client-secret: internal
+  cloud:
+    discovery:
+      client:
+        composite-indicator:
+          enabled: false
 idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}

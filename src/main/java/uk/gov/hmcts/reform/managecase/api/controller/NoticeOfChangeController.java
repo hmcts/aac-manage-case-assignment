@@ -139,8 +139,7 @@ public class NoticeOfChangeController {
                         + "\"answer_field\":null,"
                         + "\"question_id\":\"QuestionId1\"}]}\n",
                     mediaType = APPLICATION_JSON_VALUE)
-            })
-        ),
+            })),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:\n"
@@ -159,8 +158,7 @@ public class NoticeOfChangeController {
                         + " \"code\": \"case-id-invalid\","
                         + " \"status\": \"BAD_REQUEST\" }",
                     mediaType = APPLICATION_JSON_VALUE)
-            })
-        ),
+            })),
         @ApiResponse(
             code = 404,
             message = "Case could not be found",
@@ -169,16 +167,13 @@ public class NoticeOfChangeController {
                     value = "{\"message\": \"Case could not be found\","
                         + " \"status\": \"NOT_FOUND\" }",
                     mediaType = APPLICATION_JSON_VALUE)
-            })
-        ),
+            })),
         @ApiResponse(
             code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID
-        ),
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID),
         @ApiResponse(
             code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE
-        )
+            message = AuthError.UNAUTHORISED_S2S_SERVICE)
     })
     public ChallengeQuestionsResult getNoticeOfChangeQuestions(@RequestParam("case_id")
                                                                @Valid
@@ -213,8 +208,7 @@ public class NoticeOfChangeController {
                         + "    \"status_message\": \"Notice of Change answers verified successfully\"\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
-            })
-        ),
+            })),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:\n"
@@ -237,8 +231,7 @@ public class NoticeOfChangeController {
                         + "    \"errors\": []\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
-            })
-        ),
+            })),
         @ApiResponse(
             code = 404,
             message = "Case could not be found",
@@ -247,16 +240,13 @@ public class NoticeOfChangeController {
                     value = "{\"message\": \"Case could not be found\","
                         + " \"status\": \"NOT_FOUND\" }",
                     mediaType = APPLICATION_JSON_VALUE)
-            })
-        ),
+            })),
         @ApiResponse(
             code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID
-        ),
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID),
         @ApiResponse(
             code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE
-        )
+            message = AuthError.UNAUTHORISED_S2S_SERVICE)
     })
     public VerifyNoCAnswersResponse verifyNoticeOfChangeAnswers(
         @Valid @RequestBody VerifyNoCAnswersRequest verifyNoCAnswersRequest) {
@@ -271,8 +261,7 @@ public class NoticeOfChangeController {
             + "Note that this operation acts as a callback and therefore it accepts a standard callback request, "
             + "and similarly returns a standard callback response. As with normal callbacks, the response "
             + "returns a 200 (success) status when valid parameters have been passed to the operation but "
-            + "processing errors have occurred."
-    )
+            + "processing errors have occurred.")
     @ApiResponses({
         @ApiResponse(
             code = 200,
@@ -325,8 +314,7 @@ public class NoticeOfChangeController {
                         + "    }\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
-            })
-        ),
+            })),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:\n"
@@ -339,16 +327,13 @@ public class NoticeOfChangeController {
                         + "    \"errors\": []\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
-            })
-        ),
+            })),
         @ApiResponse(
             code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID
-        ),
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID),
         @ApiResponse(
             code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE
-        )
+            message = AuthError.UNAUTHORISED_S2S_SERVICE)
     })
     public ApplyNoCDecisionResponse applyNoticeOfChangeDecision(
         @Valid @RequestBody ApplyNoCDecisionRequest applyNoCDecisionRequest) {
@@ -368,8 +353,7 @@ public class NoticeOfChangeController {
         @ApiResponse(
             code = 200,
             response = AboutToStartCallbackResponse.class,
-            message = "Data with a list of Case Roles attached to the ChangeOrganisationRequest."
-        ),
+            message = "Data with a list of Case Roles attached to the ChangeOrganisationRequest."),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
@@ -391,16 +375,13 @@ public class NoticeOfChangeController {
                         + "   \"errors\": [ ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
-            })
-        ),
+            })),
         @ApiResponse(
             code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID
-        ),
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID),
         @ApiResponse(
             code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE
-        )
+            message = AuthError.UNAUTHORISED_S2S_SERVICE)
     })
     public AboutToStartCallbackResponse prepareNoC(
         @Valid @RequestBody AboutToStartCallbackRequest aboutToStartCallbackRequest) {
@@ -419,8 +400,7 @@ public class NoticeOfChangeController {
     @ApiResponses({
         @ApiResponse(
             code = 201,
-            message = REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE
-        ),
+            message = REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
@@ -440,8 +420,7 @@ public class NoticeOfChangeController {
                         + "   \"errors\": [ ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
-            })
-        ),
+            })),
         @ApiResponse(
             code = 404,
             message = "Case could not be found",
@@ -450,16 +429,13 @@ public class NoticeOfChangeController {
                     value = "{\"message\": \"Case could not be found\","
                         + " \"status\": \"NOT_FOUND\" }",
                     mediaType = APPLICATION_JSON_VALUE)
-            })
-        ),
+            })),
         @ApiResponse(
             code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID
-        ),
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID),
         @ApiResponse(
             code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE
-        )
+            message = AuthError.UNAUTHORISED_S2S_SERVICE)
     })
     public RequestNoticeOfChangeResponse requestNoticeOfChange(@Valid @RequestBody RequestNoticeOfChangeRequest
                                                                                         requestNoticeOfChangeRequest) {
@@ -476,8 +452,7 @@ public class NoticeOfChangeController {
         @ApiResponse(
             code = 200,
             message = StringUtils.EMPTY,
-            response = SubmitCallbackResponse.class
-        ),
+            response = SubmitCallbackResponse.class),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
@@ -495,16 +470,13 @@ public class NoticeOfChangeController {
                         + "   \"errors\": [ ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
-            })
-        ),
+            })),
         @ApiResponse(
             code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID
-        ),
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID),
         @ApiResponse(
             code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE
-        )
+            message = AuthError.UNAUTHORISED_S2S_SERVICE)
     })
     public SubmitCallbackResponse checkNoticeOfChangeApproval(@Valid @RequestBody CallbackRequest callbackRequest) {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
@@ -533,8 +505,7 @@ public class NoticeOfChangeController {
         @ApiResponse(
             code = 200,
             message = StringUtils.EMPTY,
-            response = AboutToSubmitCallbackResponse.class
-        ),
+            response = AboutToSubmitCallbackResponse.class),
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
@@ -552,16 +523,13 @@ public class NoticeOfChangeController {
                         + "   \"errors\": [ ]\n"
                         + "}",
                     mediaType = APPLICATION_JSON_VALUE)
-            })
-        ),
+            })),
         @ApiResponse(
             code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID
-        ),
+            message = AuthError.AUTHENTICATION_TOKEN_INVALID),
         @ApiResponse(
             code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE
-        )
+            message = AuthError.UNAUTHORISED_S2S_SERVICE)
     })
     public AboutToSubmitCallbackResponse setOrganisationToRemove(@Valid @RequestBody CallbackRequest callbackRequest) {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();

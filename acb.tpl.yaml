@@ -2,7 +2,6 @@ version: 1.0-preview-1
 steps:
   - id: pull-base-image-amd64
     cmd: docker pull --platform linux/amd64 hmctspublic.azurecr.io/base/java:17-distroless && docker tag hmctspublic.azurecr.io/base/java:17-distroless hmctspublic.azurecr.io/base/java/linux/amd64:17-distroless
-    keep: true
     retries: 3
     retryDelay: 5
 
@@ -14,7 +13,6 @@ steps:
       .
     when:
       - pull-base-image-amd64
-    keep: true
     retries: 3
     retryDelay: 5
 
@@ -22,7 +20,6 @@ steps:
     cmd: docker pull --platform linux/arm64 hmctspublic.azurecr.io/base/java:17-distroless && docker tag hmctspublic.azurecr.io/base/java:17-distroless hmctspublic.azurecr.io/base/java/linux/arm64:17-distroless
     when:
       - pull-base-image-amd64
-    keep: true
     retries: 3
     retryDelay: 5
 
@@ -34,7 +31,6 @@ steps:
       .
     when:
       - pull-base-image-arm64
-    keep: true
     retries: 3
     retryDelay: 5
 
@@ -52,7 +48,6 @@ steps:
     cmd: docker manifest create {{.Run.Registry}}/{{CI_IMAGE_TAG}} {{.Run.Registry}}/{{CI_IMAGE_TAG}}-amd64 {{.Run.Registry}}/{{CI_IMAGE_TAG}}-arm64
     when:
       - push-images
-    keep: true
     retries: 3
     retryDelay: 5
 
@@ -60,6 +55,5 @@ steps:
     cmd: docker manifest push --purge {{.Run.Registry}}/{{CI_IMAGE_TAG}}
     when:
       - manifest-create
-    keep: true
     retries: 3
     retryDelay: 5

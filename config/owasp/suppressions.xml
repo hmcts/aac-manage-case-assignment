@@ -6,7 +6,6 @@
         CVE-2023-20860 refer [Ticket]
         CVE-2023-20863 refer [Ticket]
         CVE-2023-20873 refer [Ticket]
-        CVE-2023-20883 refer [Ticket]
         CVE-2023-2976  refer [Ticket]
         CVE-2023-34036 refer [Ticket]
         CVE-2023-34034 refer [Ticket]
@@ -29,7 +28,6 @@
     <cve>CVE-2023-20860</cve>
     <cve>CVE-2023-20863</cve>
     <cve>CVE-2023-20873</cve>
-    <cve>CVE-2023-20883</cve>
     <cve>CVE-2023-34036</cve>
     <cve>CVE-2023-34034</cve>
     <cve>CVE-2023-41080</cve>

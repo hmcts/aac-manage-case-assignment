@@ -2,8 +2,6 @@
   <suppress>
     <notes>Temporary Suppression
         CVE-2022-45688 refer https://tools.hmcts.net/jira/browse/CCD-4373
-        CVE-2023-20861 refer [Ticket]
-        CVE-2023-20860 refer [Ticket]
         CVE-2023-20863 refer [Ticket]
         CVE-2023-20873 refer [Ticket]
         CVE-2023-20883 refer [Ticket]
@@ -18,15 +16,12 @@
         CVE-2023-44487 refer [Ticket]
         CVE-2023-5072  refer [Ticket]
         CVE-2023-31582 refer [Ticket]
-    
         CVE-2023-33202 refer [Ticket]
         CVE-2023-34055 refer [Ticket]
         CVE-2023-46589 refer [Ticket]
         CVE-2023-6378 refer [Ticket]
         CVE-2023-35116 refer [Ticket]</notes>
     <cve>CVE-2022-45688</cve>
-    <cve>CVE-2023-20861</cve>
-    <cve>CVE-2023-20860</cve>
     <cve>CVE-2023-20863</cve>
     <cve>CVE-2023-20873</cve>
     <cve>CVE-2023-20883</cve>

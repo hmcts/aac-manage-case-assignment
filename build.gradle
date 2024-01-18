@@ -347,8 +347,8 @@ dependencies {
 
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.security:spring-security-config"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.5.14"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.5.14"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.5.15"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.5.15"
 
   implementation "io.github.openfeign:feign-httpclient:11.0"
   testImplementation 'io.github.openfeign:feign-jackson:10.7.0'

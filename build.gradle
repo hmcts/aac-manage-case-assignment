@@ -295,11 +295,11 @@ ext.libraries = [
 // GOV.UK Notify has CVE-2021-29425 and transient dependency commons-io:commons-io needs updating
 // At the time latest is:
 // https://search.maven.org/artifact/uk.gov.service.notify/notifications-java-client/3.17.0-RELEASE/jar
-//configurations.all {
-//  resolutionStrategy.force {
-//    'commons-io:commons-io:2.8.0', 'org.springframework.cloud:spring-cloud-starter:4.0.3'
-//  }
-//}
+configurations.all {
+  resolutionStrategy {
+    force 'commons-io:commons-io:2.8.0'
+  }
+}
 
 configurations.all {
   resolutionStrategy.force 'commons-io:commons-io:2.8.0', 'org.springframework.cloud:spring-cloud-starter:4.0.3'

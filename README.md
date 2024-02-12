@@ -21,7 +21,7 @@ To build the project execute the following command:
 ./gradlew build
 ```
 
-### Running
+### Running 
 Run the application by executing:
 ```bash
 ./gradlew bootRun

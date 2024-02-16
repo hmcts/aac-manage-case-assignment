@@ -46,11 +46,11 @@
 
   "expectedResponse": {
     "body": {
-      "organisationStatus": "[[ANYTHING_PRESENT]]",
-      "organisationProfileIds": "[[ANYTHING_PRESENT]]",
       "case_data": {
         "applicantOrganisationPolicy": {
           "Organisation": {
+            "organisationStatus": "[[ANYTHING_PRESENT]]",
+            "organisationProfileIds": "[[ANYTHING_PRESENT]]",
             "_extends_" : "F-209_org_name_LESTKK0_only"
           }
         },

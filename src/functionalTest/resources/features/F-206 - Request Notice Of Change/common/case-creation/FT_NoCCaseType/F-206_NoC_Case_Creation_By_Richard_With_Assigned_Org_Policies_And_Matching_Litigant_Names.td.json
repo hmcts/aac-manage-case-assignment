@@ -33,8 +33,6 @@
 
   "expectedResponse": {
     "body": {
-      "organisationStatus": "[[ANYTHING_PRESENT]]",
-      "organisationProfileIds": "[[ANYTHING_PRESENT]]",
       "case_data": {
         "applicant": {
           "individual": {

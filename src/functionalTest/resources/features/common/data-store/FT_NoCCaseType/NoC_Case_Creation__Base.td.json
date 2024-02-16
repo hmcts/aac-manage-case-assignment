@@ -22,8 +22,6 @@
 
 	"expectedResponse": {
 		"body": {
-			"organisationStatus": "",
-			"organisationProfileIds": "",
 			"jurisdiction": "BEFTA_MASTER",
 			"case_type_id": "FT_NoCCaseType",
 			"state": "CaseCreated",

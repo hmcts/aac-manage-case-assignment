@@ -31,6 +31,8 @@
 
   "expectedResponse": {
     "body": {
+      "organisationStatus": "[[ANYTHING_PRESENT]]",
+      "organisationProfileIds": "[[ANYTHING_PRESENT]]",
       "case_data": {
         "_extends_" : "F_209_OrgPolicies"
       }

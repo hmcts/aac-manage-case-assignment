@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.api.payload;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.Links;
 import org.springframework.hateoas.RepresentationModel;
@@ -10,6 +11,7 @@ import org.springframework.hateoas.RepresentationModel;
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class CaseAssignedUserRolesResource extends RepresentationModel<RepresentationModel<?>> {
 

@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @ApiModel(description = "")
@@ -17,8 +16,8 @@ public class FieldType {
     private String min;
     private String max;
     private String regularExpression;
-    private List<FixedListItem> fixedListItems = new ArrayList<>();
-    private List<CaseField> complexFields = new ArrayList<>();
+    private List<FixedListItem> fixedListItems;
+    private List<CaseField> complexFields;
     private FieldType collectionFieldType;
 
     @JsonProperty("id")

@@ -51,9 +51,7 @@
       "case_data": {
         "applicantOrganisationPolicy": {
           "Organisation": {
-            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}",
-            "organisationStatus": "[[ANYTHING_PRESENT]]",
-            "organisationProfileIds": "[[ANYTHING_PRESENT]]"
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
           }
         },
         "respondentOrganisationPolicy": {

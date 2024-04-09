@@ -6,7 +6,7 @@ import java.net.ConnectException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;

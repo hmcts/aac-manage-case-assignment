@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableE
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.repository.NocApprovalDataStoreRepository;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import java.util.HashMap;
 import java.util.Map;
 

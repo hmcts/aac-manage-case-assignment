@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 import java.util.Date;
 
-@ApiModel(description = "")
+@Schema
 public class Version implements Serializable {
 
     private static final long serialVersionUID = 6196146295016140921L;
@@ -15,7 +14,7 @@ public class Version implements Serializable {
     private Date liveFrom;
     private Date liveUntil;
 
-    @ApiModelProperty(required = true, value = "Sequantial version number")
+    @Schema(required = true, description = "Sequantial version number")
     @JsonProperty("number")
     public Integer getNumber() {
         return number;
@@ -28,7 +27,7 @@ public class Version implements Serializable {
     /**
      * Date and time from when this version is valid from.
      **/
-    @ApiModelProperty(required = true, value = "Date and time from when this version is valid from")
+    @Schema(required = true, description = "Date and time from when this version is valid from")
     @JsonProperty("live_from")
     public Date getLiveFrom() {
         return liveFrom;
@@ -41,7 +40,7 @@ public class Version implements Serializable {
     /**
      * Date and time this version is to be retired.
      **/
-    @ApiModelProperty("Date and time this version is to be retired")
+    @Schema(description = "Date and time this version is to be retired")
     @JsonProperty("live_until")
     public Date getLiveUntil() {
         return liveUntil;

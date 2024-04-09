@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.managecase.api.payload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
@@ -11,13 +11,13 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 
 @Getter
 @AllArgsConstructor
-@ApiModel("Verify Notice of Change Answers Response")
+@Schema(description = "Verify Notice of Change Answers Response")
 public class VerifyNoCAnswersResponse {
 
     @JsonProperty("status_message")
-    @ApiModelProperty(value = "Domain status message", required = true, example = VERIFY_NOC_ANSWERS_MESSAGE)
+    @Schema(description = "Domain status message", required = true, example = VERIFY_NOC_ANSWERS_MESSAGE)
     private String status;
 
-    @ApiModelProperty(value = "Organisation for identified case role", required = true)
+    @Schema(description = "Organisation for identified case role", required = true)
     private Organisation organisation;
 }

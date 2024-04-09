@@ -49,6 +49,8 @@ spring:
       client:
         composite-indicator:
           enabled: false
+springdoc:
+  packagesToScan: uk.gov.hmcts.reform.managecase.api.controller
 idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}

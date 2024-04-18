@@ -20,7 +20,8 @@ import java.util.Map;
 @Schema(description = "About to Start Callback Response")
 public class AboutToStartCallbackResponse {
 
-    @Schema(description = "Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
+    @Schema(description = "Case data as defined in case type definition."
+        + "See `docs/api/case-data.md` for data structure.")
     private Map<String, JsonNode> data;
     @JsonProperty("data_classification")
     @Schema(description = "Same structure as `data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "

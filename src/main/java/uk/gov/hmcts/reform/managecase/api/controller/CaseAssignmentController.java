@@ -82,12 +82,12 @@ public class CaseAssignmentController {
                 schema = @Schema(implementation = ApiError.class),
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\n"
-                    + "   \"status\": \"BAD_REQUEST\",\n"
-                    + "   \"message\": \"" + ValidationError.ASSIGNEE_ORGANISATION_ERROR + "\",\n"
-                    + "   \"errors\": [ ]\n"
-                    + "}"
-            )})),
+                        value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"message\": \"" + ValidationError.ASSIGNEE_ORGANISATION_ERROR + "\",\n"
+                        + "   \"errors\": [ ]\n"
+                        + "}"
+                        )})),
         @ApiResponse(
             responseCode = "401",
             description = AuthError.AUTHENTICATION_TOKEN_INVALID),
@@ -117,37 +117,37 @@ public class CaseAssignmentController {
                 schema = @Schema(implementation = GetCaseAssignmentsResponse.class),
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\n"
-                    + "  \"status_message\": \"Case-User-Role assignments returned "
-                    + "successfully\",\n"
-                    + "  \"case_assignments\": [\n"
-                    + "    {\n"
-                    + "      \"case_id\": \"1588234985453946\",\n"
-                    + "      \"shared_with\": [\n"
-                    + "        {\n"
-                    + "          \"idam_id\": \"221a2877-e1ab-4dc4-a9ff-f9424ad58738\",\n"
-                    + "          \"first_name\": \"Bill\",\n"
-                    + "          \"last_name\": \"Roberts\",\n"
-                    + "          \"email\": \"bill.roberts@greatbrsolicitors.co.uk\",\n"
-                    + "          \"case_roles\": [\n"
-                    + "            \"[Claimant]\",\n"
-                    + "            \"[Defendant]\"\n"
-                    + "          ]\n"
-                    + "        }\n"
-                    + "      ]\n"
-                    + "    }    \n"
-                    + "  ]\n"
-                    + "}"
-            )})),
+                        value = "{\n"
+                        + "  \"status_message\": \"Case-User-Role assignments returned "
+                        + "successfully\",\n"
+                        + "  \"case_assignments\": [\n"
+                        + "    {\n"
+                        + "      \"case_id\": \"1588234985453946\",\n"
+                        + "      \"shared_with\": [\n"
+                        + "        {\n"
+                        + "          \"idam_id\": \"221a2877-e1ab-4dc4-a9ff-f9424ad58738\",\n"
+                        + "          \"first_name\": \"Bill\",\n"
+                        + "          \"last_name\": \"Roberts\",\n"
+                        + "          \"email\": \"bill.roberts@greatbrsolicitors.co.uk\",\n"
+                        + "          \"case_roles\": [\n"
+                        + "            \"[Claimant]\",\n"
+                        + "            \"[Defendant]\"\n"
+                        + "          ]\n"
+                        + "        }\n"
+                        + "      ]\n"
+                        + "    }    \n"
+                        + "  ]\n"
+                        + "}"
+                        )})),
         @ApiResponse(
             responseCode = "400",
             description = "case_ids must be a non-empty list of proper case ids.",
             content = @Content(
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\"message\": \"case_ids must be a non-empty list of proper case ids\","
-                    + " \"status\": \"BAD_REQUEST\" }"
-            )})),
+                        value = "{\"message\": \"case_ids must be a non-empty list of proper case ids\","
+                        + " \"status\": \"BAD_REQUEST\" }"
+                        )})),
         @ApiResponse(
             responseCode = "401",
             description = AuthError.AUTHENTICATION_TOKEN_INVALID),
@@ -183,14 +183,14 @@ public class CaseAssignmentController {
                 schema = @Schema(implementation = ApiError.class),
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\n"
-                    + "   \"status\": \"BAD_REQUEST\",\n"
-                    + "   \"errors\": [\n"
-                    + "      \"" + ValidationError.CASE_ID_INVALID + "\", \n"
-                    + "      \"" + ValidationError.CASE_ROLE_FORMAT_INVALID + "\"\n"
-                    + "   ]\n"
-                    + "}"
-            )})),
+                        value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"errors\": [\n"
+                        + "      \"" + ValidationError.CASE_ID_INVALID + "\", \n"
+                        + "      \"" + ValidationError.CASE_ROLE_FORMAT_INVALID + "\"\n"
+                        + "   ]\n"
+                        + "}"
+                        )})),
         @ApiResponse(
             responseCode = "401",
             description = AuthError.AUTHENTICATION_TOKEN_INVALID),

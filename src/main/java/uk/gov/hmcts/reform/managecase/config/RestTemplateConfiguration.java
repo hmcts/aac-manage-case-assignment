@@ -90,7 +90,6 @@ public class RestTemplateConfiguration {
     }
 
     private HttpClient getHttpClient(final int timeout) {
-        PoolingHttpClientConnectionManagerBuilder builder = PoolingHttpClientConnectionManagerBuilder.create();
 
         LOG.info("maxTotalHttpClient: {}", maxTotalHttpClient);
         LOG.info("maxSecondsIdleConnection: {}", maxSecondsIdleConnection);
@@ -98,6 +97,8 @@ public class RestTemplateConfiguration {
         LOG.info("validateAfterInactivity: {}", validateAfterInactivity);
         LOG.info("connectionTimeout: {}", timeout);
         LOG.info("readTimeout: {}", readTimeout);
+
+        PoolingHttpClientConnectionManagerBuilder builder = PoolingHttpClientConnectionManagerBuilder.create();
 
         builder.setMaxConnTotal(maxTotalHttpClient);
         builder.setMaxConnPerRoute(maxClientPerRoute);
@@ -115,7 +116,7 @@ public class RestTemplateConfiguration {
             }
             
         });
-        builder.setSocketConfigResolver(new Resolver<HttpRoute,SocketConfig>(){
+        builder.setSocketConfigResolver(new Resolver<HttpRoute,SocketConfig>() {
 
             @Override
             public SocketConfig resolve(HttpRoute object) {

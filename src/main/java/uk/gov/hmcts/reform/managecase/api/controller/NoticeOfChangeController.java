@@ -124,25 +124,25 @@ public class NoticeOfChangeController {
                 schema = @Schema(implementation = ChallengeQuestionsResult.class),
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\"questions\":["
-                    + "{\"case_type_id\":\"caseType\","
-                    + "\"order\":1,"
-                    + "\"question_text\":\"questionText\","
-                    + "\"answer_field_type\""
-                    + ":{\"id\":\"Number\","
-                    + "\"type\":\"Number\","
-                    + "\"min\":null,"
-                    + "\"max\":null,"
-                    + "\"regular_expression\":null,"
-                    + "\"fixed_list_items\":[],"
-                    + "\"complex_fields\":[],"
-                    + "\"collection_field_type\":null"
-                    + "},"
-                    + "\"display_context_parameter\":null,"
-                    + "\"challenge_question_id\":\"NoC\","
-                    + "\"answer_field\":null,"
-                    + "\"question_id\":\"QuestionId1\"}]}\n"
-            )})),
+                        value = "{\"questions\":["
+                        + "{\"case_type_id\":\"caseType\","
+                        + "\"order\":1,"
+                        + "\"question_text\":\"questionText\","
+                        + "\"answer_field_type\""
+                        + ":{\"id\":\"Number\","
+                        + "\"type\":\"Number\","
+                        + "\"min\":null,"
+                        + "\"max\":null,"
+                        + "\"regular_expression\":null,"
+                        + "\"fixed_list_items\":[],"
+                        + "\"complex_fields\":[],"
+                        + "\"collection_field_type\":null"
+                        + "},"
+                        + "\"display_context_parameter\":null,"
+                        + "\"challenge_question_id\":\"NoC\","
+                        + "\"answer_field\":null,"
+                        + "\"question_id\":\"QuestionId1\"}]}\n"
+                        )})),
         @ApiResponse(
             responseCode = "400",
             description = "One or more of the following reasons:\n"
@@ -158,19 +158,19 @@ public class NoticeOfChangeController {
             content = @Content(
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\"message\": \"Case ID has to be a valid 16-digit Luhn number\","
-                    + " \"code\": \"case-id-invalid\","
-                    + " \"status\": \"BAD_REQUEST\" }"
-            )})),
+                        value = "{\"message\": \"Case ID has to be a valid 16-digit Luhn number\","
+                        + " \"code\": \"case-id-invalid\","
+                        + " \"status\": \"BAD_REQUEST\" }"
+                        )})),
         @ApiResponse(
             responseCode = "404",
             description = "Case could not be found",
             content = @Content(
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\"message\": \"Case could not be found\","
-                    + " \"status\": \"NOT_FOUND\" }"
-            )})),
+                        value = "{\"message\": \"Case could not be found\","
+                        + " \"status\": \"NOT_FOUND\" }"
+                        )})),
         @ApiResponse(
             responseCode = "401",
             description = AuthError.AUTHENTICATION_TOKEN_INVALID),
@@ -204,14 +204,14 @@ public class NoticeOfChangeController {
                 schema = @Schema(implementation = VerifyNoCAnswersResponse.class),
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\n"
-                    + "    \"organisation\": {\n"
-                    + "        \"OrganisationID\": \"QUK822NA\",\n"
-                    + "        \"OrganisationName\": \"Some Org\"\n"
-                    + "    },\n"
-                    + "    \"status_message\": \"Notice of Change answers verified successfully\"\n"
-                    + "}"
-            )})),
+                        value = "{\n"
+                        + "    \"organisation\": {\n"
+                        + "        \"OrganisationID\": \"QUK822NA\",\n"
+                        + "        \"OrganisationName\": \"Some Org\"\n"
+                        + "    },\n"
+                        + "    \"status_message\": \"Notice of Change answers verified successfully\"\n"
+                        + "}"
+                        )})),
         @ApiResponse(
             responseCode = "400",
             description = "One or more of the following reasons:\n"
@@ -228,22 +228,22 @@ public class NoticeOfChangeController {
             content = @Content(
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\n"
-                    + "    \"status\": \"BAD_REQUEST\",\n"
-                    + "    \"message\": \"The answers did not match those for any litigant\",\n"
-                    + "    \"code\": \"answers-not-matched-any-litigant\",\n"
-                    + "    \"errors\": []\n"
-                    + "}"
-            )})),
+                        value = "{\n"
+                        + "    \"status\": \"BAD_REQUEST\",\n"
+                        + "    \"message\": \"The answers did not match those for any litigant\",\n"
+                        + "    \"code\": \"answers-not-matched-any-litigant\",\n"
+                        + "    \"errors\": []\n"
+                        + "}"
+                        )})),
         @ApiResponse(
             responseCode = "404",
             description = "Case could not be found",
             content = @Content(
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\"message\": \"Case could not be found\","
-                    + " \"status\": \"NOT_FOUND\" }"
-            )})),
+                        value = "{\"message\": \"Case could not be found\","
+                        + " \"status\": \"NOT_FOUND\" }"
+                        )})),
         @ApiResponse(
             responseCode = "401",
             description = AuthError.AUTHENTICATION_TOKEN_INVALID),
@@ -278,46 +278,46 @@ public class NoticeOfChangeController {
                 schema = @Schema(implementation = ApplyNoCDecisionResponse.class),
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\n"
-                    + "    \"data\": {\n"
-                    + "        \"TextField\": \"TextFieldValue\",\n"
-                    + "        \"EmailField\": \"aca72@gmail.com\",\n"
-                    + "        \"NumberField\": \"123\",\n"
-                    + "        \"OrganisationPolicyField1\": {\n"
-                    + "            \"Organisation\": {\n"
-                    + "                \"OrganisationID\": null,\n"
-                    + "                \"OrganisationName\": null\n"
-                    + "            },\n"
-                    + "            \"OrgPolicyReference\": \"DefendantPolicy\",\n"
-                    + "            \"OrgPolicyCaseAssignedRole\": \"[Defendant]\"\n"
-                    + "        },\n"
-                    + "        \"OrganisationPolicyField2\": {\n"
-                    + "            \"Organisation\": {\n"
-                    + "                \"OrganisationID\": \"QUK822N\",\n"
-                    + "                \"OrganisationName\": \"SomeOrg\"\n"
-                    + "            },\n"
-                    + "            \"OrgPolicyReference\": \"ClaimantPolicy\",\n"
-                    + "            \"OrgPolicyCaseAssignedRole\": \"[Claimant]\"\n"
-                    + "        },\n"
-                    + "        \"ChangeOrganisationRequestField\": {\n"
-                    + "            \"Reason\": null,\n"
-                    + "            \"CaseRoleId\": null,\n"
-                    + "            \"NotesReason\": null,\n"
-                    + "            \"ApprovalStatus\": null,\n"
-                    + "            \"RequestTimestamp\": null,\n"
-                    + "            \"OrganisationToAdd\": {\n"
-                    + "                \"OrganisationID\": null,\n"
-                    + "                \"OrganisationName\": null\n"
-                    + "            },\n"
-                    + "            \"OrganisationToRemove\": {\n"
-                    + "                \"OrganisationID\": null,\n"
-                    + "                \"OrganisationName\": null\n"
-                    + "            },\n"
-                    + "            \"ApprovalRejectionTimestamp\": null\n"
-                    + "        }\n"
-                    + "    }\n"
-                    + "}"
-            )})),
+                        value = "{\n"
+                        + "    \"data\": {\n"
+                        + "        \"TextField\": \"TextFieldValue\",\n"
+                        + "        \"EmailField\": \"aca72@gmail.com\",\n"
+                        + "        \"NumberField\": \"123\",\n"
+                        + "        \"OrganisationPolicyField1\": {\n"
+                        + "            \"Organisation\": {\n"
+                        + "                \"OrganisationID\": null,\n"
+                        + "                \"OrganisationName\": null\n"
+                        + "            },\n"
+                        + "            \"OrgPolicyReference\": \"DefendantPolicy\",\n"
+                        + "            \"OrgPolicyCaseAssignedRole\": \"[Defendant]\"\n"
+                        + "        },\n"
+                        + "        \"OrganisationPolicyField2\": {\n"
+                        + "            \"Organisation\": {\n"
+                        + "                \"OrganisationID\": \"QUK822N\",\n"
+                        + "                \"OrganisationName\": \"SomeOrg\"\n"
+                        + "            },\n"
+                        + "            \"OrgPolicyReference\": \"ClaimantPolicy\",\n"
+                        + "            \"OrgPolicyCaseAssignedRole\": \"[Claimant]\"\n"
+                        + "        },\n"
+                        + "        \"ChangeOrganisationRequestField\": {\n"
+                        + "            \"Reason\": null,\n"
+                        + "            \"CaseRoleId\": null,\n"
+                        + "            \"NotesReason\": null,\n"
+                        + "            \"ApprovalStatus\": null,\n"
+                        + "            \"RequestTimestamp\": null,\n"
+                        + "            \"OrganisationToAdd\": {\n"
+                        + "                \"OrganisationID\": null,\n"
+                        + "                \"OrganisationName\": null\n"
+                        + "            },\n"
+                        + "            \"OrganisationToRemove\": {\n"
+                        + "                \"OrganisationID\": null,\n"
+                        + "                \"OrganisationName\": null\n"
+                        + "            },\n"
+                        + "            \"ApprovalRejectionTimestamp\": null\n"
+                        + "        }\n"
+                        + "    }\n"
+                        + "}"
+                        )})),
         @ApiResponse(
             responseCode = "400",
             description = "One or more of the following reasons:\n"
@@ -325,12 +325,12 @@ public class NoticeOfChangeController {
             content = @Content(
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\n"
-                    + "    \"status\": \"BAD_REQUEST\",\n"
-                    + "    \"message\": \"'case_details' are required.\",\n"
-                    + "    \"errors\": []\n"
-                    + "}"
-            )})),
+                        value = "{\n"
+                        + "    \"status\": \"BAD_REQUEST\",\n"
+                        + "    \"message\": \"'case_details' are required.\",\n"
+                        + "    \"errors\": []\n"
+                        + "}"
+                        )})),
         @ApiResponse(
             responseCode = "401",
             description = AuthError.AUTHENTICATION_TOKEN_INVALID),
@@ -359,7 +359,7 @@ public class NoticeOfChangeController {
             content = @Content(
                 schema = @Schema(implementation = AboutToStartCallbackResponse.class),
                 mediaType = APPLICATION_JSON_VALUE
-        )),
+            )),
         @ApiResponse(
             responseCode = "400",
             description = "One or more of the following reasons:"
@@ -376,12 +376,12 @@ public class NoticeOfChangeController {
                 schema = @Schema(implementation = ApiError.class),
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\n"
-                    + "   \"status\": \"BAD_REQUEST\",\n"
-                    + "   \"message\": \"" + ValidationError.NOC_REQUEST_ONGOING + "\",\n"
-                    + "   \"errors\": [ ]\n"
-                    + "}"
-            )})),
+                        value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"message\": \"" + ValidationError.NOC_REQUEST_ONGOING + "\",\n"
+                        + "   \"errors\": [ ]\n"
+                        + "}"
+                        )})),
         @ApiResponse(
             responseCode = "401",
             description = AuthError.AUTHENTICATION_TOKEN_INVALID),
@@ -420,13 +420,13 @@ public class NoticeOfChangeController {
                 schema = @Schema(implementation = NoCApiError.class),
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\n"
-                    + "   \"status\": \"BAD_REQUEST\",\n"
-                    + "   \"message\": \"" + CASE_ID_INVALID + "\",\n"
-                    + "   \"code\": \"" + "case-id-invalid" + "\",\n"
-                    + "   \"errors\": [ ]\n"
-                    + "}"
-            )})),
+                        value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"message\": \"" + CASE_ID_INVALID + "\",\n"
+                        + "   \"code\": \"" + "case-id-invalid" + "\",\n"
+                        + "   \"errors\": [ ]\n"
+                        + "}"
+                        )})),
         @ApiResponse(
             responseCode = "404",
             description = "Case could not be found",
@@ -434,9 +434,9 @@ public class NoticeOfChangeController {
                 schema = @Schema(implementation = NoCApiError.class),
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\"message\": \"Case could not be found\","
-                    + " \"status\": \"NOT_FOUND\" }"
-            )})),
+                        value = "{\"message\": \"Case could not be found\","
+                        + " \"status\": \"NOT_FOUND\" }"
+                        )})),
         @ApiResponse(
             responseCode = "401",
             description = AuthError.AUTHENTICATION_TOKEN_INVALID),
@@ -462,8 +462,7 @@ public class NoticeOfChangeController {
             content = @Content(
                 schema = @Schema(implementation = SubmitCallbackResponse.class),
                 mediaType = APPLICATION_JSON_VALUE
-            )
-        ),
+            )),
         @ApiResponse(
             responseCode = "400",
             description = "One or more of the following reasons:"
@@ -476,12 +475,12 @@ public class NoticeOfChangeController {
                 schema = @Schema(implementation = ApiError.class),
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\n"
-                    + "   \"status\": \"BAD_REQUEST\",\n"
-                    + "   \"message\": \"" + CASE_ID_EMPTY + "\",\n"
-                    + "   \"errors\": [ ]\n"
-                    + "}"
-            )})),
+                        value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"message\": \"" + CASE_ID_EMPTY + "\",\n"
+                        + "   \"errors\": [ ]\n"
+                        + "}"
+                        )})),
         @ApiResponse(
             responseCode = "401",
             description = AuthError.AUTHENTICATION_TOKEN_INVALID),
@@ -532,12 +531,12 @@ public class NoticeOfChangeController {
                 schema = @Schema(implementation = ApiError.class),
                 mediaType = APPLICATION_JSON_VALUE,
                 examples = { @ExampleObject(
-                    value = "{\n"
-                    + "   \"status\": \"BAD_REQUEST\",\n"
-                    + "   \"message\": \"" + CASE_ID_EMPTY + "\",\n"
-                    + "   \"errors\": [ ]\n"
-                    + "}"
-            )})),
+                        value = "{\n"
+                        + "   \"status\": \"BAD_REQUEST\",\n"
+                        + "   \"message\": \"" + CASE_ID_EMPTY + "\",\n"
+                        + "   \"errors\": [ ]\n"
+                        + "}"
+                        )})),
         @ApiResponse(
             responseCode = "401",
             description = AuthError.AUTHENTICATION_TOKEN_INVALID),

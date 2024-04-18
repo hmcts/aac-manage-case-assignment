@@ -12,7 +12,7 @@ plugins {
 
 ext {
   set('log4j2.version', '2.23.1')
-  set('jackson.version', '2.15.3')
+  set('jackson.version', '2.16.0')
   set('snakeyaml.version', '2.2')
 }
 

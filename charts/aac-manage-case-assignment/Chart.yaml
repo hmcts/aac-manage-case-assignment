@@ -3,10 +3,10 @@ appVersion: "1.0"
 description: A Helm chart for manage-case-assignment App
 name: aac-manage-case-assignment
 home: https://github.com/hmcts/aac-manage-case-assignment
-version: 0.2.15
+version: 0.2.16
 maintainers:
   - name: HMCTS CDM team
 dependencies:
   - name: java
-    version: 5.0.4
+    version: 5.2.0
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/

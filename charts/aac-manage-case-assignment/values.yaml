@@ -4,7 +4,7 @@ java:
   ingressHost: aac-manage-case-assignment-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   aadIdentityName: aac
   autoscaling:
-    enabled: true
+    enabled: false
     maxReplicas: 4
   keyVaults:
     aac:

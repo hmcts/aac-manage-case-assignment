@@ -37,7 +37,7 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixtur
     host = "${PACT_BROKER_URL:localhost}",
     port = "${PACT_BROKER_PORT:80}",
     consumerVersionSelectors = {
-        @VersionSelector(tag = "Dev")
+        @VersionSelector(tag = "master")
     }
 )
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})

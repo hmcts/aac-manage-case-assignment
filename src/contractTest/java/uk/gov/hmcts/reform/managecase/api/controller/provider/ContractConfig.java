@@ -17,7 +17,13 @@ import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 import uk.gov.hmcts.reform.managecase.service.NotifyService;
-import uk.gov.hmcts.reform.managecase.service.noc.*;
+import uk.gov.hmcts.reform.managecase.service.noc.ChallengeAnswerValidator;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
+import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
+import uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService;
+import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
+import uk.gov.hmcts.reform.managecase.service.noc.ApplyNoCDecisionService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 @Configuration

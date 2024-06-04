@@ -10,11 +10,15 @@ plugins {
   id 'au.com.dius.pact' version '4.1.7'
 }
 
-ext['spring-security.version'] = '5.7.11'
-ext['spring-framework.version'] = '5.3.27'
-ext['log4j2.version'] = '2.17.1'
-ext['jackson.version'] = '2.16.0'
-ext['snakeyaml.version'] = '2.0'
+ext {
+  set('spring-cloud.version', "2021.0.8")
+  set('spring-security.version','5.7.11')
+  set('spring-framework.version','5.3.27')
+  set('log4j2.version','2.17.1')
+  set('jackson.version','2.16.0')
+  set('snakeyaml.version','2.0')
+}
+
 
 group = 'uk.gov.hmcts.reform'
 
@@ -232,7 +236,7 @@ dependencyCheck {
 
 dependencyManagement {
   imports {
-    mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.3"
+    mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring-cloud.version}"
   }
   dependencies {
     dependency(group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.77'){

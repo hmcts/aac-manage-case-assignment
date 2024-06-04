@@ -1,19 +1,19 @@
 package uk.gov.hmcts.reform.managecase;
 
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.reactive.config.EnableWebFlux;
 
 @SpringBootApplication
 @EnableFeignClients
-@EnableZuulProxy
-@EnableWebMvc
-@SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
+@EnableWebFlux
 public class Application {
 
     public static void main(final String[] args) {
-        SpringApplication.run(Application.class, args);
+        new SpringApplicationBuilder(Application.class)
+            .web(WebApplicationType.REACTIVE)
+            .run(args);
     }
 }

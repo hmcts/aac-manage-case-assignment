@@ -30,6 +30,7 @@ spring:
     import: "optional:configtree:/mnt/secrets/aac/"
   main:
     allow-bean-definition-overriding: true
+    web-application-type: REACTIVE
   cache:
     cache-names: userInfoCache,usersByOrganisationExternal,usersByOrganisationInternal,organisationAddressById,systemUserAccessTokenCache,caaAccessTokenCache,nocApproverAccessTokenCache,caseRoles,challengeQuestions
     caffeine:
@@ -45,6 +46,14 @@ spring:
             client-id: internal
             client-secret: internal
   cloud:
+    gateway:
+      routes:
+        - id: data-store
+          uri: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
+          predicates:
+            - Path=/ccd/**
+          filters:
+            - RemoveResponseHeader=Cookie,Set-Cookie
     discovery:
       client:
         composite-indicator:
@@ -88,12 +97,6 @@ ccd:
     services:
       case_user_roles: aac_manage_case_assignment,xui_webapp
 
-zuul:
-  routes:
-    data-store:
-      path: /ccd/**
-      sensitiveHeaders: Cookie,Set-Cookie
-      url: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
 prd:
   host: ${PRD_HOST:http://localhost:5544}
   client:

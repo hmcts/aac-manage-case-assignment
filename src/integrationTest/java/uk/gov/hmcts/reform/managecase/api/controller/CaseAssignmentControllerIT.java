@@ -1,16 +1,16 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils;
+
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.reform.managecase.BaseTest;
+import uk.gov.hmcts.reform.managecase.BaseIT;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseUnassignmentRequest;
@@ -27,16 +27,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.IdamFixture.userDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
@@ -56,9 +47,9 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.CASE_ROLE;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CASE_ROLE2;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ORGANIZATION_ID;
 
-@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
+@SuppressWarnings({ "PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "PMD.TooManyMethods",
-    "squid:S100", "squid:S1192"})
+    "squid:S100", "squid:S1192" })
 public class CaseAssignmentControllerIT {
 
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
@@ -73,24 +64,19 @@ public class CaseAssignmentControllerIT {
 
     @Nested
     @DisplayName("POST /case-assignments")
-    class AssignAccessWithinOrganisation extends BaseTest {
-
-        @Autowired
-        private MockMvc mockMvc;
-
-        @Autowired
-        private ObjectMapper objectMapper;
+    class AssignAccessWithinOrganisation extends BaseIT {
 
         private CaseAssignmentRequest request;
 
         @BeforeEach
         void setUp() {
             request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, ASSIGNEE_ID);
-            // Positive stub mappings - individual tests override again for a specific scenario.
+            // Positive stub mappings - individual tests override again for a specific
+            // scenario.
             stubGetUsersByOrganisationExternal(usersByOrganisation(user(ASSIGNEE_ID), user(ANOTHER_USER)));
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID,
-                                                         "caseworker-AUTOTEST1-solicitor",
-                                                         "caseworker-AUTOTEST1"));
+                    "caseworker-AUTOTEST1-solicitor",
+                    "caseworker-AUTOTEST1"));
             stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE));
             stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE);
         }
@@ -99,12 +85,16 @@ public class CaseAssignmentControllerIT {
         @Test
         void shouldAssignCaseAccess_whenInvokerSuccessfullyShareACase() throws Exception {
 
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE))));
+            this.webClient.post()
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isCreated()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.status_message")
+                        .isEqualTo(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE));
 
             verify(postRequestedFor(urlEqualTo(CASE_USERS)));
         }
@@ -114,58 +104,68 @@ public class CaseAssignmentControllerIT {
         void shouldAssignCaseAccess_withMultipleOrganisationRoles() throws Exception {
 
             stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID,
-                                                     caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
+                    caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2));
             stubAssignCase(CASE_ID, ASSIGNEE_ID, ORG_POLICY_ROLE, ORG_POLICY_ROLE2);
 
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(String.format(
-                    ASSIGN_ACCESS_MESSAGE,
-                    StringUtils.join(List.of(ORG_POLICY_ROLE, ORG_POLICY_ROLE2), ',')
-                ))));
+            this.webClient.post()
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isCreated()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.status_message")
+                        .isEqualTo(String.format(ASSIGN_ACCESS_MESSAGE,
+                                StringUtils.join(List.of(ORG_POLICY_ROLE, ORG_POLICY_ROLE2), ',')));
 
             verify(postRequestedFor(urlEqualTo(CASE_USERS)));
         }
 
         @DisplayName("Invoker successfully sharing case access with another solicitor in their org"
-            + " and jurisdiction role is mixed case")
+                + " and jurisdiction role is mixed case")
         @Test
         void shouldAssignCaseAccess_whenInvokerSuccessfullyShareACaseWithMixedCaseJurisdictionRole()
-            throws Exception {
+                throws Exception {
 
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID,
-                                                         "caseworker-AUTOTEST1-SoLiciToR",
-                                                         "caseworker-AUTOTEST1"));
+                    "caseworker-AUTOTEST1-SoLiciToR",
+                    "caseworker-AUTOTEST1"));
 
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE))));
+            this.webClient.post()
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isCreated()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.status_message")
+                        .isEqualTo(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE));
 
             verify(postRequestedFor(urlEqualTo(CASE_USERS)));
         }
 
         @DisplayName("Invoker successfully sharing case access with another solicitor in their org"
-            + " and jurisdiction role is upper case")
+                + " and jurisdiction role is upper case")
         @Test
         void shouldAssignCaseAccess_whenInvokerSuccessfullyShareACaseWithUpperCaseJurisdictionRole()
-            throws Exception {
+                throws Exception {
 
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID,
-                                                         "CASEWORKER-AUTOTEST1-SOLICITOR",
-                                                         "CASEWORKER-AUTOTEST1"));
+                    "CASEWORKER-AUTOTEST1-SOLICITOR",
+                    "CASEWORKER-AUTOTEST1"));
 
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE))));
+            this.webClient.post()
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isCreated()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.status_message")
+                        .isEqualTo(String.format(ASSIGN_ACCESS_MESSAGE, ORG_POLICY_ROLE));
 
             verify(postRequestedFor(urlEqualTo(CASE_USERS)));
         }
@@ -176,18 +176,20 @@ public class CaseAssignmentControllerIT {
 
             stubGetUsersByOrganisationExternal(usersByOrganisation(user(ANOTHER_USER)));
 
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(
-                    "$.message",
-                    is(ValidationError.ASSIGNEE_ORGANISATION_ERROR)
-                ));
+            this.webClient.post()
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo(ValidationError.ASSIGNEE_ORGANISATION_ERROR);
         }
 
         @DisplayName("Must return 400 bad request response if assignee doesn't have a solicitor role for the"
-            + " jurisdiction of the case")
+                + " jurisdiction of the case")
         @Test
         void shouldReturn400_whenAssigneeNotHaveCorrectJurisdictionRole() throws Exception {
 
@@ -195,18 +197,20 @@ public class CaseAssignmentControllerIT {
 
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicitor-role"));
 
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(
-                    "$.message",
-                    is(ValidationError.ASSIGNEE_ROLE_ERROR)
-                ));
+            this.webClient.post()
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo(ValidationError.ASSIGNEE_ROLE_ERROR);
         }
 
         @DisplayName("Must return 400 bad request response if assignee has an invalid solicitor role for the"
-            + " jurisdiction of the case")
+                + " jurisdiction of the case")
         @Test
         void shouldReturn400_whenAssigneeHasInvalidJurisdictionRole() throws Exception {
 
@@ -214,27 +218,34 @@ public class CaseAssignmentControllerIT {
 
             stubIdamGetUserById(ASSIGNEE_ID, userDetails(ASSIGNEE_ID, "caseworker-AUTOTEST2-solicit"));
 
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(
-                    "$.message",
-                    is(ValidationError.ASSIGNEE_ROLE_ERROR)
-                ));
+            this.webClient.post()
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo(ValidationError.ASSIGNEE_ROLE_ERROR);
         }
 
         @DisplayName("Must return 400 bad request response if invoker's organisation is not present"
-            + " in the case data organisation policies")
+                + " in the case data organisation policies")
         @Test
         void shouldReturn400_whenInvokersOrgIsNotPresentInCaseData() throws Exception {
             stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, caseDetails("ANOTHER_ORGANIZATION_ID", ORG_POLICY_ROLE));
 
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", is(ValidationError.ORGANISATION_POLICY_ERROR)));
+            this.webClient.post()
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo(ValidationError.ORGANISATION_POLICY_ERROR);
         }
 
         @DisplayName("Must return 404 server error response if case could not be found")
@@ -244,12 +255,16 @@ public class CaseAssignmentControllerIT {
             stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, null); // i.e. no case not found
 
             // ACT + ASSERT
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.message", is(ValidationError.CASE_NOT_FOUND)));
+            this.webClient.post()
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo(ValidationError.CASE_NOT_FOUND);
 
             // ASSERT
             verify(exactly(0), deleteRequestedFor(urlEqualTo(CASE_USERS)));
@@ -258,72 +273,73 @@ public class CaseAssignmentControllerIT {
 
     @Nested
     @DisplayName("GET /case-assignments")
-    class GetCaseAssignments extends BaseTest {
-
-        @Autowired
-        private MockMvc mockMvc;
-
-        @Autowired
-        private ObjectMapper objectMapper;
+    class GetCaseAssignments extends BaseIT {
 
         @DisplayName("Successfully return case assignments of my organisation")
         @Test
         void shouldGetCaseAssignments_forAValidRequest() throws Exception {
 
             CaseUserRole caseUserRole = CaseUserRole.builder()
-                .caseId(CASE_ID)
-                .userId(ASSIGNEE_ID)
-                .caseRole(CASE_ROLE)
-                .build();
+                    .caseId(CASE_ID)
+                    .userId(ASSIGNEE_ID)
+                    .caseRole(CASE_ROLE)
+                    .build();
 
             stubGetUsersByOrganisationExternal(usersByOrganisation(user(ASSIGNEE_ID)));
 
             stubGetCaseAssignments(List.of(CASE_ID), List.of(ASSIGNEE_ID), List.of(caseUserRole));
 
-            this.mockMvc.perform(get(CASE_ASSIGNMENTS_PATH)
-                                     .queryParam("case_ids", CASE_ID))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-
-                .andExpect(jsonPath("$.status_message", is(GET_ASSIGNMENTS_MESSAGE)))
-
-                .andExpect(jsonPath("$.case_assignments", hasSize(1)))
-                .andExpect(jsonPath("$.case_assignments[0].case_id", is(CASE_ID)))
-                .andExpect(jsonPath("$.case_assignments[0].shared_with", hasSize(1)))
-                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].first_name", is(TestFixtures.FIRST_NAME)))
-                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].last_name", is(TestFixtures.LAST_NAME)))
-                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].email", is(TestFixtures.EMAIL)))
-                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles", hasSize(1)))
-                .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles[0]", is(CASE_ROLE)));
+            this.webClient.get()
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .attribute("case_ids", CASE_ID)
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.status_message")
+                        .isEqualTo(GET_ASSIGNMENTS_MESSAGE)
+                    .jsonPath("$.case_assignments.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.case_assignments[0].case_id")
+                        .isEqualTo(CASE_ID)
+                    .jsonPath("$.case_assignments[0].shared_with.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.case_assignments[0].shared_with[0].first_name")
+                        .isEqualTo(TestFixtures.FIRST_NAME)
+                    .jsonPath("$.case_assignments[0].shared_with[0].last_name")
+                        .isEqualTo(TestFixtures.LAST_NAME)
+                    .jsonPath("$.case_assignments[0].shared_with[0].email")
+                        .isEqualTo(TestFixtures.EMAIL)
+                    .jsonPath("$.case_assignments[0].shared_with[0].case_roles.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.case_assignments[0].shared_with[0].case_roles[0]")
+                        .isEqualTo(CASE_ROLE);
         }
 
         @DisplayName("Must return 400 bad request response if caseIds are missing in GetAssignments request")
         @Test
         void shouldReturn400_whenCaseIdsAreNotPassedForGetAssignmentsApi() throws Exception {
 
-            this.mockMvc.perform(get(CASE_ASSIGNMENTS_PATH)
-                                     .queryParam("case_ids", ""))
-                .andExpect(status().isBadRequest());
+            this.webClient.get()
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .attribute("case_ids", "")
+                .exchange()
+                    .expectStatus().isBadRequest();
         }
 
     }
 
     @Nested
     @DisplayName("DELETE /case-assignments")
-    class UnassignAccessWithinOrganisation extends BaseTest {
-
-        @Autowired
-        private MockMvc mockMvc;
-
-        @Autowired
-        private ObjectMapper objectMapper;
+    class UnassignAccessWithinOrganisation extends BaseIT {
 
         @BeforeEach
         void setUp() {
             // reset wiremock counters
             WireMock.resetAllRequests();
 
-            // Positive stub mappings - individual tests override again for a specific scenario.
+            // Positive stub mappings - individual tests override again for a specific
+            // scenario.
             stubGetUsersByOrganisationExternal(usersByOrganisation(user(ASSIGNEE_ID), user(ANOTHER_USER)));
         }
 
@@ -333,23 +349,25 @@ public class CaseAssignmentControllerIT {
             // ARRANGE
             // :: request data
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, List.of(CASE_ROLE))
-            );
+                    new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, List.of(CASE_ROLE)));
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
             // :: data store stub data
             List<CaseUserRoleWithOrganisation> expectedUnassignments = List.of(
-                new CaseUserRoleWithOrganisation(CASE_ID, ASSIGNEE_ID, CASE_ROLE, ORGANIZATION_ID)
-            );
+                    new CaseUserRoleWithOrganisation(CASE_ID, ASSIGNEE_ID, CASE_ROLE, ORGANIZATION_ID));
             stubUnassignCase(expectedUnassignments);
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(UNASSIGN_ACCESS_MESSAGE)));
+            this.webClient.method(HttpMethod.DELETE)
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.status_message")
+                        .isEqualTo(UNASSIGN_ACCESS_MESSAGE);
 
             // ASSERT
             verify(exactly(1), deleteRequestedFor(urlEqualTo(CASE_USERS)));
@@ -361,26 +379,28 @@ public class CaseAssignmentControllerIT {
             // ARRANGE
             // :: request data
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, List.of(CASE_ROLE)),
-                new RequestedCaseUnassignment(CASE_ID2, ANOTHER_USER, List.of(CASE_ROLE, CASE_ROLE2))
-            );
+                    new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, List.of(CASE_ROLE)),
+                    new RequestedCaseUnassignment(CASE_ID2, ANOTHER_USER, List.of(CASE_ROLE, CASE_ROLE2)));
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
             // :: data store stub data
             List<CaseUserRoleWithOrganisation> expectedUnassignments = List.of(
-                new CaseUserRoleWithOrganisation(CASE_ID, ASSIGNEE_ID, CASE_ROLE, ORGANIZATION_ID),
-                new CaseUserRoleWithOrganisation(CASE_ID2, ANOTHER_USER, CASE_ROLE, ORGANIZATION_ID),
-                new CaseUserRoleWithOrganisation(CASE_ID2, ANOTHER_USER, CASE_ROLE2, ORGANIZATION_ID)
-            );
+                    new CaseUserRoleWithOrganisation(CASE_ID, ASSIGNEE_ID, CASE_ROLE, ORGANIZATION_ID),
+                    new CaseUserRoleWithOrganisation(CASE_ID2, ANOTHER_USER, CASE_ROLE, ORGANIZATION_ID),
+                    new CaseUserRoleWithOrganisation(CASE_ID2, ANOTHER_USER, CASE_ROLE2, ORGANIZATION_ID));
             stubUnassignCase(expectedUnassignments);
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(UNASSIGN_ACCESS_MESSAGE)));
+            this.webClient.method(HttpMethod.DELETE)
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.status_message")
+                        .isEqualTo(UNASSIGN_ACCESS_MESSAGE);
 
             // ASSERT
             verify(exactly(1), deleteRequestedFor(urlEqualTo(CASE_USERS)));
@@ -392,37 +412,41 @@ public class CaseAssignmentControllerIT {
             // ARRANGE
             // :: request data
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, NULL_CASE_ROLES),
-                new RequestedCaseUnassignment(CASE_ID2, ANOTHER_USER, NULL_CASE_ROLES)
-            );
+                    new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, NULL_CASE_ROLES),
+                    new RequestedCaseUnassignment(CASE_ID2, ANOTHER_USER, NULL_CASE_ROLES));
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
             // :: data store stub data
             // :: :: getCaseAssignments
             stubGetCaseAssignments(List.of(CASE_ID, CASE_ID2),
-                                   List.of(ASSIGNEE_ID, ANOTHER_USER),
-                                   List.of(
-                                       new CaseUserRole(CASE_ID, ASSIGNEE_ID, CASE_ROLE),
-                                       new CaseUserRole(CASE_ID, ASSIGNEE_ID, CASE_ROLE2),
-                                       // extra return item from get call not in unassignment request ...
-                                       // ... therefore must be ignored (i.e. not in expectedUnassignments)
-                                       new CaseUserRole(CASE_ID2, ASSIGNEE_ID, CASE_ROLE) // NB: extra
-                                   ));
+                    List.of(ASSIGNEE_ID, ANOTHER_USER),
+                    List.of(
+                            new CaseUserRole(CASE_ID, ASSIGNEE_ID, CASE_ROLE),
+                            new CaseUserRole(CASE_ID, ASSIGNEE_ID, CASE_ROLE2),
+                            // extra return item from get call not in unassignment request ...
+                            // ... therefore must be ignored (i.e. not in expectedUnassignments)
+                            new CaseUserRole(CASE_ID2, ASSIGNEE_ID, CASE_ROLE) // NB: extra
+                    ));
             // :: :: unassignCase
             List<CaseUserRoleWithOrganisation> expectedUnassignments = List.of(
-                new CaseUserRoleWithOrganisation(CASE_ID, ASSIGNEE_ID, CASE_ROLE, ORGANIZATION_ID),
-                new CaseUserRoleWithOrganisation(CASE_ID, ASSIGNEE_ID, CASE_ROLE2, ORGANIZATION_ID)
-            //   NB: extra CaseUserRole from above not defined in expected list as not part of unassignment request
+                    new CaseUserRoleWithOrganisation(CASE_ID, ASSIGNEE_ID, CASE_ROLE, ORGANIZATION_ID),
+                    new CaseUserRoleWithOrganisation(CASE_ID, ASSIGNEE_ID, CASE_ROLE2, ORGANIZATION_ID)
+            // NB: extra CaseUserRole from above not defined in expected list as not part of
+            // unassignment request
             );
             stubUnassignCase(expectedUnassignments);
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(UNASSIGN_ACCESS_MESSAGE)));
+            this.webClient.method(HttpMethod.DELETE)
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.status_message")
+                        .isEqualTo(UNASSIGN_ACCESS_MESSAGE);
 
             // ASSERT
             verify(exactly(1), deleteRequestedFor(urlEqualTo(CASE_USERS)));
@@ -434,26 +458,29 @@ public class CaseAssignmentControllerIT {
             // ARRANGE
             // :: request data
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, NULL_CASE_ROLES),
-                new RequestedCaseUnassignment(CASE_ID2, ANOTHER_USER, NULL_CASE_ROLES)
-            );
+                    new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, NULL_CASE_ROLES),
+                    new RequestedCaseUnassignment(CASE_ID2, ANOTHER_USER, NULL_CASE_ROLES));
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
             // :: data store stub data
             // :: :: getCaseAssignments
             stubGetCaseAssignments(List.of(CASE_ID, CASE_ID2),
-                                   List.of(ASSIGNEE_ID, ANOTHER_USER),
-                                   List.of()); // i.e. empty result
+                    List.of(ASSIGNEE_ID, ANOTHER_USER),
+                    List.of()); // i.e. empty result
 
             // :: NB: no stubbing for unassignCase as call not expected
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk()) // NB: Still a happy response as call is idempotent
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(UNASSIGN_ACCESS_MESSAGE)));
+            this.webClient.method(HttpMethod.DELETE)
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.status_message")
+                        .isEqualTo(UNASSIGN_ACCESS_MESSAGE);
 
             // ASSERT
             verify(exactly(0), deleteRequestedFor(urlEqualTo(CASE_USERS)));
@@ -465,19 +492,23 @@ public class CaseAssignmentControllerIT {
             // ARRANGE
             // :: request data
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment(CASE_ID, "ASSIGNEE-NOT-IN-ORG", NULL_CASE_ROLES)
-            );
+                    new RequestedCaseUnassignment(CASE_ID, "ASSIGNEE-NOT-IN-ORG", NULL_CASE_ROLES));
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
             // :: data store stub data
             // :: NB: no stubbing for unassignCase as call not expected
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", is(ValidationError.UNASSIGNEE_ORGANISATION_ERROR)));
+            this.webClient.method(HttpMethod.DELETE)
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo(ValidationError.UNASSIGNEE_ORGANISATION_ERROR);
 
             // ASSERT
             verify(exactly(0), deleteRequestedFor(urlEqualTo(CASE_USERS)));
@@ -490,12 +521,17 @@ public class CaseAssignmentControllerIT {
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(null);
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.EMPTY_REQUESTED_UNASSIGNMENTS_LIST)));
+            this.webClient.method(HttpMethod.DELETE)
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                .expectBody()
+                    .jsonPath("$.errors.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.errors[0]")
+                        .isEqualTo(ValidationError.EMPTY_REQUESTED_UNASSIGNMENTS_LIST);
 
             // ASSERT
             verify(exactly(0), deleteRequestedFor(urlEqualTo(CASE_USERS)));
@@ -508,12 +544,17 @@ public class CaseAssignmentControllerIT {
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(List.of());
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.EMPTY_REQUESTED_UNASSIGNMENTS_LIST)));
+            this.webClient.method(HttpMethod.DELETE)
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                .expectBody()
+                    .jsonPath("$.errors.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.errors[0]")
+                        .isEqualTo(ValidationError.EMPTY_REQUESTED_UNASSIGNMENTS_LIST);
 
             // ASSERT
             verify(exactly(0), deleteRequestedFor(urlEqualTo(CASE_USERS)));
@@ -524,17 +565,21 @@ public class CaseAssignmentControllerIT {
         void shouldReturn400_whenCaseIdIsNull() throws Exception {
             // ARRANGE
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment(null, ASSIGNEE_ID, Collections.emptyList())
-            );
+                    new RequestedCaseUnassignment(null, ASSIGNEE_ID, Collections.emptyList()));
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_EMPTY)));
+            this.webClient.method(HttpMethod.DELETE)
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                .expectBody()
+                    .jsonPath("$.errors.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.errors[0]")
+                        .isEqualTo(ValidationError.CASE_ID_EMPTY);
 
             // ASSERT
             verify(exactly(0), deleteRequestedFor(urlEqualTo(CASE_USERS)));
@@ -545,18 +590,24 @@ public class CaseAssignmentControllerIT {
         void shouldReturn400_whenCaseIdIsInvalid() throws Exception {
             // ARRANGE
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment("invalid", ASSIGNEE_ID, List.of())
-            );
+                    new RequestedCaseUnassignment("invalid", ASSIGNEE_ID, List.of()));
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors", hasSize(2)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_INVALID_LENGTH)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_INVALID)));
+            this.webClient.method(HttpMethod.DELETE)
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                .expectBody()
+                    .jsonPath("$.errors.length()")
+                        .isEqualTo(2)
+                    .jsonPath("$.errors")
+                        .value(Matchers.containsInAnyOrder(
+                            ValidationError.CASE_ID_INVALID_LENGTH,
+                            ValidationError.CASE_ID_INVALID
+                        ));
 
             // ASSERT
             verify(exactly(0), deleteRequestedFor(urlEqualTo(CASE_USERS)));
@@ -567,17 +618,21 @@ public class CaseAssignmentControllerIT {
         void shouldReturn400_whenAssigneeIdIsNull() throws Exception {
             // ARRANGE
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment(CASE_ID, null, Collections.emptyList())
-            );
+                    new RequestedCaseUnassignment(CASE_ID, null, Collections.emptyList()));
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.ASSIGNEE_ID_EMPTY)));
+            this.webClient.method(HttpMethod.DELETE)
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                .expectBody()
+                    .jsonPath("$.errors.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.errors[0]")
+                        .isEqualTo(ValidationError.ASSIGNEE_ID_EMPTY);
 
             // ASSERT
             verify(exactly(0), deleteRequestedFor(urlEqualTo(CASE_USERS)));
@@ -588,17 +643,21 @@ public class CaseAssignmentControllerIT {
         void shouldReturn400_whenAssigneeIdIsEmpty() throws Exception {
             // ARRANGE
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment(CASE_ID, "", List.of())
-            );
+                    new RequestedCaseUnassignment(CASE_ID, "", List.of()));
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.ASSIGNEE_ID_EMPTY)));
+            this.webClient.method(HttpMethod.DELETE)
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                .expectBody()
+                    .jsonPath("$.errors.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.errors[0]")
+                        .isEqualTo(ValidationError.ASSIGNEE_ID_EMPTY);
 
             // ASSERT
             verify(exactly(0), deleteRequestedFor(urlEqualTo(CASE_USERS)));
@@ -609,17 +668,21 @@ public class CaseAssignmentControllerIT {
         void shouldReturn400_whenAACaseRoleIsInvalid() throws Exception {
             // ARRANGE
             List<RequestedCaseUnassignment> unassignments = List.of(
-                new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, List.of(CASE_ROLE, "INVALID"))
-            );
+                    new RequestedCaseUnassignment(CASE_ID, ASSIGNEE_ID, List.of(CASE_ROLE, "INVALID")));
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ROLE_FORMAT_INVALID)));
+            this.webClient.method(HttpMethod.DELETE)
+                    .uri(CASE_ASSIGNMENTS_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(objectMapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                .expectBody()
+                    .jsonPath("$.errors.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.errors[0]")
+                        .isEqualTo(ValidationError.CASE_ROLE_FORMAT_INVALID);
 
             // ASSERT
             verify(exactly(0), deleteRequestedFor(urlEqualTo(CASE_USERS)));

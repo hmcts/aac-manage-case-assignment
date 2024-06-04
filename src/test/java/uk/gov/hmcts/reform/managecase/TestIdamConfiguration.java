@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.managecase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.web.context.ContextCleanupListener;
 
@@ -14,8 +14,8 @@ public class TestIdamConfiguration extends ContextCleanupListener {
     @Bean
     // Overriding as OAuth2ClientRegistrationRepositoryConfiguration loading before
     // wire-mock mappings for /o/.well-known/openid-configuration
-    public ClientRegistrationRepository clientRegistrationRepository() {
-        return new InMemoryClientRegistrationRepository(clientRegistration());
+    public ReactiveClientRegistrationRepository clientRegistrationRepository() {
+        return new InMemoryReactiveClientRegistrationRepository(clientRegistration());
     }
 
     private ClientRegistration clientRegistration() {

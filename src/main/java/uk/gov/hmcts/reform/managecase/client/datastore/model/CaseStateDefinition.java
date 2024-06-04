@@ -2,13 +2,13 @@ package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 import java.util.List;
 
-@ApiModel(description = "")
+@Schema
 public class CaseStateDefinition implements Serializable {
 
     private static final long serialVersionUID = -4257574164546267919L;
@@ -23,7 +23,7 @@ public class CaseStateDefinition implements Serializable {
     private String titleDisplay;
     private List<AccessControlList> accessControlLists;
 
-    @ApiModelProperty(required = true, value = "")
+    @Schema(required = true)
     @JsonProperty("id")
     public String getId() {
         return id;
@@ -33,7 +33,7 @@ public class CaseStateDefinition implements Serializable {
         this.id = id;
     }
 
-    @ApiModelProperty("")
+    @Schema
     @JsonProperty("description")
     public String getDescription() {
         return description;
@@ -46,7 +46,7 @@ public class CaseStateDefinition implements Serializable {
     /**
      * Short name to display.
      **/
-    @ApiModelProperty("Short name to display.")
+    @Schema(description = "Short name to display.")
     @JsonProperty("name")
     public String getName() {
         return name;
@@ -65,7 +65,7 @@ public class CaseStateDefinition implements Serializable {
         this.displayOrder = displayOrder;
     }
 
-    @ApiModelProperty("Title label to be displayed for state")
+    @Schema(description = "Title label to be displayed for state")
     @JsonProperty("title_display")
     public String getTitleDisplay() {
         return titleDisplay;
@@ -75,7 +75,7 @@ public class CaseStateDefinition implements Serializable {
         this.titleDisplay = titleDisplay;
     }
 
-    @ApiModelProperty("State Access Control Lists")
+    @Schema(description = "State Access Control Lists")
     @JsonProperty("acls")
     public List<AccessControlList> getAccessControlLists() {
         return accessControlLists;

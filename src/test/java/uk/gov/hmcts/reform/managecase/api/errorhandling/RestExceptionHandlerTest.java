@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.managecase.api.errorhandling;
 
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -32,9 +29,6 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 public class RestExceptionHandlerTest {
 
     private MockMvc mockMvc;
-
-    private Logger logger;
-    private ListAppender<ILoggingEvent> listAppender;
 
     @Mock
     protected NoticeOfChangeQuestions service;

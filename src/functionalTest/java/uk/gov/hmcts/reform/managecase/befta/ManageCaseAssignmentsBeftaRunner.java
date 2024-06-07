@@ -13,7 +13,7 @@ import uk.gov.hmcts.befta.BeftaMain;
     plugin = "json:target/cucumber.json",
         glue = { "uk.gov.hmcts.befta.player" },
     features = { "classpath:features" },
-    tags = { "not @Ignore" }
+    tags = "not @Ignore"
 )
 public final class ManageCaseAssignmentsBeftaRunner {
 

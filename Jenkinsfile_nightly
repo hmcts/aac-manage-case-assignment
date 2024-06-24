@@ -13,7 +13,7 @@ def product = "aac"
 def component = "spring-boot-template"
 
 withNightlyPipeline(type, product, component) {
-  enableFortifyScan()
+  // enableFortifyScan()
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
   }

@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.managecase.BaseTest;
+import uk.gov.hmcts.reform.managecase.BaseIT;
 
 import java.net.URI;
 import java.util.List;
@@ -42,7 +42,7 @@ import static org.apache.http.entity.ContentType.APPLICATION_JSON;
     "http.client.seconds.idle.connection=1",
     "http.client.max.client_per_route=2",
     "http.client.validate.after.inactivity=1"})
-public class RestTemplateConfigurationTest extends BaseTest {
+public class RestTemplateConfigurationTest extends BaseIT {
 
     @Autowired
     private RestTemplate restTemplate;

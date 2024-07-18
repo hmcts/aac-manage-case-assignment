@@ -11,11 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import uk.gov.hmcts.reform.managecase.BaseTest;
+import uk.gov.hmcts.reform.managecase.BaseIT;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.CallbackRequest;
@@ -57,14 +54,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.defaultCaseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getCaseViewFields;
@@ -200,24 +190,28 @@ public class NoticeOfChangeControllerIT {
 
     @Nested
     @DisplayName("GET /noc/noc-questions")
-    class GetNoticeOfChangeQuestions extends BaseTest {
-
-        @Autowired
-        private MockMvc mockMvc;
+    class GetNoticeOfChangeQuestions extends BaseIT {
 
         @DisplayName("Successfully return NoC questions for case id")
         @Test
         void shouldGetNoCQuestions_forAValidRequest() throws Exception {
-            this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
-                                     .queryParam("case_id", CASE_ID))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-
-                .andExpect(jsonPath("$.questions", hasSize(1)))
-                .andExpect(jsonPath("$.questions[0].case_type_id", is(CASE_TYPE_ID)))
-                .andExpect(jsonPath("$.questions[0].order", is(1)))
-                .andExpect(jsonPath("$.questions[0].question_text", is("questionText")))
-                .andExpect(jsonPath("$.questions[0].challenge_question_id", is("NoC")));
+            this.webClient.get()
+                    .uri("/noc" + GET_NOC_QUESTIONS)
+                    .attribute("case_id", CASE_ID)
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.questions.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.questions[0].case_type_id")
+                        .isEqualTo(CASE_TYPE_ID)
+                    .jsonPath("$.questions[0].order")
+                        .isEqualTo(1)
+                    .jsonPath("$.questions[0].question_text")
+                        .isEqualTo("questionText")
+                    .jsonPath("$.questions[0].challenge_question_id")
+                        .isEqualTo("NoC");
 
         }
 
@@ -225,9 +219,11 @@ public class NoticeOfChangeControllerIT {
         @Test
         void shouldReturn400_whenCaseIdsAreNotPassedForGetNoCQuestionsApi() throws Exception {
 
-            this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
-                                     .queryParam("case_id", ""))
-                .andExpect(status().isBadRequest());
+            this.webClient.get()
+                    .uri("/noc" + GET_NOC_QUESTIONS)
+                    .attribute("case_id", "")
+                .exchange()
+                    .expectStatus().isBadRequest();
         }
 
         @DisplayName("Must return 400 bad request when no Noc event is available in the case")
@@ -237,10 +233,14 @@ public class NoticeOfChangeControllerIT {
             caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[0]);
             stubGetCaseInternal(CASE_ID, caseViewResource);
 
-            this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
-                .queryParam("case_id", CASE_ID))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", is(NOC_EVENT_NOT_AVAILABLE)));
+            this.webClient.get()
+                    .uri("/noc" + GET_NOC_QUESTIONS)
+                    .attribute("case_id", CASE_ID)
+                .exchange()
+                    .expectStatus().isBadRequest()
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo(NOC_EVENT_NOT_AVAILABLE);
         }
 
         @DisplayName("Must return 400 bad request when multiple Noc events are available in the case")
@@ -252,22 +252,23 @@ public class NoticeOfChangeControllerIT {
             );
             stubGetCaseInternal(CASE_ID, caseViewResource);
 
-            this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
-                .queryParam("case_id", CASE_ID))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message", is(MULTIPLE_NOC_REQUEST_EVENTS)));
+            this.webClient.get()
+                    .uri("/noc" + GET_NOC_QUESTIONS)
+                    .attribute("case_id", CASE_ID)
+                .exchange()
+                    .expectStatus().isBadRequest()
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo(MULTIPLE_NOC_REQUEST_EVENTS);
         }
 
     }
 
     @Nested
     @DisplayName("POST /noc/verify-noc-answers")
-    class VerifyNoticeOfChangeQuestions extends BaseTest {
+    class VerifyNoticeOfChangeQuestions extends BaseIT {
 
         private static final String ENDPOINT_URL = "/noc" + VERIFY_NOC_ANSWERS;
-
-        @Autowired
-        private MockMvc mockMvc;
 
         @Test
         void shouldVerifyNoCAnswersSuccessfully() throws Exception {
@@ -275,14 +276,20 @@ public class NoticeOfChangeControllerIT {
                 ORGANISATION_ID.toLowerCase(Locale.getDefault()));
             VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, singletonList(answer));
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(VERIFY_NOC_ANSWERS_MESSAGE)))
-                .andExpect(jsonPath("$.organisation.OrganisationID", is(ORGANISATION_ID)))
-                .andExpect(jsonPath("$.organisation.OrganisationName", is("CCD Solicitors Limited")));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.status_message")
+                        .isEqualTo(VERIFY_NOC_ANSWERS_MESSAGE)
+                    .jsonPath("$.organisation.OrganisationID")
+                        .isEqualTo(ORGANISATION_ID)
+                    .jsonPath("$.organisation.OrganisationName")
+                        .isEqualTo("CCD Solicitors Limited");
         }
 
         @Test
@@ -290,12 +297,16 @@ public class NoticeOfChangeControllerIT {
             SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer(QUESTION_ID_1, "Incorrect Answer");
             VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, singletonList(answer));
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.message", is("The answers did not match those for any litigant")));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo("The answers did not match those for any litigant");
         }
 
         @Test
@@ -303,18 +314,22 @@ public class NoticeOfChangeControllerIT {
             SubmittedChallengeAnswer answer = new SubmittedChallengeAnswer("UnknownID", ORGANISATION_ID);
             VerifyNoCAnswersRequest request = new VerifyNoCAnswersRequest(CASE_ID, singletonList(answer));
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.message", is("No answer has been provided for question ID 'QuestionId1'")));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo("No answer has been provided for question ID 'QuestionId1'");
         }
     }
 
     @Nested
     @DisplayName("POST /noc/apply-decision")
-    class ApplyNoticeOfChangeDecision extends BaseTest {
+    class ApplyNoticeOfChangeDecision extends BaseIT {
 
         private static final String ENDPOINT_URL = "/noc" + APPLY_NOC_DECISION;
 
@@ -328,9 +343,6 @@ public class NoticeOfChangeControllerIT {
         private static final String ORG_POLICY_2_ROLE = "[Claimant]";
         private static final String USER_ID_1 = "UserId1";
         private static final String USER_ID_2 = "UserId2";
-
-        @Autowired
-        private MockMvc mockMvc;
 
         @BeforeEach
         void setUp() throws JsonProcessingException {
@@ -354,42 +366,62 @@ public class NoticeOfChangeControllerIT {
                 .createdDate(LocalDateTime.now())
                 .build());
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.Reason").isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId").isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.NotesReason").isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.ApprovalStatus").isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.RequestTimestamp").isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.ApprovalStatus").isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.ApprovalRejectionTimestamp").isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToAdd.OrganisationID")
-                    .isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToAdd.OrganisationName")
-                    .isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToRemove.OrganisationID")
-                    .isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToRemove.OrganisationName")
-                    .isEmpty())
-                .andExpect(jsonPath("$.data.OrganisationPolicyField1.Organisation.OrganisationID", is(ORG_1_ID)))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField1.Organisation.OrganisationName", is(ORG_1_NAME)))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField1.OrgPolicyReference", is(ORG_POLICY_1_REF)))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField1.OrgPolicyCaseAssignedRole", is(ORG_POLICY_1_ROLE)))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField2.Organisation.OrganisationID").isEmpty())
-                .andExpect(jsonPath("$.data.OrganisationPolicyField2.Organisation.OrganisationName").isEmpty())
-                .andExpect(jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].value.OrganisationName",
-                                    is(ORG_2_NAME)))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].value.FromTimestamp")
-                               .isNotEmpty())
-                .andExpect(jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].value.ToTimestamp")
-                               .isNotEmpty())
-                .andExpect(jsonPath("$.data.OrganisationPolicyField2.OrgPolicyReference", is(ORG_POLICY_2_REF)))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField2.OrgPolicyCaseAssignedRole", is(ORG_POLICY_2_ROLE)))
-                .andExpect(jsonPath("$.data.TextField", is("TextFieldValue")))
-                .andExpect(jsonPath("$.errors").doesNotExist());
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.Reason")
+                        .isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId")
+                        .isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.NotesReason")
+                        .isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.ApprovalStatus")
+                        .isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.RequestTimestamp")
+                        .isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.ApprovalStatus")
+                        .isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.ApprovalRejectionTimestamp")
+                        .isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToAdd.OrganisationID")
+                        .isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToAdd.OrganisationName")
+                        .isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToRemove.OrganisationID")
+                        .isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToRemove.OrganisationName")
+                        .isEmpty()
+                    .jsonPath("$.data.OrganisationPolicyField1.Organisation.OrganisationID")
+                        .isEqualTo(ORG_1_ID)
+                    .jsonPath("$.data.OrganisationPolicyField1.Organisation.OrganisationName")
+                        .isEqualTo(ORG_1_NAME)
+                    .jsonPath("$.data.OrganisationPolicyField1.OrgPolicyReference")
+                        .isEqualTo(ORG_POLICY_1_REF)
+                    .jsonPath("$.data.OrganisationPolicyField1.OrgPolicyCaseAssignedRole")
+                        .isEqualTo(ORG_POLICY_1_ROLE)
+                    .jsonPath("$.data.OrganisationPolicyField2.Organisation.OrganisationID")
+                        .isEmpty()
+                    .jsonPath("$.data.OrganisationPolicyField2.Organisation.OrganisationName")
+                        .isEmpty()
+                    .jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].value.OrganisationName")
+                        .isEqualTo(ORG_2_NAME)
+                    .jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].value.FromTimestamp")
+                        .isNotEmpty()
+                    .jsonPath("$.data.OrganisationPolicyField2.PreviousOrganisations[0].value.ToTimestamp")
+                        .isNotEmpty()
+                    .jsonPath("$.data.OrganisationPolicyField2.OrgPolicyReference")
+                        .isEqualTo(ORG_POLICY_2_REF)
+                    .jsonPath("$.data.OrganisationPolicyField2.OrgPolicyCaseAssignedRole")
+                        .isEqualTo(ORG_POLICY_2_ROLE)
+                    .jsonPath("$.data.TextField")
+                        .isEqualTo("TextFieldValue")
+                    .jsonPath("$.errors")
+                        .doesNotExist();
         }
 
         @Test
@@ -400,36 +432,49 @@ public class NoticeOfChangeControllerIT {
                 .data(createData(REJECTED))
                 .build());
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.Reason").isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId").isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.NotesReason").isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.ApprovalStatus").isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.RequestTimestamp").isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.ApprovalStatus").isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.ApprovalRejectionTimestamp").isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToAdd.OrganisationID")
-                    .isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToAdd.OrganisationName")
-                    .isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToRemove.OrganisationID")
-                    .isEmpty())
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToRemove.OrganisationName")
-                    .isEmpty())
-                .andExpect(jsonPath("$.data.OrganisationPolicyField1.Organisation.OrganisationID", is(ORG_1_ID)))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField1.Organisation.OrganisationName", is(ORG_1_NAME)))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField1.OrgPolicyReference", is(ORG_POLICY_1_REF)))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField1.OrgPolicyCaseAssignedRole", is(ORG_POLICY_1_ROLE)))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField2.Organisation.OrganisationID", is(ORG_2_ID)))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField2.Organisation.OrganisationName", is(ORG_2_NAME)))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField2.OrgPolicyReference", is(ORG_POLICY_2_REF)))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField2.OrgPolicyCaseAssignedRole", is(ORG_POLICY_2_ROLE)))
-                .andExpect(jsonPath("$.data.TextField", is("TextFieldValue")))
-                .andExpect(jsonPath("$.errors").doesNotExist());
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.Reason").isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId").isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.NotesReason").isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.ApprovalStatus").isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.RequestTimestamp").isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.ApprovalStatus").isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.ApprovalRejectionTimestamp")
+                        .isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToAdd.OrganisationID")
+                        .isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToAdd.OrganisationName")
+                        .isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToRemove.OrganisationID")
+                        .isEmpty()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToRemove.OrganisationName")
+                        .isEmpty()
+                    .jsonPath("$.data.OrganisationPolicyField1.Organisation.OrganisationID")
+                        .isEqualTo(ORG_1_ID)
+                    .jsonPath("$.data.OrganisationPolicyField1.Organisation.OrganisationName")
+                        .isEqualTo(ORG_1_NAME)
+                    .jsonPath("$.data.OrganisationPolicyField1.OrgPolicyReference")
+                        .isEqualTo(ORG_POLICY_1_REF)
+                    .jsonPath("$.data.OrganisationPolicyField1.OrgPolicyCaseAssignedRole")
+                        .isEqualTo(ORG_POLICY_1_ROLE)
+                    .jsonPath("$.data.OrganisationPolicyField2.Organisation.OrganisationID")
+                        .isEqualTo(ORG_2_ID)
+                    .jsonPath("$.data.OrganisationPolicyField2.Organisation.OrganisationName")
+                        .isEqualTo(ORG_2_NAME)
+                    .jsonPath("$.data.OrganisationPolicyField2.OrgPolicyReference")
+                        .isEqualTo(ORG_POLICY_2_REF)
+                    .jsonPath("$.data.OrganisationPolicyField2.OrgPolicyCaseAssignedRole")
+                        .isEqualTo(ORG_POLICY_2_ROLE)
+                    .jsonPath("$.data.TextField")
+                        .isEqualTo("TextFieldValue")
+                    .jsonPath("$.errors").doesNotExist();
         }
 
         @Test
@@ -440,13 +485,18 @@ public class NoticeOfChangeControllerIT {
                 .data(createData(PENDING))
                 .build());
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errors.length()", is(1)))
-                .andExpect(jsonPath("$.errors[0]", is(NOC_REQUEST_NOT_CONSIDERED)));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.errors.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.errors[0]")
+                        .isEqualTo(NOC_REQUEST_NOT_CONSIDERED);
         }
 
         @Test
@@ -456,13 +506,18 @@ public class NoticeOfChangeControllerIT {
                 .caseTypeId(CASE_TYPE_ID)
                 .build());
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errors.length()", is(1)))
-                .andExpect(jsonPath("$.errors[0]", is(NO_DATA_PROVIDED)));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.errors.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.errors[0]")
+                        .isEqualTo(NO_DATA_PROVIDED);
         }
 
         @Test
@@ -479,13 +534,18 @@ public class NoticeOfChangeControllerIT {
                     organisationAsString("UnknownId", null), APPROVED))
                 .build());
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errors.length()", is(1)))
-                .andExpect(jsonPath("$.errors[0]", is("Organisation with ID 'UnknownId' can not be found.")));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.errors.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.errors[0]")
+                        .isEqualTo("Organisation with ID 'UnknownId' can not be found.");
         }
 
         @Test
@@ -502,27 +562,37 @@ public class NoticeOfChangeControllerIT {
                     organisationAsString("OrgId", null), APPROVED))
                 .build());
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errors.length()", is(1)))
-                .andExpect(jsonPath("$.errors[0]", is("Error encountered while retrieving"
-                    + " organisation users for organisation ID 'OrgId': Bad Request")));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.errors.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.errors[0]")
+                        .isEqualTo("Error encountered while retrieving organisation"
+                            + " users for organisation ID 'OrgId': Bad Request");
         }
 
         @Test
         void shouldReturnErrorWhenRequestDoesNotContainCaseDetails() throws Exception {
             ApplyNoCDecisionRequest request = new ApplyNoCDecisionRequest(null);
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errors.length()", is(1)))
-                .andExpect(jsonPath("$.errors[0]", is(CASE_DETAILS_REQUIRED)));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.errors.length()")
+                        .isEqualTo(1)
+                    .jsonPath("$.errors[0]")
+                        .isEqualTo(CASE_DETAILS_REQUIRED);
         }
 
         private String orgPolicyAsString(String organisationId,
@@ -601,12 +671,9 @@ public class NoticeOfChangeControllerIT {
 
     @Nested
     @DisplayName("POST /noc/noc-prepare")
-    class PrepareNoticeOfChange extends BaseTest {
+    class PrepareNoticeOfChange extends BaseIT {
 
         private static final String ENDPOINT_URL = "/noc" + NOC_PREPARE_PATH;
-
-        @Autowired
-        private MockMvc mockMvc;
 
         @Test
         void shouldPrepareNoCEventSuccessfully() throws Exception {
@@ -627,19 +694,24 @@ public class NoticeOfChangeControllerIT {
             AboutToStartCallbackRequest request = new AboutToStartCallbackRequest("prepareOrganisation",
                                                                                   caseDetails, caseDetails);
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId.value.code", is("[Defendant]")))
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId.value.label", is("Defendant")))
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId.list_items[0].code",
-                                    is("[Defendant]")))
-                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId.list_items[0].label",
-                                    is("Defendant")))
-                .andExpect(jsonPath("$.data.OrganisationPolicyField.Organisation.OrganisationID",
-                                    is(ORGANISATION_ID)));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(request))
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId.value.code")
+                        .isEqualTo("[Defendant]")
+                    .jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId.value.label")
+                        .isEqualTo("Defendant")
+                    .jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId.list_items[0].code")
+                        .isEqualTo("[Defendant]")
+                    .jsonPath("$.data.ChangeOrganisationRequestField.CaseRoleId.list_items[0].label")
+                        .isEqualTo("Defendant")
+                    .jsonPath("$.data.OrganisationPolicyField.Organisation.OrganisationID")
+                        .isEqualTo(ORGANISATION_ID);
         }
 
         private JsonNode createOrganisationPolicyField() throws JsonProcessingException {
@@ -675,16 +747,13 @@ public class NoticeOfChangeControllerIT {
 
     @Nested
     @DisplayName("POST /noc/noc-requests")
-    class PostNoticeOfChangeRequests extends BaseTest {
+    class PostNoticeOfChangeRequests extends BaseIT {
         private static final String ENDPOINT_URL = "/noc" + REQUEST_NOTICE_OF_CHANGE_PATH;
         private static final String EVENT_TOKEN = "EVENT_TOKEN";
         private static final String CHANGE_ORGANISATION_REQUEST_FIELD = "changeOrganisationRequestField";
         private static final String ZERO = "0";
         private static final String JURISDICTION = ZERO;
         private static final String USER_ID = ZERO;
-
-        @Autowired
-        private MockMvc mockMvc;
 
         private RequestNoticeOfChangeRequest requestNoticeOfChangeRequest;
 
@@ -748,13 +817,18 @@ public class NoticeOfChangeControllerIT {
 
         @Test
         void shouldSuccessfullyVerifyNoCRequestWithoutAutoApproval() throws Exception {
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(requestNoticeOfChangeRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)))
-                .andExpect(jsonPath("$.approval_status", is(PENDING.name())));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(requestNoticeOfChangeRequest))
+                .exchange()
+                    .expectStatus().isCreated()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.status_message")
+                        .isEqualTo(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)
+                    .jsonPath("$.approval_status")
+                        .isEqualTo(PENDING.name());
         }
 
         @Test
@@ -776,28 +850,30 @@ public class NoticeOfChangeControllerIT {
 
             stubSubmitEventForCase(CASE_ID, caseDetails);
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(requestNoticeOfChangeRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status_message", is(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)))
-                .andExpect(jsonPath("$.approval_status", is(APPROVED.name())));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(requestNoticeOfChangeRequest))
+                .exchange()
+                    .expectStatus().isCreated()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.status_message")
+                        .isEqualTo(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)
+                    .jsonPath("$.approval_status")
+                        .isEqualTo(APPROVED.name());
         }
     }
 
     @Nested
     @DisplayName("POST /noc/check-noc-approval")
-    class CheckNoticeOfChangeApproval extends BaseTest {
+    class CheckNoticeOfChangeApproval extends BaseIT {
 
         private CallbackRequest checkNoticeOfChangeApprovalRequest;
         private CaseDetails caseDetails;
         private ChangeOrganisationRequest changeOrganisationRequest;
 
         private static final String ENDPOINT_URL = "/noc" + CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
-
-        @Autowired
-        private MockMvc mockMvc;
 
         DynamicListElement dynamicListElement = DynamicListElement.builder().code("code").label("label").build();
         DynamicList dynamicList = DynamicList.builder()
@@ -852,13 +928,17 @@ public class NoticeOfChangeControllerIT {
 
         @Test
         void shouldSuccessfullyCheckNoCApprovalWithAutoApproval() throws Exception {
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)))
-                .andExpect(jsonPath("$.confirmation_body", is(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest))
+                .exchange()
+                    .expectStatus().isOk()
+                .expectBody()
+                    .jsonPath("$.confirmation_header")
+                        .isEqualTo(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)
+                    .jsonPath("$.confirmation_body")
+                        .isEqualTo(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE);
         }
 
         @Test
@@ -874,12 +954,17 @@ public class NoticeOfChangeControllerIT {
             caseDetails =  caseDetails(changeOrganisationRequest);
             checkNoticeOfChangeApprovalRequest = new CallbackRequest(NOC, null, caseDetails);
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE)))
-                .andExpect(jsonPath("$.confirmation_body", is(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE)));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest))
+                .exchange()
+                    .expectStatus().isOk()
+                .expectBody()
+                    .jsonPath("$.confirmation_header")
+                        .isEqualTo(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE)
+                    .jsonPath("$.confirmation_body")
+                        .isEqualTo(CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE);
         }
 
         @Test
@@ -888,12 +973,15 @@ public class NoticeOfChangeControllerIT {
 
             checkNoticeOfChangeApprovalRequest = new CallbackRequest(NOC, null, caseDetails);
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
         }
 
         @Test
@@ -902,27 +990,27 @@ public class NoticeOfChangeControllerIT {
             caseDetails =  caseDetails(changeOrganisationRequest);
             checkNoticeOfChangeApprovalRequest = new CallbackRequest(NOC, null, caseDetails);
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(checkNoticeOfChangeApprovalRequest))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
         }
     }
 
     @Nested
     @DisplayName("POST /noc/set-organisation-to-remove")
-    class SetOrganisationToRemove extends BaseTest {
+    class SetOrganisationToRemove extends BaseIT {
 
         private CallbackRequest noticeOfChangeRequest;
         private CaseDetails caseDetails;
         private ChangeOrganisationRequest changeOrganisationRequest;
 
         private static final String ENDPOINT_URL = "/noc" + SET_ORGANISATION_TO_REMOVE_PATH;
-
-        @Autowired
-        private MockMvc mockMvc;
 
         DynamicListElement dynamicListElement = DynamicListElement.builder().code("Role1").label("label").build();
         DynamicList dynamicList = DynamicList.builder()
@@ -956,14 +1044,16 @@ public class NoticeOfChangeControllerIT {
 
         @Test
         void shouldSuccessfullySetOrganisationToRemove() throws Exception {
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(noticeOfChangeRequest)))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.data.changeOrganisationRequestField.OrganisationToRemove.OrganisationID",
-                                    is("Org1")));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(noticeOfChangeRequest))
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.data.changeOrganisationRequestField.OrganisationToRemove.OrganisationID")
+                        .isEqualTo("Org1");
         }
 
         @Test
@@ -971,12 +1061,16 @@ public class NoticeOfChangeControllerIT {
             caseDetails = defaultCaseDetails().data(Map.of()).build();
             noticeOfChangeRequest = new CallbackRequest(NOC, null, caseDetails);
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(noticeOfChangeRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(noticeOfChangeRequest))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
         }
 
         @Test
@@ -985,12 +1079,16 @@ public class NoticeOfChangeControllerIT {
             caseDetails = caseDetails(changeOrganisationRequest);
             noticeOfChangeRequest = new CallbackRequest(NOC, null, caseDetails);
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(noticeOfChangeRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(noticeOfChangeRequest))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
         }
 
         @Test
@@ -999,12 +1097,16 @@ public class NoticeOfChangeControllerIT {
             caseDetails = caseDetails(changeOrganisationRequest);
             noticeOfChangeRequest = new CallbackRequest(NOC, null, caseDetails);
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(noticeOfChangeRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(noticeOfChangeRequest))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID);
         }
 
         @Test
@@ -1012,12 +1114,16 @@ public class NoticeOfChangeControllerIT {
             caseDetails = caseDetails(changeOrganisationRequest);
             noticeOfChangeRequest = new CallbackRequest(NOC, null, caseDetails);
 
-            this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(mapper.writeValueAsString(noticeOfChangeRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.message", is(INVALID_CASE_ROLE_FIELD)));
+            this.webClient.post()
+                    .uri(ENDPOINT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(mapper.writeValueAsString(noticeOfChangeRequest))
+                .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectHeader().contentType(APPLICATION_JSON_VALUE)
+                .expectBody()
+                    .jsonPath("$.message")
+                        .isEqualTo(INVALID_CASE_ROLE_FIELD);
         }
     }
 }

@@ -15,10 +15,14 @@ import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCaseWithPrefix;
-import static uk.gov.hmcts.reform.managecase.gatewayfilters.AuthHeaderRoutingFilter.SERVICE_AUTHORIZATION;
+import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions", "PMD.AvoidDuplicateLiterals"})
 public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
@@ -40,16 +44,13 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
         stubSearchCase(CASE_TYPE_ID, ES_QUERY, caseDetails());
 
         String s2SToken = generateDummyS2SToken(SERVICE_NAME);
-        this.webClient.post()
-                .uri(PATH)
-                .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(ES_QUERY)
-            .exchange()
-                .expectStatus().isOk()
-            .expectBody()
-                .jsonPath("$.cases.length()").isEqualTo(1)
-                .jsonPath("$.cases[0].id").isEqualTo(TestFixtures.CASE_ID);
+        this.mockMvc.perform(post(PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
+            .content(ES_QUERY))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.cases.length()", is(1)))
+            .andExpect(jsonPath("$.cases[0].id", is(TestFixtures.CASE_ID)));
 
         verify(postRequestedFor(urlEqualTo("/o/token"))
                    .withRequestBody(containing("username=master.caa%40gmail.com")));
@@ -69,16 +70,13 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
         String s2SToken = generateDummyS2SToken(SERVICE_NAME);
         stubSearchCaseWithPrefix(CASE_TYPE_ID, ES_QUERY, caseDetails(), "/internal");
 
-        this.webClient.post()
-                .uri(PATH_INTERNAL)
-                .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(ES_QUERY)
-            .exchange()
-                .expectStatus().isOk()
-            .expectBody()
-                .jsonPath("$.cases.length()").isEqualTo(1)
-                .jsonPath("$.cases[0].id").isEqualTo(TestFixtures.CASE_ID);
+        this.mockMvc.perform(post(PATH_INTERNAL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
+            .content(ES_QUERY))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.cases.length()", is(1)))
+            .andExpect(jsonPath("$.cases[0].id", is(TestFixtures.CASE_ID)));
 
         verify(postRequestedFor(urlEqualTo("/o/token"))
                    .withRequestBody(containing("username=master.caa%40gmail.com")));
@@ -94,12 +92,10 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
     @Test
     void shouldReturn404_whenInvalidRequestUrlHasCcdPrefix() throws Exception {
         String s2SToken = generateDummyS2SToken(SERVICE_NAME);
-        this.webClient.post()
-                .uri(INVALID_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
-            .exchange()
-                .expectStatus().isNotFound();
+        this.mockMvc.perform(post(INVALID_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(SERVICE_AUTHORIZATION, BEARER + s2SToken))
+            .andExpect(status().isNotFound());
     }
 
     @DisplayName("SpringCloudGateway fails with 403 on a valid not allowed request url")
@@ -108,13 +104,11 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
         String s2SToken = generateDummyS2SToken(SERVICE_NAME);
         stubSearchCaseWithPrefix(CASE_TYPE_ID, ES_QUERY, caseDetails(), "/notallowed");
 
-        this.webClient.post()
-                .uri(VALID_NOT_ALLOWED_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
-                .bodyValue("{}")
-            .exchange()
-                .expectStatus().isForbidden();
+        this.mockMvc.perform(post(VALID_NOT_ALLOWED_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
+            .content("{}"))
+            .andExpect(status().isForbidden());
     }
 
     @DisplayName("SpringCloudGateway fails with 403 on invalid service name")
@@ -122,13 +116,11 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
     void shouldReturn403_whenInvalidServiceName() throws Exception {
         String s2SToken = generateDummyS2SToken("invalidService");
 
-        this.webClient.post()
-                .uri(PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
-                .bodyValue(ES_QUERY)
-            .exchange()
-                .expectStatus().isForbidden();
+        this.mockMvc.perform(post(PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
+            .content(ES_QUERY))
+            .andExpect(status().isForbidden());
     }
 
     @SuppressWarnings("PMD.LawOfDemeter")

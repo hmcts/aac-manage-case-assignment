@@ -8,7 +8,8 @@ import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandl
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(SpringExtension.class)
@@ -16,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class BaseTest {
     
     @Autowired
-    protected WebTestClient webClient;
+    protected MockMvc mockMvc;
 
     @MockBean
     protected ModelMapper mapper;

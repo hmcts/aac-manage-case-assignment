@@ -30,7 +30,7 @@ spring:
     import: "optional:configtree:/mnt/secrets/aac/"
   main:
     allow-bean-definition-overriding: true
-    web-application-type: REACTIVE
+    web-application-type: SERVLET
   cache:
     cache-names: userInfoCache,usersByOrganisationExternal,usersByOrganisationInternal,organisationAddressById,systemUserAccessTokenCache,caaAccessTokenCache,nocApproverAccessTokenCache,caseRoles,challengeQuestions
     caffeine:

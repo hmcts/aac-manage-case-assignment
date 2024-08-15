@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebFlux;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.cloud.contract.wiremock.WireMockConfigurationCustomizer;
@@ -17,7 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,13 +34,13 @@ import static org.mockito.Mockito.when;
     Application.class,
     TestIdamConfiguration.class
 })
-@AutoConfigureWebFlux
+@AutoConfigureWebMvc
 @AutoConfigureWireMock(port = 0, stubs = "classpath:/wiremock-stubs")
 @TestPropertySource("/integration-test.properties")
 public class BaseIT {
 
     @Autowired
-    protected WebTestClient webClient;
+    protected MockMvc mockMvc;
     @Autowired
     protected ObjectMapper objectMapper;
     @Value("${wiremock.server.port}")

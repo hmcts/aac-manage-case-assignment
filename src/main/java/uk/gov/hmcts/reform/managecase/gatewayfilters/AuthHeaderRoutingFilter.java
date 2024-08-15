@@ -2,54 +2,58 @@ package uk.gov.hmcts.reform.managecase.gatewayfilters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.gateway.filter.GatewayFilter;
-import org.springframework.cloud.gateway.filter.OrderedGatewayFilter;
-import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.function.RouterFunction;
+import org.springframework.web.servlet.function.ServerRequest;
+import org.springframework.web.servlet.function.ServerResponse;
+
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AccessException;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
+
+import java.util.function.Function;
+import static org.springframework.web.servlet.function.RouterFunctions.route;
 
 /**
  * Validates xui_webapp client_id from ServiceAuthorization header.
  * Adds system user Authorization header with the access token.
  * Adds ServiceAuthorization header with the s2s MCA access token.
  */
-@Component
-public class AuthHeaderRoutingFilter extends AbstractGatewayFilterFactory<OrderedGatewayFilter> {
+@Configuration
+public class AuthHeaderRoutingFilter {
+
     private static final Logger LOG = LoggerFactory.getLogger(AuthHeaderRoutingFilter.class);
 
-    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    @Autowired
+    private SecurityUtils securityUtils;
 
-    private final SecurityUtils securityUtils;
-    private final ApplicationParams applicationParams;
+    @Autowired
+    private ApplicationParams applicationParams;
 
-    public AuthHeaderRoutingFilter(SecurityUtils securityUtils,
-                                   ApplicationParams applicationParams) {
-        super();
-        this.securityUtils = securityUtils;
-        this.applicationParams = applicationParams;
+    @Bean
+    public RouterFunction<ServerResponse> instrumentRoute() {
+		return route().before(validate()).build();
     }
 
-    @Override
-    public GatewayFilter apply(OrderedGatewayFilter config) {
-        return new OrderedGatewayFilter((exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
+    public Function<ServerRequest, ServerRequest> validate() {
+		return request -> {
             doValidateClientId(request);
-            request = request.mutate().headers((httpHeaders) -> {
-                httpHeaders.add(AUTHORIZATION, securityUtils.getCaaSystemUserToken());
-                httpHeaders.add(SERVICE_AUTHORIZATION, securityUtils.getS2SToken());
-            }).build();
-            return chain.filter(exchange.mutate().request(request).build());
-        }, -1);
-    }
+            return ServerRequest
+            .from(request)
+            .header(AUTHORIZATION, securityUtils.getCaaSystemUserToken())
+            .header(SERVICE_AUTHORIZATION, securityUtils.getS2SToken())
+            .build();
+        };
+	}
 
-    private void doValidateClientId(ServerHttpRequest request) {
+    private void doValidateClientId(ServerRequest request) {
         String serviceName = securityUtils
-                .getServiceNameFromS2SToken(request.getHeaders().get(SERVICE_AUTHORIZATION).get(0));
+                .getServiceNameFromS2SToken(request.headers().firstHeader(SERVICE_AUTHORIZATION));
 
         if (!applicationParams.getCcdDataStoreAllowedService().equals(serviceName)
             || !applicationParams.getCcdDefinitionStoreAllowedService().equals(serviceName)) {
@@ -58,4 +62,5 @@ public class AuthHeaderRoutingFilter extends AbstractGatewayFilterFactory<Ordere
             throw new AccessException(errorMessage);
         }
     }
+
 }

@@ -1,37 +1,44 @@
 package uk.gov.hmcts.reform.managecase.gatewayfilters;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.gateway.filter.GatewayFilter;
-import org.springframework.cloud.gateway.filter.OrderedGatewayFilter;
-import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.function.RouterFunction;
+import org.springframework.web.servlet.function.ServerRequest;
+import org.springframework.web.servlet.function.ServerResponse;
+
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AccessException;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.springframework.web.servlet.function.RouterFunctions.route;
 
 /**
  * Filters requests based on the uri. Checks if it matches against one of the regex list elements defined in
  * ccd.data-store.allowed-urls property.
  */
-@Component
-public class AllowedUrlRoutingFilter extends AbstractGatewayFilterFactory<OrderedGatewayFilter> {
+@Configuration
+public class AllowedUrlRoutingFilter {
 
     @Autowired
-    private ApplicationParams applicationParams;
+    ApplicationParams applicationParams;
 
-    @Override
-    public GatewayFilter apply(OrderedGatewayFilter config) {
-        return new OrderedGatewayFilter((exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
-            doValidateAllowedUrls(request);
-            return chain.filter(exchange.mutate().request(request).build());
-        }, -2);
+    @Bean
+    public RouterFunction<ServerResponse> instrumentRoute() {
+		return route().before(validate()).build();
     }
 
-    private void doValidateAllowedUrls(ServerHttpRequest request) {
+    public Function<ServerRequest, ServerRequest> validate() {
+		return request -> {
+            doValidateAllowedUrls(request);
+            return ServerRequest.from(request).build();
+        };
+	}
+
+    private void doValidateAllowedUrls(ServerRequest request) {
 
         List<String> ccdDataStoreAllowedUrls = applicationParams.getCcdDataStoreAllowedUrls()
             .stream()
@@ -43,8 +50,8 @@ public class AllowedUrlRoutingFilter extends AbstractGatewayFilterFactory<Ordere
             .map("/ccd"::concat)
             .collect(Collectors.toList());
 
-        String uri = request.getURI().getPath()
-            + (request.getURI().getQuery() == null ? "" : "?" + request.getURI().getQuery());
+        String uri = request.path()
+            + (request.uri().getQuery() == null ? "" : "?" + request.uri().getQuery());
 
         if (ccdDataStoreAllowedUrls.stream().noneMatch(uri::matches)
             && ccdDefinitionStoreAllowedUrls.stream().noneMatch(uri::matches)) {

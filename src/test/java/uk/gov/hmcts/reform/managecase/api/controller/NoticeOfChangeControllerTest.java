@@ -16,10 +16,9 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointPr
 import org.springframework.boot.actuate.endpoint.web.EndpointMediaTypes;
 import org.springframework.boot.actuate.endpoint.web.WebEndpointsSupplier;
 import org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpointsSupplier;
-import org.springframework.boot.actuate.endpoint.web.annotation.ServletEndpointsSupplier;
 import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -120,7 +119,7 @@ public class NoticeOfChangeControllerTest {
         includeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes = MapperConfig.class),
         excludeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes =
             { SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class }))
-    @AutoConfigureWebMvc
+    @AutoConfigureMockMvc(addFilters = false)
     @ImportAutoConfiguration(TestIdamConfiguration.class)
     static class BaseWebMvcTest {
 
@@ -150,9 +149,6 @@ public class NoticeOfChangeControllerTest {
 
         @MockBean
         protected WebEndpointsSupplier webEndpointsSupplier;
-
-        @MockBean
-        protected ServletEndpointsSupplier servletEndpointsSupplier;
 
         @MockBean
         protected ControllerEndpointsSupplier controllerEndpointsSupplier;
@@ -500,7 +496,8 @@ public class NoticeOfChangeControllerTest {
         @Test
         void shouldFailWithInternalServerErrorIfExceptionThrown() throws Exception {
 
-            given(requestNoticeOfChangeService.requestNoticeOfChange(null)).willCallRealMethod();
+            given(requestNoticeOfChangeService.requestNoticeOfChange(any()))
+                .willThrow(new RuntimeException());
 
             this.mockMvc.perform(post("/noc" + REQUEST_NOTICE_OF_CHANGE_PATH)
                     .contentType(APPLICATION_JSON_VALUE)

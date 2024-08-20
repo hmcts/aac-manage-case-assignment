@@ -35,7 +35,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -100,10 +99,10 @@ public class CaseAssignmentController {
     })
     public CaseAssignmentResponse assignAccessWithinOrganisation(
             @Valid @RequestBody CaseAssignmentRequest requestPayload,
-            @RequestParam(name = "use_user_token", required = false) Optional<Boolean> useUserToken) {
+            @RequestParam(name = "use_user_token", defaultValue = "false", required = false) boolean useUserToken) {
         CaseAssignment caseAssignment = mapper.map(requestPayload, CaseAssignment.class);
-        List<String> roles = caseAssignmentService.assignCaseAccess(caseAssignment, useUserToken.orElse(false));
-        return new CaseAssignmentResponse(String.format(ASSIGN_ACCESS_MESSAGE, StringUtils.join(roles, ',')));
+        List<String> roles = caseAssignmentService.assignCaseAccess(caseAssignment, useUserToken);
+        return new CaseAssignmentResponse(String.format(ASSIGN_ACCESS_MESSAGE, StringUtils.join(roles, ",")));
     }
 
     @GetMapping(path = CASE_ASSIGNMENTS_PATH, produces = APPLICATION_JSON_VALUE)

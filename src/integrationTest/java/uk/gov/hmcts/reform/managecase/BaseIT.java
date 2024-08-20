@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.managecase;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSASigner.detDSA;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;

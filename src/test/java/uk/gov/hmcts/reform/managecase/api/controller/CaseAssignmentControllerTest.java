@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,6 +34,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.endpoint.web.WebEndpointsSupplier;
+import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -42,9 +44,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import feign.FeignException;
 import feign.Request;
-import uk.gov.hmcts.reform.managecase.BaseTest;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
 import uk.gov.hmcts.reform.managecase.TestFixtures.CaseAssignedUsersFixture;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
@@ -81,7 +86,7 @@ import uk.gov.hmcts.reform.managecase.service.common.UIDService;
 )
 @AutoConfigureMockMvc(addFilters = false)
 @ImportAutoConfiguration(TestIdamConfiguration.class)
-public class CaseAssignmentControllerTest extends BaseTest {
+public class CaseAssignmentControllerTest {
 
     private static final String ASSIGNEE_ID = "0a5874a4-3f38-4bbd-ba4c";
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
@@ -98,6 +103,18 @@ public class CaseAssignmentControllerTest extends BaseTest {
 
     @MockBean
     protected SecurityUtils securityUtils;
+
+    @Autowired
+    protected MockMvc mockMvc;
+
+    @MockBean
+    protected WebEndpointsSupplier webEndpointsSupplier;
+
+    @MockBean
+    protected WebMvcEndpointHandlerMapping webMvcEndpointHandlerMapping;
+
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     @Nested
     @DisplayName("POST /case-assignments")
@@ -120,7 +137,7 @@ public class CaseAssignmentControllerTest extends BaseTest {
             CaseAssignmentController controller = new CaseAssignmentController(service, new ModelMapper());
 
             // ACT
-            CaseAssignmentResponse response = controller.assignAccessWithinOrganisation(request, Optional.of(false));
+            CaseAssignmentResponse response = controller.assignAccessWithinOrganisation(request, false);
 
             // ASSERT
             assertThat(response).isNotNull();

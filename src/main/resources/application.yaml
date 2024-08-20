@@ -6,6 +6,8 @@ management:
   endpoint:
     health:
       show-details: always
+      probes:
+        enabled: true
       cache:
         time-to-live: 10s
   endpoints:
@@ -13,9 +15,7 @@ management:
       base-path: /
       exposure:
         include: health, info, prometheus
-  health:
-    probes:
-      enabled: true
+
 spring:
   # CCD-3509 CVE-2021-22044 spring.mvc.pathmatch.matching-strategy = ant_path_matcher
   # required to fix null pointers in integration tests, conflict in Springfox after Springboot 2.6.10 upgrade
@@ -47,13 +47,15 @@ spring:
             client-secret: internal
   cloud:
     gateway:
-      routes:
-        - id: data-store
-          uri: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
-          predicates:
-            - Path=/ccd/**
-          filters:
-            - RemoveResponseHeader=Cookie,Set-Cookie
+      mvc:
+        routes:
+          - id: data-store
+            uri: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
+            predicates:
+              - Path=/ccd/**
+            filters:
+              - RemoveResponseHeader=Cookie
+              - RemoveResponseHeader=Set-Cookie
     discovery:
       client:
         composite-indicator:

@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures;
     Application.class,
     TestIdamConfiguration.class
 })
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureWireMock(port = 0, stubs = "classpath:/wiremock-stubs")
 @TestPropertySource("/integration-test.yaml")
 public class BaseIT {

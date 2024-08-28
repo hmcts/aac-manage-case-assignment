@@ -143,7 +143,7 @@ public class NoticeOfChangeController {
                             "answer_field":null,
                             "question_id":"QuestionId1"
                         }]
-                    }\n"""
+                    }"""
                     )}))
     @ApiResponse(
         responseCode = "400",
@@ -336,8 +336,10 @@ public class NoticeOfChangeController {
                         )}))
     @ApiResponse(
         responseCode = "400",
-        description = "One or more of the following reasons:\n"
-            + "- Request payload does not match the expected format\n",
+        description = """
+                One or more of the following reasons:
+                - Request payload does not match the expected format
+                """,
         content = @Content(
             mediaType = APPLICATION_JSON_VALUE,
             examples = { @ExampleObject(

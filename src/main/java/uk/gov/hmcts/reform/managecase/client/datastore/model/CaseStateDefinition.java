@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 
 import java.io.Serializable;
 import java.util.List;
@@ -23,7 +24,7 @@ public class CaseStateDefinition implements Serializable {
     private String titleDisplay;
     private List<AccessControlList> accessControlLists;
 
-    @Schema(required = true)
+    @Schema(requiredMode = RequiredMode.REQUIRED)
     @JsonProperty("id")
     public String getId() {
         return id;

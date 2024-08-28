@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -14,7 +15,7 @@ public class Version implements Serializable {
     private Date liveFrom;
     private Date liveUntil;
 
-    @Schema(required = true, description = "Sequantial version number")
+    @Schema(requiredMode = RequiredMode.REQUIRED, description = "Sequantial version number")
     @JsonProperty("number")
     public Integer getNumber() {
         return number;
@@ -27,7 +28,7 @@ public class Version implements Serializable {
     /**
      * Date and time from when this version is valid from.
      **/
-    @Schema(required = true, description = "Date and time from when this version is valid from")
+    @Schema(requiredMode = RequiredMode.REQUIRED, description = "Date and time from when this version is valid from")
     @JsonProperty("live_from")
     public Date getLiveFrom() {
         return liveFrom;

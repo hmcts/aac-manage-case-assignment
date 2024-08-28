@@ -8,7 +8,6 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
-import org.apache.hc.core5.function.Resolver;
 import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.util.TimeValue;
 import org.slf4j.Logger;
@@ -51,26 +50,17 @@ public class RestTemplateConfiguration {
     @Bean
     CloseableHttpClient getCloseableHttpClient() {
         PoolingHttpClientConnectionManagerBuilder builder = PoolingHttpClientConnectionManagerBuilder.create();
-        builder.setConnectionConfigResolver(new Resolver<HttpRoute,ConnectionConfig>() {
-
-            @Override
-            public ConnectionConfig resolve(HttpRoute object) {
-                return ConnectionConfig
-                    .custom()
-                    .setTimeToLive(maxSecondsIdleConnection, TimeUnit.SECONDS)
-                    .setConnectTimeout(readTimeout, TimeUnit.SECONDS)
-                    .setSocketTimeout(readTimeout, TimeUnit.SECONDS)
-                    .setValidateAfterInactivity(validateAfterInactivity, TimeUnit.SECONDS)
-                    .build();
-            }
-            
-        });
+        builder.setConnectionConfigResolver((HttpRoute object) -> ConnectionConfig.custom()
+            .setTimeToLive(maxSecondsIdleConnection, TimeUnit.SECONDS)
+            .setConnectTimeout(readTimeout, TimeUnit.SECONDS)
+            .setSocketTimeout(readTimeout, TimeUnit.SECONDS)
+            .setValidateAfterInactivity(validateAfterInactivity, TimeUnit.SECONDS)
+            .build());
         RequestConfig config = RequestConfig.custom()
             .setConnectionRequestTimeout(readTimeout, TimeUnit.SECONDS)
             .build();
 
-        return HttpClientBuilder
-            .create()
+        return HttpClientBuilder.create()
             .useSystemProperties()
             .disableRedirectHandling()
             .setDefaultRequestConfig(config)
@@ -102,41 +92,23 @@ public class RestTemplateConfiguration {
 
         builder.setMaxConnTotal(maxTotalHttpClient);
         builder.setMaxConnPerRoute(maxClientPerRoute);
-        builder.setConnectionConfigResolver(new Resolver<HttpRoute,ConnectionConfig>() {
-
-            @Override
-            public ConnectionConfig resolve(HttpRoute object) {
-                return ConnectionConfig
-                    .custom()
-                    .setTimeToLive(maxSecondsIdleConnection, TimeUnit.SECONDS)
-                    .setConnectTimeout(timeout, TimeUnit.SECONDS)
-                    .setSocketTimeout(timeout, TimeUnit.SECONDS)
-                    .setValidateAfterInactivity(validateAfterInactivity, TimeUnit.SECONDS)
-                    .build();
-            }
-            
-        });
-        builder.setSocketConfigResolver(new Resolver<HttpRoute,SocketConfig>() {
-
-            @Override
-            public SocketConfig resolve(HttpRoute object) {
-                return SocketConfig
-                    .custom()
-                    .setSoTimeout(readTimeout, TimeUnit.SECONDS)
-                    .build();
-            }
-
-        });
+        builder.setConnectionConfigResolver((HttpRoute object) -> ConnectionConfig.custom()
+            .setTimeToLive(maxSecondsIdleConnection, TimeUnit.SECONDS)
+            .setConnectTimeout(timeout, TimeUnit.SECONDS)
+            .setSocketTimeout(timeout, TimeUnit.SECONDS)
+            .setValidateAfterInactivity(validateAfterInactivity, TimeUnit.SECONDS)
+            .build());
+        builder.setSocketConfigResolver((HttpRoute object) -> SocketConfig.custom()
+            .setSoTimeout(readTimeout, TimeUnit.SECONDS)
+            .build());
 
         cm = builder.build();
 
         cm.closeIdle(TimeValue.of(maxSecondsIdleConnection, TimeUnit.SECONDS));
         
-        final RequestConfig
-            config =
-            RequestConfig.custom()
-                .setConnectionRequestTimeout(timeout, TimeUnit.SECONDS)
-                .build();
+        final RequestConfig config = RequestConfig.custom()
+            .setConnectionRequestTimeout(timeout, TimeUnit.SECONDS)
+            .build();
 
         return HttpClientBuilder.create()
             .useSystemProperties()

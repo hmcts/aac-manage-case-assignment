@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import lombok.ToString;
 
 import java.io.Serializable;
@@ -24,7 +25,7 @@ public class JurisdictionDefinition implements Serializable {
 
     private List<CaseTypeDefinition> caseTypeDefinitions = new ArrayList<>();
 
-    @Schema(required = true)
+    @Schema(requiredMode = RequiredMode.REQUIRED)
     @JsonProperty("id")
     public String getId() {
         return id;
@@ -34,7 +35,7 @@ public class JurisdictionDefinition implements Serializable {
         this.id = id;
     }
 
-    @Schema(required = true)
+    @Schema(requiredMode = RequiredMode.REQUIRED)
     @JsonProperty("name")
     public String getName() {
         return name;

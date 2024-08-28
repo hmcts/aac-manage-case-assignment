@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.client.definitionstore.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.AccessControlList;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.ComplexACL;
 
@@ -33,7 +34,7 @@ public class CaseField implements HasAcls, Orderable {
     /**
      * The id of the case field.
      **/
-    @Schema(required = true, description = "The id of the case field")
+    @Schema(requiredMode = RequiredMode.REQUIRED, description = "The id of the case field")
     @JsonProperty("id")
     public String getId() {
         return id;
@@ -72,7 +73,7 @@ public class CaseField implements HasAcls, Orderable {
     /**
      * label associated with the field.
      **/
-    @Schema(required = true)
+    @Schema(requiredMode = RequiredMode.REQUIRED)
     @JsonProperty("label")
     public String getLabel() {
         return label;
@@ -85,7 +86,7 @@ public class CaseField implements HasAcls, Orderable {
     /**
      * return the type of the field i.e. YesOrNo, text, date etc.
      **/
-    @Schema(required = true)
+    @Schema(requiredMode = RequiredMode.REQUIRED)
     @JsonProperty("field_type")
     public FieldType getFieldType() {
         return fieldType;

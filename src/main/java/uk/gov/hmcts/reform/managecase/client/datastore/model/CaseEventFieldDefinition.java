@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.client.datastore.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import lombok.ToString;
 
 import java.io.Serializable;
@@ -26,7 +27,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
     private String defaultValue;
     private List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions = new ArrayList<>();
 
-    @Schema(required = true, description = "Foreign key to CaseField.id")
+    @Schema(requiredMode = RequiredMode.REQUIRED, description = "Foreign key to CaseField.id")
     @JsonProperty("case_field_id")
     public String getCaseFieldId() {
         return caseFieldId;

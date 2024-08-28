@@ -23,15 +23,17 @@ public interface ValidateClientFilter {
     @Shortcut
     static HandlerFilterFunction<ServerResponse, ServerResponse> validateClientFilter() {
         return (request, next) -> {
-            Logger LOG = LoggerFactory.getLogger(ValidateClientFilter.class);
+            Logger log = LoggerFactory.getLogger(ValidateClientFilter.class);
             SecurityUtils securityUtils = getApplicationContext(request).getBean(SecurityUtils.class);
             ApplicationParams applicationParams = getApplicationContext(request).getBean(ApplicationParams.class);
 
-            String serviceName = securityUtils.getServiceNameFromS2SToken(request.headers().firstHeader(SERVICE_AUTHORIZATION));
-            if (!applicationParams.getCcdDataStoreAllowedService().equals(serviceName)
-                    || !applicationParams.getCcdDefinitionStoreAllowedService().equals(serviceName)) {
-                String errorMessage = String.format("forbidden client id %s for the /ccd endpoint", serviceName);
-                LOG.debug(errorMessage);
+            String service = securityUtils.getServiceNameFromS2SToken(
+                request.headers().firstHeader(SERVICE_AUTHORIZATION)
+            );
+            if (!applicationParams.getCcdDataStoreAllowedService().equals(service)
+                    || !applicationParams.getCcdDefinitionStoreAllowedService().equals(service)) {
+                String errorMessage = String.format("forbidden client id %s for the /ccd endpoint", service);
+                log.debug(errorMessage);
                 throw new AccessException(errorMessage);
             }
 
@@ -45,12 +47,10 @@ public interface ValidateClientFilter {
     }
 
     class FilterSupplier implements org.springframework.cloud.gateway.server.mvc.filter.FilterSupplier {
-
         @Override
-		public Collection<Method> get() {
-			return Arrays.asList(ValidateClientFilter.class.getMethods());
-		}
+        public Collection<Method> get() {
+            return Arrays.asList(ValidateClientFilter.class.getMethods());
+        }
+    }
 
-	}
-    
 }

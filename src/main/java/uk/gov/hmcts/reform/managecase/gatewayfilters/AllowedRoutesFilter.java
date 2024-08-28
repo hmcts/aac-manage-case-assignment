@@ -46,12 +46,10 @@ public interface AllowedRoutesFilter {
     }
 
     class FilterSupplier implements org.springframework.cloud.gateway.server.mvc.filter.FilterSupplier {
-
         @Override
-		public Collection<Method> get() {
-			return Arrays.asList(AllowedRoutesFilter.class.getMethods());
-		}
-
-	}
+        public Collection<Method> get() {
+            return Arrays.asList(AllowedRoutesFilter.class.getMethods());
+        }
+    }
     
 }

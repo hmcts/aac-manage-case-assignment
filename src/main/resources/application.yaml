@@ -48,14 +48,19 @@ spring:
   cloud:
     gateway:
       mvc:
+        http-client:
+          type: AUTODETECT
         routes:
           - id: data-store
             uri: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
             predicates:
               - Path=/ccd/**
             filters:
+              - AllowedRoutesFilter
+              - ValidateClientFilter
               - RemoveResponseHeader=Cookie
               - RemoveResponseHeader=Set-Cookie
+              - StripPrefix=1
     discovery:
       client:
         composite-indicator:

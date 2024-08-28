@@ -113,7 +113,7 @@ class ApplyNoCDecisionServiceTest {
     @BeforeEach
     void setUp() {
         mapper.registerModule(new JavaTimeModule());
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         applyNoCDecisionService = new ApplyNoCDecisionService(prdRepository, dataStoreRepository,
             notifyService, new JacksonUtils(mapper), mapper);
         when(prdRepository.findOrganisationAddress(ArgumentMatchers.any()))

@@ -50,7 +50,7 @@ class NotifyServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         this.notifyService = new NotifyService(appParams, notificationClient);
     }
 

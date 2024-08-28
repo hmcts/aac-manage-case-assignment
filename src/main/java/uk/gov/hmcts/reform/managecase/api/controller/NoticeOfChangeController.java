@@ -240,7 +240,8 @@ public class NoticeOfChangeController {
                     value = """
                     {
                         "status": "BAD_REQUEST",
-                        "message": "The number of provided answers must match the number of questions - expected 1 answers, received 2",
+                        "message": "The number of provided answers must match the number of questions 
+                            - expected 1 answers, received 2",
                         "errors": []
                     }"""
                     )}))

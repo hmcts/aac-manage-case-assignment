@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -29,12 +30,14 @@ public class RequestedCaseUnassignment {
     @NotEmpty(message = ValidationError.CASE_ID_EMPTY)
     @Size(min = 16, max = 16, message = ValidationError.CASE_ID_INVALID_LENGTH)
     @LuhnCheck(message = ValidationError.CASE_ID_INVALID)
-    @Schema(description = "Case ID to Unassign Access To", required = true, example = "1583841721773828")
+    @Schema(description = "Case ID to Unassign Access To", 
+            requiredMode = RequiredMode.REQUIRED, example = "1583841721773828")
     private String caseId;
 
     @JsonProperty("assignee_id")
     @NotEmpty(message = ValidationError.ASSIGNEE_ID_EMPTY)
-    @Schema(description = "IDAM ID of the User to Unassign", required = true, example = "ecb5edf4-2f5f-4031-a0ec")
+    @Schema(description = "IDAM ID of the User to Unassign", 
+            requiredMode = RequiredMode.REQUIRED, example = "ecb5edf4-2f5f-4031-a0ec")
     private String assigneeId;
 
     @JsonProperty("case_roles")

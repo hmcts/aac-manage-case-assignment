@@ -49,7 +49,7 @@ public class NotifyService {
         return notificationStatuses;
     }
 
-    @Retryable(value = {ConnectException.class}, backoff = @Backoff(delay = 1000, multiplier = 3))
+    @Retryable(retryFor = {ConnectException.class}, backoff = @Backoff(delay = 1000, multiplier = 3))
     private EmailNotificationRequestSuccess sendNotification(EmailNotificationRequest request)
         throws NotificationClientException {
         validateRequest(request);

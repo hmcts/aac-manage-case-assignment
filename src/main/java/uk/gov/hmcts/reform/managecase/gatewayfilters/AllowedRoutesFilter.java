@@ -26,12 +26,12 @@ public interface AllowedRoutesFilter {
             List<String> ccdDataStoreAllowedUrls = applicationParams.getCcdDataStoreAllowedUrls()
                 .stream()
                 .map("/ccd"::concat)
-                .collect(Collectors.toList());
+                .toList();
 
             List<String> ccdDefinitionStoreAllowedUrls = applicationParams.getCcdDefinitionStoreAllowedUrls()
                 .stream()
                 .map("/ccd"::concat)
-                .collect(Collectors.toList());
+                .toList();
 
             String uri = request.uri().getPath()
                 + (request.uri().getQuery() == null ? "" : "?" + request.uri().getQuery());

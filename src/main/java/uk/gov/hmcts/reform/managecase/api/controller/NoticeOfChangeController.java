@@ -124,49 +124,49 @@ public class NoticeOfChangeController {
             examples = { @ExampleObject(
                     value = """
                     {
-                        \"questions\":[{
-                            \"case_type_id\":\"caseType\",
-                            \"order\":1,
-                            \"question_text\":\"questionText\",
-                            \"answer_field_type\":{
-                                \"id\":\"Number\",
-                                \"type\":\"Number\",
-                                \"min\":null,
-                                \"max\":null,
-                                \"regular_expression\":null,
-                                \"fixed_list_items\":[],
-                                \"complex_fields\":[],
-                                \"collection_field_type\":null
+                        "questions":[{
+                            "case_type_id":"caseType",
+                            "order":1,
+                            "question_text":"questionText",
+                            "answer_field_type":{
+                                "id":"Number",
+                                "type":"Number",
+                                "min":null,
+                                "max":null,
+                                "regular_expression":null,
+                                "fixed_list_items":[],
+                                "complex_fields":[],
+                                "collection_field_type":null
                             },
-                            \"display_context_parameter\":null,
-                            \"challenge_question_id\":\"NoC\",
-                            \"answer_field\":null,
-                            \"question_id\":\"QuestionId1\"
+                            "display_context_parameter":null,
+                            "challenge_question_id":"NoC",
+                            "answer_field":null,
+                            "question_id":"QuestionId1"
                         }]
                     }\n"""
                     )}))
     @ApiResponse(
         responseCode = "400",
         description = """
-            One or more of the following reasons:\n
-            1. Case ID can not be empty, \n
-            2. Case ID has to be a valid 16-digit Luhn number, \n
-            3. No NoC events available for this case type, \n
-            4. Multiple NoC Request events found for the user, \n
-            5. More than one change request found on the case, \n
-            6. Ongoing NoC request in progress \n
-            7. Insufficient privileges for notice of change request \n
+            One or more of the following reasons:
+            1. Case ID can not be empty, 
+            2. Case ID has to be a valid 16-digit Luhn number, 
+            3. No NoC events available for this case type, 
+            4. Multiple NoC Request events found for the user, 
+            5. More than one change request found on the case, 
+            6. Ongoing NoC request in progress 
+            7. Insufficient privileges for notice of change request 
             8. No Organisation Policy for one or more of the roles available
-             for the notice of change request \n
+             for the notice of change request 
             """,
         content = @Content(
             mediaType = APPLICATION_JSON_VALUE,
             examples = { @ExampleObject(
                     value = """
                     {
-                        \"message\": \"Case ID has to be a valid 16-digit Luhn number\"
-                        \"code\": \"case-id-invalid\"
-                        \"status\": \"BAD_REQUEST\"
+                        "message": "Case ID has to be a valid 16-digit Luhn number"
+                        "code": "case-id-invalid"
+                        "status": "BAD_REQUEST"
                     }"""
                     )}))
     @ApiResponse(
@@ -175,8 +175,11 @@ public class NoticeOfChangeController {
         content = @Content(
             mediaType = APPLICATION_JSON_VALUE,
             examples = { @ExampleObject(
-                    value = "{\"message\": \"Case could not be found\","
-                    + " \"status\": \"NOT_FOUND\" }"
+                    value = """
+                    {
+                        "message": "Case could not be found",
+                        "status": "NOT_FOUND"
+                    }"""
                     )}))
     @ApiResponse(
         responseCode = "401",
@@ -209,13 +212,14 @@ public class NoticeOfChangeController {
             schema = @Schema(implementation = VerifyNoCAnswersResponse.class),
             mediaType = APPLICATION_JSON_VALUE,
             examples = { @ExampleObject(
-                    value = "{\n"
-                    + "    \"organisation\": {\n"
-                    + "        \"OrganisationID\": \"QUK822NA\",\n"
-                    + "        \"OrganisationName\": \"Some Org\"\n"
-                    + "    },\n"
-                    + "    \"status_message\": \"Notice of Change answers verified successfully\"\n"
-                    + "}"
+                    value = """
+                    {
+                        "organisation": {
+                            "OrganisationID": "QUK822NA",
+                            "OrganisationName": "Some Org"
+                        },
+                        "status_message": "Notice of Change answers verified successfully"
+                    }"""
                     )}))
     @ApiResponse(
         responseCode = "400",
@@ -233,12 +237,12 @@ public class NoticeOfChangeController {
         content = @Content(
             mediaType = APPLICATION_JSON_VALUE,
             examples = { @ExampleObject(
-                    value = "{\n"
-                    + "    \"status\": \"BAD_REQUEST\",\n"
-                    + "    \"message\": \"The answers did not match those for any litigant\",\n"
-                    + "    \"code\": \"answers-not-matched-any-litigant\",\n"
-                    + "    \"errors\": []\n"
-                    + "}"
+                    value = """
+                    {
+                        "status": "BAD_REQUEST",
+                        "message": "The number of provided answers must match the number of questions - expected 1 answers, received 2",
+                        "errors": []
+                    }"""
                     )}))
     @ApiResponse(
         responseCode = "404",
@@ -267,11 +271,13 @@ public class NoticeOfChangeController {
     @PostMapping(path = APPLY_NOC_DECISION, produces = APPLICATION_JSON_VALUE)
     @Operation(
         summary = "Apply Notice of Change decision",
-        description = "Use to apply a Notice of Change decision on a case.\n\n"
-            + "Note that this operation acts as a callback and therefore it accepts a standard callback request, "
-            + "and similarly returns a standard callback response. As with normal callbacks, the response "
-            + "returns a 200 (success) status when valid parameters have been passed to the operation but "
-            + "processing errors have occurred.")
+        description = """
+                Use to apply a Notice of Change decision on a case.
+                Note that this operation acts as a callback and therefore it accepts a standard callback request,
+                and similarly returns a standard callback response. As with normal callbacks, the response
+                returns a 200 (success) status when valid parameters have been passed to the operation but
+                processing errors have occurred.
+                """)
     @ApiResponse(
         responseCode = "200",
         description = """
@@ -440,8 +446,11 @@ public class NoticeOfChangeController {
             schema = @Schema(implementation = NoCApiError.class),
             mediaType = APPLICATION_JSON_VALUE,
             examples = { @ExampleObject(
-                    value = "{\"message\": \"Case could not be found\","
-                    + " \"status\": \"NOT_FOUND\" }"
+                    value = """
+                    {
+                        "message": "Case could not be found",
+                        "status": "NOT_FOUND"
+                    }"""
                     )}))
     @ApiResponse(
         responseCode = "401",

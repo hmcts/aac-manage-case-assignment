@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.api.payload;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,6 @@ public class ApplyNoCDecisionRequest {
 
     @JsonProperty("case_details")
     @NotNull(message = CASE_DETAILS_REQUIRED)
-    @Schema(description = "Case details", required = true)
+    @Schema(description = "Case details", requiredMode = RequiredMode.REQUIRED)
     private CaseDetails caseDetails;
 }

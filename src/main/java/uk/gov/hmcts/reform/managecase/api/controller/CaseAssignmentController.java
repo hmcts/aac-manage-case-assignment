@@ -96,7 +96,7 @@ public class CaseAssignmentController {
         description = ValidationError.CASE_NOT_FOUND)
     public CaseAssignmentResponse assignAccessWithinOrganisation(
             @Valid @RequestBody CaseAssignmentRequest requestPayload,
-            @RequestParam(name = "use_user_token", defaultValue = "false", required = false) boolean useUserToken) {
+            @RequestParam(name = "use_user_token", defaultValue = "false") boolean useUserToken) {
         CaseAssignment caseAssignment = mapper.map(requestPayload, CaseAssignment.class);
         List<String> roles = caseAssignmentService.assignCaseAccess(caseAssignment, useUserToken);
         return new CaseAssignmentResponse(String.format(ASSIGN_ACCESS_MESSAGE, StringUtils.join(roles, ",")));
@@ -113,25 +113,25 @@ public class CaseAssignmentController {
             mediaType = APPLICATION_JSON_VALUE,
             examples = { @ExampleObject(
                     value = """
-                    {\n
-                    \"status_message\": \"Case-User-Role assignments returned successfully\",\n
-                      \"case_assignments\": [\n
-                        {\n
-                            \"case_id\": \"1588234985453946\",\n
-                            \"shared_with\": [\n
-                            {\n
-                                \"idam_id\": \"221a2877-e1ab-4dc4-a9ff-f9424ad58738\",\n
-                                \"first_name\": \"Bill\",\n
-                                \"last_name\": \"Roberts\",\n
-                                \"email\": \"bill.roberts@greatbrsolicitors.co.uk\",\n
-                                \"case_roles\": [\n
-                                    \"[Claimant]\",\n
-                                    \"[Defendant]\"\n
-                                ]\n
-                            }\n
-                            ]\n
-                        }\n
-                      ]\n
+                    {
+                    "status_message": "Case-User-Role assignments returned successfully",
+                      "case_assignments": [
+                        {
+                            "case_id": "1588234985453946",
+                            "shared_with": [
+                            {
+                                "idam_id": "221a2877-e1ab-4dc4-a9ff-f9424ad58738",
+                                "first_name": "Bill",
+                                "last_name": "Roberts",
+                                "email": "bill.roberts@greatbrsolicitors.co.uk",
+                                "case_roles": [
+                                    "[Claimant]",
+                                    "[Defendant]"
+                                ]
+                            }
+                            ]
+                        }
+                      ]
                     }"""
                     )}))
     @ApiResponse(

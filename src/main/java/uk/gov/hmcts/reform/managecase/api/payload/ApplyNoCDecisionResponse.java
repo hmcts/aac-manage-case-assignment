@@ -17,9 +17,9 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApplyNoCDecisionResponse {
 
-    @Schema(description = "Case data", required = false)
+    @Schema(description = "Case data")
     private Map<String, JsonNode> data;
 
-    @Schema(description = "Errors", required = false)
+    @Schema(description = "Errors")
     private List<String> errors;
 }

@@ -64,7 +64,7 @@ public class SecurityConfiguration {
         http
             .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
             .sessionManagement(s -> s.sessionCreationPolicy(STATELESS))
-            .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf.disable()) // NOSONAR
             .formLogin(fl -> fl.disable())
             .logout(l -> l.disable())
             .authorizeHttpRequests(aht -> aht.anyRequest().authenticated())

@@ -254,7 +254,7 @@ dependencyManagement {
     dependencySet(group: 'com.netflix.servo', version: '0.12.5') {
       entry 'servo-core'
     }
-    dependencySet(group: 'org.apache.groovy', version: '4.0.21') {
+    dependencySet(group: 'org.apache.groovy', version: '4.0.23') {
       entry 'groovy'
       entry 'groovy-xml'
       entry 'groovy-json'
@@ -408,6 +408,7 @@ dependencies {
   testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.22.2'
   testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.0.2'
   testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.3'
+  testImplementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath

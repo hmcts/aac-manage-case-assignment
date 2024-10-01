@@ -8,9 +8,7 @@
     </notes>
     <cve>CVE-2023-31582</cve>
     <cve>CVE-2022-45688</cve>
-    <cve>CVE-2023-1370</cve>
     <cve>CVE-2023-5072</cve>
-    <cve>CVE-2023-31582</cve>
     <cve>CVE-2023-34055</cve>
   </suppress>
 </suppressions>

@@ -1,18 +1,20 @@
 package uk.gov.hmcts.reform.managecase.api.payload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-@ApiModel("Case Assignment Response")
+@Schema(description = "Case Assignment Response")
 public class CaseAssignmentResponse {
 
     @JsonProperty("status_message")
-    @ApiModelProperty(value = "Domain Status Message", required = true,
+    @Schema(description = "Domain Status Message", 
+            requiredMode = RequiredMode.REQUIRED,
             example = "Role [Defendant] from the organisation policy successfully assigned to the assignee.")
     private String status;
 

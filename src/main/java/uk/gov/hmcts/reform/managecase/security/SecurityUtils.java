@@ -1,16 +1,18 @@
 package uk.gov.hmcts.reform.managecase.security;
 
-import com.auth0.jwt.JWT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
+
+import com.auth0.jwt.JWT;
+
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;

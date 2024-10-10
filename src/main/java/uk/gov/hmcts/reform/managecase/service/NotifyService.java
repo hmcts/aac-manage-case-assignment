@@ -6,7 +6,7 @@ import java.net.ConnectException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -49,7 +49,7 @@ public class NotifyService {
         return notificationStatuses;
     }
 
-    @Retryable(value = {ConnectException.class}, backoff = @Backoff(delay = 1000, multiplier = 3))
+    @Retryable(retryFor = {ConnectException.class}, backoff = @Backoff(delay = 1000, multiplier = 3))
     private EmailNotificationRequestSuccess sendNotification(EmailNotificationRequest request)
         throws NotificationClientException {
         validateRequest(request);

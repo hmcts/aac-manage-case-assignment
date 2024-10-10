@@ -6,6 +6,8 @@ management:
   endpoint:
     health:
       show-details: always
+      probes:
+        enabled: true
       cache:
         time-to-live: 10s
   endpoints:
@@ -13,9 +15,7 @@ management:
       base-path: /
       exposure:
         include: health, info, prometheus
-  health:
-    probes:
-      enabled: true
+
 spring:
   # CCD-3509 CVE-2021-22044 spring.mvc.pathmatch.matching-strategy = ant_path_matcher
   # required to fix null pointers in integration tests, conflict in Springfox after Springboot 2.6.10 upgrade
@@ -30,6 +30,7 @@ spring:
     import: "optional:configtree:/mnt/secrets/aac/"
   main:
     allow-bean-definition-overriding: true
+    web-application-type: SERVLET
   cache:
     cache-names: userInfoCache,usersByOrganisationExternal,usersByOrganisationInternal,organisationAddressById,systemUserAccessTokenCache,caaAccessTokenCache,nocApproverAccessTokenCache,caseRoles,challengeQuestions
     caffeine:
@@ -45,10 +46,27 @@ spring:
             client-id: internal
             client-secret: internal
   cloud:
+    gateway:
+      mvc:
+        http-client:
+          type: AUTODETECT
+        routes:
+          - id: data-store
+            uri: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
+            predicates:
+              - Path=/ccd/**
+            filters:
+              - AllowedRoutesFilter
+              - ValidateClientFilter
+              - RemoveResponseHeader=Cookie
+              - RemoveResponseHeader=Set-Cookie
+              - StripPrefix=1
     discovery:
       client:
         composite-indicator:
           enabled: false
+springdoc:
+  packagesToScan: uk.gov.hmcts.reform.managecase.api.controller
 idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
@@ -86,12 +104,6 @@ ccd:
     services:
       case_user_roles: aac_manage_case_assignment,xui_webapp
 
-zuul:
-  routes:
-    data-store:
-      path: /ccd/**
-      sensitiveHeaders: Cookie,Set-Cookie
-      url: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
 prd:
   host: ${PRD_HOST:http://localhost:5544}
   client:

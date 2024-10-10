@@ -10,7 +10,7 @@ This micro-service provides a set of APIs to manage case access.
 ## Getting Started
 
 ### Prerequisites
-- [JDK 17](https://java.com)
+- [JDK 21](https://java.com)
 
 ### Building
 The project uses [Gradle](https://gradle.org) as a build tool. It already contains

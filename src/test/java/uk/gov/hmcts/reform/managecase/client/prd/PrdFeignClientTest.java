@@ -1,32 +1,30 @@
 package uk.gov.hmcts.reform.managecase.client.prd;
 
 import feign.Request;
+import feign.RequestTemplate;
 import feign.Response;
 import feign.RetryableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.MockitoAnnotations.openMocks;
 
 class PrdFeignClientTest {
 
     PrdFeignClient prdFeignClient;
 
-    @Mock
-    Request request;
+    Request request = Request.create(Request.HttpMethod.GET, "url", Map.of(), null, new RequestTemplate());
 
     @BeforeEach
     void setUp() {
-        openMocks(this);
         prdFeignClient = new PrdFeignClient(null, null);
     }
 

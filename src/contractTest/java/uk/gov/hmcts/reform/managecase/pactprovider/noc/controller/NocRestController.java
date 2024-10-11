@@ -14,7 +14,13 @@ import org.hibernate.validator.constraints.LuhnCheck;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
@@ -118,14 +124,14 @@ public class NocRestController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE)
     })
     public ResponseEntity<String> getNoticeOfChangeQuestionsMethod2(@RequestParam("case_id")
-                                                                               @Valid
-                                                                               @NotEmpty(message = NoCValidationError.NOC_CASE_ID_EMPTY)
-                                                                               @Size(min = 16, max = 16, message =
-                                                                                   NoCValidationError.NOC_CASE_ID_INVALID_LENGTH)
-                                                                               @LuhnCheck(message =
-                                                                                   NoCValidationError.NOC_CASE_ID_INVALID,
-                                                                                   ignoreNonDigitCharacters = false)
-                                                                               String caseId) throws JsonProcessingException {
+                                                               @Valid
+                                                               @NotEmpty(message = NoCValidationError.NOC_CASE_ID_EMPTY)
+                                                               @Size(min = 16, max = 16, message =
+                                                                   NoCValidationError.NOC_CASE_ID_INVALID_LENGTH)
+                                                               @LuhnCheck(message =
+                                                                   NoCValidationError.NOC_CASE_ID_INVALID,
+                                                                   ignoreNonDigitCharacters = false)
+                                                               String caseId) throws JsonProcessingException {
         System.out.println("********** JCDEBUG: METHOD TWO: caseId = " + caseId);
 
         ChallengeQuestionsResult challengeQuestionsResult = noticeOfChangeQuestions.getChallengeQuestions(caseId);
@@ -133,7 +139,8 @@ public class NocRestController {
             System.out.println(objectMapper.writeValueAsString(challengeQuestionsResult));
             return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(challengeQuestionsResult));
         } else {
-            String jsonString = "{\"status\":\"BAD_REQUEST\",\"message\":\"Case ID has to be a valid 16-digit Luhn number\",\"code\":\"case-id-invalid\"}";
+            String jsonString = "{\"status\":\"BAD_REQUEST\",\"message\":\"Case ID has to be a valid 16-digit Luhn "
+                + "number\",\"code\":\"case-id-invalid\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(jsonString);
         }
     }
@@ -173,11 +180,16 @@ public class NocRestController {
 
         if ("1234567890123456".equals(caseId)) {
             System.out.println("**** JCDEBUG: Returning OK");
-            String jsonString = "{\"questions\":[{\"case_type_id\":\"Probate\",\"order\":\"1\",\"question_text\":\"What is their Email?\",\"answer_field_type\":{\"id\":\"Email\",\"type\":\"Email\",\"min\":0,\"max\":10,\"regular_expression\":\"asdsa\",\"collection_field_type\":\"type\"},\"display_context_parameter\":\"1\",\"challenge_question_id\":\"NoC\",\"answer_field\":\"\",\"question_id\":\"QuestionId67745\"}]}";
+            String jsonString = "{\"questions\":[{\"case_type_id\":\"Probate\",\"order\":\"1\",\"question_text\":\""
+                + "What is their Email?\",\"answer_field_type\":{\"id\":\"Email\",\"type\":\"Email\",\"min\":0,\"max\":"
+                + "10,\"regular_expression\":\"asdsa\",\"collection_field_type\":\"type\"},\""
+                + "display_context_parameter\":\"1\",\"challenge_question_id\":\"NoC\",\"answer_field\":\"\",\""
+                + "question_id\":\"QuestionId67745\"}]}";
             return ResponseEntity.status(HttpStatus.OK).body(jsonString);
         } else {
             System.out.println("**** JCDEBUG: Returning BAD_REQUEST");
-            String jsonString = "{\"status\":\"BAD_REQUEST\",\"message\":\"Case ID has to be a valid 16-digit Luhn number\",\"code\":\"case-id-invalid\"}";
+            String jsonString = "{\"status\":\"BAD_REQUEST\",\"message\":\"Case ID has to be a valid 16-digit Luhn "
+                + "number\",\"code\":\"case-id-invalid\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(jsonString);
         }
     }
@@ -206,7 +218,8 @@ public class NocRestController {
     public ResponseEntity<String> requestNoticeOfChange(@Valid @RequestBody RequestNoticeOfChangeRequest
                                                                 requestNoticeOfChangeRequest) {
 
-        String jsonString = "{\"approval_status\":\"APPROVED\",\"case_role\":\"[Claimant]\",\"status_message\":\"Notice of request has been successfully submitted.\"}";
+        String jsonString = "{\"approval_status\":\"APPROVED\",\"case_role\":\"[Claimant]\",\"status_message\":\""
+            + "Notice of request has been successfully submitted.\"}";
         return ResponseEntity.status(HttpStatus.CREATED).body(jsonString);
     }
 
@@ -231,9 +244,11 @@ public class NocRestController {
             })
     })
     @PostMapping(path = "/verify-noc-answers", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> verifyNoticeOfChangeAnswers(@Valid @RequestBody VerifyNoCAnswersRequest verifyNoCAnswersRequest) {
+    public ResponseEntity<String> verifyNoticeOfChangeAnswers(@Valid @RequestBody VerifyNoCAnswersRequest
+                                                                      verifyNoCAnswersRequest) {
 
-        String jsonString = "{\"organisation\":{\"OrganisationID\":\"QUK822NA\",\"OrganisationName\":\"Some Org\"},\"status_message\":\"Notice of Change answers verified successfully\"}";
+        String jsonString = "{\"organisation\":{\"OrganisationID\":\"QUK822NA\",\"OrganisationName\":\"Some Org\"},\""
+            + "status_message\":\"Notice of Change answers verified successfully\"}";
         return ResponseEntity.status(HttpStatus.CREATED).body(jsonString);
     }
 }

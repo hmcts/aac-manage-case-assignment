@@ -19,7 +19,12 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQues
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.pactprovider.noc.controller.NocRestController;
-import uk.gov.hmcts.reform.managecase.service.noc.*;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
+import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
+import uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService;
+import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
+import uk.gov.hmcts.reform.managecase.service.noc.ApplyNoCDecisionService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.util.ArrayList;
@@ -31,15 +36,20 @@ import static org.mockito.Mockito.when;
 /*
  * **** WORK IN PROGRESS ****
  * Three ways of running this Provider Test :-
- * [1] Set useProxyRestController = false                       -- Uses actual Rest Controller  ,  now passes with changes to JSON below
- * [2] Set useProxyRestController = true and activate method 1  -- Uses proxy  Rest Controller  ,  passes
- * [3] Set useProxyRestController = true and activate method 2  -- Uses proxy  Rest Controller  ,  now passes with changes to JSON below
+ * [1] Set useProxyRestController = false                       -- Uses actual Rest Controller ,
+ *                                                                 passes with changes to JSON below.
+ * [2] Set useProxyRestController = true and activate method 1  -- Uses proxy  Rest Controller  ,  passes.
+ * [3] Set useProxyRestController = true and activate method 2  -- Uses proxy  Rest Controller  ,
+ *                                                                 passes with changes to JSON below.
  *
  * The PactFolder JSON file currently only contains ONE test (providerState "a case with id 1234567890123456 exist").
  *                                                  ^^^
- * Changes made to JSON file :-  Updated order from "1" to 1                    -- reasonable because ChallengeQuestion order is Integer
- *                               Updated min & max from 0 & 10 to "0" & "10"    -- reasonable because FieldType min & max are String
- *                               Removed collection_field_type  (temporarily?)  -- because FieldType collectionFieldType is NOT String
+ * Changes made to JSON file :-
+ *     Updated order from "1" to 1                    -- reasonable because ChallengeQuestion order is Integer.
+ *     Updated min & max from 0 & 10 to "0" & "10"    -- reasonable because FieldType min & max are String.
+ *     Removed collection_field_type  (temporarily?)  -- because FieldType collectionFieldType is NOT String.
+ *
+ * Next thing to investigate:  LuhnCheck
  */
 
 @Provider("acc_manageCaseAssignment_Noc")
@@ -69,7 +79,11 @@ public class NocProviderTest {
             testTarget.setControllers(new NocRestController(mockNoticeOfChangeQuestions));
         } else {
             // Or use ACTUAL Rest Controller :-
-            testTarget.setControllers(new NoticeOfChangeController(mockNoticeOfChangeQuestions, mockNoticeOfChangeApprovalService, mockVerifyNoCAnswersService, mockPrepareNoCService, mockRequestNoticeOfChangeService, mockApplyNoCDecisionService, mockJacksonUtils));
+            testTarget.setControllers(new NoticeOfChangeController(mockNoticeOfChangeQuestions,
+                                                                   mockNoticeOfChangeApprovalService,
+                                                                   mockVerifyNoCAnswersService, mockPrepareNoCService,
+                                                                   mockRequestNoticeOfChangeService,
+                                                                   mockApplyNoCDecisionService, mockJacksonUtils));
         }
         if (context != null) {
             context.setTarget(testTarget);

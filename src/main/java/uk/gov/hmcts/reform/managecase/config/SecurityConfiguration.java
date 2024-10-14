@@ -46,7 +46,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/health/readiness",
         "/info",
         "/favicon.ico",
-        "/"
+        "/",
+        "/jctest1",
+        "/jctest2",
+        "/jctest3"
     };
 
     @Autowired

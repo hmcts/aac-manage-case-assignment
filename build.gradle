@@ -179,7 +179,7 @@ tasks.register('contract', Test) {
   useJUnitPlatform()
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
-  include "uk/gov/hmcts/reform/managecase/api/controller/provider/**"
+  include "uk/gov/hmcts/reform/managecase/pactprovider"
 }
 
 tasks.register('runProviderPactVerification', Test) {

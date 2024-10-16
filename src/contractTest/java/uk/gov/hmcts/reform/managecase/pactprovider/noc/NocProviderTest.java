@@ -33,19 +33,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-/*
- * CHANGES MAKE TO JSON FILE "INTERACTION 1" :-
- *     Updated order from "1" to 1                    -- because ChallengeQuestion order is Integer.
- *     Updated min & max from 0 & 10 to "0" & "10"    -- because FieldType min & max are String.
- *     Removed collection_field_type  (temporarily?)  -- because FieldType collectionFieldType is NOT String.
- */
-
 @Provider("acc_manageCaseAssignment_Noc")
 @PactBroker(
     url = "${PACT_BROKER_FULL_URL:http://localhost:9292}",
     consumerVersionSelectors = {@VersionSelector(tag = "master")})
 @IgnoreNoPactsToVerify
-//@PactFolder("target/pacts/reform/acc_manageCaseAssignment_noc")
 @ExtendWith(SpringExtension.class)
 public class NocProviderTest {
 

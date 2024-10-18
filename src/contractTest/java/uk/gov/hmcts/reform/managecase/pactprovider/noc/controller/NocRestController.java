@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
-
+import org.json.JSONObject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -82,8 +82,7 @@ public class NocRestController {
         if (challengeQuestionsResult != null) {
             return ResponseEntity.status(HttpStatus.OK).body(challengeQuestionsResult);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("", "", "",
-                                                                                     new String[]{}));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest().toString());
         }
     }
 
@@ -120,8 +119,7 @@ public class NocRestController {
         if (requestNoticeOfChangeResponse != null) {
             return ResponseEntity.status(HttpStatus.CREATED).body(requestNoticeOfChangeResponse);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("", "", "",
-                                                                                     new String[]{}));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest().toString());
         }
     }
 
@@ -154,8 +152,17 @@ public class NocRestController {
         if (verifyNoCAnswersResponse != null) {
             return ResponseEntity.status(HttpStatus.OK).body(verifyNoCAnswersResponse);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("", "", "",
-                                                                                     new String[]{}));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badRequest().toString());
         }
+    }
+
+    private JSONObject badRequest() {
+        return new JSONObject() {{
+                put("status", "");
+                put("message", "");
+                put("code", "");
+                put("errors", new String[]{});
+            }
+        };
     }
 }

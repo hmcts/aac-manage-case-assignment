@@ -368,6 +368,8 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamJavaClient
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.10.RELEASE'
 
+  implementation group: 'org.json', name: 'json', version: '20240303'
+
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE"
   implementation "net.minidev:json-smart:2.4.9"
 

@@ -10,7 +10,6 @@
 	],
 
 	"expectedResponse": {
-		"_extends_": "ACA_400_Response",
-		"body": null
+		"_extends_": "ACA_400_Response"
 	}
 }

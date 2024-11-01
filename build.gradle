@@ -1,7 +1,7 @@
 plugins {
   id 'application'
   id 'jacoco'
-  id 'io.spring.dependency-management' version '1.1.5'
+  id 'io.spring.dependency-management' version '1.1.6'
   id 'org.springframework.boot' version '3.3.0'
   id 'uk.gov.hmcts.java' version '0.12.63'
   id 'com.github.ben-manes.versions' version '0.51.0'
@@ -22,7 +22,7 @@ group = 'uk.gov.hmcts.reform'
 
 java {
   toolchain {
-    languageVersion = JavaLanguageVersion.of(17)
+    languageVersion = JavaLanguageVersion.of(21)
   }
 }
 
@@ -286,20 +286,10 @@ def versions = [
   junitPlatform   : '1.9.3',
   reformLogging   : '6.1.4',
   restAssured    : '5.3.2',
-  lombok  : '1.18.28',
+  lombok  : '1.18.30',
   pact_version    : '4.1.43',
   serviceAuthVersion : '5.1.4',
   idamJavaClient : '2.0.1',
-]
-
-ext.libraries = [
-  junit5: [
-    "org.junit.jupiter:junit-jupiter-api:${versions.junit}",
-    "org.junit.jupiter:junit-jupiter-engine:${versions.junit}",
-    "org.junit.jupiter:junit-jupiter-params:${versions.junit}",
-    "org.junit.platform:junit-platform-commons:${versions.junitPlatform}",
-    "org.junit.platform:junit-platform-engine:${versions.junitPlatform}"
-  ]
 ]
 
 configurations.all {
@@ -344,7 +334,6 @@ dependencies {
 
   implementation group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.4'
   implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.5.20'
-
 
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -417,9 +406,8 @@ dependencies {
   functionalTestImplementation sourceSets.test.runtimeClasspath
 
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
-  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
   contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
-  contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
+
   contractTestImplementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'
 
   contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version

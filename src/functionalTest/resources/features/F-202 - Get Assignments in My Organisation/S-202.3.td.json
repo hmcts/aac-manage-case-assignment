@@ -11,6 +11,12 @@
 
 	"expectedResponse": {
 		"_extends_": "ACA_400_Response",
-		"body": "[[ANY_NULLABLE]]"
+		"body": {
+			"status": "400",
+			"type": "Bad Request",
+			"title": "Case ID is missing",
+			"detail": "Case ID is required to get assignments in an organisation",
+			"instance": "/case-users"
+		}
 	}
 }

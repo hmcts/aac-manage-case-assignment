@@ -11,6 +11,6 @@
 
 	"expectedResponse": {
 		"_extends_": "ACA_400_Response",
-		"body": "[[ANYTHING_PRESENT]]"
+		"body": "[[ANY_NULLABLE]]"
 	}
 }

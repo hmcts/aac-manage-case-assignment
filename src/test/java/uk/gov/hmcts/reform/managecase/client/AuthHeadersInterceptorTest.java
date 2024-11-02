@@ -29,7 +29,7 @@ class AuthHeadersInterceptorTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         template = new RequestTemplate();
     }
 

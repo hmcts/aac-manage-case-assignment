@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.managecase.client.definitionstore.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-@ApiModel(description = "Case role of a Case Type")
+@Schema(description = "Case role of a Case Type")
 public class CaseRole {
 
     @JsonProperty("id")

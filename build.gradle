@@ -7,7 +7,7 @@ plugins {
   id 'com.github.ben-manes.versions' version '0.51.0'
   id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
   id 'org.sonarqube' version '5.0.0.4638'
-  id 'au.com.dius.pact' version '4.1.7'
+  id 'au.com.dius.pact' version '4.3.12'
 }
 
 ext {
@@ -179,7 +179,7 @@ tasks.register('contract', Test) {
   useJUnitPlatform()
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
-  include "uk/gov/hmcts/reform/managecase/api/controller/provider/**"
+  include "uk/gov/hmcts/reform/managecase/pactprovider"
 }
 
 tasks.register('runProviderPactVerification', Test) {
@@ -280,8 +280,9 @@ def versions = [
   springBoot      : springBoot.class.package.implementationVersion,
   springfoxSwagger: '3.0.0',
   restAssured    : '4.3.1',
+  lombok  : '1.18.28',
   lombok  : '1.18.30',
-  pact_version    : '4.1.7',
+  pact_version    : '4.3.4',
   serviceAuthVersion : '4.0.3',
   idamJavaClient : '2.0.1',
 ]

@@ -427,9 +427,7 @@ dependencies {
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
 
-  contractTestImplementation (group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version) {
-    exclude group: 'org.json', module: 'json'
-  }
+  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
   contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
 
   contractTestImplementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'

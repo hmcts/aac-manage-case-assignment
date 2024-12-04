@@ -315,6 +315,11 @@ dependencies {
         strictly '1.77'
       }
     }
+    implementation('org.json:json') {
+      version {
+        strictly '20240303'
+      }
+    }
 
   implementation 'com.google.code.gson:gson:2.8.9'
   implementation group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.1.3'
@@ -422,7 +427,9 @@ dependencies {
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath
 
-  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
+  contractTestImplementation (group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version) {
+    exclude group: 'org.json', module: 'json'
+  }
   contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
 
   contractTestImplementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'

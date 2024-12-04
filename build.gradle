@@ -315,6 +315,11 @@ dependencies {
         strictly '1.77'
       }
     }
+    implementation('org.json:json') {
+      version {
+        strictly '20240303'
+      }
+    }
 
   implementation 'com.google.code.gson:gson:2.8.9'
   implementation group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.1.3'

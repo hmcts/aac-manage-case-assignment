@@ -350,6 +350,8 @@ dependencies {
     }
   }
 
+  def withoutJsonSmart = { exclude group: 'net.minidev', module: 'json-smart' }
+
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
@@ -370,12 +372,8 @@ dependencies {
 
   implementation group: 'org.json', name: 'json', version: '20240303'
 
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE"
-  constraints {
-    implementation('net.minidev:json-smart:2.4.9') {
-      because '2.5.2 not found and causing pipeline build to fail'
-    }
-  }
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE", withoutJsonSmart
+  implementation "com.nimbusds:oauth2-oidc-sdk:9.35", withoutJsonSmart
 
   // Explicitly specify version of jakarta.el to be used to resolve CVE-2021-28170
   implementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.1'
@@ -383,17 +381,8 @@ dependencies {
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.security:spring-security-config"
 
-  //implementation ("org.springframework.boot:spring-boot-starter-oauth2-client:2.5.15") {
-  //  exclude group: 'net.minidev', module: 'json-smart' //fix nightly build failures
-  //}
 
-  implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.5.15'
-  constraints {
-    implementation('net.minidev:json-smart:2.4.9') {
-      because '2.5.2 not found and causing pipeline build to fail'
-    }
-  }
-
+  implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.5.15', withoutJsonSmart
 
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.5.15"
 

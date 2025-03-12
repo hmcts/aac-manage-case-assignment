@@ -71,6 +71,7 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.oneOf;
@@ -920,20 +921,20 @@ public class NoticeOfChangeControllerTest {
                                      .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(content().string("{\"data\":{\"ChangeOrganisationRequest\":"
-                                                + "{\"OrganisationToAdd\":null,"
-                                                + "\"OrganisationToRemove\":null,"
-                                                + "\"CaseRoleId\":null,"
-                                                + "\"RequestTimestamp\":null,"
-                                                + "\"ApprovalStatus\":null,"
-                                                + "\"CreatedBy\":null}},"
-                                                + "\"state\":null,"
-                                                + "\"errors\":null,"
-                                                + "\"warnings\":null,"
-                                                + "\"data_classification\":null,"
-                                                + "\"security_classification\":null,"
-                                                + "\"significant_item\":null"
-                                                + "}"));
+                .andExpect(jsonPath("$.data.length()", is(1)))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequest.OrganisationToAdd").hasJsonPath())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequest.OrganisationToAdd").value(nullValue()))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequest.OrganisationToRemove").value(nullValue()))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequest.CaseRoleId").value(nullValue()))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequest.RequestTimestamp").value(nullValue()))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequest.ApprovalStatus").value(nullValue()))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequest.CreatedBy").value(nullValue()))
+                .andExpect(jsonPath("$.state").value(nullValue()))
+                .andExpect(jsonPath("$.errors").value(nullValue()))
+                .andExpect(jsonPath("$.warnings").value(nullValue()))
+                .andExpect(jsonPath("$.data_classification").value(nullValue()))
+                .andExpect(jsonPath("$.security_classification").value(nullValue()))
+                .andExpect(jsonPath("$.significant_item").value(nullValue()));
         }
     }
 

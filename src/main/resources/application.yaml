@@ -10,6 +10,9 @@ management:
         enabled: true
       cache:
         time-to-live: 10s
+  health:
+    ssl:
+      enabled: false
   endpoints:
     web:
       base-path: /

@@ -6,13 +6,14 @@ import java.util.List;
 import java.util.Collection;
 
 import org.springframework.cloud.gateway.server.mvc.common.Shortcut;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.function.HandlerFilterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.AccessException;
 
 import static org.springframework.cloud.gateway.server.mvc.common.MvcUtils.getApplicationContext;
+import org.springframework.web.server.ResponseStatusException;
 
 public interface AllowedRoutesFilter {
 
@@ -37,7 +38,7 @@ public interface AllowedRoutesFilter {
 
             if (ccdDataStoreAllowedUrls.stream().noneMatch(uri::matches)
                 && ccdDefinitionStoreAllowedUrls.stream().noneMatch(uri::matches)) {
-                throw new AccessException("Uri not allowed: " + uri);
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Uri not allowed: " + uri);
             }
             
             return next.handle(request);

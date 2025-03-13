@@ -6,12 +6,13 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.server.mvc.common.Shortcut;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.function.HandlerFilterFunction;
 import org.springframework.web.servlet.function.ServerRequest;
 import org.springframework.web.servlet.function.ServerResponse;
 
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.AccessException;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import static org.springframework.cloud.gateway.server.mvc.common.MvcUtils.getApplicationContext;
@@ -34,7 +35,7 @@ public interface ValidateClientFilter {
                     || !applicationParams.getCcdDefinitionStoreAllowedService().equals(service)) {
                 String errorMessage = String.format("forbidden client id %s for the /ccd endpoint", service);
                 log.debug(errorMessage);
-                throw new AccessException(errorMessage);
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
             }
 
             ServerRequest withHeaders = ServerRequest

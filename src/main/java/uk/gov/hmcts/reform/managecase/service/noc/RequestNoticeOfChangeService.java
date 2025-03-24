@@ -222,8 +222,12 @@ public class RequestNoticeOfChangeService {
             String invokersOrganisationJson = objectMapper.writeValueAsString(invokersOrganisation);
             log.info("caseRoleId: {}, invokersOrganisation: {}", caseRoleId, invokersOrganisationJson);
 
-            String changeOrganisationRequestJson = objectMapper.writeValueAsString(changeOrganisationRequest);
-            log.info("changeOrganisationRequest details: {}", changeOrganisationRequestJson);
+            if (changeOrganisationRequest.isPresent()) {
+                String changeOrganisationRequestJson = objectMapper.writeValueAsString(changeOrganisationRequest.get());
+                log.info("changeOrganisationRequest details: {}", changeOrganisationRequestJson);
+            } else {
+                log.info("changeOrganisationRequest details IN Object: {}", changeOrganisationRequest);
+            }
         } catch (JsonProcessingException e) {
             log.warn("Error converting caseDetails to JSON", e);
         }

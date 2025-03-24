@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseAccessMetadataResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 
@@ -28,6 +29,7 @@ public interface DataStoreApiClient {
     String CASE_USERS_SEARCH = CASE_USERS + "/search";
     String INTERNAL_CASES = "/internal/cases/{caseId}";
     String START_EVENT_TRIGGER = INTERNAL_CASES + "/event-triggers/{eventId}";
+    String CASES_WITH_ID_ACCESS_METADATA = INTERNAL_CASES + "/access-metadata";
     String SUBMIT_EVENT_FOR_CASE = CASES_WITH_ID + "/events";
     String EXTERNAL_START_EVENT_TRIGGER = "/cases/{caseId}/event-triggers/{eventId}";
     String SUPPLEMENTARY_UPDATE = "/cases/{caseId}/supplementary-data";
@@ -44,6 +46,11 @@ public interface DataStoreApiClient {
 
     @DeleteMapping(value = CASE_USERS, consumes = APPLICATION_JSON_VALUE)
     void removeCaseUserRoles(@RequestBody CaseUserRolesRequest userRolesRequest);
+
+    @GetMapping(CASES_WITH_ID_ACCESS_METADATA)
+    CaseAccessMetadataResource getCaseAccessMetadataByCaseId(
+        @RequestHeader(AUTHORIZATION) String userAuthorizationHeader,
+        @PathVariable(CASE_ID) String caseId);
 
     @GetMapping(START_EVENT_TRIGGER)
     CaseUpdateViewEvent getStartEventTrigger(@RequestHeader(AUTHORIZATION) String userAuthorizationHeader,

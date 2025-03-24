@@ -229,8 +229,12 @@ public class RequestNoticeOfChangeService {
         }
 
         log.info("changeOrganisationRequest.isPresent: {}", changeOrganisationRequest.isPresent());
-        // log.info("changeOrganisationRequest.get().getCaseRoleId: {}", changeOrganisationRequest.get().getCaseRoleId
-        // ());
+        var result = changeOrganisationRequest.isPresent() ? changeOrganisationRequest.get().getCaseRoleId() : "-";
+        log.info("changeOrganisationRequest.get().getCaseRoleId: {}", result);
+        changeOrganisationRequest.ifPresent(organisationRequest -> log.info(
+            "changeOrganisationRequest.get().getCaseRoleId 2: {}",
+            organisationRequest.getCaseRoleId() == null
+        ));
 
         return changeOrganisationRequest.isPresent()
             && changeOrganisationRequest.get().getCaseRoleId() == null

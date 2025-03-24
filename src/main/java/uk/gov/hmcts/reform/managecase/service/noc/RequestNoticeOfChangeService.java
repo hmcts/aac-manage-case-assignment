@@ -229,7 +229,8 @@ public class RequestNoticeOfChangeService {
         }
 
         log.info("changeOrganisationRequest.isPresent: {}", changeOrganisationRequest.isPresent());
-        log.info("changeOrganisationRequest.get().getCaseRoleId: {}", changeOrganisationRequest.get().getCaseRoleId());
+        // log.info("changeOrganisationRequest.get().getCaseRoleId: {}", changeOrganisationRequest.get().getCaseRoleId
+        // ());
 
         return changeOrganisationRequest.isPresent()
             && changeOrganisationRequest.get().getCaseRoleId() == null

@@ -217,8 +217,19 @@ public class RequestNoticeOfChangeService {
                                                       String caseRoleId) {
         Optional<ChangeOrganisationRequest> changeOrganisationRequest = getChangeOrganisationRequest(caseDetails);
 
-        log.info("caseRoleId: {}, invokersOrganisation: {}", caseRoleId, invokersOrganisation);
-        log.info("changeOrganisationRequest details: {}", changeOrganisationRequest);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String invokersOrganisationJson = objectMapper.writeValueAsString(invokersOrganisation);
+            log.info("caseRoleId: {}, invokersOrganisation: {}", caseRoleId, invokersOrganisationJson);
+
+            String changeOrganisationRequestJson = objectMapper.writeValueAsString(changeOrganisationRequest);
+            log.info("changeOrganisationRequest details: {}", changeOrganisationRequestJson);
+        } catch (JsonProcessingException e) {
+            log.warn("Error converting caseDetails to JSON", e);
+        }
+
+        log.info("changeOrganisationRequest.isPresent: {}", changeOrganisationRequest.isPresent());
+        log.info("changeOrganisationRequest.get().getCaseRoleId: {}", changeOrganisationRequest.get().getCaseRoleId());
 
         return changeOrganisationRequest.isPresent()
             && changeOrganisationRequest.get().getCaseRoleId() == null
@@ -249,7 +260,9 @@ public class RequestNoticeOfChangeService {
     private boolean isRequestToAddOrReplaceRepresentationAndApproved(CaseDetails caseDetails,
                                                                      Organisation organisation,
                                                                      String caseRoleId) {
-        return findInvokerOrgPolicyRoles(caseDetails, organisation).contains(caseRoleId);
+        var result = findInvokerOrgPolicyRoles(caseDetails, organisation).contains(caseRoleId);
+        log.info("isRequestToAddOrReplaceRepresentationAndApproved: {}", result);
+        return result;
     }
 
     private List<OrganisationPolicy> findPolicies(CaseDetails caseDetails) {

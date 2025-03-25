@@ -348,13 +348,6 @@ class RequestNoticeOfChangeServiceTest {
         caseDetails.setJurisdiction(JURISDICTION_ONE);
         nocAutoApprovedByAdminOrSolicitor(true);
 
-        CaseAccessMetadataResource caseAccessMetadataResource = CaseAccessMetadataResource.builder()
-            .accessGrants(List.of(
-                GrantType.SPECIFIC,GrantType.BASIC
-            ))
-            .accessProcess(GrantType.STANDARD.name())
-            .build();
-
         given(dataStoreRepository.findCaseAccessMetadataByCaseId(CASE_ID)).willReturn(null);
 
         RequestNoticeOfChangeResponse requestNoticeOfChangeResponse

@@ -733,7 +733,7 @@ class DataStoreRepositoryTest {
     }
 
     @Test
-    @DisplayName("Should throw CaseCouldNotBeFoundException when Find case by caseId")
+    @DisplayName("Should throw CaseCouldNotBeFoundException when Get Case AccessMetadata By CaseId")
     void shouldThrowCaseNotFoundExceptionForGetCaseAccessMetadataByCaseId() {
         // ARRANGE
         Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null,
@@ -751,7 +751,7 @@ class DataStoreRepositoryTest {
     }
 
     @Test
-    @DisplayName("Should throw FeignException  when Find case by caseId")
+    @DisplayName("Should throw FeignException  when Get Case AccessMetadata By CaseId")
     void shouldThrowCFeignExceptionForGetCaseAccessMetadataByCaseId() {
         // ARRANGE
         Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null,

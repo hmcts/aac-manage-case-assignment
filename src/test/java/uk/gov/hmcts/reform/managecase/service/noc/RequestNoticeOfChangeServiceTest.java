@@ -317,7 +317,7 @@ class RequestNoticeOfChangeServiceTest {
 
     @Test
     @DisplayName("Do not Generate a Notice Of Change Request with approval and Auto assignment of case roles")
-    void testApprovalNotComplete() {
+    void testUserNotAssignedCaserole() {
         caseDetails.setJurisdiction(JURISDICTION_ONE);
         nocAutoApprovedByAdminOrSolicitor(true);
 
@@ -342,6 +342,32 @@ class RequestNoticeOfChangeServiceTest {
         assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(APPROVED);
     }
 
+    @Test
+    @DisplayName("Do not Generate a Notice Of Change Request with approval and Auto assignment of case roles")
+    void testUserNotAssignedCaseroleWhenAccessMetadataNull() {
+        caseDetails.setJurisdiction(JURISDICTION_ONE);
+        nocAutoApprovedByAdminOrSolicitor(true);
+
+        CaseAccessMetadataResource caseAccessMetadataResource = CaseAccessMetadataResource.builder()
+            .accessGrants(List.of(
+                GrantType.SPECIFIC,GrantType.BASIC
+            ))
+            .accessProcess(GrantType.STANDARD.name())
+            .build();
+
+        given(dataStoreRepository.findCaseAccessMetadataByCaseId(CASE_ID)).willReturn(null);
+
+        RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
+            = service.requestNoticeOfChange(noCRequestDetails);
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<String> caseIdCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(dataStoreRepository).findCaseAccessMetadataByCaseId(caseIdCaptor.capture());
+
+        assertThat(caseIdCaptor.getValue()).isEqualTo(CASE_ID);
+        assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(APPROVED);
+    }
 
     @Test
     @DisplayName("Generate a Notice Of Change Request with approval but no Auto assignment of case roles")

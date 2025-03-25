@@ -138,14 +138,11 @@ class RequestNoticeOfChangeServiceTest {
         List<CaseRole> caseRoles = List.of(CaseRole.builder().id(CASE_ASSIGNED_ROLE).name(DYNAMIC_LIST_LABEL).build());
         given(definitionStoreRepository.caseRoles(anyString(), anyString(), anyString())).willReturn(caseRoles);
 
-        // :: data store stub data
-        List<GrantType> accessGrants = accessGrants = List.of(
-            GrantType.SPECIFIC,GrantType.BASIC
-        );
-        String accessProcess = accessProcess = GrantType.SPECIFIC.name();
         CaseAccessMetadataResource caseAccessMetadataResource = CaseAccessMetadataResource.builder()
-            .accessGrants(accessGrants)
-            .accessProcess(accessProcess)
+            .accessGrants(List.of(
+                GrantType.SPECIFIC,GrantType.BASIC
+            ))
+            .accessProcess(GrantType.SPECIFIC.name())
             .build();
 
         given(dataStoreRepository.findCaseAccessMetadataByCaseId(CASE_ID)).willReturn(caseAccessMetadataResource);
@@ -340,10 +337,7 @@ class RequestNoticeOfChangeServiceTest {
             = service.requestNoticeOfChange(noCRequestDetails);
 
         @SuppressWarnings("unchecked")
-        ArgumentCaptor<List<String>> caseRolesCaptor = ArgumentCaptor.forClass(List.class);
         ArgumentCaptor<String> caseIdCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> userIdCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> organisationIdCaptor = ArgumentCaptor.forClass(String.class);
 
         verify(dataStoreRepository).findCaseAccessMetadataByCaseId(caseIdCaptor.capture());
 

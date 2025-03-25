@@ -732,6 +732,41 @@ class DataStoreRepositoryTest {
 
     }
 
+    @Test
+    @DisplayName("Should throw CaseCouldNotBeFoundException when Find case by caseId")
+    void shouldThrowCaseNotFoundExceptionForGetCaseAccessMetadataByCaseId() {
+        // ARRANGE
+        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null,
+                                         Charset.defaultCharset(), null
+        );
+        given(dataStoreApi.getCaseAccessMetadataByCaseId((anyString()), anyString()))
+            .willThrow(new FeignException.NotFound("404", request, null,
+                                                   new HashMap<String, Collection<String>>()));
+
+        // ACT & ASSERT
+        assertThatThrownBy(() -> repository.findCaseAccessMetadataByCaseId(CASE_ID))
+            .isInstanceOf(CaseCouldNotBeFoundException.class)
+            .hasMessageContaining(CASE_NOT_FOUND);
+
+    }
+
+    @Test
+    @DisplayName("Should throw FeignException  when Find case by caseId")
+    void shouldThrowCFeignExceptionForGetCaseAccessMetadataByCaseId() {
+        // ARRANGE
+        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null,
+                                         Charset.defaultCharset(), null
+        );
+        given(dataStoreApi.getCaseAccessMetadataByCaseId(anyString(), anyString()))
+            .willThrow(new FeignException.InternalServerError("500", request, null,
+                                                              new HashMap<String, Collection<String>>()));
+
+        // ACT & ASSERT
+        assertThatThrownBy(() -> repository.findCaseAccessMetadataByCaseId(CASE_ID))
+            .isInstanceOf(FeignException.class);
+
+    }
+
     private String getOrgUserCountSupDataKey(String organisationId) {
         return "orgs_assigned_users." + organisationId;
     }

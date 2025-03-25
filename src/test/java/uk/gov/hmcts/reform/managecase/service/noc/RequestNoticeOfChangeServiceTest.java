@@ -321,14 +321,11 @@ class RequestNoticeOfChangeServiceTest {
         caseDetails.setJurisdiction(JURISDICTION_ONE);
         nocAutoApprovedByAdminOrSolicitor(true);
 
-        // :: data store stub data
-        List<GrantType> accessGrants = accessGrants = List.of(
-            GrantType.SPECIFIC,GrantType.BASIC
-        );
-        String accessProcess = accessProcess = GrantType.STANDARD.name();
         CaseAccessMetadataResource caseAccessMetadataResource = CaseAccessMetadataResource.builder()
-            .accessGrants(accessGrants)
-            .accessProcess(accessProcess)
+            .accessGrants(List.of(
+                GrantType.SPECIFIC,GrantType.BASIC
+            ))
+            .accessProcess(GrantType.STANDARD.name())
             .build();
 
         given(dataStoreRepository.findCaseAccessMetadataByCaseId(CASE_ID)).willReturn(caseAccessMetadataResource);

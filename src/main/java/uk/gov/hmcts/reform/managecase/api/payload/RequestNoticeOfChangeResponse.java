@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.managecase.api.payload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import lombok.Builder;
 import lombok.Getter;
 import uk.gov.hmcts.reform.managecase.domain.ApprovalStatus;
@@ -11,21 +11,24 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 
 @Getter
 @Builder
-@ApiModel("Request Notice Of Change Response")
+@Schema(description = "Request Notice Of Change Response")
 public class RequestNoticeOfChangeResponse {
 
     @JsonProperty("status_message")
-    @ApiModelProperty(value = "Domain Status Message", required = true,
+    @Schema(description = "Domain Status Message", 
+            requiredMode = RequiredMode.REQUIRED,
         example = REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)
     private final String status;
 
     @JsonProperty("case_role")
-    @ApiModelProperty(value = "Case Role", required = true,
+    @Schema(description = "Case Role", 
+            requiredMode = RequiredMode.REQUIRED,
         example = "\"[Claimant]\"")
     private final String caseRole;
 
     @JsonProperty("approval_status")
-    @ApiModelProperty(value = "Approval status", required = true,
+    @Schema(description = "Approval status", 
+            requiredMode = RequiredMode.REQUIRED,
         example = "APPROVED")
     private final ApprovalStatus approvalStatus;
 }

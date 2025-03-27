@@ -1,0 +1,3 @@
+org.springframework.cloud.gateway.server.mvc.filter.FilterSupplier=\
+  uk.gov.hmcts.reform.managecase.gatewayfilters.AllowedRoutesFilter.FilterSupplier,\
+  uk.gov.hmcts.reform.managecase.gatewayfilters.ValidateClientFilter.FilterSupplier

@@ -237,7 +237,8 @@ public class RequestNoticeOfChangeService {
         CaseAccessMetadataResource caseAccessMetadataResource =
             dataStoreRepository.findCaseAccessMetadataByCaseId(caseDetails.getId());
         if (caseAccessMetadataResource != null
-            && !caseAccessMetadataResource.getAccessProcess().equals(GrantType.STANDARD.toString())) {
+            && !caseAccessMetadataResource.getAccessGrants().stream()
+            .anyMatch(grantType -> GrantType.STANDARD.toString().equals(grantType))) {
             dataStoreRepository.assignCase(
                 invokerOrgPolicyRoles, caseDetails.getId(),
                 securityUtils.getUserInfo().getUid(), invokersOrganisation.getOrganisationID()

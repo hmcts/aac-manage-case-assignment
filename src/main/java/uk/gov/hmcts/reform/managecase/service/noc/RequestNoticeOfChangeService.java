@@ -1,11 +1,15 @@
 package uk.gov.hmcts.reform.managecase.service.noc;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -35,6 +39,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidation
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
+@Slf4j
 @Service
 public class RequestNoticeOfChangeService {
 
@@ -48,6 +53,7 @@ public class RequestNoticeOfChangeService {
     private final PrdRepository prdRepository;
     private final JacksonUtils jacksonUtils;
     private final SecurityUtils securityUtils;
+
 
     @Autowired
     public RequestNoticeOfChangeService(NoticeOfChangeQuestions noticeOfChangeQuestions,
@@ -85,9 +91,18 @@ public class RequestNoticeOfChangeService {
         // The case may have been changed as a result of the post-submit callback to CheckForNoCApproval operation.
         // Case data is therefore reloaded before checking if the NoCRequest has been auto-approved
         CaseDetails caseDetails = getCaseViaExternalApi(caseId);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String caseDetailsJson = objectMapper.writeValueAsString(caseDetails);
+            log.info("Case details before isApprovalComplete: {}", caseDetailsJson);
+        } catch (JsonProcessingException e) {
+            log.warn("Error converting caseDetails to JSON", e);
+        }
 
         boolean isApprovalComplete =
             isNocRequestAutoApprovalCompleted(caseDetails, invokersOrganisation, caseRoleId);
+
+        log.info("isApprovalComplete: {}", isApprovalComplete);
 
         // Auto-assign relevant case-roles to the invoker if required
         if (isApprovalComplete
@@ -202,6 +217,29 @@ public class RequestNoticeOfChangeService {
                                                       String caseRoleId) {
         Optional<ChangeOrganisationRequest> changeOrganisationRequest = getChangeOrganisationRequest(caseDetails);
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String invokersOrganisationJson = objectMapper.writeValueAsString(invokersOrganisation);
+            log.info("caseRoleId: {}, invokersOrganisation: {}", caseRoleId, invokersOrganisationJson);
+
+            if (changeOrganisationRequest.isPresent()) {
+                String changeOrganisationRequestJson = objectMapper.writeValueAsString(changeOrganisationRequest.get());
+                log.info("changeOrganisationRequest details: {}", changeOrganisationRequestJson);
+            } else {
+                log.info("changeOrganisationRequest details IN Object: {}", changeOrganisationRequest);
+            }
+        } catch (JsonProcessingException e) {
+            log.warn("Error converting caseDetails to JSON", e);
+        }
+
+        log.info("changeOrganisationRequest.isPresent: {}", changeOrganisationRequest.isPresent());
+        var result = changeOrganisationRequest.isPresent() ? changeOrganisationRequest.get().getCaseRoleId() : "-";
+        log.info("changeOrganisationRequest.get().getCaseRoleId: {}", result);
+        changeOrganisationRequest.ifPresent(organisationRequest -> log.info(
+            "changeOrganisationRequest.get().getCaseRoleId 2: {}",
+            organisationRequest.getCaseRoleId() == null
+        ));
+
         return changeOrganisationRequest.isPresent()
             && changeOrganisationRequest.get().getCaseRoleId() == null
             && isRequestToAddOrReplaceRepresentationAndApproved(caseDetails, invokersOrganisation, caseRoleId);
@@ -231,7 +269,9 @@ public class RequestNoticeOfChangeService {
     private boolean isRequestToAddOrReplaceRepresentationAndApproved(CaseDetails caseDetails,
                                                                      Organisation organisation,
                                                                      String caseRoleId) {
-        return findInvokerOrgPolicyRoles(caseDetails, organisation).contains(caseRoleId);
+        var result = findInvokerOrgPolicyRoles(caseDetails, organisation).contains(caseRoleId);
+        log.info("isRequestToAddOrReplaceRepresentationAndApproved: {}", result);
+        return result;
     }
 
     private List<OrganisationPolicy> findPolicies(CaseDetails caseDetails) {

@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.managecase.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
@@ -35,6 +38,7 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
+@Slf4j
 @Repository("defaultDataStoreRepository")
 @SuppressWarnings({"PMD.PreserveStackTrace", "PMD.DataflowAnomalyAnalysis",
     "PMD.LawOfDemeter","PMD.DataflowAnomalyAnalysis",
@@ -268,6 +272,14 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
 
     private CaseDetails submitEvent(String caseId, CaseEventCreationPayload caseEventCreationPayload,
                                     String userAuthToken) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String caseEventCreationPayloadJson = mapper.writeValueAsString(caseEventCreationPayload);
+            log.info("Submitting event with payload: {}", caseEventCreationPayloadJson);
+        } catch (JsonProcessingException e) {
+            log.warn("Failed to convert caseEventCreationPayload to JSON", e);
+        }
+
         CaseDetails caseDetails = dataStoreApi.submitEventForCase(userAuthToken, caseId, caseEventCreationPayload);
         if (INCOMPLETE_CALLBACK.equalsIgnoreCase(caseDetails.getCallbackResponseStatus())) {
             throw new RuntimeException(CALLBACK_FAILED_ERRORS_MESSAGE);

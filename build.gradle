@@ -78,8 +78,6 @@ tasks.withType(Test) {
   }
 }
 
-def tags = (findProperty('tags') == null) ? 'not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
-
 test {
   failFast = true
 }
@@ -118,7 +116,7 @@ tasks.register('smoke', Test) {
       args = [
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
               '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
-              '--tags', "${tags}",
+              '--tags', '@Smoke and not @Ignore',
               '--glue', 'uk.gov.hmcts.befta.player',
               '--glue', 'uk.gov.hmcts.reform.managecase.befta', 'src/functionalTest/resources/features'
       ]
@@ -129,6 +127,9 @@ tasks.register('smoke', Test) {
 
   outputs.upToDateWhen { false }
 }
+
+def tags = (findProperty('tags') == null) ? ' not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
+println 'tags =' + tags
 
 tasks.register('functional', Test) {
   description = "Runs functional tests"

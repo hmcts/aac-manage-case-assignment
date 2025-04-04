@@ -1,0 +1,29 @@
+{
+  "_guid_": "F-206_Verify_Case_Access_Metadata__Base",
+  "_extends_": "Retrieve_Access_Metadata_By_Case_ID__Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    }
+  },
+
+  "specs": [
+    "to verify user having STANDARD access to the case"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][parentContext][testData][request][body][case_id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "access_granted": "[[ANYTHING_PRESENT]]",
+
+      "access_process": "NONE"
+    }
+  }
+}
+

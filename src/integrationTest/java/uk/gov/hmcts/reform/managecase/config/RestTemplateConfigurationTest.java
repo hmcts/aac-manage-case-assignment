@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.managecase.BaseTest;
+import uk.gov.hmcts.reform.managecase.BaseIT;
 
 import java.net.URI;
 import java.util.List;
@@ -24,8 +24,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static org.apache.http.HttpStatus.SC_OK;
-import static org.apache.http.protocol.HTTP.CONTENT_TYPE;
+import static org.apache.hc.core5.http.HttpStatus.SC_OK;
+import static org.apache.hc.core5.http.HttpHeaders.CONTENT_TYPE;
+import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -34,7 +35,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
 import static wiremock.com.google.common.collect.Lists.newArrayList;
-import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
 @TestPropertySource(properties = {"http.client.connection.timeout=1500",
     "http.client.max.total=1",
@@ -42,7 +42,7 @@ import static org.apache.http.entity.ContentType.APPLICATION_JSON;
     "http.client.seconds.idle.connection=1",
     "http.client.max.client_per_route=2",
     "http.client.validate.after.inactivity=1"})
-public class RestTemplateConfigurationTest extends BaseTest {
+public class RestTemplateConfigurationTest extends BaseIT {
 
     @Autowired
     private RestTemplate restTemplate;
@@ -56,6 +56,8 @@ public class RestTemplateConfigurationTest extends BaseTest {
         assertNotNull(restTemplate);
 
         stubResponse();
+
+        
 
         final RequestEntity<String>
             request =

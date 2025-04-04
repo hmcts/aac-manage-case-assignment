@@ -44,6 +44,13 @@ public class ChallengeQuestion {
         initAnswersList();
     }
 
+    public List<ChallengeAnswer> getAnswers() {
+        if (answers == null) {
+            initAnswersList();
+        }
+        return answers;
+    }
+
     private void initAnswersList() {
         answers = new ArrayList<>();
         if (!Strings.isNullOrEmpty(answerField)) {

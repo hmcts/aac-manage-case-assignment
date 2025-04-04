@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -29,11 +30,10 @@ import uk.gov.hmcts.reform.managecase.domain.CaseAssignedUsers;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 
-import javax.validation.Valid;
-import javax.validation.ValidationException;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -59,100 +59,96 @@ public class CaseAssignmentController {
     }
 
     @PostMapping(path = CASE_ASSIGNMENTS_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Assign Access within Organisation", notes = "Assign Access within Organisation")
+    @Operation(summary = "Assign Access within Organisation", description = "Assign Access within Organisation")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiResponses({
-        @ApiResponse(
-            code = 201,
-            message = "Role from the organisation policy successfully assigned to the assignee."),
-        @ApiResponse(
-            code = 400,
-            message = "One or more of the following reasons:"
-                + "\n1) " + ValidationError.CASE_ID_INVALID
-                + "\n2) " + ValidationError.CASE_ID_INVALID_LENGTH
-                + "\n3) " + ValidationError.CASE_ID_EMPTY
-                + "\n4) " + ValidationError.CASE_TYPE_ID_EMPTY
-                + "\n5) " + ValidationError.ASSIGNEE_ID_EMPTY
-                + "\n6) " + ValidationError.ASSIGNEE_ORGANISATION_ERROR
-                + "\n7) " + ValidationError.ORGANISATION_POLICY_ERROR
-                + "\n8) " + ValidationError.ASSIGNEE_ROLE_ERROR,
-            response = ApiError.class,
-            examples = @Example({
-                @ExampleProperty(
+    @ApiResponse(
+        responseCode = "201",
+        description = "Role from the organisation policy successfully assigned to the assignee.")
+    @ApiResponse(
+        responseCode = "400",
+        description = "One or more of the following reasons:"
+            + "\n1) " + ValidationError.CASE_ID_INVALID
+            + "\n2) " + ValidationError.CASE_ID_INVALID_LENGTH
+            + "\n3) " + ValidationError.CASE_ID_EMPTY
+            + "\n4) " + ValidationError.CASE_TYPE_ID_EMPTY
+            + "\n5) " + ValidationError.ASSIGNEE_ID_EMPTY
+            + "\n6) " + ValidationError.ASSIGNEE_ORGANISATION_ERROR
+            + "\n7) " + ValidationError.ORGANISATION_POLICY_ERROR
+            + "\n8) " + ValidationError.ASSIGNEE_ROLE_ERROR,
+        content = @Content(
+            schema = @Schema(implementation = ApiError.class),
+            mediaType = APPLICATION_JSON_VALUE,
+            examples = { @ExampleObject(
                     value = "{\n"
-                        + "   \"status\": \"BAD_REQUEST\",\n"
-                        + "   \"message\": \"" + ValidationError.ASSIGNEE_ORGANISATION_ERROR + "\",\n"
-                        + "   \"errors\": [ ]\n"
-                        + "}",
-                    mediaType = APPLICATION_JSON_VALUE)
-            })),
-        @ApiResponse(
-            code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID),
-        @ApiResponse(
-            code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE),
-        @ApiResponse(
-            code = 404,
-            message = ValidationError.CASE_NOT_FOUND)
-    })
+                    + "   \"status\": \"BAD_REQUEST\",\n"
+                    + "   \"message\": \"" + ValidationError.ASSIGNEE_ORGANISATION_ERROR + "\",\n"
+                    + "   \"errors\": [ ]\n"
+                    + "}"
+                    )}))
+    @ApiResponse(
+        responseCode = "401",
+        description = AuthError.AUTHENTICATION_TOKEN_INVALID)
+    @ApiResponse(
+        responseCode = "403",
+        description = AuthError.UNAUTHORISED_S2S_SERVICE)
+    @ApiResponse(
+        responseCode = "404",
+        description = ValidationError.CASE_NOT_FOUND)
     public CaseAssignmentResponse assignAccessWithinOrganisation(
             @Valid @RequestBody CaseAssignmentRequest requestPayload,
-            @RequestParam(name = "use_user_token", required = false) Optional<Boolean> useUserToken) {
+            @RequestParam(name = "use_user_token", defaultValue = "false") boolean useUserToken) {
         CaseAssignment caseAssignment = mapper.map(requestPayload, CaseAssignment.class);
-        List<String> roles = caseAssignmentService.assignCaseAccess(caseAssignment, useUserToken.orElse(false));
-        return new CaseAssignmentResponse(String.format(ASSIGN_ACCESS_MESSAGE, StringUtils.join(roles, ',')));
+        List<String> roles = caseAssignmentService.assignCaseAccess(caseAssignment, useUserToken);
+        return new CaseAssignmentResponse(String.format(ASSIGN_ACCESS_MESSAGE, StringUtils.join(roles, ",")));
     }
 
     @GetMapping(path = CASE_ASSIGNMENTS_PATH, produces = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get Case Assignments in My Organisation", notes = "Get Assignments in My Organisation")
+    @Operation(summary = "Get Case Assignments in My Organisation", description = "Get Assignments in My Organisation")
     @ResponseStatus(HttpStatus.OK)
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Case-User-Role assignments returned successfully.",
-            response = GetCaseAssignmentsResponse.class,
-            examples = @Example({
-                @ExampleProperty(
-                    value = "{\n"
-                        + "  \"status_message\": \"Case-User-Role assignments returned "
-                        + "successfully\",\n"
-                        + "  \"case_assignments\": [\n"
-                        + "    {\n"
-                        + "      \"case_id\": \"1588234985453946\",\n"
-                        + "      \"shared_with\": [\n"
-                        + "        {\n"
-                        + "          \"idam_id\": \"221a2877-e1ab-4dc4-a9ff-f9424ad58738\",\n"
-                        + "          \"first_name\": \"Bill\",\n"
-                        + "          \"last_name\": \"Roberts\",\n"
-                        + "          \"email\": \"bill.roberts@greatbrsolicitors.co.uk\",\n"
-                        + "          \"case_roles\": [\n"
-                        + "            \"[Claimant]\",\n"
-                        + "            \"[Defendant]\"\n"
-                        + "          ]\n"
-                        + "        }\n"
-                        + "      ]\n"
-                        + "    }    \n"
-                        + "  ]\n"
-                        + "}",
-                    mediaType = APPLICATION_JSON_VALUE)
-            })),
-        @ApiResponse(
-            code = 400,
-            message = "case_ids must be a non-empty list of proper case ids.",
-            examples = @Example({
-                @ExampleProperty(
+    @ApiResponse(
+        responseCode = "200",
+        description = "Case-User-Role assignments returned successfully.",
+        content = @Content(
+            schema = @Schema(implementation = GetCaseAssignmentsResponse.class),
+            mediaType = APPLICATION_JSON_VALUE,
+            examples = { @ExampleObject(
+                    value = """
+                    {
+                    "status_message": "Case-User-Role assignments returned successfully",
+                      "case_assignments": [
+                        {
+                            "case_id": "1588234985453946",
+                            "shared_with": [
+                            {
+                                "idam_id": "221a2877-e1ab-4dc4-a9ff-f9424ad58738",
+                                "first_name": "Bill",
+                                "last_name": "Roberts",
+                                "email": "bill.roberts@greatbrsolicitors.co.uk",
+                                "case_roles": [
+                                    "[Claimant]",
+                                    "[Defendant]"
+                                ]
+                            }
+                            ]
+                        }
+                      ]
+                    }"""
+                    )}))
+    @ApiResponse(
+        responseCode = "400",
+        description = "case_ids must be a non-empty list of proper case ids.",
+        content = @Content(
+            mediaType = APPLICATION_JSON_VALUE,
+            examples = { @ExampleObject(
                     value = "{\"message\": \"case_ids must be a non-empty list of proper case ids\","
-                        + " \"status\": \"BAD_REQUEST\" }",
-                    mediaType = APPLICATION_JSON_VALUE)
-            })),
-        @ApiResponse(
-            code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID),
-        @ApiResponse(
-            code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE)
-    })
+                    + " \"status\": \"BAD_REQUEST\" }"
+                    )}))
+    @ApiResponse(
+        responseCode = "401",
+        description = AuthError.AUTHENTICATION_TOKEN_INVALID)
+    @ApiResponse(
+        responseCode = "403",
+        description = AuthError.UNAUTHORISED_S2S_SERVICE)
     public GetCaseAssignmentsResponse getCaseAssignments(@RequestParam("case_ids")
             @Valid @NotEmpty(message = "case_ids must be a non-empty list of proper case ids.") List<String> caseIds) {
         validateCaseIds(caseIds);
@@ -161,41 +157,39 @@ public class CaseAssignmentController {
     }
 
     @DeleteMapping(path = CASE_ASSIGNMENTS_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Unassign Access within Organisation", notes = "Unassign Access within Organisation")
+    @Operation(summary = "Unassign Access within Organisation", description = "Unassign Access within Organisation")
     @ResponseStatus(HttpStatus.OK)
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = UNASSIGN_ACCESS_MESSAGE),
-        @ApiResponse(
-            code = 400,
-            message = "One or more of the following reasons:"
-                + "\n1) " + ValidationError.EMPTY_REQUESTED_UNASSIGNMENTS_LIST
-                + "\n2) " + ValidationError.CASE_ID_INVALID
-                + "\n3) " + ValidationError.CASE_ID_INVALID_LENGTH
-                + "\n4) " + ValidationError.CASE_ID_EMPTY
-                + "\n5) " + ValidationError.ASSIGNEE_ID_EMPTY
-                + "\n6) " + ValidationError.CASE_ROLE_FORMAT_INVALID
-                + "\n7) " + ValidationError.UNASSIGNEE_ORGANISATION_ERROR,
-            response = ApiError.class,
-            examples = @Example(value = {
-                @ExampleProperty(
+    @ApiResponse(
+        responseCode = "200",
+        description = UNASSIGN_ACCESS_MESSAGE)
+    @ApiResponse(
+        responseCode = "400",
+        description = "One or more of the following reasons:"
+            + "\n1) " + ValidationError.EMPTY_REQUESTED_UNASSIGNMENTS_LIST
+            + "\n2) " + ValidationError.CASE_ID_INVALID
+            + "\n3) " + ValidationError.CASE_ID_INVALID_LENGTH
+            + "\n4) " + ValidationError.CASE_ID_EMPTY
+            + "\n5) " + ValidationError.ASSIGNEE_ID_EMPTY
+            + "\n6) " + ValidationError.CASE_ROLE_FORMAT_INVALID
+            + "\n7) " + ValidationError.UNASSIGNEE_ORGANISATION_ERROR,
+        content = @Content(
+            schema = @Schema(implementation = ApiError.class),
+            mediaType = APPLICATION_JSON_VALUE,
+            examples = { @ExampleObject(
                     value = "{\n"
-                        + "   \"status\": \"BAD_REQUEST\",\n"
-                        + "   \"errors\": [\n"
-                        + "      \"" + ValidationError.CASE_ID_INVALID + "\", \n"
-                        + "      \"" + ValidationError.CASE_ROLE_FORMAT_INVALID + "\"\n"
-                        + "   ]\n"
-                        + "}",
-                    mediaType = APPLICATION_JSON_VALUE)
-            })),
-        @ApiResponse(
-            code = 401,
-            message = AuthError.AUTHENTICATION_TOKEN_INVALID),
-        @ApiResponse(
-            code = 403,
-            message = AuthError.UNAUTHORISED_S2S_SERVICE)
-    })
+                    + "   \"status\": \"BAD_REQUEST\",\n"
+                    + "   \"errors\": [\n"
+                    + "      \"" + ValidationError.CASE_ID_INVALID + "\", \n"
+                    + "      \"" + ValidationError.CASE_ROLE_FORMAT_INVALID + "\"\n"
+                    + "   ]\n"
+                    + "}"
+                    )}))
+    @ApiResponse(
+        responseCode = "401",
+        description = AuthError.AUTHENTICATION_TOKEN_INVALID)
+    @ApiResponse(
+        responseCode = "403",
+        description = AuthError.UNAUTHORISED_S2S_SERVICE)
     public CaseUnassignmentResponse unassignAccessWithinOrganisation(
         @Valid @RequestBody CaseUnassignmentRequest requestPayload) {
         caseAssignmentService.unassignCaseAccess(requestPayload.getUnassignments());

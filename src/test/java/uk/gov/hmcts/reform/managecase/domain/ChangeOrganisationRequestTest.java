@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest.ChangeOrganisationRequestBuilder;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 
 import java.time.LocalDateTime;
 import java.util.List;

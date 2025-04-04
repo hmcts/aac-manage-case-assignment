@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +38,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
@@ -80,7 +80,7 @@ class CaseAssignmentServiceTest {
 
     @BeforeEach
     void setUp() {
-        initMocks(this);
+        openMocks(this);
     }
 
     @Nested
@@ -194,7 +194,7 @@ class CaseAssignmentServiceTest {
 
         @BeforeEach
         void setUp() {
-            initMocks(this);
+            openMocks(this);
         }
 
         @Test
@@ -246,7 +246,7 @@ class CaseAssignmentServiceTest {
 
         @BeforeEach
         void setUp() {
-            initMocks(this);
+            openMocks(this);
 
             given(prdRepository.findUsersByOrganisation())
                 .willReturn(usersByOrganisation(user(ASSIGNEE_ID), user(ASSIGNEE_ID2)));

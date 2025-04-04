@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableE
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.EVENT_TOKEN_NOT_PRESENT;

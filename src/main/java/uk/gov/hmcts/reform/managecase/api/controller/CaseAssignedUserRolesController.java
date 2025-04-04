@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.google.common.collect.Lists;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,6 +44,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError.AUTHENTICATION_TOKEN_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.AuthError.UNAUTHORISED_S2S_SERVICE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
@@ -82,37 +86,37 @@ public class CaseAssignedUserRolesController {
 
     @PostMapping(path = "/case-users")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(value = "Add Case-Assigned Users and Roles")
-    @ApiResponses({
-        @ApiResponse(
-            code = 201,
-            message = ADD_SUCCESS_MESSAGE,
-            response = CaseAssignedUserRolesResponse.class),
-        @ApiResponse(
-            code = 400,
-            message = "One or more of the following reasons:\n"
-                + "1. " + EMPTY_CASE_USER_ROLE_LIST + ", \n"
-                + "2. " + CASE_ID_INVALID + ": has to be a valid 16-digit Luhn number, \n"
-                + "3. " + USER_ID_INVALID + ": has to be a string of length > 0, \n"
-                + "4. " + CASE_ROLE_FORMAT_INVALID + ": has to be a none-empty string in square brackets, \n"
-                + "5. " + ORGANISATION_ID_INVALID + ": has to be a non-empty string, when present."),
-        @ApiResponse(
-            code = 401,
-            message = AUTHENTICATION_TOKEN_INVALID),
-        @ApiResponse(
-            code = 403,
-            message = "One of the following reasons:\n"
-                + "1. " + UNAUTHORISED_S2S_SERVICE + "\n"
-                + "2. " + CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."),
-        @ApiResponse(
-            code = 404,
-            message = CASE_NOT_FOUND)
-    })
-
+    @Operation(summary = "Add Case-Assigned Users and Roles")
+    @ApiResponse(
+        responseCode = "201",
+        description = ADD_SUCCESS_MESSAGE,
+        content = @Content(
+            schema = @Schema(implementation = CaseAssignedUserRolesResponse.class),
+            mediaType = APPLICATION_JSON_VALUE
+        ))
+    @ApiResponse(
+        responseCode = "400",
+        description = "One or more of the following reasons:\n"
+            + "1. " + EMPTY_CASE_USER_ROLE_LIST + ", \n"
+            + "2. " + CASE_ID_INVALID + ": has to be a valid 16-digit Luhn number, \n"
+            + "3. " + USER_ID_INVALID + ": has to be a string of length > 0, \n"
+            + "4. " + CASE_ROLE_FORMAT_INVALID + ": has to be a none-empty string in square brackets, \n"
+            + "5. " + ORGANISATION_ID_INVALID + ": has to be a non-empty string, when present.")
+    @ApiResponse(
+        responseCode = "401",
+        description = AUTHENTICATION_TOKEN_INVALID)
+    @ApiResponse(
+        responseCode = "403",
+        description = "One of the following reasons:\n"
+            + "1. " + UNAUTHORISED_S2S_SERVICE + "\n"
+            + "2. " + CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + ".")
+    @ApiResponse(
+        responseCode = "404",
+        description = CASE_NOT_FOUND)
     public ResponseEntity<CaseAssignedUserRolesResponse> addCaseUserRoles(
-        @ApiParam(value = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
+        @Parameter(description = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
         @RequestHeader(SERVICE_AUTHORIZATION) String clientS2SToken,
-        @ApiParam(value = "List of Case-User-Role assignments to add", required = true)
+        @Parameter(description = "List of Case-User-Role assignments to add", required = true)
         @RequestBody CaseAssignedUserRolesRequest caseAssignedUserRolesRequest
     ) {
         validateRequest(clientS2SToken, caseAssignedUserRolesRequest);
@@ -123,37 +127,38 @@ public class CaseAssignedUserRolesController {
 
     @DeleteMapping(path = "/case-users")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Remove Case-Assigned Users and Roles")
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = REMOVE_SUCCESS_MESSAGE,
-            response = CaseAssignedUserRolesResponse.class),
-        @ApiResponse(
-            code = 400,
-            message = "One or more of the following reasons:\n"
-                + "1. " + EMPTY_CASE_USER_ROLE_LIST + ", \n"
-                + "2. " + CASE_ID_INVALID + ": has to be a valid 16-digit Luhn number, \n"
-                + "3. " + USER_ID_INVALID + ": has to be a string of length > 0, \n"
-                + "4. " + CASE_ROLE_FORMAT_INVALID + ": has to be a none-empty string in square "
-                + "brackets, \n"
-                + "5. " + ORGANISATION_ID_INVALID + ": has to be a non-empty string, when present."),
-        @ApiResponse(
-            code = 401,
-            message = "Authentication failure due to invalid / expired tokens (IDAM / S2S)."),
-        @ApiResponse(
-            code = 403,
-            message = "One of the following reasons:\n"
-                + "1. Unauthorised S2S service \n"
-                + "2. " + CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."),
-        @ApiResponse(
-            code = 404,
-            message = CASE_NOT_FOUND)
-    })
+    @Operation(summary = "Remove Case-Assigned Users and Roles")
+    @ApiResponse(
+        responseCode = "200",
+        description = REMOVE_SUCCESS_MESSAGE,
+        content = @Content(
+            schema = @Schema(implementation = CaseAssignedUserRolesResponse.class),
+            mediaType = APPLICATION_JSON_VALUE
+        ))
+    @ApiResponse(
+        responseCode = "400",
+        description = "One or more of the following reasons:\n"
+            + "1. " + EMPTY_CASE_USER_ROLE_LIST + ", \n"
+            + "2. " + CASE_ID_INVALID + ": has to be a valid 16-digit Luhn number, \n"
+            + "3. " + USER_ID_INVALID + ": has to be a string of length > 0, \n"
+            + "4. " + CASE_ROLE_FORMAT_INVALID + ": has to be a none-empty string in square "
+            + "brackets, \n"
+            + "5. " + ORGANISATION_ID_INVALID + ": has to be a non-empty string, when present.")
+    @ApiResponse(
+        responseCode = "401",
+        description = "Authentication failure due to invalid / expired tokens (IDAM / S2S).")
+    @ApiResponse(
+        responseCode = "403",
+        description = "One of the following reasons:\n"
+            + "1. Unauthorised S2S service \n"
+            + "2. " + CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + ".")
+    @ApiResponse(
+        responseCode = "404",
+        description = CASE_NOT_FOUND)
     public ResponseEntity<CaseAssignedUserRolesResponse> removeCaseUserRoles(
-        @ApiParam(value = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
+        @Parameter(description = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
         @RequestHeader(SERVICE_AUTHORIZATION) String clientS2SToken,
-        @ApiParam(value = "List of Case-User-Role assignments to add", required = true)
+        @Parameter(description = "List of Case-User-Role assignments to add", required = true)
         @RequestBody CaseAssignedUserRolesRequest caseAssignedUserRolesRequest
     ) {
         validateRequest(clientS2SToken, caseAssignedUserRolesRequest);
@@ -163,28 +168,32 @@ public class CaseAssignedUserRolesController {
     }
 
     @GetMapping(path = "/case-users")
-    @ApiOperation(value = "Get Case-Assigned Users and Roles")
-    @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Get Case-Assigned Users and Roles",
-            response = CaseAssignedUserRolesResource.class),
-        @ApiResponse(
-            code = 400,
-            message = "One or more of the following reasons:"
-                + "\n1) " + CASE_ID_INVALID
-                + "\n2) " + EMPTY_CASE_ID_LIST
-                + "\n3) " + USER_ID_INVALID,
-            response = ApiError.class),
-        @ApiResponse(
-            code = 401,
-            message = AUTHENTICATION_TOKEN_INVALID),
-        @ApiResponse(
-            code = 403,
-            message = "One of the following reasons:"
-                + "\n1) " + AuthError.OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED
-                + "\n2) " + UNAUTHORISED_S2S_SERVICE)
-    })
+    @Operation(summary = "Get Case-Assigned Users and Roles")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Get Case-Assigned Users and Roles",
+        content = @Content(
+            schema = @Schema(implementation = CaseAssignedUserRolesResource.class),
+            mediaType = APPLICATION_JSON_VALUE
+        ))
+    @ApiResponse(
+        responseCode = "400",
+        description = "One or more of the following reasons:"
+            + "\n1) " + CASE_ID_INVALID
+            + "\n2) " + EMPTY_CASE_ID_LIST
+            + "\n3) " + USER_ID_INVALID,
+        content = @Content(
+            schema = @Schema(implementation = ApiError.class),
+            mediaType = APPLICATION_JSON_VALUE
+        ))
+    @ApiResponse(
+        responseCode = "401",
+        description = AUTHENTICATION_TOKEN_INVALID)
+    @ApiResponse(
+        responseCode = "403",
+        description = "One of the following reasons:"
+            + "\n1) " + AuthError.OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED
+            + "\n2) " + UNAUTHORISED_S2S_SERVICE)
     public ResponseEntity<CaseAssignedUserRolesResource> getCaseUserRoles(@RequestParam("case_ids")
                                                                               List<String> caseIds,
                                                                           @RequestParam(value = "user_ids",

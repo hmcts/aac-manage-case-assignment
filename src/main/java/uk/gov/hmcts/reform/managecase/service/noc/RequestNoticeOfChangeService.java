@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -236,14 +237,17 @@ public class RequestNoticeOfChangeService {
 
         CaseAccessMetadataResource caseAccessMetadataResource =
             dataStoreRepository.findCaseAccessMetadataByCaseId(caseDetails.getId());
-        if (caseAccessMetadataResource != null
-            && caseAccessMetadataResource.getAccessGrants().stream()
-            .noneMatch(grantType -> GrantType.STANDARD.toString().equals(grantType.toString()))) {
-            dataStoreRepository.assignCase(
-                invokerOrgPolicyRoles, caseDetails.getId(),
-                securityUtils.getUserInfo().getUid(), invokersOrganisation.getOrganisationID()
 
-            );
+        if (caseAccessMetadataResource != null) {
+            boolean hasStandardAccess = Optional.ofNullable(caseAccessMetadataResource.getAccessGrants()).stream()
+                .flatMap(Collection::stream)
+                .anyMatch(code -> GrantType.STANDARD.toString().equals(code.name()));
+            if (!hasStandardAccess) {
+                dataStoreRepository.assignCase(
+                    invokerOrgPolicyRoles, caseDetails.getId(),
+                    securityUtils.getUserInfo().getUid(), invokersOrganisation.getOrganisationID()
+                );
+            }
         }
     }
 

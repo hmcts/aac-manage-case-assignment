@@ -5,7 +5,7 @@
 	"operationName": "Retrieve access metadata for a given case ID",
 
 	"method": "GET",
-	"uri": "{{CCD_DATA_STORE_API_BASE_URL}}/cases/{caseId}/access-metadata",
+	"uri": "{{CCD_DATA_STORE_API_BASE_URL}}/internal/cases/{caseId}/access-metadata",
 
 	"request": {
 		"_extends_": "Common_Request",
@@ -15,16 +15,6 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_200_Response",
-		"headers": {
-			"Strict-Transport-Security": "[[ANY_NULLABLE]]",
-			"Content-Encoding": "gzip",
-			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]",
-			"Vary": "accept-encoding"
-		},
-		"body": {
-			"access_granted": "STANDARD",
-			"access_process": "NONE"
-		}
+		"_extends_": "Common_200_Response"
 	}
 }

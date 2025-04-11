@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import lombok.ToString;
 
 import java.io.Serializable;
@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ApiModel(description = "")
+@Schema
 @ToString
 public class JurisdictionDefinition implements Serializable {
 
@@ -25,7 +25,7 @@ public class JurisdictionDefinition implements Serializable {
 
     private List<CaseTypeDefinition> caseTypeDefinitions = new ArrayList<>();
 
-    @ApiModelProperty(required = true, value = "")
+    @Schema(requiredMode = RequiredMode.REQUIRED)
     @JsonProperty("id")
     public String getId() {
         return id;
@@ -35,7 +35,7 @@ public class JurisdictionDefinition implements Serializable {
         this.id = id;
     }
 
-    @ApiModelProperty(required = true, value = "")
+    @Schema(requiredMode = RequiredMode.REQUIRED)
     @JsonProperty("name")
     public String getName() {
         return name;
@@ -45,7 +45,7 @@ public class JurisdictionDefinition implements Serializable {
         this.name = name;
     }
 
-    @ApiModelProperty("")
+    @Schema
     @JsonProperty("live_until")
     public Date getLiveUntil() {
         return liveUntil;
@@ -55,7 +55,7 @@ public class JurisdictionDefinition implements Serializable {
         this.liveUntil = liveUntil;
     }
 
-    @ApiModelProperty("")
+    @Schema
     @JsonProperty("description")
     public String getDescription() {
         return description;
@@ -65,7 +65,7 @@ public class JurisdictionDefinition implements Serializable {
         this.description = description;
     }
 
-    @ApiModelProperty("")
+    @Schema
     @JsonProperty("live_from")
     public Date getLiveFrom() {
         return liveFrom;
@@ -75,7 +75,7 @@ public class JurisdictionDefinition implements Serializable {
         this.liveFrom = liveFrom;
     }
 
-    @ApiModelProperty("")
+    @Schema
     @JsonProperty("case_types")
     public List<CaseTypeDefinition> getCaseTypeDefinitions() {
         return caseTypeDefinitions;

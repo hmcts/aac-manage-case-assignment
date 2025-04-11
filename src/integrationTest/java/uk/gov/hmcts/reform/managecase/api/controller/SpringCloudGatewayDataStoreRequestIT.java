@@ -1,14 +1,10 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.TextCodec;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.reform.managecase.BaseTest;
+import uk.gov.hmcts.reform.managecase.BaseIT;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
 
 import java.util.Date;
@@ -24,10 +20,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCaseWithPrefix;
-import static uk.gov.hmcts.reform.managecase.zuulfilters.AuthHeaderRoutingFilter.SERVICE_AUTHORIZATION;
+import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions", "PMD.AvoidDuplicateLiterals"})
-public class ZuulProxyDataStoreRequestIT extends BaseTest {
+public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
 
     private static final String CASE_TYPE_ID = "CT_MasterCase";
     private static final String PATH = "/ccd/searchCases?ctid=CT_MasterCase";
@@ -38,11 +34,8 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
     private static final String SERVICE_NAME = "xui_webapp";
     private static final String BEARER = "Bearer ";
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @DisplayName("Zuul successfully forwards /ccd/searchCases request to the data store with a system user token"
-        + " and aac_manage_case_assignment client id")
+    @DisplayName("SpringCloudGateway successfully forwards /ccd/searchCases request to the data store with a "
+        + "system user token and aac_manage_case_assignment client id")
     @Test
     void shouldReturn200_whenTheSearchCasesRequestHasCcdPrefix() throws Exception {
 
@@ -50,9 +43,9 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
 
         String s2SToken = generateDummyS2SToken(SERVICE_NAME);
         this.mockMvc.perform(post(PATH)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
-                                 .content(ES_QUERY))
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
+            .content(ES_QUERY))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))
             .andExpect(jsonPath("$.cases[0].id", is(TestFixtures.CASE_ID)));
@@ -67,7 +60,7 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
                    ));
     }
 
-    @DisplayName("Zuul successfully forwards /ccd/internal/searchCases request to the data store with"
+    @DisplayName("SpringCloudGateway successfully forwards /ccd/internal/searchCases request to the data store with"
         + " a system user token and aac_manage_case_assignment client id")
     @Test
     void shouldReturn200_whenTheInternalSearchCasesRequestHasCcdPrefix() throws Exception {
@@ -76,9 +69,9 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
         stubSearchCaseWithPrefix(CASE_TYPE_ID, ES_QUERY, caseDetails(), "/internal");
 
         this.mockMvc.perform(post(PATH_INTERNAL)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
-                                 .content(ES_QUERY))
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
+            .content(ES_QUERY))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))
             .andExpect(jsonPath("$.cases[0].id", is(TestFixtures.CASE_ID)));
@@ -93,47 +86,47 @@ public class ZuulProxyDataStoreRequestIT extends BaseTest {
                    ));
     }
 
-    @DisplayName("Zuul fails with 404 on invalid /ccd/invalid request url")
+    @DisplayName("SpringCloudGateway fails with 404 on invalid /ccd/invalid request url")
     @Test
     void shouldReturn404_whenInvalidRequestUrlHasCcdPrefix() throws Exception {
         String s2SToken = generateDummyS2SToken(SERVICE_NAME);
         this.mockMvc.perform(post(INVALID_PATH)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .header(SERVICE_AUTHORIZATION, BEARER + s2SToken))
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(SERVICE_AUTHORIZATION, BEARER + s2SToken))
             .andExpect(status().isNotFound());
     }
 
-    @DisplayName("Zuul fails with 403 on a valid not allowed request url")
+    @DisplayName("SpringCloudGateway fails with 403 on a valid not allowed request url")
     @Test
     void shouldReturn403_whenValidNotAllowedRequestUrl() throws Exception {
         String s2SToken = generateDummyS2SToken(SERVICE_NAME);
         stubSearchCaseWithPrefix(CASE_TYPE_ID, ES_QUERY, caseDetails(), "/notallowed");
 
         this.mockMvc.perform(post(VALID_NOT_ALLOWED_PATH)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
-                                 .content("{}"))
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
+            .content("{}"))
             .andExpect(status().isForbidden());
     }
 
-    @DisplayName("Zuul fails with 403 on invalid service name")
+    @DisplayName("SpringCloudGateway fails with 403 on invalid service name")
     @Test
     void shouldReturn403_whenInvalidServiceName() throws Exception {
         String s2SToken = generateDummyS2SToken("invalidService");
 
         this.mockMvc.perform(post(PATH)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
-                                 .content(ES_QUERY))
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
+            .content(ES_QUERY))
             .andExpect(status().isForbidden());
     }
 
     @SuppressWarnings("PMD.LawOfDemeter")
     public static String generateDummyS2SToken(String serviceName) {
         return Jwts.builder()
-                .setSubject(serviceName)
-                .setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+                .subject(serviceName)
+                .issuedAt(new Date())
+                .signWith(Jwts.SIG.HS256.key().build())
                 .compact();
     }
 }

@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.managecase.service;
 
 import com.google.common.collect.Lists;
 import java.util.List;
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,7 @@ class NotifyServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         this.notifyService = new NotifyService(appParams, notificationClient);
     }
 

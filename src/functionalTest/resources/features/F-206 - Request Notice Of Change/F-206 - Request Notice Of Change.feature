@@ -142,9 +142,9 @@ Scenario: (Happy Path) CAA (also a solicitor for a different jurisdiction) reque
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# ACA-68 / AC-7
+# ACA-68 / AC-7 CCD-5334/6255 AC1
 @S-206.7 @callbackTests
-Scenario: (Happy Path) Solicitor requests NoC to replace representation - auto-approval applies
+Scenario: (Happy Path) Solicitor having STANDARD access to case requests NoC to replace representation - auto-approval applies
 
     Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
       And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
@@ -159,9 +159,10 @@ Scenario: (Happy Path) Solicitor requests NoC to replace representation - auto-a
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Dil HAS been granted case roles R1 & R2 for the case but not R3] will get the expected response as in [F-206_Verify_Granted_Case_Roles_R1_R2_Dil],
+      And a call [to verify that Dil has NOT been granted any case roles for the case] will get the expected response as in [F-206_Verify_Not_Granted_Case_Roles_Dil],
       And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved_ReplaceRepresentation],
       And a call [to get Case Events API returns a NoCRequest event in which the user ID is set to invoking users email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data].
+      And a call [to get Grant Access Metadata API returning Standard Grant Access for case] will get the expected response as in [F-206_Verify_NoC_Request_Access_Metadata],
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

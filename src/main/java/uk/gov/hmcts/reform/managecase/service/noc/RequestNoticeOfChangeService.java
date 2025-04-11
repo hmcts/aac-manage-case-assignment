@@ -237,6 +237,7 @@ public class RequestNoticeOfChangeService {
 
         CaseAccessMetadataResource caseAccessMetadataResource =
             dataStoreRepository.findCaseAccessMetadataByCaseId(caseDetails.getId());
+
         if (caseAccessMetadataResource != null) {
             boolean hasStandardAccess = Optional.ofNullable(caseAccessMetadataResource.getAccessGrants()).stream()
                 .flatMap(Collection::stream)

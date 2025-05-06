@@ -36,6 +36,7 @@ Background:
     And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from BeftaCaseworkerCaa's],
     And [a citizen Mario, on behalf of whom BeftaCaseworkerCaa will create a case] in the context,
     And a successful call [by BeftaCaseworkerCaa to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Dil's organisation, R2 & R3 which are both assigned to BeftaCaseworkerCaa's organisation] as in [F-206_NoC_Auto_Approval_Case_Creation_By_BeftaCaseworkerCaa_With_Assigned_Org_Policies],
+    And a successful call [to grant SPECIFIC access to the caseworkerCaa] as in [GrantAccess_FT_NoCAutoApprovalCaseType_CaseworkerCaa_SPECIFIC]
 
     When a request is prepared with appropriate values,
     And the request [is made by Dil to place a NOC Request for C1],
@@ -58,7 +59,7 @@ Background:
     And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
     And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
     And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Dil's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Auto_Approval_Case_Creation_By_Richard_With_Assigned_Org_Policies],
-    And a successful call [to grant SPECIFIC access to the caseworker] as in [GrantAccess_FT_NoCAutoApprovalCaseTypeRole_Caseworker_SPECIFIC]
+    And a successful call [to grant SPECIFIC access to the caseworkerCaa] as in [GrantAccess_FT_NoCAutoApprovalCaseTypeRole_CaseworkerCaa_SPECIFIC]
 
     When a request is prepared with appropriate values,
     And the request [is made by Dil to place a NOC Request for C1],

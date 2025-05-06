@@ -1,5 +1,5 @@
 {
-  "_guid_": "GrantAccess_FT_NoCAutoApprovalCaseType_Caseworker_SPECIFIC__Base",
+  "_guid_": "GrantAccess_FT_NoCAutoApprovalCaseType_CaseworkerCaa_SPECIFIC__Base",
   "_extends_": "CaseUserRoles_Add__PositiveResponse_Base",
 
   "users": {

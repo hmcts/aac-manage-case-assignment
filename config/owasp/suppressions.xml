@@ -6,5 +6,6 @@
     </notes>
     <cve>CVE-2024-38820</cve>
     <cve>CVE-2025-24813</cve>
+    
   </suppress>
 </suppressions>

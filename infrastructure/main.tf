@@ -24,10 +24,10 @@ module "key-vault" {
   additional_managed_identities_access = var.additional_managed_identities_access
 }
 
-resource "azurerm_key_vault_secret" "AZURE_APPINSGHTS_KEY" {
-  name         = "AppInsightsInstrumentationKey"
-  value        = module.application_insights.instrumentation_key
-  key_vault_id = module.key-vault.key_vault_id
+resource "azurerm_key_vault_secret" "connection_string" {
+  name         = "app-insights-connection-string"
+  value        = azurerm_application_insights.appinsights.connection_string
+  key_vault_id = module.vault.key_vault_id
 }
 
 module "application_insights" {

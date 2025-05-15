@@ -30,7 +30,6 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -254,6 +253,8 @@ class NotifyServiceTest {
         List<EmailNotificationRequestStatus> responses = notifyService.sendEmail(requests);
         long endTime = System.currentTimeMillis();
         
+        System.out.println("Execution time for 10 parallel requests: " + (endTime - startTime) + "ms");
+
         assertNotNull(responses, "response object should not be null");
         assertEquals(10, responses.size(), "response size should be 10");
 
@@ -263,8 +264,6 @@ class NotifyServiceTest {
             anyMap(),
             anyString()
         );
-        
-        System.out.println("Execution time for 10 parallel requests: " + (endTime - startTime) + "ms");
     }
     
     @Test
@@ -289,7 +288,6 @@ class NotifyServiceTest {
         ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
         
         // Note: In a unit test environment, Spring's @Retryable won't actually work
-        // because it requires Spring AOP context which isn't set up in JUnit tests
         given(notificationClient.sendEmail(
             templateIdCaptor.capture(),
             emailCaptor.capture(),

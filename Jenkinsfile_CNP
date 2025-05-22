@@ -16,7 +16,7 @@ GradleBuilder builder = new GradleBuilder(this, product)
 def definitionStoreDevelopPr = "PR-1540"  // This doesn't change frequently, but when it does, only change this value.
 def dataStoreApiDevelopPr    = "PR-2552" // This doesn't change frequently, but when it does, only change this value.
 def prsToUseAat              = "PR-148,PR-161,PR-167,PR-259,PR-264" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
-def prsRunningInIsolation    = "PR-463" // Set this value to a PR number, or add it as a comma-separated value, if PRs for MCA, Data-Store and Def-Store are all configured to run in isolation from other PRs.
+def prsRunningInIsolation    = "PR-561" // Set this value to a PR number, or add it as a comma-separated value, if PRs for MCA, Data-Store and Def-Store are all configured to run in isolation from other PRs.
 
 def secrets = [
   'rpx-${env}': [
@@ -41,7 +41,13 @@ def secrets = [
     secret('ccd-befta-jurisdiction3-solicitor1-pwd', 'CCD_BEFTA_JURISDICTION_3_SOLICITOR_1_PWD'),
     secret('ccd-befta-solicitor-4-pwd', 'CCD_BEFTA_SOLICITOR_4_PWD'),
     secret('ccd-befta-citizen-2-pwd', 'CCD_BEFTA_CITIZEN_2_PWD'),
-    secret('ccd-befta-pui-caa-1-pwd', 'CCD_BEFTA_PUI_CAA_1_PWD')
+    secret('ccd-befta-pui-caa-1-pwd', 'CCD_BEFTA_PUI_CAA_1_PWD'),
+    secret('ccd-befta-caseworker-caa-pwd', 'CCD_BEFTA_CASEWORKER_CAA_PWD'),
+    secret('ccd-befta-master-caseworker-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_ROLE1_BASIC_PWD'),
+    secret('ccd-befta-master-caseworker-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_ROLE1_STANDARD_PWD'),
+    secret('ccd-befta-master-caseworker-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_ROLE3_CHALLENGED_PWD'),
+    secret('ccd-befta-master-caseworker-regional-staff-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_REGIONAL_STAFF_PWD'),
+    secret('ccd-befta-master-caseworker-staff-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_STAFF_PWD')
   ],
   's2s-${env}': [
     secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_KEY'),

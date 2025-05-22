@@ -42,7 +42,12 @@ def secrets = [
     secret('ccd-befta-solicitor-4-pwd', 'CCD_BEFTA_SOLICITOR_4_PWD'),
     secret('ccd-befta-citizen-2-pwd', 'CCD_BEFTA_CITIZEN_2_PWD'),
     secret('ccd-befta-pui-caa-1-pwd', 'CCD_BEFTA_PUI_CAA_1_PWD'),
-    secret('ccd-befta-caseworker-caa-pwd', 'CCD_BEFTA_CASEWORKER_CAA_PWD')
+    secret('ccd-befta-caseworker-caa-pwd', 'CCD_BEFTA_CASEWORKER_CAA_PWD'),
+    secret('ccd-befta-master-caseworker-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_ROLE1_BASIC_PWD'),
+    secret('ccd-befta-master-caseworker-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_ROLE1_STANDARD_PWD'),
+    secret('ccd-befta-master-caseworker-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_ROLE3_CHALLENGED_PWD'),
+    secret('ccd-befta-master-caseworker-regional-staff-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_REGIONAL_STAFF_PWD'),
+    secret('ccd-befta-master-caseworker-staff-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_STAFF_PWD')
   ],
   's2s-${env}': [
     secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_KEY'),

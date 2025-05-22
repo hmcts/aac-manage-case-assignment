@@ -104,7 +104,7 @@ public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHel
     private RuntimeException mapException(Exception exception, ResourceNotFoundException resourceNotFoundException) {
 
         if (exception instanceof HttpClientErrorException
-            && ((HttpClientErrorException) exception).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
+            && ((HttpClientErrorException) exception).getStatusCode().value() == HttpStatus.NOT_FOUND.value()) {
             return resourceNotFoundException;
         } else {
             return mapException(exception, "getting");
@@ -114,7 +114,7 @@ public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHel
     private RuntimeException mapException(Exception exception, String processDescription) {
 
         if (exception instanceof HttpClientErrorException
-            && HttpStatus.valueOf(((HttpClientErrorException) exception).getRawStatusCode()).is4xxClientError()) {
+            && ((HttpClientErrorException) exception).getStatusCode().is4xxClientError()) {
             return new BadRequestException(
                 String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, processDescription, exception.getMessage()));
         } else {

@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableE
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.repository.NocApprovalDataStoreRepository;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.NOC_DECISION_EVENT_UNIDENTIFIABLE;
 
 public class NoticeOfChangeApprovalServiceTest {
@@ -41,7 +41,7 @@ public class NoticeOfChangeApprovalServiceTest {
 
     @BeforeEach
     void setUp() {
-        initMocks(this);
+        openMocks(this);
     }
 
     @Nested

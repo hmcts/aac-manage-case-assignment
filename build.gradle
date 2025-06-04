@@ -128,6 +128,9 @@ tasks.register('smoke', Test) {
   outputs.upToDateWhen { false }
 }
 
+def tags = (findProperty('tags') == null) ? ' not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
+println 'tags =' + tags
+
 tasks.register('functional', Test) {
   description = "Runs functional tests"
   group = "Verification"
@@ -422,9 +425,9 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.24.2')
+  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.2')
 
-  testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.0'
+  testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.3'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath

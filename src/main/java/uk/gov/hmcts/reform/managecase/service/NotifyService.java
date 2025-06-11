@@ -1,11 +1,16 @@
 package uk.gov.hmcts.reform.managecase.service;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.net.ConnectException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import javax.annotation.PreDestroy;
 import javax.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
@@ -25,12 +30,23 @@ public class NotifyService {
 
     private final NotificationClient notificationClient;
     private final ApplicationParams appParams;
+    private final Executor executor;
 
     @Autowired
     public NotifyService(ApplicationParams appParams,
                          NotificationClient notificationClient) {
         this.notificationClient = notificationClient;
         this.appParams = appParams;
+
+        int poolSize = Math.max(4, Runtime.getRuntime().availableProcessors() * 2);
+        this.executor = Executors.newFixedThreadPool(poolSize);
+    }
+
+    @PreDestroy
+    public void cleanup() {
+        if (executor instanceof ExecutorService) {
+            ((ExecutorService) executor).shutdown();
+        }
     }
 
     public List<EmailNotificationRequestStatus> sendEmail(final List<EmailNotificationRequest> notificationRequests) {
@@ -38,18 +54,22 @@ public class NotifyService {
             throw new ValidationException("At least one email notification request is required to send notification");
         }
 
-        List<EmailNotificationRequestStatus> notificationStatuses = Lists.newArrayList();
-        notificationRequests.forEach(emailNotificationRequest -> {
-            try {
-                notificationStatuses.add(sendNotification(emailNotificationRequest));
-            } catch (Exception e) {
-                notificationStatuses.add(new EmailNotificationRequestFailure(emailNotificationRequest, e));
-            }
-        });
-        return notificationStatuses;
+        List<CompletableFuture<EmailNotificationRequestStatus>> futures = notificationRequests.stream()
+            .map(request -> CompletableFuture.supplyAsync(() -> {
+                try {
+                    return sendNotification(request);
+                } catch (Exception e) {
+                    return new EmailNotificationRequestFailure(request, e);
+                }
+            }, executor))
+            .collect(Collectors.toList());
+        
+        return futures.stream()
+            .map(CompletableFuture::join)
+            .collect(Collectors.toList());
     }
 
-    @Retryable(value = {ConnectException.class}, backoff = @Backoff(delay = 1000, multiplier = 3))
+    @Retryable(value = {ConnectException.class}, maxAttempts = 3, backoff = @Backoff(delay = 500, multiplier = 2))
     private EmailNotificationRequestSuccess sendNotification(EmailNotificationRequest request)
         throws NotificationClientException {
         validateRequest(request);

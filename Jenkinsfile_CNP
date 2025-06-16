@@ -115,12 +115,18 @@ env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
 
 withPipeline("java", product, component) {
   afterAlways('test') {
-    builder.gradle('integration')
-
     // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
-
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
+     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
+     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
+      builder.gradle('integration')
+      publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "build/reports/tests/integration",
+            reportFiles          : "index.html",
+            reportName           : "Integration Test Report"
+        ]
   }
   onMaster {
     enableSlackNotifications('#ccd-master-builds')
@@ -158,18 +164,6 @@ withPipeline("java", product, component) {
 
   enableAksStagingDeployment()
   disableLegacyDeployment()
-
-  afterAlways('test') {
-      builder.gradle('integration')
-      publishHTML target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "build/reports/tests/integration",
-            reportFiles          : "index.html",
-            reportName           : "Integration Test Report"
-        ]
-    }
 
   afterAlways('smoketest:preview') {
     //copyIgnore('./build/reports/tests/befta/smoke/cucumber-html-reports', './BEFTA Report for Smoke Tests/')

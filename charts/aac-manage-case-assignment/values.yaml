@@ -6,8 +6,8 @@ java:
   keyVaults:
     aac:
       secrets:
-        - name: AppInsightsInstrumentationKey
-          alias: azure.application-insights.instrumentation-key
+        - name: app-insights-connection-string
+          alias: app-insights-connection-string
         - name: aac-manage-case-s2s-secret
           alias: MANAGE_CASE_S2S_KEY
         - name: idam-mca-client-secret

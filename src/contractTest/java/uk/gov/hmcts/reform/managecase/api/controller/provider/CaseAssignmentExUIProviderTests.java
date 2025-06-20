@@ -52,8 +52,6 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidation
     port = "${PACT_BROKER_PORT:80}",
     consumerVersionSelectors = {@VersionSelector(tag = "master")})
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
-@DirtiesContext
 public class CaseAssignmentExUIProviderTests {
 
     @Autowired

@@ -8,20 +8,17 @@ import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController;
 import uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
-import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
@@ -33,12 +30,10 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.usersByOrganisation;
 
@@ -104,36 +99,6 @@ public class NocCaseAssignmentProviderTests {
         if (context != null) {
             context.setTarget(testTarget);
         }
-    }
-
-    @State({"Assign a user to a case"})
-    public void toAssignUserToCase() throws IOException {
-
-        given(prdRepository.findUsersByOrganisation())
-            .willReturn(usersByOrganisation(user(ASSIGNEE_ID), user(ASSIGNEE_ID2), user(ASSIGNEE_ID3)));
-
-        //use_user_token=true mock
-        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(TestFixtures.CASE_ID))
-            .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID,  ORG_POLICY_ROLE3,
-                                                                    ORG_POLICY_ROLE4));
-        //use_user_token=false or not present mock
-        given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(TestFixtures.CASE_ID))
-            .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE3,
-                                                                    ORG_POLICY_ROLE4));
-
-        given(securityUtils.hasSolicitorRole(anyList())).willReturn(true);
-        given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), anyString())).willReturn(true);
-
-        UserDetails userDetails = UserDetails.builder()
-            .id(ASSIGNEE_ID).roles(List.of("caseworker-AUTOTEST1-solicitor")).build();
-        given(idamRepository.getCaaSystemUserAccessToken()).willReturn(BEAR_TOKEN);
-        given(idamRepository.getNocApproverSystemUserAccessToken()).willReturn(BEAR_TOKEN);
-        given(idamRepository.getUserByUserId(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
-        given(idamRepository.getUserByUserId(ASSIGNEE_ID3, BEAR_TOKEN)).willReturn(userDetails);
-
-        given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
-            .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE))
-            .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE2));
     }
 
     @State({"Case assignments exist for case Ids"})

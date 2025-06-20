@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import uk.gov.hmcts.reform.managecase.BaseTest;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
@@ -83,6 +84,7 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_DETAILS_REQUIRED;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.MULTIPLE_NOC_REQUEST_EVENTS;
@@ -98,9 +100,9 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCa
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseRoles;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseViaExternalApi;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetChallengeQuestions;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetLatestVersion;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetExternalStartEventTrigger;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetExternalStartEventTriggerAsApprover;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetLatestVersion;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetStartEventTrigger;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisationInternal;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSubmitEventForCase;
@@ -256,6 +258,23 @@ public class NoticeOfChangeControllerIT {
                 .queryParam("case_id", CASE_ID))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is(MULTIPLE_NOC_REQUEST_EVENTS)));
+        }
+
+        @DisplayName("Must return 400 bad request when invalid case id is passed in the request")
+        @Test
+        void shouldReturnErrorWhenInvalidCaseIdPassed() throws Exception {
+            CaseViewResource caseViewResource = new CaseViewResource();
+            caseViewResource.setCaseViewActionableEvents(
+                new CaseViewActionableEvent[]{new CaseViewActionableEvent(), new CaseViewActionableEvent()}
+            );
+            stubGetCaseInternal(CASE_ID, caseViewResource);
+
+            MvcResult result = this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
+                                     .queryParam("case_id", "1234567890123456"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(CASE_ID_INVALID)))
+                .andReturn();
+            String response = result.getResponse().getContentAsString();
         }
 
     }

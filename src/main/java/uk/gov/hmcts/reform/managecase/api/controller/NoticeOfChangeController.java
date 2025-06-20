@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import org.hibernate.validator.constraints.LuhnCheck;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -67,6 +69,7 @@ import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 @RequestMapping(path = "/noc")
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class NoticeOfChangeController {
+    private static final Logger LOG = LoggerFactory.getLogger(NoticeOfChangeController.class);
 
     @SuppressWarnings({"squid:S1075"})
     public static final String GET_NOC_QUESTIONS = "/noc-questions";
@@ -108,6 +111,13 @@ public class NoticeOfChangeController {
         this.applyNoCDecisionService = applyNoCDecisionService;
         this.noticeOfChangeApprovalService = noticeOfChangeApprovalService;
         this.jacksonUtils = jacksonUtils;
+    }
+
+    private void jclog(String message) {
+        LOG.info("JCDEBUG: Info: NoticeOfChangeController: {}", message);
+        LOG.warn("JCDEBUG: Warn: NoticeOfChangeController: {}", message);
+        LOG.error("JCDEBUG: Error: NoticeOfChangeController: {}", message);
+        LOG.debug("JCDEBUG: Debug: NoticeOfChangeController: {}", message);
     }
 
     @GetMapping(path = GET_NOC_QUESTIONS, produces = APPLICATION_JSON_VALUE)
@@ -184,6 +194,7 @@ public class NoticeOfChangeController {
                                                                    NoCValidationError.NOC_CASE_ID_INVALID,
                                                                    ignoreNonDigitCharacters = false)
                                                                    String caseId) {
+        jclog("getNoticeOfChangeQuestions() called with caseId: " + caseId);
         return noticeOfChangeQuestions.getChallengeQuestions(caseId);
     }
 
@@ -250,6 +261,7 @@ public class NoticeOfChangeController {
     })
     public VerifyNoCAnswersResponse verifyNoticeOfChangeAnswers(
         @Valid @RequestBody VerifyNoCAnswersRequest verifyNoCAnswersRequest) {
+        jclog("verifyNoticeOfChangeAnswers() called with request: " + verifyNoCAnswersRequest);
         NoCRequestDetails result = verifyNoCAnswersService.verifyNoCAnswers(verifyNoCAnswersRequest);
         return result.toVerifyNoCAnswersResponse(VERIFY_NOC_ANSWERS_MESSAGE);
     }
@@ -337,6 +349,7 @@ public class NoticeOfChangeController {
     })
     public ApplyNoCDecisionResponse applyNoticeOfChangeDecision(
         @Valid @RequestBody ApplyNoCDecisionRequest applyNoCDecisionRequest) {
+        jclog("applyNoticeOfChangeDecision() called with request: " + applyNoCDecisionRequest);
         ApplyNoCDecisionResponse result = new ApplyNoCDecisionResponse();
         try {
             result.setData(applyNoCDecisionService.applyNoCDecision(applyNoCDecisionRequest));
@@ -386,6 +399,7 @@ public class NoticeOfChangeController {
     public AboutToStartCallbackResponse prepareNoC(
         @Valid @RequestBody AboutToStartCallbackRequest aboutToStartCallbackRequest) {
 
+        jclog("prepareNoC() called with request: " + aboutToStartCallbackRequest);
         return AboutToStartCallbackResponse.builder()
             .data(prepareNoCService.prepareNoCRequest(aboutToStartCallbackRequest.getCaseDetails()))
             .state(aboutToStartCallbackRequest.getCaseDetails().getState())
@@ -439,6 +453,7 @@ public class NoticeOfChangeController {
     })
     public RequestNoticeOfChangeResponse requestNoticeOfChange(@Valid @RequestBody RequestNoticeOfChangeRequest
                                                                                         requestNoticeOfChangeRequest) {
+        jclog("requestNoticeOfChange() called with request: " + requestNoticeOfChangeRequest);
         VerifyNoCAnswersRequest verifyNoCAnswersRequest
             = new VerifyNoCAnswersRequest(requestNoticeOfChangeRequest.getCaseId(),
                                           requestNoticeOfChangeRequest.getAnswers());
@@ -479,6 +494,7 @@ public class NoticeOfChangeController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE)
     })
     public SubmitCallbackResponse checkNoticeOfChangeApproval(@Valid @RequestBody CallbackRequest callbackRequest) {
+        jclog("checkNoticeOfChangeApproval() called with request: " + callbackRequest);
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findCorNodeWithApprovalStatus();
         if (changeOrganisationRequestFieldJson.isEmpty()) {
@@ -532,6 +548,7 @@ public class NoticeOfChangeController {
             message = AuthError.UNAUTHORISED_S2S_SERVICE)
     })
     public AboutToSubmitCallbackResponse setOrganisationToRemove(@Valid @RequestBody CallbackRequest callbackRequest) {
+        jclog("setOrganisationToRemove() called with request: " + callbackRequest);
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         Optional<JsonNode> changeOrganisationRequestFieldJson = caseDetails.findChangeOrganisationRequestNode();
 

@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDateTime;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,9 +17,9 @@ import org.hibernate.validator.constraints.LuhnCheck;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.SecurityClassification;
 
-import javax.validation.ValidationException;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import jakarta.validation.ValidationException;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -69,7 +71,7 @@ public class CaseDetails {
     @JsonProperty("security_classification")
     private SecurityClassification securityClassification;
     @JsonProperty("data_classification")
-    @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "
+    @Schema(description = "Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "
         + "as field's value.")
     private Map<String, JsonNode> dataClassification;
 

@@ -221,7 +221,7 @@ withPipeline("java", product, component) {
             reportName           : "Contract Tests Report"
         ]
     }
-
+}
 /**
   * Forces a recursive copy by always returning 0 regardless of errors
   */

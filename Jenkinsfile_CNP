@@ -116,10 +116,12 @@ env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
 withPipeline("java", product, component) {
   afterAlways('test') {
      builder.gradle('integration')
+
      // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
+
      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
-     builder.gradle('integration')
+
      publishHTML target: [
           allowMissing         : true,
           alwaysLinkToLastBuild: true,
@@ -167,7 +169,7 @@ withPipeline("java", product, component) {
   disableLegacyDeployment()
 
   afterAlways('smoketest:preview') {
-    //copyIgnore('./build/reports/tests/befta/smoke/cucumber-html-reports', './BEFTA Report for Smoke Tests/')
+    copyIgnore('./build/reports/tests/befta/smoke/cucumber-html-reports', './BEFTA Report for Smoke Tests/')
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
     publishHTML target: [
       allowMissing         : true,
@@ -180,7 +182,7 @@ withPipeline("java", product, component) {
   }
 
   afterAlways('smoketest:aat') {
-    //copyIgnore('./build/reports/tests/befta/smoke/cucumber-html-reports', './BEFTA Report for Smoke Tests/')
+    copyIgnore('./build/reports/tests/befta/smoke/cucumber-html-reports', './BEFTA Report for Smoke Tests/')
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
     publishHTML target: [
             allowMissing         : true,
@@ -193,7 +195,7 @@ withPipeline("java", product, component) {
   }
 
   afterAlways('functionalTest:preview') {
-    //copyIgnore('./build/reports/tests/befta/functional/cucumber-html-reports', './BEFTA Report for Functional Tests/')
+    copyIgnore('./build/reports/tests/befta/functional/cucumber-html-reports', './BEFTA Report for Functional Tests/')
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
     publishHTML target: [
             allowMissing         : true,
@@ -206,7 +208,7 @@ withPipeline("java", product, component) {
   }
 
   afterAlways('functionalTest:aat') {
-    //copyIgnore('./build/reports/tests/befta/functional/cucumber-html-reports', './BEFTA Report for Functional Tests/')
+    copyIgnore('./build/reports/tests/befta/functional/cucumber-html-reports', './BEFTA Report for Functional Tests/')
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
     publishHTML target: [
             allowMissing         : true,

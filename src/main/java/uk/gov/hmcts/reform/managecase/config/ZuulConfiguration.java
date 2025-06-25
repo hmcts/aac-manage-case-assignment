@@ -33,10 +33,12 @@ public class ZuulConfiguration {
 
     private void jclog(String message) {
         LOG.info("JCDEBUG: Info: ZuulConfiguration: {}", message);
-        LOG.warn("JCDEBUG: Warn: ZuulConfiguration: {}", message);
-        LOG.error("JCDEBUG: Error: ZuulConfiguration: {}", message);
-        LOG.debug("JCDEBUG: Debug: ZuulConfiguration: {}", message);
     }
+
+    // Preview environment :-
+    // routeLocator.getRoutes = [Route{id='data-store', fullPath='/ccd/**', path='/**', location='http://ccd-data-store-api-pr-1260-java.ccd', prefix='/ccd', retryable=false, sensitiveHeaders=[cookie, set-cookie], customSensitiveHeaders=true, prefixStripped=true}]
+    // routeLocator.getClass = class org.springframework.cloud.netflix.zuul.filters.CompositeRouteLocator
+    // routeLocator.toString = org.springframework.cloud.netflix.zuul.filters.CompositeRouteLocator@a451491
 
     /**
      * Constructs a new bean post-processor for Zuul.

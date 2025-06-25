@@ -1,0 +1,14 @@
+{
+  "_guid_": "F-206_NoC_Auto_Approval_Case_Creation_By_BeftaMasterCaseworker_Token_Creation",
+  "_extends_": "NoC_Auto_Approval_Case_Creation_Token_Creation__Base",
+
+  "specs": [
+    "As a prerequisite"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  }
+}

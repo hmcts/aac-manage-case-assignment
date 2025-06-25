@@ -1,0 +1,13 @@
+{
+  "_guid_": "GrantAccess_FT_NoCAutoApprovalCaseType_BeftaMasterCaseworker_SPECIFIC__Base",
+  "_extends_": "CaseUserRoles_Add__PositiveResponse_Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    },
+    "caseworker": {
+      "_extends_": "MasterCaseworker_RegionalStaff"
+    }
+  }
+}

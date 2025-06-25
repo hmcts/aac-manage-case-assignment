@@ -1,0 +1,12 @@
+{
+  "_guid_": "Access_Metadata_Case_Found",
+  "_extends_": "Retrieve_Access_Metadata_By_Case_ID__Base",
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "accessGrants" : [ "STANDARD" ],
+      "accessProcess" : "NONE"
+    }
+  }
+}

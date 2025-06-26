@@ -13,7 +13,7 @@ plugins {
 ext {
   set('springCloudVersion', '2021.0.8')
   set('spring-security.version','5.7.11')
-  set('spring-framework.version','5.3.39')
+  set('spring-framework.version','5.3.27')
   set('log4j2.version','2.17.1')
   set('jackson.version','2.16.0')
   set('snakeyaml.version','2.0')
@@ -250,7 +250,7 @@ dependencyManagement {
     }
 
     // CVE-2021-23181
-    dependencySet(group: 'org.apache.tomcat.embed', version: '11.0.8') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.104') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
@@ -371,6 +371,7 @@ dependencies {
 
   implementation group: 'org.json', name: 'json', version: '20240303'
 
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE"
   implementation "net.minidev:json-smart:2.4.9"
 
   // Explicitly specify version of jakarta.el to be used to resolve CVE-2021-28170
@@ -378,8 +379,8 @@ dependencies {
 
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.security:spring-security-config"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:3.5.3"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.5.3"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.5.15"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.5.15"
 
   implementation "io.github.openfeign:feign-httpclient:11.0"
   testImplementation 'io.github.openfeign:feign-jackson:10.7.0'

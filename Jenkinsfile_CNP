@@ -119,17 +119,30 @@ withPipeline("java", product, component) {
 
      // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
-
      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
 
-     publishHTML target: [
+     copyIgnore('./build/reports/tests/test', './Unit Tests/')
+     copyIgnore('./build/reports/tests/integration', './Integration Tests/')
+     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Unit Tests/**/*'
+     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
+
+    publishHTML target: [
           allowMissing         : true,
           alwaysLinkToLastBuild: true,
           keepAll              : true,
-          reportDir            : 'build/reports/tests/integration',
+          reportDir            : 'Unit Tests',
           reportFiles          : "index.html",
-          reportName           : "Integration Test Report"
+          reportName           : "Unit Test Report"
       ]
+
+    publishHTML target: [
+      allowMissing         : true,
+      alwaysLinkToLastBuild: true,
+      keepAll              : true,
+      reportDir            : 'Integration Tests',
+      reportFiles          : "index.html",
+      reportName           : "Integration Test Report"
+    ]
   }
   onMaster {
     enableSlackNotifications('#ccd-master-builds')

@@ -13,7 +13,7 @@ plugins {
 ext {
   set('springCloudVersion', '2021.0.8')
   set('spring-security.version','5.7.11')
-  set('spring-framework.version','5.3.40')
+  set('spring-framework.version','5.3.39')
   set('log4j2.version','2.17.1')
   set('jackson.version','2.16.0')
   set('snakeyaml.version','2.0')
@@ -422,7 +422,7 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.24.2')
+  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.4')
 
   testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.0'
 
@@ -448,7 +448,7 @@ dependencies {
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation 'com.github.hmcts:fortify-client:1.4.3:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
 }
 
 bootJar {

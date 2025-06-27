@@ -12,6 +12,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 public class PrdFeignClient extends Client.Default {
     private static final Logger log = LoggerFactory.getLogger(PrdFeignClient.class);
@@ -44,7 +45,7 @@ public class PrdFeignClient extends Client.Default {
                 502,
                 response.reason(),
                 response.request().httpMethod(),
-                null,
+                (Date) null,
                 response.request()
             );
         }

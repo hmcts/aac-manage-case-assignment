@@ -1,24 +1,24 @@
 plugins {
   id 'application'
   id 'jacoco'
-  id 'io.spring.dependency-management' version '1.1.6'
+  id 'io.spring.dependency-management' version '1.1.7'
   id 'org.springframework.boot' version '2.7.18'
   id 'uk.gov.hmcts.java' version '0.12.57'
-  id 'com.github.ben-manes.versions' version '0.51.0'
+  id 'com.github.ben-manes.versions' version '0.52.0'
   id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
-  id 'org.sonarqube' version '5.0.0.4638'
-  id 'au.com.dius.pact' version '4.1.7'
+  id 'org.sonarqube' version '6.2.0.5505'
+  id 'au.com.dius.pact' version '4.6.17'
 }
 
 ext {
-  set('springCloudVersion', '2021.0.8')
-  set('spring-security.version','5.7.11')
-  set('spring-framework.version','5.3.27')
-  set('log4j2.version','2.17.1')
+  set('springCloudVersion', '2025.0.0')
+  set('spring-security.version','5.8.16')
+  set('spring-framework.version','5.3.39')
+  //---- JC: ABOVE CHECKED ----
+  set('log4j2.version','2.25.0')
   set('jackson.version','2.16.0')
   set('snakeyaml.version','2.0')
 }
-
 
 group = 'uk.gov.hmcts.reform'
 
@@ -215,6 +215,7 @@ sonarqube {
     property "sonar.projectName", "Reform::manage-case-assignment"
     property "sonar.projectKey", "uk.gov.hmcts.reform:manage-case-assignment"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation}"
+    property "sonar.exclusions", "**/ZuulConfiguration.java"
   }
 }
 
@@ -258,7 +259,7 @@ dependencyManagement {
     dependencySet(group: 'com.netflix.servo', version: '0.12.5') {
       entry 'servo-core'
     }
-    dependencySet(group: 'org.codehaus.groovy', version: '3.0.3') {
+    dependencySet(group: 'org.apache.groovy', version: '4.0.21') {
       entry 'groovy'
       entry 'groovy-xml'
       entry 'groovy-json'
@@ -280,7 +281,7 @@ def versions = [
   reformLogging   : '6.0.1',
   springBoot      : springBoot.class.package.implementationVersion,
   springfoxSwagger: '3.0.0',
-  restAssured    : '4.3.1',
+  restAssured    : '5.4.0',
   lombok  : '1.18.30',
   pact_version    : '4.1.7',
   serviceAuthVersion : '4.0.3',
@@ -370,8 +371,6 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.10.RELEASE'
 
   implementation group: 'org.json', name: 'json', version: '20240303'
-
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE"
   implementation "net.minidev:json-smart:2.4.9"
 
   // Explicitly specify version of jakarta.el to be used to resolve CVE-2021-28170
@@ -379,8 +378,8 @@ dependencies {
 
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.security:spring-security-config"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.5.15"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.5.15"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:3.5.3"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.5.3"
 
   implementation "io.github.openfeign:feign-httpclient:11.0"
   testImplementation 'io.github.openfeign:feign-jackson:10.7.0'
@@ -418,12 +417,12 @@ dependencies {
 
   // groovy v3.* added to avoid 'WARNING: Illegal reflective access by org.codehaus.groovy.reflection.CachedClass'
   // in groovy:2.5.* when running functional/befta tests
-  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.3'
+  testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.21'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.24.2')
+  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.4')
 
   testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.0'
 
@@ -449,7 +448,7 @@ dependencies {
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation 'com.github.hmcts:fortify-client:1.4.3:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
 }
 
 bootJar {

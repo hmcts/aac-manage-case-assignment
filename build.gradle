@@ -12,10 +12,10 @@ plugins {
 
 ext {
   set('springCloudVersion', '2025.0.0')
-  //---- JC: ABOVE CHECKED ----
   set('spring-security.version','5.8.16')
   set('spring-framework.version','5.3.39')
-  set('log4j2.version','2.17.1')
+  //---- JC: ABOVE CHECKED ----
+  set('log4j2.version','2.25.0')
   set('jackson.version','2.16.0')
   set('snakeyaml.version','2.0')
 }

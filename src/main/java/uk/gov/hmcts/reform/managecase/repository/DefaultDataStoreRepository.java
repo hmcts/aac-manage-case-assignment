@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.repository;
 import com.fasterxml.jackson.databind.JsonNode;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
+@Primary
 @Repository("defaultDataStoreRepository")
 @SuppressWarnings({"PMD.PreserveStackTrace", "PMD.DataflowAnomalyAnalysis",
     "PMD.LawOfDemeter","PMD.DataflowAnomalyAnalysis",

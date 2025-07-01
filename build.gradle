@@ -11,8 +11,8 @@ plugins {
 }
 
 ext {
-  set('springCloudVersion', '2025.0.0')
-  set('spring-security.version','5.8.16')
+  set('springCloudVersion', '2021.0.8')
+  set('spring-security.version','5.7.11')
   set('spring-framework.version','5.3.39')
   //---- JC: ABOVE CHECKED ----
   set('log4j2.version','2.25.0')
@@ -259,7 +259,7 @@ dependencyManagement {
     dependencySet(group: 'com.netflix.servo', version: '0.12.5') {
       entry 'servo-core'
     }
-    dependencySet(group: 'org.apache.groovy', version: '4.0.21') {
+    dependencySet(group: 'org.codehaus.groovy', version: '3.0.3') {
       entry 'groovy'
       entry 'groovy-xml'
       entry 'groovy-json'
@@ -281,7 +281,7 @@ def versions = [
   reformLogging   : '6.0.1',
   springBoot      : springBoot.class.package.implementationVersion,
   springfoxSwagger: '3.0.0',
-  restAssured    : '5.4.0',
+  restAssured    : '4.3.1',
   lombok  : '1.18.30',
   pact_version    : '4.1.7',
   serviceAuthVersion : '4.0.3',
@@ -417,7 +417,7 @@ dependencies {
 
   // groovy v3.* added to avoid 'WARNING: Illegal reflective access by org.codehaus.groovy.reflection.CachedClass'
   // in groovy:2.5.* when running functional/befta tests
-  testImplementation group: 'org.apache.groovy', name: 'groovy', version: '4.0.21'
+  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.3'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath

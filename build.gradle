@@ -18,7 +18,6 @@ ext {
   set('jackson.version','2.17.3')
   set('snakeyaml.version','2.4')
 }
-//---- JC: ABOVE CHECKED ----
 
 group = 'uk.gov.hmcts.reform'
 
@@ -241,8 +240,9 @@ dependencyManagement {
     mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
   }
   dependencies {
-    dependency(group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.77'){
-    }
+    dependency(group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.81')
+
+    //---------- JC: ABOVE CHECKED ----------
 
     // CVE-2018-10237 - Unbounded memory allocation
     dependencySet(group: 'com.google.guava', version: '32.1.2-jre') {
@@ -314,7 +314,7 @@ dependencies {
 
     implementation('org.bouncycastle:bcprov-jdk18on') {
       version {
-        strictly '1.77'
+        strictly '1.81'
       }
     }
     implementation('org.json:json') {

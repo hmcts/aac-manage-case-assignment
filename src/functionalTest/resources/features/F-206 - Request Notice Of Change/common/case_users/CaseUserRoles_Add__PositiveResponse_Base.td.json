@@ -2,7 +2,7 @@
   "_guid_": "CaseUserRoles_Add__PositiveResponse_Base",
   "_extends_": "CaseUserRoles_Add__Base",
 
-  "s2sClientId": "aac_manage_case_assignment",
+  "s2sClientId": "xui_webapp",
 
   "expectedResponse": {
     "_extends_": "Common_201_Response",

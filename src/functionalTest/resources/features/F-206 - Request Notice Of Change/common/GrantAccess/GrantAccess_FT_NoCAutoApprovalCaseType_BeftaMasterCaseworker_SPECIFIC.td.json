@@ -10,7 +10,7 @@
       "case_users": [
         {
           "case_id": "${[scenarioContext][siblingContexts][F-206_NoC_Auto_Approval_Case_Creation_By_BeftaMasterCaseworker_With_Assigned_Org_Policies][testData][actualResponse][body][id]}",
-          "user_id": "${[scenarioContext][testData][users][caseworker][id]}",
+          "user_id": "${[scenarioContext][testData][users][invokingUser][id]}",
           "case_role": "[SPECIFICACCESSPROFILE]"
         }
       ]

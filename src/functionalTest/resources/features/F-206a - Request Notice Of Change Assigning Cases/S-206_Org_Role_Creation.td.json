@@ -59,48 +59,6 @@
               "jurisdiction": "IA",
               "substantive" : "N"
             }
-          },
-          {
-            "_extends_": "ResponseRequestedRole",
-            "process": "specific-access",
-            "actorId": "${[scenarioContext][testData][users][invokingUser][id]}",
-            "roleType": "ORGANISATION",
-            "grantType": "STANDARD",
-            "roleCategory": "JUDICIAL",
-            "roleName": "case-allocator",
-            "attributes":
-            {
-              "jurisdiction": "IA",
-              "substantive" : "N"
-            }
-          },
-          {
-            "_extends_": "ResponseRequestedRole",
-            "process": "specific-access",
-            "actorId": "${[scenarioContext][testData][users][invokingUser][id]}",
-            "roleType": "ORGANISATION",
-            "grantType": "STANDARD",
-            "roleCategory": "JUDICIAL",
-            "roleName": "case-allocator",
-            "attributes":
-            {
-              "jurisdiction": "IA",
-              "substantive" : "N"
-            }
-          },
-          {
-            "_extends_": "ResponseRequestedRole",
-            "process": "specific-access",
-            "actorId": "${[scenarioContext][testData][users][invokingUser][id]}",
-            "roleType": "ORGANISATION",
-            "grantType": "STANDARD",
-            "roleCategory": "JUDICIAL",
-            "roleName": "case-allocator",
-            "attributes":
-            {
-              "jurisdiction": "IA",
-              "substantive" : "N"
-            }
           }
         ]
       }

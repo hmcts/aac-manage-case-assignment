@@ -27,10 +27,11 @@
           "_extends_": "RequestedRole",
           "roleType" : "CASE",
           "grantType" : "BASIC",
-          "classification" : "RESTRICTED",
+          "classification" : "PUBLIC",
           "attributes": {
             "caseId": "${[scenarioContext][customValues][caseIdAsStringFrom_F-206_NoC_Auto_Approval_Case_Creation_By_BeftaMasterCaseworker_With_Assigned_Org_Policies]}",
-            "requestedRole":"specific-access-judiciary"
+            "requestedRole":"specific-access-judiciary",
+            "caseType" : "FT_NoCAutoApprovalCaseType"
           },
           "roleName": "specific-access-requested",
           "roleCategory": "JUDICIAL",
@@ -75,7 +76,7 @@
               "requestedRole":"specific-access-judiciary",
               "caseId" : "${[scenarioContext][testData][request][body][requestedRoles][0][attributes][caseId]}",
               "jurisdiction" : "${[scenarioContext][testData][request][body][requestedRoles][0][attributes][jurisdiction]}",
-              "caseType" : "Asylum",
+              "caseType" : "FT_NoCAutoApprovalCaseType",
               "substantive" : "N"
             },
             "notes" : [{

@@ -245,16 +245,16 @@ dependencyManagement {
     //---------- JC: ABOVE CHECKED ----------
 
     // CVE-2018-10237 - Unbounded memory allocation
-    // dependencySet(group: 'com.google.guava', version: '32.1.2-jre') {
-    //   entry 'guava'
-    // }
+    dependencySet(group: 'com.google.guava', version: '32.1.2-jre') {
+      entry 'guava'
+    }
 
     // CVE-2021-23181
-    // dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.104') {
-    //   entry 'tomcat-embed-core'
-    //   entry 'tomcat-embed-el'
-    //   entry 'tomcat-embed-websocket'
-    // }
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.104') {
+      entry 'tomcat-embed-core'
+      entry 'tomcat-embed-el'
+      entry 'tomcat-embed-websocket'
+    }
 
     // multiple CVEs
     // dependencySet(group: 'com.netflix.servo', version: '0.12.5') {
@@ -280,7 +280,7 @@ repositories {
 }
 
 def versions = [
-  reformLogging   : '6.0.1',
+  reformLogging   : '6.1.9',
   springBoot      : springBoot.class.package.implementationVersion,
   springfoxSwagger: '3.0.0',
   restAssured    : '4.3.1',

@@ -245,26 +245,28 @@ dependencyManagement {
     //---------- JC: ABOVE CHECKED ----------
 
     // CVE-2018-10237 - Unbounded memory allocation
-    dependencySet(group: 'com.google.guava', version: '32.1.2-jre') {
-      entry 'guava'
-    }
+    // dependencySet(group: 'com.google.guava', version: '32.1.2-jre') {
+    //   entry 'guava'
+    // }
 
     // CVE-2021-23181
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.104') {
-      entry 'tomcat-embed-core'
-      entry 'tomcat-embed-el'
-      entry 'tomcat-embed-websocket'
-    }
+    // dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.104') {
+    //   entry 'tomcat-embed-core'
+    //   entry 'tomcat-embed-el'
+    //   entry 'tomcat-embed-websocket'
+    // }
+
     // multiple CVEs
-    dependencySet(group: 'com.netflix.servo', version: '0.12.5') {
-      entry 'servo-core'
-    }
-    dependencySet(group: 'org.codehaus.groovy', version: '3.0.3') {
-      entry 'groovy'
-      entry 'groovy-xml'
-      entry 'groovy-json'
-      entry 'groovy-nio'
-    }
+    // dependencySet(group: 'com.netflix.servo', version: '0.12.5') {
+    //   entry 'servo-core'
+    // }
+
+    // dependencySet(group: 'org.codehaus.groovy', version: '3.0.3') {
+    //   entry 'groovy'
+    //   entry 'groovy-xml'
+    //   entry 'groovy-json'
+    //   entry 'groovy-nio'
+    // }
   }
 }
 

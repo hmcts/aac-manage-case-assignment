@@ -16,9 +16,9 @@ ext {
   set('spring-framework.version','5.3.39')
   set('log4j2.version','2.24.3')
   set('jackson.version','2.17.3')
-  //---- JC: ABOVE CHECKED ----
-  set('snakeyaml.version','2.0')
+  set('snakeyaml.version','2.4')
 }
+//---- JC: ABOVE CHECKED ----
 
 group = 'uk.gov.hmcts.reform'
 

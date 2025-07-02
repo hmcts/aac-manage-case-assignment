@@ -282,9 +282,10 @@ def versions = [
   springBoot      : springBoot.class.package.implementationVersion,
   springfoxSwagger: '3.0.0',
   restAssured    : '4.5.1',
-  //---------- JC: ABOVE CHECKED ----------
   lombok  : '1.18.38',
-  pact_version    : '4.2.4',
+  //---------- JC: ABOVE CHECKED ----------
+  // pact_version 2.4.2 passed  ,  4.3.15 failed
+  pact_version    : '4.3.0',
   serviceAuthVersion : '4.0.3',
   idamJavaClient : '2.0.1',
 ]

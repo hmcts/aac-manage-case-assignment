@@ -301,11 +301,7 @@ dependencies {
 
     implementation('org.springframework.boot:spring-boot-starter')
 
-    implementation('org.springframework.security:spring-security-rsa'){
-      version {
-        strictly '1.0.12.RELEASE'
-      }
-    }
+    implementation('org.springframework.security:spring-security-rsa')
 
     implementation('org.bouncycastle:bcprov-jdk18on') {
       version {

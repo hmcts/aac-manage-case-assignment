@@ -286,7 +286,7 @@ def versions = [
   //---------- JC: ABOVE CHECKED ----------
   // pact_version 4.2.4 PASSED  ,  4.3.0 FAILED
   pact_version    : '4.2.21',
-  serviceAuthVersion : '4.0.3',
+  serviceAuthVersion : '5.1.0',
   idamJavaClient : '2.0.1',
 ]
 

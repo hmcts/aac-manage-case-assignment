@@ -284,8 +284,8 @@ def versions = [
   restAssured    : '4.5.1',
   lombok  : '1.18.38',
   //---------- JC: ABOVE CHECKED ----------
-  // pact_version 4.2.4 PASSED  ,  4.2.14 FAILED  ,  https://mvnrepository.com/artifact/au.com.dius.pact.consumer/junit5?p=5
-  pact_version    : '4.2.9',
+  // pact_version 4.2.9 PASSED  ,  4.2.14 FAILED  ,  https://mvnrepository.com/artifact/au.com.dius.pact.consumer/junit5?p=5
+  pact_version    : '4.2.11',
   serviceAuthVersion : '4.0.3',
   idamJavaClient : '3.0.3',
 ]

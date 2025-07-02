@@ -303,11 +303,8 @@ dependencies {
 
     implementation('org.springframework.security:spring-security-rsa')
 
-    implementation('org.bouncycastle:bcprov-jdk18on') {
-      version {
-        strictly '1.81'
-      }
-    }
+    implementation('org.bouncycastle:bcprov-jdk18on')
+
     implementation('org.json:json') {
       version {
         strictly '20240303'

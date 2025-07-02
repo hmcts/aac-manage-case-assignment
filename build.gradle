@@ -285,7 +285,7 @@ def versions = [
   lombok  : '1.18.38',
   //---------- JC: ABOVE CHECKED ----------
   // pact_version 4.2.9 PASSED  ,  4.2.14 FAILED  ,  https://mvnrepository.com/artifact/au.com.dius.pact.consumer/junit5?p=5
-  pact_version    : '4.2.11',
+  pact_version    : '4.2.13',
   serviceAuthVersion : '4.0.3',
   idamJavaClient : '3.0.3',
 ]

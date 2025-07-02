@@ -287,7 +287,7 @@ def versions = [
   // pact_version 4.2.4 PASSED  ,  4.3.0 FAILED
   pact_version    : '4.2.21',
   serviceAuthVersion : '4.0.3',
-  idamJavaClient : '2.0.1',
+  idamJavaClient : '3.0.3',
 ]
 
 configurations.all {

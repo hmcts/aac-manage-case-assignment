@@ -299,11 +299,7 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.3.0'
     implementation('org.springframework.cloud:spring-cloud-starter')
 
-    implementation('org.springframework.boot:spring-boot-starter'){
-      version {
-        strictly '3.1.7'
-      }
-    }
+    implementation('org.springframework.boot:spring-boot-starter')
 
     implementation('org.springframework.security:spring-security-rsa'){
       version {

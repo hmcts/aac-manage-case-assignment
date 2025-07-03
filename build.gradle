@@ -331,7 +331,6 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.serviceAuthVersion
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamJavaClient
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.10.RELEASE'
-  //------------ JC: ABOVE CHECKED ------------
 
   implementation group: 'org.json', name: 'json', version: '20250517'
   implementation "net.minidev:json-smart:2.5.2"
@@ -348,9 +347,9 @@ dependencies {
   testImplementation 'io.github.openfeign:feign-jackson:13.6'
   testImplementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
   implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
-  //---------- JC: ABOVE BUILDING / CHECKING ----------
   implementation "com.github.ben-manes.caffeine:caffeine:3.2.1"
-  implementation "org.apache.httpcomponents:httpclient:4.5.13"
+  //------------ JC: ABOVE CHECKED ------------
+  implementation "org.apache.httpcomponents:httpclient:4.5.14"
 
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
   implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'

@@ -321,8 +321,8 @@ dependencies {
 
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
   //------------ JC: ABOVE CHECKED ------------
-  implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.17'
-  implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: '2.0.17'
+  implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+  implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.32'
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
 

@@ -326,19 +326,19 @@ dependencies {
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
-  //------------ JC: ABOVE CHECKED ------------
 
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.serviceAuthVersion
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamJavaClient
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.10.RELEASE'
-  //---------- JC: ABOVE BUILDING / CHECKING ----------
+  //------------ JC: ABOVE CHECKED ------------
 
   implementation group: 'org.json', name: 'json', version: '20250517'
   implementation "net.minidev:json-smart:2.5.2"
+  //---------- JC: ABOVE BUILDING / CHECKING ----------
 
   // Explicitly specify version of jakarta.el to be used to resolve CVE-2021-28170
-  implementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.1'
+  implementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.2'
 
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.security:spring-security-config"

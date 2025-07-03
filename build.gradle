@@ -335,7 +335,6 @@ dependencies {
 
   implementation group: 'org.json', name: 'json', version: '20250517'
   implementation "net.minidev:json-smart:2.5.2"
-  //---------- JC: ABOVE BUILDING / CHECKING ----------
 
   // Explicitly specify version of jakarta.el to be used to resolve CVE-2021-28170
   implementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.2'
@@ -344,8 +343,9 @@ dependencies {
   implementation "org.springframework.security:spring-security-config"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client:3.5.3"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.5.3"
+  //---------- JC: ABOVE BUILDING / CHECKING ----------
 
-  implementation "io.github.openfeign:feign-httpclient:11.0"
+  implementation "io.github.openfeign:feign-httpclient:13.6"
   testImplementation 'io.github.openfeign:feign-jackson:10.7.0'
   testImplementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
   implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'

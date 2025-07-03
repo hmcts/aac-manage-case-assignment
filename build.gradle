@@ -353,11 +353,11 @@ dependencies {
 
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
   implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.4'
-  //------------ JC: ABOVE CHECKING ------------
   implementation('uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE')
 
   // CVE-2021-42550
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.37.2'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.3'
+  //------------ JC: ABOVE CHECKING ------------
 
   implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
   annotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final'

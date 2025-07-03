@@ -352,7 +352,8 @@ dependencies {
   implementation "org.apache.httpcomponents:httpclient:4.5.14"
 
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
-  implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'
+  implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.4'
+  //------------ JC: ABOVE CHECKING ------------
   implementation('uk.gov.service.notify:notifications-java-client:3.15.1-RELEASE') {
     exclude group: 'org.bitbucket.b_c', module: 'jose4j'
   }

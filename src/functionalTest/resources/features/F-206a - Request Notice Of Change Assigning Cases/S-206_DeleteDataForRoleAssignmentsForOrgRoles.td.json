@@ -1,5 +1,6 @@
 {
   "_guid_": "S-206_DeleteDataForRoleAssignmentsForOrgRoles",
+  "s2sClientId": "xui_webapp",
   "productName": "Role Assignment Service",
   "operationName": "Delete Role Assignments by Process",
   "method": "DELETE",
@@ -20,7 +21,7 @@
     },
     "pathVariables": {
       "process": "specific-access",
-      "reference": "${[scenarioContext][parentContext][childContexts][S-210_Org_Role_Creation][testData][request][body][roleRequest][reference]}"
+      "reference": "${[scenarioContext][parentContext][childContexts][S-206_Org_Role_Creation][testData][request][body][roleRequest][reference]}"
     }
   },
   "expectedResponse": {

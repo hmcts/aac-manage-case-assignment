@@ -1,6 +1,6 @@
 {
   "_guid_": "F-206_Verify_Granted_Case_Roles_BeftaMasterCaseworker",
-  "_extends_": "F-206_Verify_Granted_Case_Roles_R1_R2__Base",
+  "_extends_": "F-206_Verify_Granted_Case_Roles_Specific__Base",
 
   "specs": [
     "to verify that specific access has been granted to BeftaMasterCaseworker for the case"

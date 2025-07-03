@@ -16,6 +16,7 @@
       "roleRequest": {
         "assignerId": "${[scenarioContext][testData][users][invokingUser][id]}",
         "process" : "specific-access",
+        "grantType" : "SPECIFIC",
         "reference": "OVERRIDE_ME",
         "replaceExisting": true
       }

@@ -62,6 +62,13 @@
       "lastName": "Solicitor 4",
       "email": "befta.solicitor.4@gmail.com",
       "idamStatus": "ACTIVE"
+    },
+    {
+      "userIdentifier": "",
+      "firstName": "Master",
+      "lastName": "caseworker",
+      "email": "master.caseworker@gmail.com",
+      "idamStatus": "ACTIVE"
     }
   ],
   "organisationIdentifier": "QUK822N"

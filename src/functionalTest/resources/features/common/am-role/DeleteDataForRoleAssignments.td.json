@@ -1,5 +1,6 @@
 {
   "_guid_": "DeleteDataForRoleAssignments",
+  "s2sClientId": "xui_webapp",
   "productName": "Role Assignment Service",
   "operationName": "Delete Role Assignments by Process",
   "method": "DELETE",

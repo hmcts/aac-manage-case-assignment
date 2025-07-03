@@ -269,12 +269,12 @@ def versions = [
   reformLogging   : '6.1.9',
   springBoot      : springBoot.class.package.implementationVersion,
   springfoxSwagger: '3.0.0',
-  restAssured    : '4.5.1',
-  lombok  : '1.18.38',
+  restAssured     : '4.5.1',
+  lombok          : '1.18.38',
   pact_version    : '4.2.13',
   // serviceAuthVersion next version after 4.0.3 is 5.1.0
   serviceAuthVersion : '4.0.3',
-  idamJavaClient : '3.0.3',
+  idamJavaClient  : '3.0.3',
 ]
 
 dependencies {
@@ -307,18 +307,13 @@ dependencies {
 
   implementation group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '1.5.6'
 
-  //---------- JC: ABOVE CHECKED ----------
-
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
   // this doesn't support spring boot v3, should be replaced with springdoc
   implementation group: 'io.springfox', name: 'springfox-boot-starter', version: versions.springfoxSwagger
+  //---------- JC: ABOVE CHECKED ----------
   // once updated to spring boot v3, this shouldn't be needed
-  implementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.5', {
-    version {
-      strictly '1.14.5'
-    }
-  }
+  implementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.6'
 
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -329,7 +324,6 @@ dependencies {
   implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.32'
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
-
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
 

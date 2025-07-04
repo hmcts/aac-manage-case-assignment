@@ -348,7 +348,6 @@ dependencies {
   testImplementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
   implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
   implementation "com.github.ben-manes.caffeine:caffeine:3.2.1"
-  //------------ JC: ABOVE CHECKED ------------
   implementation "org.apache.httpcomponents:httpclient:4.5.14"
 
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
@@ -367,14 +366,15 @@ dependencies {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
+  //------------ JC: ABOVE CHECKED ------------
   testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.3.0'
-  //------------ JC: ABOVE CHECKING ------------
   testImplementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
   testImplementation group: 'io.rest-assured', name: 'json-path', version: versions.restAssured
   testImplementation group: 'io.rest-assured', name: 'xml-path', version: versions.restAssured
 
   // https://mvnrepository.com/artifact/nl.jqno.equalsverifier/equalsverifier
-  testImplementation group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '3.14.3'
+  testImplementation group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '4.0.3'
+  //------------ JC: ABOVE CHECKING ------------
 
   // groovy v3.* added to avoid 'WARNING: Illegal reflective access by org.codehaus.groovy.reflection.CachedClass'
   // in groovy:2.5.* when running functional/befta tests

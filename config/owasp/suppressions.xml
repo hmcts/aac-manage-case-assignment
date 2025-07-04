@@ -2,11 +2,7 @@
   <suppress>
     <notes>Temporary Suppression
         CVE-2024-38820 refer [https://tools.hmcts.net/jira/browse/CFTS-6913]
-        CVE-2025-46701 refer [https://tools.hmcts.net/jira/browse/CCD-6534]
-        CVE-2025-48988 refer [https://tools.hmcts.net/jira/browse/CCD-6534]
     </notes>
     <cve>CVE-2024-38820</cve>
-    <cve>CVE-2025-46701</cve>
-    <cve>CVE-2025-48988</cve>
   </suppress>
 </suppressions>

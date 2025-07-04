@@ -1,24 +1,23 @@
 plugins {
   id 'application'
   id 'jacoco'
-  id 'io.spring.dependency-management' version '1.1.6'
+  id 'io.spring.dependency-management' version '1.1.7'
   id 'org.springframework.boot' version '2.7.18'
   id 'uk.gov.hmcts.java' version '0.12.57'
-  id 'com.github.ben-manes.versions' version '0.51.0'
+  id 'com.github.ben-manes.versions' version '0.52.0'
   id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
-  id 'org.sonarqube' version '5.0.0.4638'
-  id 'au.com.dius.pact' version '4.1.7'
+  id 'org.sonarqube' version '6.2.0.5505'
+  id 'au.com.dius.pact' version '4.6.17'
 }
 
 ext {
-  set('springCloudVersion', '2021.0.8')
-  set('spring-security.version','5.7.11')
-  set('spring-framework.version','5.3.27')
-  set('log4j2.version','2.17.1')
-  set('jackson.version','2.16.0')
-  set('snakeyaml.version','2.0')
+  set('springCloudVersion', '2021.0.9')
+  set('spring-security.version','5.8.16')
+  set('spring-framework.version','5.3.39')
+  set('log4j2.version','2.24.3')
+  set('jackson.version','2.17.3')
+  set('snakeyaml.version','2.4')
 }
-
 
 group = 'uk.gov.hmcts.reform'
 
@@ -240,8 +239,7 @@ dependencyManagement {
     mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
   }
   dependencies {
-    dependency(group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.77'){
-    }
+    dependency(group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.81')
 
     // CVE-2018-10237 - Unbounded memory allocation
     dependencySet(group: 'com.google.guava', version: '32.1.2-jre') {
@@ -249,20 +247,10 @@ dependencyManagement {
     }
 
     // CVE-2021-23181
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.104') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.106') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
-    }
-    // multiple CVEs
-    dependencySet(group: 'com.netflix.servo', version: '0.12.5') {
-      entry 'servo-core'
-    }
-    dependencySet(group: 'org.codehaus.groovy', version: '3.0.3') {
-      entry 'groovy'
-      entry 'groovy-xml'
-      entry 'groovy-json'
-      entry 'groovy-nio'
     }
   }
 }
@@ -277,60 +265,38 @@ repositories {
 }
 
 def versions = [
-  reformLogging   : '6.0.1',
+  reformLogging   : '6.1.9',
   springBoot      : springBoot.class.package.implementationVersion,
   springfoxSwagger: '3.0.0',
-  restAssured    : '4.3.1',
-  lombok  : '1.18.30',
-  pact_version    : '4.1.7',
+  restAssured     : '4.5.1',
+  lombok          : '1.18.38',
+  pact_version    : '4.2.13',
+  // serviceAuthVersion next version after 4.0.3 is 5.1.0
   serviceAuthVersion : '4.0.3',
-  idamJavaClient : '2.0.1',
+  idamJavaClient  : '3.0.3',
 ]
 
-configurations.all {
-  resolutionStrategy.force 'commons-io:commons-io:2.8.0', 'org.springframework.cloud:spring-cloud-starter:4.0.3'
-}
-
 dependencies {
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.0.3'
-    implementation('org.springframework.cloud:spring-cloud-starter'){
-      version {
-        strictly '3.1.7'
-      }
-    }
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.3.0'
+    implementation('org.springframework.cloud:spring-cloud-starter')
 
-    implementation('org.springframework.boot:spring-boot-starter'){
-      version {
-        strictly '3.1.7'
-      }
-    }
+    implementation('org.springframework.boot:spring-boot-starter')
 
-    implementation('org.springframework.security:spring-security-rsa'){
-      version {
-        strictly '1.0.12.RELEASE'
-      }
-    }
+    implementation('org.springframework.security:spring-security-rsa')
 
-    implementation('org.bouncycastle:bcprov-jdk18on') {
-      version {
-        strictly '1.77'
-      }
-    }
-    implementation('org.json:json') {
-      version {
-        strictly '20240303'
-      }
-    }
+    implementation('org.bouncycastle:bcprov-jdk18on')
 
-  implementation 'com.google.code.gson:gson:2.8.9'
-  implementation group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.1.3'
-  implementation group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.9.13'
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.0.3'
+    implementation('org.json:json')
 
-  implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
-  implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
-  implementation group: 'commons-io', name: 'commons-io', version: '2.14.0'
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '4.0.3'
+  implementation 'com.google.code.gson:gson:2.13.1'
+  implementation group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.3.0'
+  implementation group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.21.1'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.0'
+
+  implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'
+  implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
+  implementation group: 'commons-io', name: 'commons-io', version: '2.19.0'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '4.3.0'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
@@ -338,29 +304,25 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
 
-  implementation group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '1.5.5'
+  implementation group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '1.5.6'
 
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
   // this doesn't support spring boot v3, should be replaced with springdoc
   implementation group: 'io.springfox', name: 'springfox-boot-starter', version: versions.springfoxSwagger
   // once updated to spring boot v3, this shouldn't be needed
-  implementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.5', {
-    version {
-      strictly '1.14.5'
-    }
-  }
+  implementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.6'
 
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
-  implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '6.6'
-  implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-  implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.32'
+
+  implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
+  implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
+  implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.36'
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
-
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
 
@@ -369,61 +331,56 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamJavaClient
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.10.RELEASE'
 
-  implementation group: 'org.json', name: 'json', version: '20240303'
-
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.3.8.RELEASE"
-  implementation "net.minidev:json-smart:2.4.9"
+  implementation group: 'org.json', name: 'json', version: '20250517'
+  implementation "net.minidev:json-smart:2.5.2"
 
   // Explicitly specify version of jakarta.el to be used to resolve CVE-2021-28170
-  implementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.1'
+  implementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.2'
 
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.security:spring-security-config"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:2.5.15"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.5.15"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:3.5.3"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.5.3"
 
-  implementation "io.github.openfeign:feign-httpclient:11.0"
-  testImplementation 'io.github.openfeign:feign-jackson:10.7.0'
+  implementation "io.github.openfeign:feign-httpclient:13.6"
+  testImplementation 'io.github.openfeign:feign-jackson:13.6'
   testImplementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
   implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
-  implementation "com.github.ben-manes.caffeine:caffeine:2.7.0"
-  implementation "org.apache.httpcomponents:httpclient:4.5.13"
+  implementation "com.github.ben-manes.caffeine:caffeine:3.2.1"
+  implementation "org.apache.httpcomponents:httpclient:4.5.14"
 
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
-  implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'
-  implementation('uk.gov.service.notify:notifications-java-client:3.15.1-RELEASE') {
-    exclude group: 'org.bitbucket.b_c', module: 'jose4j'
-  }
-  implementation group: 'org.bitbucket.b_c', name: 'jose4j', version: '0.9.6'
+  implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.4'
+  implementation('uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE')
 
   // CVE-2021-42550
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.37.2'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.3'
 
   implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-  annotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final'
-  testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final'
+  annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+  testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
     exclude group: 'junit', module: 'junit'
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
-  testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '2.2.8.RELEASE'
+  testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.3.0'
   testImplementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
   testImplementation group: 'io.rest-assured', name: 'json-path', version: versions.restAssured
   testImplementation group: 'io.rest-assured', name: 'xml-path', version: versions.restAssured
 
   // https://mvnrepository.com/artifact/nl.jqno.equalsverifier/equalsverifier
-  testImplementation group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '3.14.3'
+  testImplementation group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '4.0.3'
 
   // groovy v3.* added to avoid 'WARNING: Illegal reflective access by org.codehaus.groovy.reflection.CachedClass'
   // in groovy:2.5.* when running functional/befta tests
-  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.3'
+  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.25'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.24.2')
+  testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.4')
 
   testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.0'
 
@@ -433,15 +390,15 @@ dependencies {
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
   contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
 
-  contractTestImplementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'
+  contractTestImplementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.4'
 
   contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
   contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
   contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
-  contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
-  contractTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.0')
-  contractTestRuntimeOnly "org.junit.platform:junit-platform-commons:1.7.0"
+  contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.13.2")
+  contractTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.2")
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.13.2')
+  contractTestRuntimeOnly "org.junit.platform:junit-platform-commons:1.13.2"
   contractTestImplementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamJavaClient
   contractTestImplementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.serviceAuthVersion
   contractTestImplementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -449,7 +406,7 @@ dependencies {
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  testImplementation 'com.github.hmcts:fortify-client:1.4.3:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
 }
 
 bootJar {

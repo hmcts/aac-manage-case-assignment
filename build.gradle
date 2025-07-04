@@ -366,19 +366,19 @@ dependencies {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
-  //------------ JC: ABOVE CHECKED ------------
   testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '4.3.0'
   testImplementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
   testImplementation group: 'io.rest-assured', name: 'json-path', version: versions.restAssured
   testImplementation group: 'io.rest-assured', name: 'xml-path', version: versions.restAssured
 
+  //------------ JC: ABOVE CHECKED ------------
   // https://mvnrepository.com/artifact/nl.jqno.equalsverifier/equalsverifier
   testImplementation group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '4.0.3'
-  //------------ JC: ABOVE CHECKING ------------
 
   // groovy v3.* added to avoid 'WARNING: Illegal reflective access by org.codehaus.groovy.reflection.CachedClass'
   // in groovy:2.5.* when running functional/befta tests
-  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.3'
+  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.25'
+  //------------ JC: ABOVE CHECKING ------------
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath

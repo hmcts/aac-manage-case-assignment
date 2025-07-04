@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.managecase.config;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -25,20 +23,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ZuulConfiguration {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ZuulConfiguration.class);
-
     /** The path returned by ErrorContoller.getErrorPath() with Spring Boot < 2.5 (and no longer available on
      * Spring Boot >= 2.5). */
     private static final String ERROR_PATH = "/error";
-
-    private void jclog(String message) {
-        LOG.info("JCDEBUG: Info: ZuulConfiguration: {}", message);
-    }
-
-    // Preview environment :-
-    // routeLocator.getRoutes = [Route{id='data-store', fullPath='/ccd/**', path='/**', location='http://ccd-data-store-api-pr-1260-java.ccd', prefix='/ccd', retryable=false, sensitiveHeaders=[cookie, set-cookie], customSensitiveHeaders=true, prefixStripped=true}]
-    // routeLocator.getClass = class org.springframework.cloud.netflix.zuul.filters.CompositeRouteLocator
-    // routeLocator.toString = org.springframework.cloud.netflix.zuul.filters.CompositeRouteLocator@a451491
 
     /**
      * Constructs a new bean post-processor for Zuul.
@@ -55,9 +42,6 @@ public class ZuulConfiguration {
     public ZuulPostProcessor zuulPostProcessor(@Autowired RouteLocator routeLocator,
                                                @Autowired ZuulController zuulController,
                                                @Autowired(required = false) ErrorController errorController) {
-        jclog("zuulPostProcessor(): routeLocator.getRoutes = " + routeLocator.getRoutes());
-        jclog("zuulPostProcessor(): routeLocator.getClass = " + routeLocator.getClass());
-        jclog("zuulPostProcessor(): routeLocator.toString = " + routeLocator);
         return new ZuulPostProcessor(routeLocator, zuulController, errorController);
     }
 

@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.managecase.client.prd.PrdApiClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 class PrdRepositoryTest {
 
@@ -22,7 +22,7 @@ class PrdRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        initMocks(this);
+        openMocks(this);
     }
 
     @Test

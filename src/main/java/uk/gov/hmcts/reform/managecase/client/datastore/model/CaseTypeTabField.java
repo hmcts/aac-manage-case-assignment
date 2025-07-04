@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
-@ApiModel(description = "")
+@Schema
 public class CaseTypeTabField implements Serializable, CommonDCPModel {
 
     private static final long serialVersionUID = -4257574164546267919L;
@@ -16,7 +16,7 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
     private String showCondition;
     private String displayContextParameter;
 
-    @ApiModelProperty("")
+    @Schema
     @JsonProperty("case_field")
     public CaseFieldDefinition getCaseFieldDefinition() {
         return caseFieldDefinition;
@@ -26,7 +26,7 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
         this.caseFieldDefinition = caseFieldDefinition;
     }
 
-    @ApiModelProperty("")
+    @Schema
     @JsonProperty("order")
     public Integer getDisplayOrder() {
         return displayOrder;
@@ -36,7 +36,7 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
         this.displayOrder = displayOrder;
     }
 
-    @ApiModelProperty("")
+    @Schema
     @JsonProperty("show_condition")
     public String getShowCondition() {
         return showCondition;
@@ -46,7 +46,7 @@ public class CaseTypeTabField implements Serializable, CommonDCPModel {
         this.showCondition = showCondition;
     }
 
-    @ApiModelProperty("")
+    @Schema
     @JsonProperty("display_context_parameter")
     @Override
     public String getDisplayContextParameter() {

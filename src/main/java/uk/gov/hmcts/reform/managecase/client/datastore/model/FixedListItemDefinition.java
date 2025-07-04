@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
-@ApiModel(description = "")
+@Schema
 @SuppressWarnings({"PMD.UncommentedEmptyConstructor"})
 public class FixedListItemDefinition implements Serializable {
 
@@ -24,7 +23,7 @@ public class FixedListItemDefinition implements Serializable {
         this.label = label;
     }
 
-    @ApiModelProperty("")
+    @Schema
     @JsonProperty("order")
     public String getOrder() {
         return order;
@@ -34,7 +33,7 @@ public class FixedListItemDefinition implements Serializable {
         this.order = order;
     }
 
-    @ApiModelProperty("")
+    @Schema
     @JsonProperty("code")
     public String getCode() {
         return code;

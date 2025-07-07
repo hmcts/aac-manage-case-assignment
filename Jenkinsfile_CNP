@@ -124,6 +124,7 @@ withPipeline("java", product, component) {
   }
   onMaster {
     enableSlackNotifications('#ccd-master-builds')
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
   }
 
@@ -132,6 +133,7 @@ withPipeline("java", product, component) {
   }
   onPR {
     enableSlackNotifications('#ccd-pr-builds')
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
   }
 

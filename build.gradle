@@ -248,7 +248,7 @@ dependencyManagement {
     }
 
     // CVE-2021-23181
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.91') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.104') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
@@ -270,7 +270,8 @@ repositories {
   mavenLocal()
   mavenCentral()
   maven {
-    url 'https://jitpack.io'
+    name = "AzureArtifacts"
+    url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
   }
 }
 

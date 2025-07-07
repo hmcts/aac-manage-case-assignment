@@ -190,6 +190,14 @@ tasks.register('runProviderPactVerification', Test) {
   systemProperty 'pact.provider.version', project.pactVersion
 }
 
+tasks.register('runAndPublishConsumerPactTests', Test) {
+  dependsOn(contract)
+  logger.lifecycle("Runs pact consumer Tests")
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  finalizedBy(pactPublish)
+}
+
 tasks.named('runProviderPactVerification').configure {
   finalizedBy 'pactVerify'
 }

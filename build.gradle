@@ -179,6 +179,7 @@ tasks.register('contract', Test) {
   useJUnitPlatform()
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
+  include "uk/gov/hmcts/reform/managecase/consumer/**"
 }
 
 tasks.register('runProviderPactVerification', Test) {
@@ -188,6 +189,8 @@ tasks.register('runProviderPactVerification', Test) {
     systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
   }
   systemProperty 'pact.provider.version', project.pactVersion
+  include "uk/gov/hmcts/reform/managecase/api/controller/provider/**"
+  finalizedBy(pactVerify)
 }
 
 tasks.register('runAndPublishConsumerPactTests', Test) {
@@ -195,11 +198,8 @@ tasks.register('runAndPublishConsumerPactTests', Test) {
   logger.lifecycle("Runs pact consumer Tests")
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
+  include "uk/gov/hmcts/reform/managecase/consumer/**"
   finalizedBy(pactPublish)
-}
-
-tasks.named('runProviderPactVerification').configure {
-  finalizedBy 'pactVerify'
 }
 
 def getCheckedOutGitCommitHash() {

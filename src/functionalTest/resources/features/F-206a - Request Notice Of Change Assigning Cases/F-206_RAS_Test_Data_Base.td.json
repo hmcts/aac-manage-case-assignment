@@ -7,7 +7,7 @@
     "an active IDAM profile with full permissions"
   ],
   "method": "POST",
-  "uri": "{{ROLE_ASSIGNMENT_HOST}}/am/role-assignments",
+  "uri": "{{ROLE_ASSIGNMENT_URL}}/am/role-assignments",
   "request": {
     "headers": {
       "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]"

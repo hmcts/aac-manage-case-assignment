@@ -52,7 +52,7 @@ Background:
     And a call [to get Grant Access Metadata API returning Standard Grant Access for case] will get the expected response as in [F-206_Verify_NoC_Request_Access_Metadata],
 
 
-  @S-206a.03 @callbackTests #SPECIFIC
+  @Ignore @S-206a.03 @callbackTests #SPECIFIC
   Scenario: NoC is requested by a Solicitor having SPECIFIC access to case - auto-approval applies
 
     Given a user [BeftaMasterCaseworker - with the ability to create a case for a particular jurisdiction within an organisation],
@@ -71,6 +71,7 @@ Background:
 
     #set up so that the next scenario can run to create a specific access role assignment for the BeftaMasterCaseworker
     And a successful call [to create org role assignments for actors & requester] as in [S-206_Org_Role_Creation],
+    #And a successful call [to create role assignments for requested role] as in [S-206_Access_Requested],
     When a request is prepared with appropriate values,
     And a successful call [contains specific-access-legal-ops case requested role assignment] as in [F-206_Access_Requested_Case_Role_Assignment],
     Then a positive response is received,
@@ -91,3 +92,15 @@ Background:
     #And a successful call [to delete role assignments just created above] as in [DeleteDataForRoleAssignments],
     #And a successful call [to delete role assignments just created above] as in [S-206_DeleteDataForRoleAssignmentsForOrgRoles],
     #And a successful call [to delete role assignments just created above] as in [S-206_DeleteDataForRoleAssignmentsForRequestedRole].
+
+
+  @S-206a.04 @callbackTests #SPECIFIC
+  Scenario: NoC is requested by a Solicitor having SPECIFIC access to case - auto-approval applies
+
+    Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
+    And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Dil's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Auto_Approval_Case_Creation_By_Richard_With_Assigned_Org_Policies],
+    #And a successful call [to create a role assignment for an actor] as in [S-206_Case_Role_Creation_Dil],
+    #When a request is prepared with appropriate values,
+    #And a successful call [contains specific-access-requested case requested role assignment] as in [F-206_Access_Requested_Case_Role_Assignment_Dil],
+    #And a successful call [contains specific-access-legal-ops case requested role assignment] as in [F-206_Access_Requested_Case_Role_Assignment_Dil_SPECIFIC],
+    And a successful call [contains specific-access-judiciary case granted role assignment] as in [F-206_Access_Requested_Case_Role_Assignment_Dil_SAJ],

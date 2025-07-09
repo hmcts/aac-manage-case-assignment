@@ -1,0 +1,64 @@
+{
+  "_guid_": "S-206_Lead_judge_Role_Creation",
+  "_extends_": "F-206_RAS_Test_Data_Base",
+  "specs": [
+    "to create org role assignments for actors & requester",
+    "Befta1 - who is the actor for requested role"
+  ],
+  "request": {
+    "body": {
+      "roleRequest": {
+        "assignerId": "${[scenarioContext][testData][users][invokingUser][id]}",
+        "reference": "1747132978960059/lead-judge"
+      },
+      "requestedRoles": [
+        {
+          "_extends_": "RequestedRole",
+          "actorId": "${[scenarioContext][testData][users][invokingUser][id]}",
+          "roleName": "lead-judge",
+          "roleCategory": "JUDICIAL",
+          "roleType": "CASE",
+          "grantType": "SPECIFIC",
+          "attributes":
+          {
+            "caseId" : "1747132978960059",
+            "jurisdiction": "IA",
+            "caseType": "Asylum"
+          }
+        }
+      ]
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "roleAssignmentResponse": {
+        "roleRequest": {
+          "_extends_": "ResponseRoleRequest",
+          "reference": "${[scenarioContext][testData][request][body][roleRequest][reference]}",
+          "replaceExisting": false
+        },
+        "requestedRoles": [
+          {
+            "_extends_": "ResponseRequestedRole",
+            "actorId": "${[scenarioContext][testData][users][befta1][id]}",
+            "roleName": "lead-judge",
+            "roleCategory": "JUDICIAL",
+            "roleType": "CASE",
+            "grantType": "SPECIFIC",
+            "attributes":
+            {
+              "caseId" : "${[scenarioContext][testData][request][body][requestedRoles][0][attributes][caseId]}",
+              "jurisdiction" : "${[scenarioContext][testData][request][body][requestedRoles][0][attributes][jurisdiction]}",
+              "caseType" : "Asylum"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

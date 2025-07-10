@@ -1,0 +1,20 @@
+{
+	"_guid_": "Retrieve_Access_Metadata_By_Case_ID__Base",
+
+	"productName": "CCD Data Store",
+	"operationName": "Retrieve access metadata for a given case ID",
+
+	"method": "GET",
+	"uri": "{{CCD_DATA_STORE_API_BASE_URL}}/internal/cases/{caseId}/access-metadata",
+
+	"request": {
+		"_extends_": "Common_Request",
+		"headers": {
+			"experimental": "true"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response"
+	}
+}

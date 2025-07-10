@@ -128,9 +128,6 @@ tasks.register('smoke', Test) {
   outputs.upToDateWhen { false }
 }
 
-def tags = (findProperty('tags') == null) ? ' not @Ignore' : '(' + findProperty('tags') + ') and not @Ignore'
-println 'tags =' + tags
-
 tasks.register('functional', Test) {
   description = "Runs functional tests"
   group = "Verification"
@@ -145,6 +142,8 @@ tasks.register('functional', Test) {
     cucumberReports.reports = files("${cucumberReports.outputDir}/cucumber.json")
     cucumberReports.notFailingStatuses = ["skipped", "passed"]
 
+    def tags = (project.hasProperty('tags')) ? "(${project.property('tags')}) and not @Ignore" : 'not @Ignore'
+
     javaexec {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
@@ -152,12 +151,13 @@ tasks.register('functional', Test) {
               '--threads', '1',
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
               '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
-              '--tags', 'not @Ignore',
+              '--tags',  "${tags}",
               '--glue', 'uk.gov.hmcts.befta.player',
               '--glue', 'uk.gov.hmcts.reform.managecase.befta', 'src/functionalTest/resources/features'
       ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+      println 'args =' + args
     }
   }
 
@@ -428,7 +428,7 @@ dependencies {
 
   testImplementation (group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.25.4')
 
-  testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.3'
+  testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4'
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
   functionalTestImplementation sourceSets.test.runtimeClasspath

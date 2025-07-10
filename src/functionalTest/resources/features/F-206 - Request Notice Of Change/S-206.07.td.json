@@ -2,7 +2,7 @@
   "_guid_": "S-206.7",
   "_extends_": "Request_NoC__Base",
 
-  "title": "(Happy Path) Solicitor requests NoC to replace representation - auto-approval applies",
+  "title": "(Happy Path) Solicitor having STANDARD access to case requests NoC to replace representation - auto-approval applies",
 
   "specs": [
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation",

@@ -103,4 +103,9 @@ Background:
     #When a request is prepared with appropriate values,
     #And a successful call [contains specific-access-requested case requested role assignment] as in [F-206_Access_Requested_Case_Role_Assignment_Dil],
     #And a successful call [contains specific-access-legal-ops case requested role assignment] as in [F-206_Access_Requested_Case_Role_Assignment_Dil_SPECIFIC],
-    And a successful call [contains specific-access-judiciary case granted role assignment] as in [F-206_Access_Requested_Case_Role_Assignment_Dil_SAJ],
+    #And a successful call [contains specific-access-judiciary case granted role assignment] as in [F-206_Access_Requested_Case_Role_Assignment_Dil_SAJ],
+
+    And a successful call [to grant access for Dil with a case role BARRISTER over the case created by Richard] as in [S-206_Grant_Access],
+
+    And a call [to get Grant Access Metadata API returning Specific Grant Access for case] will get the expected response as in [F-206_Verify_NoC_Request_Specific_Access_Metadata],
+

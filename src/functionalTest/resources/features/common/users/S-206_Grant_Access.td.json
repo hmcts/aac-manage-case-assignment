@@ -1,0 +1,45 @@
+{
+  "_guid_": "S-206_Grant_Access",
+  "_extends_": "Base_Expecting_201",
+
+  "productName": "CCD Data Store",
+  "operationName": "to grant access on a case",
+
+  "specs": [
+    "to grant access for Dil with a case role BARRISTER over the case created by Richard"
+  ],
+
+  "method": "POST",
+
+  "s2sClientId": "xui_webapp",
+
+  "uri": "/case-users",
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "Authorization": "Bearer ${[scenarioContext][parentContext][testData][users][Richard][accessToken]}"
+    },
+
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][siblingContexts][F-206_NoC_Auto_Approval_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][invokingUser][id]}",
+          "case_role": "[BARRISTER]"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "status_message": "Case-User-Role assignments created successfully"
+    }
+  }
+}

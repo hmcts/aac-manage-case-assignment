@@ -8,13 +8,13 @@
 
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
+      "_extends_": "ACA_Users_Richard"
     }
   },
 
   "request": {
     "pathVariables": {
-      "caseId": "${[scenarioContext][parentContext][testData][request][body][case_id]}"
+      "caseId": "${[scenarioContext][customValues][caseIdAsStringFrom_F-206_NoC_Auto_Approval_Case_Creation_By_Richard_With_Assigned_Org_Policies]}"
     }
   },
 

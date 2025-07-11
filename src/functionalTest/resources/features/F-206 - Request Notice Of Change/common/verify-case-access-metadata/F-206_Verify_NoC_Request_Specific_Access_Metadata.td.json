@@ -1,0 +1,28 @@
+{
+  "_guid_": "F-206_Verify_NoC_Request_Specific_Access_Metadata",
+  "_extends_": "Retrieve_Access_Metadata_By_Case_ID__Base",
+
+  "specs": [
+    "to get Grant Access Metadata API returning Specific Grant Access for case"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Richard"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][customValues][caseIdAsStringFrom_F-206_NoC_Auto_Approval_Case_Creation_By_Richard_With_Assigned_Org_Policies]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "accessGrants" : [ "SPECIFIC" ],
+      "accessProcess": "NONE"
+    }
+  }
+}

@@ -6,11 +6,11 @@
   "operationName": "to grant access on a case",
 
   "specs": [
-    "to grant access to user with a case role BARRISTER (SPECIFIC) over the case created"
+    "to grant access to user with a case role BARRISTER over the case created"
   ],
   "users": {
 
-      "_extends_": "F-206_Users"
+      "_extends_": "F-206a_Users"
   },
 
   "method": "POST",

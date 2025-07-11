@@ -20,7 +20,7 @@ Scenario: (Happy Path) CAA requests NoC to replace representation - auto-approva
       When a request is prepared with appropriate values,
 
       #Matt need to be granted Specific access to the case before he can request a NoC
-      And a successful call [to grant access to user with a case role BARRISTER over the case created] as in [S-206_Grant_Access],
+      And a successful call [to grant access to user with a case role BARRISTER (SPECIFIC) over the case created] as in [S-206_Grant_Access],
 
 
       And the request [is made by Matt to place a NOC Request for C1],
@@ -30,7 +30,7 @@ Scenario: (Happy Path) CAA requests NoC to replace representation - auto-approva
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Matt has NOT been granted any case roles for the case] will get the expected response as in [F-206_Verify_Not_Granted_Case_Roles_Matt],
+      And a call [to verify that Matt has been granted case roles] will get the expected response as in [F-206_Verify_Granted_Case_Roles_Matt],
       And another call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved_ReplaceRepresentation],
       And another call [to get Case Events API returns a NoCRequest event in which the user ID is set to invoking users email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data].
-      And a call [to get Grant Access Metadata API returning Standard Grant Access for case] will get the expected response as in [F-206_Verify_NoC_Request_Access_Metadata]
+      And a call [to get Grant Access Metadata API returning Specific Grant Access for case] will get the expected response as in [F-206_Verify_NoC_Request_Specific_Access_Metadata]

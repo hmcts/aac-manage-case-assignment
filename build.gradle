@@ -292,6 +292,8 @@ def versions = [
 
 configurations.all {
   resolutionStrategy.force 'commons-io:commons-io:2.8.0', 'org.springframework.cloud:spring-cloud-starter:4.0.3'
+  resolutionStrategy.force 'commons-configuration:commons-configuration2:2.12.0'
+  exclude group: 'commons-configuration', module: 'commons-configuration'
 }
 
 dependencies {

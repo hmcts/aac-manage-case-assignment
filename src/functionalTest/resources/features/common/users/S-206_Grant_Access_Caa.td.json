@@ -10,7 +10,7 @@
   ],
   "users": {
 
-      "_extends_": "F-206a_Users"
+      "_extends_": "F-206_Users"
   },
 
   "method": "POST",

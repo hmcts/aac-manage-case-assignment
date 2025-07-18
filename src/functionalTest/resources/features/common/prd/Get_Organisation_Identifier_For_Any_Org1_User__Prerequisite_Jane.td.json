@@ -1,5 +1,5 @@
 {
-  "_guid_": "Get_Organisation_Identifier_For_Any_Org1_User__Prerequisite",
+  "_guid_": "Get_Organisation_Identifier_For_Any_Org1_User__Prerequisite_Jane",
   "_extends_": "Get_Organisation_Identifier__Base",
 
   "specs": [
@@ -8,7 +8,7 @@
 
   "users": {
     "invokingUser": {
-      "_extends_": "ACA_Users_Richard"
+      "_extends_": "ACA_Users_CAA_Jane"
     }
   }
 

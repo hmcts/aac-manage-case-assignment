@@ -293,6 +293,12 @@ def versions = [
 configurations.all {
   resolutionStrategy.force 'commons-io:commons-io:2.8.0', 'org.springframework.cloud:spring-cloud-starter:4.0.3'
   resolutionStrategy.force 'commons-configuration:commons-configuration2:2.12.0'
+  resolutionStrategy.eachDependency { details ->
+    if (details.requested.group == 'commons-configuration' && details.requested.name == 'commons-configuration') {
+      details.useVersion '1.10'
+      details.because 'Latest version compatible with project requirements'
+    }
+  }
 }
 
 dependencies {

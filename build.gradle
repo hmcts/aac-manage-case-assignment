@@ -274,6 +274,10 @@ repositories {
   mavenLocal()
   mavenCentral()
   maven {
+    url  "https://jitpack.io"
+  }
+
+  maven {
     name = "AzureArtifacts"
     url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
   }
@@ -292,6 +296,7 @@ def versions = [
 
 configurations.all {
   resolutionStrategy.force 'commons-io:commons-io:2.8.0', 'org.springframework.cloud:spring-cloud-starter:4.0.3'
+  resolutionStrategy.force 'commons-configuration:commons-configuration2:2.12.0'
 }
 
 dependencies {

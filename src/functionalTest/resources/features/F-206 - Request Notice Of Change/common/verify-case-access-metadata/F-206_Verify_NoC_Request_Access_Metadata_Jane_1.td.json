@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-206_Verify_NoC_Request_Access_Metadata_Jane",
+  "_guid_": "F-206_Verify_NoC_Request_Access_Metadata_Jane_1",
   "_extends_": "Retrieve_Access_Metadata_By_Case_ID__Base",
 
   "specs": [
@@ -21,7 +21,7 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body": {
-      "accessGrants" : [ "SPECIFIC", "SPECIFIC", "SPECIFIC"],
+      "accessGrants" : [ "SPECIFIC"],
       "accessProcess": "NONE"
     }
   }

@@ -3,7 +3,8 @@ version: '2.4'
 
 services:
   manage-case-assignment:
-    image: "hmctspublic.azurecr.io/aac/manage-case-assignment:${MANAGE_CASE_ASSIGNMENT_TAG:-latest}"
+    #image: "hmctspublic.azurecr.io/aac/manage-case-assignment:${MANAGE_CASE_ASSIGNMENT_TAG:-latest}"
+    image: hmcts/manage-case-assignment:local
     container_name: manage-case-assignment
     environment:
       SERVER_PORT: 4454
@@ -26,7 +27,7 @@ services:
     ports:
       - 4454:4454
       # Uncomment this and the JAVA_TOOL_OPTIONS flag for JVM debugging
-      - 5005:5005
+      #- 5005:5005
     depends_on:
       - aca-wiremock
     networks:

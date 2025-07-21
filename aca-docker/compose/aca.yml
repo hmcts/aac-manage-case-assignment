@@ -26,7 +26,7 @@ services:
     ports:
       - 4454:4454
       # Uncomment this and the JAVA_TOOL_OPTIONS flag for JVM debugging
-      #- 5005:5005
+      # - 5005:5005
     depends_on:
       - aca-wiremock
     networks:

@@ -274,15 +274,6 @@ ext.libraries = [
   ]
 ]
 
-<<<<<<< HEAD
-=======
-configurations.all {
-  resolutionStrategy.force 'commons-io:commons-io:2.8.0', 'org.springframework.cloud:spring-cloud-starter:4.0.3'
-  resolutionStrategy.force 'commons-configuration:commons-configuration2:2.12.0'
-  exclude group: 'commons-configuration', module: 'commons-configuration'
-}
-
->>>>>>> 92f55b7f (remove commons-configuration 1.10)
 dependencies {
 
   // start::CVE Vulnerability dependency overrides                                                    // MAIN PARENT DEPENDEDNCY

@@ -33,7 +33,7 @@
           "ApprovalStatus" : "0",
           "RequestTimestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
           "OrganisationToAdd" : {
-            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
+            "OrganisationID": "[[ANYTHING_PRESENT]]"
           },
           "OrganisationToRemove" : "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][respondentOrganisationPolicy][Organisation]}"
         }

@@ -21,7 +21,7 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body": {
-      "accessGrants" : [ "SPECIFIC", "SPECIFIC", "SPECIFIC"],
+      "accessGrants" : [ "SPECIFIC", "SPECIFIC"],
       "accessProcess": "NONE"
     }
   }

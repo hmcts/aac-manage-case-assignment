@@ -99,12 +99,12 @@
       "individual" : {
         "classification" : "PUBLIC",
         "value" : {
-          "DateOfBirth" : "RESTRICTED",
-          "NationalInsuranceNumber" : "PRIVATE",
-          "FirstName" : "RESTRICTED",
           "Title" : "PUBLIC",
           "LastName" : "PUBLIC",
-          "MiddleName" : "PRIVATE"
+          "FirstName" : "RESTRICTED",
+          "MiddleName" : "PRIVATE",
+          "DateOfBirth" : "RESTRICTED",
+          "NationalInsuranceNumber" : "PRIVATE"
         }
       },
       "dob" : "PUBLIC"

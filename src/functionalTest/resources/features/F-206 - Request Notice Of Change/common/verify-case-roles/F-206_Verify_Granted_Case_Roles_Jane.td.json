@@ -1,0 +1,15 @@
+{
+  "_guid_": "F-206_Verify_Granted_Case_Roles_Jane",
+  "_extends_": "F-206_Verify_Granted_Case_Roles_Specific__Base",
+
+  "specs": [
+    "to verify that Jane has been granted case roles"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Jane"
+    }
+  }
+
+}

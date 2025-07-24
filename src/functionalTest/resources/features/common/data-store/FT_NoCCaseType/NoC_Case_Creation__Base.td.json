@@ -27,7 +27,7 @@
 			"state": "CaseCreated",
 
 			"case_data": {
-				"_extends_": "NoC_Case_Data__publicFields"
+				"_extends_": "NoC_Case_Data"
 			},
 
 			"data_classification": {

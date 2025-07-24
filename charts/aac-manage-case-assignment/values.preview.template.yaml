@@ -23,5 +23,5 @@ java:
     S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     CCD_DATA_STORE_API_BASE_URL: http://ccd-data-store-api-pr-1260-java.ccd
     CCD_DEFINITION_STORE_API_BASE_URL: http://ccd-definition-store-api-pr-575-java.ccd
-    ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-pr-929-java.am
+    ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
     MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp,ccd_data,finrem_case_orchestration,divorce_frontend,iac,nfdiv_cos,fpl_case_service,civil_service,prl_cos_api

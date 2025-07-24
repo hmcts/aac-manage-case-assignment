@@ -16,8 +16,13 @@ services:
       CCD_DEFINITION_STORE_API_BASE_URL: http://ccd-definition-store-api:4451
       PRD_HOST: http://aca-wiremock:8080
       NOTIFY_MCA_API_KEY: "notify-test-api-key"
+      BEFTA_HTTP_LOGGING_ENABLED: "true"
+      MCA_API_BASE_URL: http://host.docker.internal:4454
+      TEST_STUB_SERVICE_BASE_URL: http://host.docker.internal:5555
+      ROLE_ASSIGNMENT_URL: http://am-role-assignment-service:4096
+
       # Uncomment this line to enable JVM debugging and uncomment the port mapping below
-      # JAVA_TOOL_OPTIONS: '-XX:InitialRAMPercentage=30.0 -XX:MaxRAMPercentage=65.0 -XX:MinRAMPercentage=30.0 -XX:+UseConcMarkSweepGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'
+      #JAVA_TOOL_OPTIONS: '-XX:InitialRAMPercentage=30.0 -XX:MaxRAMPercentage=65.0 -XX:MinRAMPercentage=30.0 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'
     ports:
       - 4454:4454
       # Uncomment this and the JAVA_TOOL_OPTIONS flag for JVM debugging

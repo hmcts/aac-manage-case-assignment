@@ -4,7 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.reform.managecase.BaseTest;
+
+import uk.gov.hmcts.reform.managecase.BaseIT;
 
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -17,16 +18,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Built-in feature which saves service's swagger specs in temporary directory.
  * Each travis run on master should automatically save and upload (if updated) documentation.
  */
-class SwaggerPublisher extends BaseTest {
+class SwaggerPublisher extends BaseIT {
 
     @Autowired
-    private MockMvc mvc;
+    protected MockMvc mockMvc;
 
     @DisplayName("Generate swagger documentation")
     @Test
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void generateDocs() throws Exception {
-        byte[] specs = mvc.perform(get("/v2/api-docs"))
+        
+        byte[] specs = mockMvc.perform(get("/v3/api-docs"))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()

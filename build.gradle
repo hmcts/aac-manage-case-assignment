@@ -182,7 +182,7 @@ tasks.register('contract', Test) {
   useJUnitPlatform()
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
-  include "uk/gov/hmcts/reform/managecase/api/controller/provider/**"
+  include "uk/gov/hmcts/reform/managecase/consumer/**"
 }
 
 tasks.register('runProviderPactVerification', Test) {
@@ -192,10 +192,17 @@ tasks.register('runProviderPactVerification', Test) {
     systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
   }
   systemProperty 'pact.provider.version', project.pactVersion
+  include "uk/gov/hmcts/reform/managecase/api/controller/provider/**"
+  finalizedBy(pactVerify)
 }
 
-tasks.named('runProviderPactVerification').configure {
-  finalizedBy 'pactVerify'
+tasks.register('runAndPublishConsumerPactTests', Test) {
+  dependsOn(contract)
+  logger.lifecycle("Runs pact consumer Tests")
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  include "uk/gov/hmcts/reform/managecase/consumer/**"
+  finalizedBy(pactPublish)
 }
 
 def getCheckedOutGitCommitHash() {
@@ -205,7 +212,7 @@ def getCheckedOutGitCommitHash() {
 pact {
   publish {
     pactDirectory = 'pacts'
-    pactBrokerUrl = System.getenv("PACT_BROKER_URL") ?: 'http://localhost:80'
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
     tags = [System.getenv("PACT_BRANCH_NAME") ?:'Dev']
     version = project.pactVersion
   }
@@ -434,7 +441,6 @@ dependencies {
   functionalTestImplementation sourceSets.test.runtimeClasspath
 
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
-  contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
 
   contractTestImplementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.7'
 
@@ -448,6 +454,7 @@ dependencies {
   contractTestImplementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamJavaClient
   contractTestImplementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.serviceAuthVersion
   contractTestImplementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-loadbalancer', version: '4.0.5'
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath

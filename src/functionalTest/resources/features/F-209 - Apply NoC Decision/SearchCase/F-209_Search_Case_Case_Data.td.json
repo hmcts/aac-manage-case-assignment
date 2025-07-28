@@ -49,7 +49,11 @@
     "litigantType" : "INDIVIDUAL",
     "individual" : {
       "Title" : "mr",
-      "LastName" : "noronha"
+      "LastName" : "noronha",
+      "FirstName" : "ashley",
+      "MiddleName" : "dean",
+      "DateOfBirth" : "1989-09-19",
+      "NationalInsuranceNumber" : null
     },
     "dob" : "1989-09-19"
   }

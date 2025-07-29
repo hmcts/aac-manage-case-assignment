@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.ToString;
 
 import java.io.Serializable;
@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @ToString
-@ApiModel(description = "")
+@Schema
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyFields"})
 public class CaseFieldDefinition implements Serializable, CommonField {
 

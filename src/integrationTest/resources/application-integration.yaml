@@ -1,0 +1,53 @@
+ccd:
+  data-store:
+    host: http://localhost:${wiremock.server.port:4452}
+    allowed-urls: /searchCases.*,/internal/searchCases.*,/invalid.*
+  definition-store:
+    host: http://localhost:${wiremock.server.port:4451}
+    allowed-urls: /api/display/challenge-questions.*,/invalid.*
+  s2s-authorised:
+    services:
+      case_user_roles: aac_manage_case_assignment
+
+idam:
+  api:
+    url: http://localhost:${wiremock.server.port:5000}
+  s2s-auth:
+    url: http://localhost:${wiremock.server.port:4502}/s2s
+
+spring:
+  cache:
+    type: none
+  cloud:
+    discovery:
+      client:
+        composite-indicator:
+          enabled: false
+    gateway:
+      mvc:
+        routes:
+          - id: data-store
+            predicates:
+              - Path=/ccd/**
+            uri: http://localhost:${wiremock.server.port:4452}
+            filters:
+              - AllowedRoutesFilter
+              - ValidateClientFilter
+              - StripPrefix=1
+          - id: definition-store
+            predicates:
+              - Path=/ccd/**
+            uri: http://localhost:${wiremock.server.port:4451}
+            filters:
+              - AllowedRoutesFilter
+              - ValidateClientFilter
+              - StripPrefix=1
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: http://localhost:${wiremock.server.port:5000}/o
+
+prd:
+  host: http://localhost:${wiremock.server.port:8090}

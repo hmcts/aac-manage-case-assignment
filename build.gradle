@@ -18,7 +18,7 @@ ext {
   set('log4j2.version', '2.24.3')
   set('jackson.version', '2.18.2')
   set('snakeyaml.version', '2.3')
-  
+
   junit               = '5.11.4'
   junitPlatform       = '1.11.4'
   lombokVersion       = '1.18.36'
@@ -192,18 +192,18 @@ tasks.register('contract', Test) {
   include "uk/gov/hmcts/reform/managecase/api/controller/provider/**"
 }
 
-tasks.register('runProviderPactVerification', Test) {
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
-  if (project.hasProperty('pact.verifier.publishResults')) {
-    systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
-  }
-  systemProperty 'pact.provider.version', project.pactVersion
-}
-
-tasks.named('runProviderPactVerification').configure {
-  finalizedBy 'pactVerify'
-}
+//tasks.register('runProviderPactVerification', Test) {
+//  testClassesDirs = sourceSets.contractTest.output.classesDirs
+//  classpath = sourceSets.contractTest.runtimeClasspath
+//  if (project.hasProperty('pact.verifier.publishResults')) {
+//    systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+//  }
+//  systemProperty 'pact.provider.version', project.pactVersion
+//}
+//
+//tasks.named('runProviderPactVerification').configure {
+//  finalizedBy 'pactVerify'
+//}
 
 def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --short HEAD'.execute().text.trim()

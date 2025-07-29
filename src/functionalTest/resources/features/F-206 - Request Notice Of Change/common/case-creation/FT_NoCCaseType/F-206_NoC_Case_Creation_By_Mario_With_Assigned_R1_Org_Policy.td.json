@@ -1,6 +1,6 @@
 {
   "_guid_": "F-206_NoC_Case_Creation_By_Mario_With_Assigned_R1_Org_Policy",
-  "_extends_": "NoC_Case_Creation_With_Org_Policies__Base",
+  "_extends_": "NoC_Case_Creation__Base",
 
 	"method": "POST",
   "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",

@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public enum SecurityClassification implements Serializable {
+public enum SecurityClassification {
     PUBLIC(1), PRIVATE(2), RESTRICTED(3);
 
     private final int rank;

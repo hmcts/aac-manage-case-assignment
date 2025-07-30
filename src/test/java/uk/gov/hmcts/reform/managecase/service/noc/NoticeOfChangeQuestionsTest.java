@@ -44,7 +44,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicyJsonNode;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
@@ -96,7 +96,7 @@ class NoticeOfChangeQuestionsTest {
 
     @BeforeEach
     void setUp() {
-        initMocks(this);
+        openMocks(this);
     }
 
     @Nested

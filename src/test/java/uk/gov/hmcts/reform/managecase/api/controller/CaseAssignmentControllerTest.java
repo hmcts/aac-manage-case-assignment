@@ -1,8 +1,32 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.FeignException;
-import feign.Request;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.CASE_ASSIGNMENTS_PATH;
+import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.GET_ASSIGNMENTS_MESSAGE;
+
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,9 +42,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import feign.FeignException;
+import feign.Request;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
 import uk.gov.hmcts.reform.managecase.TestFixtures.CaseAssignedUsersFixture;
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
@@ -36,76 +65,60 @@ import uk.gov.hmcts.reform.managecase.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignedUsers;
 import uk.gov.hmcts.reform.managecase.domain.CaseAssignment;
 import uk.gov.hmcts.reform.managecase.domain.UserDetails;
+import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
-
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.CASE_ASSIGNMENTS_PATH;
-import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.GET_ASSIGNMENTS_MESSAGE;
+import uk.gov.hmcts.reform.managecase.service.common.UIDService;
 
 
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports",
     "squid:S2699"})
+@WebMvcTest(controllers = CaseAssignmentController.class,
+    includeFilters = @ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE, 
+        classes = { MapperConfig.class }
+    ),
+    excludeFilters = @ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE, 
+        classes = { SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class }
+    )
+)
+@AutoConfigureMockMvc(addFilters = false)
+@ImportAutoConfiguration(TestIdamConfiguration.class)
 public class CaseAssignmentControllerTest {
 
     private static final String ASSIGNEE_ID = "0a5874a4-3f38-4bbd-ba4c";
     private static final String CASE_TYPE_ID = "TEST_CASE_TYPE";
     private static final String CASE_ID = "1588234985453946";
 
-    @WebMvcTest(controllers = CaseAssignmentController.class,
-        includeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes = MapperConfig.class),
-        excludeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes =
-            { SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class }))
-    @AutoConfigureMockMvc(addFilters = false)
-    @ImportAutoConfiguration(TestIdamConfiguration.class)
-    static class BaseMvcTest {
+    @MockBean
+    protected CaseAssignmentService service;
 
-        @Autowired
-        protected MockMvc mockMvc;
+    @MockBean
+    protected UIDService uidService;
 
-        @MockBean
-        protected CaseAssignmentService service;
+    @MockBean
+    protected IdamRepository idamRepository;
 
-        @MockBean
-        protected WebEndpointsSupplier webEndpointsSupplier;
+    @MockBean
+    protected SecurityUtils securityUtils;
 
-        @MockBean
-        protected WebMvcEndpointHandlerMapping webMvcEndpointHandlerMapping;
+    @Autowired
+    protected MockMvc mockMvc;
 
-        @Autowired
-        protected ObjectMapper objectMapper;
-    }
+    @MockBean
+    protected WebEndpointsSupplier webEndpointsSupplier;
+
+    @MockBean
+    protected WebMvcEndpointHandlerMapping webMvcEndpointHandlerMapping;
+
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     @Nested
     @DisplayName("POST /case-assignments")
-    @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
-    class AssignAccessWithinOrganisation extends BaseMvcTest {
+    class AssignAccessWithinOrganisation {
         private static final String USE_USER_TOKEN_PARAM = "use_user_token=true";
         private CaseAssignmentRequest request;
 
@@ -114,7 +127,7 @@ public class CaseAssignmentControllerTest {
             request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, ASSIGNEE_ID);
         }
 
-        @DisplayName("happy path test without mockMvc")
+        @DisplayName("happy path test without mockWebMvc")
         @Test
         void directCallHappyPath() { // created to avoid IDE warnings in controller class that function is never used
             // ARRANGE
@@ -124,7 +137,7 @@ public class CaseAssignmentControllerTest {
             CaseAssignmentController controller = new CaseAssignmentController(service, new ModelMapper());
 
             // ACT
-            CaseAssignmentResponse response = controller.assignAccessWithinOrganisation(request, Optional.of(false));
+            CaseAssignmentResponse response = controller.assignAccessWithinOrganisation(request, false);
 
             // ASSERT
             assertThat(response).isNotNull();
@@ -137,10 +150,10 @@ public class CaseAssignmentControllerTest {
         void shouldAssignCaseAccess() throws Exception {
             List<String> roles = List.of("Role1", "Role2");
             given(service.assignCaseAccess(any(CaseAssignment.class), anyBoolean())).willReturn(roles);
-
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            
+            mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(
@@ -150,9 +163,9 @@ public class CaseAssignmentControllerTest {
         @DisplayName("should delegate to service domain for a valid request")
         @Test
         void shouldDelegateToServiceDomain() throws Exception {
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
 
             ArgumentCaptor<CaseAssignment> captor = ArgumentCaptor.forClass(CaseAssignment.class);
@@ -164,9 +177,9 @@ public class CaseAssignmentControllerTest {
         @DisplayName("should delegate to service domain for a valid request with provided use_user_token request param")
         @Test
         void shouldDelegateToServiceDomainWithProvidedUseUserTokenParam() throws Exception {
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH + "?" + USE_USER_TOKEN_PARAM)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(CASE_ASSIGNMENTS_PATH + "?" + USE_USER_TOKEN_PARAM)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
 
             ArgumentCaptor<CaseAssignment> captor = ArgumentCaptor.forClass(CaseAssignment.class);
@@ -180,9 +193,9 @@ public class CaseAssignmentControllerTest {
         void shouldFailWithBadRequestWhenCaseTypeIdIsNull() throws Exception {
             request = new CaseAssignmentRequest(null, CASE_ID, ASSIGNEE_ID);
 
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_TYPE_ID_EMPTY)));
@@ -193,9 +206,9 @@ public class CaseAssignmentControllerTest {
         void shouldFailWithBadRequestWhenCaseIdIsNull() throws Exception {
             request = new CaseAssignmentRequest(CASE_TYPE_ID, null, ASSIGNEE_ID);
 
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_EMPTY)));
@@ -206,9 +219,9 @@ public class CaseAssignmentControllerTest {
         void shouldFailWithBadRequestWhenCaseIdIsInvalidLuhnNumber() throws Exception {
             request = new CaseAssignmentRequest(CASE_TYPE_ID, "123", ASSIGNEE_ID);
 
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(2)))
                 .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_INVALID_LENGTH)))
@@ -220,9 +233,9 @@ public class CaseAssignmentControllerTest {
         void shouldFailWithBadRequestWhenAssigneeIdIsNull() throws Exception {
             request = new CaseAssignmentRequest(CASE_TYPE_ID, CASE_ID, "");
 
-            this.mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.errors", hasItem(ValidationError.ASSIGNEE_ID_EMPTY)));
@@ -231,9 +244,9 @@ public class CaseAssignmentControllerTest {
 
     @Nested
     @DisplayName("GET /case-assignments")
-    class GetCaseAssignments extends BaseMvcTest {
+    class GetCaseAssignments {
 
-        @DisplayName("happy path test without mockMvc")
+        @DisplayName("happy path test without mockWebMvc")
         @Test
         void directCallHappyPath() { // created to avoid IDE warnings in controller class that function is never used
             // ARRANGE
@@ -271,8 +284,7 @@ public class CaseAssignmentControllerTest {
 
             given(service.getCaseAssignments(List.of(caseIds.split(",")))).willReturn(caseAssignedUsers);
 
-            this.mockMvc.perform(get(CASE_ASSIGNMENTS_PATH)
-                                     .queryParam("case_ids", caseIds))
+            mockMvc.perform(get(CASE_ASSIGNMENTS_PATH).queryParam("case_ids", caseIds))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(GET_ASSIGNMENTS_MESSAGE)))
@@ -298,20 +310,20 @@ public class CaseAssignmentControllerTest {
                 .willThrow(new FeignException.NotFound("404", request, "data store failure".getBytes(),
                                                        new HashMap<String, Collection<String>>()));
 
-            this.mockMvc.perform(get(CASE_ASSIGNMENTS_PATH)
-                                     .queryParam("case_ids", caseIds))
+            mockMvc.perform(get(CASE_ASSIGNMENTS_PATH).queryParam("case_ids", caseIds))
                 .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath(
                     "$.message",
                     containsString("data store failure")
                 ));
+
         }
 
         @DisplayName("should fail with 400 bad request when caseIds query param is not passed")
         @Test
         void shouldFailWithBadRequestWhenCaseIdsInGetAssignmentsIsNull() throws Exception {
 
-            this.mockMvc.perform(get(CASE_ASSIGNMENTS_PATH))
+            mockMvc.perform(get(CASE_ASSIGNMENTS_PATH))
                 .andExpect(status().isBadRequest());
         }
 
@@ -319,8 +331,7 @@ public class CaseAssignmentControllerTest {
         @Test
         void shouldFailWithBadRequestWhenCaseIdsInGetAssignmentsIsEmpty() throws Exception {
 
-            this.mockMvc.perform(get(CASE_ASSIGNMENTS_PATH)
-                                     .queryParam("case_ids", ""))
+            mockMvc.perform(get(CASE_ASSIGNMENTS_PATH).queryParam("case_ids", ""))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath(
                     "$.message",
@@ -332,8 +343,7 @@ public class CaseAssignmentControllerTest {
         @Test
         void shouldFailWithBadRequestWhenCaseIdsInGetAssignmentsIsMalformed() throws Exception {
 
-            this.mockMvc.perform(get(CASE_ASSIGNMENTS_PATH)
-                                     .queryParam("case_ids", "121324,%12345"))
+            mockMvc.perform(get(CASE_ASSIGNMENTS_PATH).queryParam("case_ids", "121324,%12345"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is("Case ID should contain digits only")));
         }
@@ -341,12 +351,12 @@ public class CaseAssignmentControllerTest {
 
     @Nested
     @DisplayName("DELETE /case-assignments")
-    class UnassignAccessWithinOrganisation extends BaseMvcTest {
+    class UnassignAccessWithinOrganisation {
 
         @Captor
         private ArgumentCaptor<ArrayList<RequestedCaseUnassignment>> requestedCaseUnassignmentsCaptor;
 
-        @DisplayName("happy path test without mockMvc")
+        @DisplayName("happy path test without mockWebMvc")
         @Test
         void directCallHappyPath() { // created to avoid IDE warnings in controller class that function is never used
             // ARRANGE
@@ -377,17 +387,14 @@ public class CaseAssignmentControllerTest {
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
             // ACT + ASSERT
-            final MvcResult result = this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(
-                    CaseAssignmentController.UNASSIGN_ACCESS_MESSAGE)))
-                .andReturn();
+                    CaseAssignmentController.UNASSIGN_ACCESS_MESSAGE)));
 
-            // ASSERT
-            assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
         }
 
         @DisplayName("should delegate to service domain for a valid request")
@@ -401,9 +408,9 @@ public class CaseAssignmentControllerTest {
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
             // ASSERT
@@ -420,13 +427,13 @@ public class CaseAssignmentControllerTest {
             // ARRANGE
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(null);
 
-            // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.errors", hasItem(ValidationError.EMPTY_REQUESTED_UNASSIGNMENTS_LIST)));
+
         }
 
         @DisplayName("should fail with 400 bad request when unassignments list is empty")
@@ -435,13 +442,13 @@ public class CaseAssignmentControllerTest {
             // ARRANGE
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(List.of());
 
-            // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.errors", hasItem(ValidationError.EMPTY_REQUESTED_UNASSIGNMENTS_LIST)));
+
         }
 
         @DisplayName("should fail with 400 bad request when case id is null")
@@ -454,9 +461,9 @@ public class CaseAssignmentControllerTest {
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_EMPTY)));
@@ -471,10 +478,9 @@ public class CaseAssignmentControllerTest {
             );
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
-            // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(2)))
                 .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ID_INVALID_LENGTH)))
@@ -491,9 +497,9 @@ public class CaseAssignmentControllerTest {
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
             // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.errors", hasItem(ValidationError.ASSIGNEE_ID_EMPTY)));
@@ -508,10 +514,9 @@ public class CaseAssignmentControllerTest {
             );
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
-            // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.errors", hasItem(ValidationError.ASSIGNEE_ID_EMPTY)));
@@ -526,10 +531,9 @@ public class CaseAssignmentControllerTest {
             );
             CaseUnassignmentRequest request = new CaseUnassignmentRequest(unassignments);
 
-            // ACT + ASSERT
-            this.mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(delete(CASE_ASSIGNMENTS_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.errors", hasItem(ValidationError.CASE_ROLE_FORMAT_INVALID)));

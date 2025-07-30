@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -34,10 +35,11 @@ public class AuditEvent extends Event {
     @JsonProperty("state_name")
     private String stateName;
     @JsonProperty("data")
-    @ApiModelProperty("Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
+    @Schema(description = "Case data as defined in case type definition."
+        + " See `docs/api/case-data.md` for data structure.")
     private Map<String, JsonNode> data;
     @JsonProperty("data_classification")
-    @ApiModelProperty("Same structure as `data` with classification "
+    @Schema(description = "Same structure as `data` with classification "
         + "(`PUBLIC`, `PRIVATE`, `RESTRICTED`) as field's value.")
     private Map<String, JsonNode> dataClassification;
     @JsonProperty("security_classification")
@@ -151,7 +153,7 @@ public class AuditEvent extends Event {
 
     @Deprecated
     @JsonGetter("security_classifications")
-    @ApiModelProperty("Deprecated. Use `data_classification` instead.")
+    @Schema(description = "Deprecated. Use `data_classification` instead.")
     public Map<String, JsonNode> getSecurityClassifications() {
         return dataClassification;
     }

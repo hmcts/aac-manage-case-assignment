@@ -61,7 +61,7 @@ class VerifyNoCAnswersServiceTest {
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         caseDetails = createCase();
         challengeQuestionsResult = new ChallengeQuestionsResult();

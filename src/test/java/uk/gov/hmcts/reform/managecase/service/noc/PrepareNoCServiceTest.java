@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
-import uk.gov.hmcts.reform.managecase.client.datastore.model.SecurityClassification;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
@@ -23,7 +22,7 @@ import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_TYPE_ID_EMPTY;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.INVALID_CASE_ROLE_FIELD;
@@ -75,12 +74,10 @@ class PrepareNoCServiceTest {
     private final JacksonUtils jacksonUtils = new JacksonUtils(objectMapper);
 
     private Map<String, OrganisationPolicy> orgPolicies;
-    private final SecurityClassification securityClassification = SecurityClassification.PUBLIC;
-    private final Map<String, JsonNode> dataClassification = new HashMap<>();
 
     @BeforeEach
     void setUp() {
-        initMocks(this);
+        openMocks(this);
         prepareNoCService = new PrepareNoCService(prdRepository,
                                                   securityUtils,
                                                   jacksonUtils,

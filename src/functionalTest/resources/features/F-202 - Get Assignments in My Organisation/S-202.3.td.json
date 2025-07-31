@@ -11,6 +11,12 @@
 
 	"expectedResponse": {
 		"_extends_": "ACA_400_Response",
-		"body": null
+		"body": {
+			"status": 400,
+			"type": "[[ANY_NULLABLE]]",
+			"title": "Bad Request",
+			"detail": "Required parameter 'case_ids' is not present.",
+			"instance": "[[ANY_NULLABLE]]"
+		}
 	}
 }

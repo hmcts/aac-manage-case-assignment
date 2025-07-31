@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import lombok.ToString;
 
 import java.io.Serializable;
@@ -25,7 +27,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
     private String defaultValue;
     private List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions = new ArrayList<>();
 
-    @ApiModelProperty(required = true, value = "Foreign key to CaseField.id")
+    @Schema(requiredMode = RequiredMode.REQUIRED, description = "Foreign key to CaseField.id")
     @JsonProperty("case_field_id")
     public String getCaseFieldId() {
         return caseFieldId;
@@ -35,7 +37,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
         this.caseFieldId = caseFieldId;
     }
 
-    @ApiModelProperty("whether this field is optional, mandatory or read only for this event")
+    @Schema(description = "whether this field is optional, mandatory or read only for this event")
     @JsonProperty("display_context")
     public String getDisplayContext() {
         return displayContext;
@@ -45,7 +47,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
         this.displayContext = displayContext;
     }
 
-    @ApiModelProperty("contain names of fields for list or table")
+    @Schema(description = "contain names of fields for list or table")
     @JsonProperty("display_context_parameter")
     @Override
     public String getDisplayContextParameter() {
@@ -56,7 +58,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
         this.displayContextParameter = displayContextParameter;
     }
 
-    @ApiModelProperty("Show Condition expression for this field")
+    @Schema(description = "Show Condition expression for this field")
     @JsonProperty("show_condition")
     public String getShowCondition() {
         return showCondition;
@@ -69,7 +71,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
     /**
      * event case field hint text.
      **/
-    @ApiModelProperty("")
+    @Schema
     @JsonProperty("hint_text")
     public String getHintText() {
         return hintText;
@@ -79,7 +81,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
         this.hintText = hintText;
     }
 
-    @ApiModelProperty("Show Summary Change Option")
+    @Schema(description = "Show Summary Change Option")
     @JsonProperty("show_summary_change_option")
     public Boolean getShowSummaryChangeOption() {
         return showSummaryChangeOption;
@@ -89,7 +91,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
         this.showSummaryChangeOption = showSummaryChangeOption;
     }
 
-    @ApiModelProperty("Show Summary Content Option")
+    @Schema(description = "Show Summary Content Option")
     @JsonProperty("show_summary_content_option")
     public Integer getShowSummaryContentOption() {
         return showSummaryContentOption;
@@ -102,7 +104,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
     /**
      * event case field label.
      **/
-    @ApiModelProperty("")
+    @Schema
     @JsonProperty("label")
     public String getLabel() {
         return label;
@@ -112,7 +114,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
         this.label = label;
     }
 
-    @ApiModelProperty("")
+    @Schema
     @JsonProperty("case_fields_complex")
     public List<CaseEventFieldComplexDefinition> getCaseEventFieldComplexDefinitions() {
         return caseEventFieldComplexDefinitions;
@@ -122,7 +124,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
         this.caseEventFieldComplexDefinitions = eventComplexTypeEntities;
     }
 
-    @ApiModelProperty("Default value coming from the Event that overwrites complex fields.")
+    @Schema(description = "Default value coming from the Event that overwrites complex fields.")
     @JsonProperty("defaultValue")
     public String getDefaultValue() {
         return defaultValue;
@@ -132,7 +134,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
         this.defaultValue = defaultValue;
     }
 
-    @ApiModelProperty("whether this field is data should be retained, "
+    @Schema(description = "whether this field is data should be retained, "
         + "dependant on show_condition being populated")
     @JsonProperty("retain_hidden_value")
     public Boolean getRetainHiddenValue() {

@@ -56,7 +56,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.CHANGE_ORGANISATION_REQUEST_FIELD;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getCaseViewFields;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseUpdateViewEventFixture.getWizardPages;
@@ -113,7 +113,7 @@ class DataStoreRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        initMocks(this);
+        openMocks(this);
         given(securityUtils.getCaaSystemUserToken()).willReturn(SYSTEM_USER_TOKEN);
         given(securityUtils.getUserBearerToken()).willReturn(SYSTEM_USER_TOKEN);
 

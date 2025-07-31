@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.managecase.client.definitionstore.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-@ApiModel(description = "")
+@Schema
 @SuppressWarnings({"PMD.UncommentedEmptyConstructor"})
 public class FixedListItem implements Orderable {
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import feign.FeignException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,7 +16,6 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointPr
 import org.springframework.boot.actuate.endpoint.web.EndpointMediaTypes;
 import org.springframework.boot.actuate.endpoint.web.WebEndpointsSupplier;
 import org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpointsSupplier;
-import org.springframework.boot.actuate.endpoint.web.annotation.ServletEndpointsSupplier;
 import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,6 +25,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.web.servlet.MockMvc;
+
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
 import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.CallbackRequest;
@@ -56,7 +57,7 @@ import uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -70,6 +71,7 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.oneOf;
@@ -114,14 +116,13 @@ public class NoticeOfChangeControllerTest {
         + "${applicant.soletrader.name}:Applicant,${respondent.individual.fullname}|${respondent.company.name}"
         + "|${respondent.soletrader.name}:Respondent";
 
-
     @WebMvcTest(controllers = NoticeOfChangeController.class,
         includeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes = MapperConfig.class),
         excludeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes =
             { SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class }))
     @AutoConfigureMockMvc(addFilters = false)
     @ImportAutoConfiguration(TestIdamConfiguration.class)
-    static class BaseMvcTest {
+    static class BaseWebMvcTest {
 
         @Autowired
         protected MockMvc mockMvc;
@@ -151,9 +152,6 @@ public class NoticeOfChangeControllerTest {
         protected WebEndpointsSupplier webEndpointsSupplier;
 
         @MockBean
-        protected ServletEndpointsSupplier servletEndpointsSupplier;
-
-        @MockBean
         protected ControllerEndpointsSupplier controllerEndpointsSupplier;
 
         @MockBean
@@ -179,9 +177,9 @@ public class NoticeOfChangeControllerTest {
 
         @Nested
         @DisplayName("GET /noc/noc-questions")
-        class GetCaseAssignments extends BaseMvcTest {
+        class GetCaseAssignments extends BaseWebMvcTest {
 
-            @DisplayName("happy path test without mockMvc")
+            @DisplayName("happy path test without mockWebMVC")
             @Test
             void directCallHappyPath() {
                 // created to avoid IDE warnings in controller class that function is never used
@@ -241,8 +239,7 @@ public class NoticeOfChangeControllerTest {
 
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 
-                this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
-                                         .queryParam("case_id", CASE_ID))
+                this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS).queryParam("case_id", CASE_ID))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(APPLICATION_JSON_VALUE));
             }
@@ -258,8 +255,7 @@ public class NoticeOfChangeControllerTest {
             @Test
             void shouldFailWithBadRequestWhenCaseIdsInGetAssignmentsIsEmpty() throws Exception {
 
-                this.mockMvc.perform(get("/noc" +  GET_NOC_QUESTIONS)
-                                         .queryParam("case_id", ""))
+                this.mockMvc.perform(get("/noc" +  GET_NOC_QUESTIONS).queryParam("case_id", ""))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code",
                         oneOf("case-id-empty", "case-id-invalid", "case-id-invalid-length")))
@@ -271,7 +267,7 @@ public class NoticeOfChangeControllerTest {
             void shouldFailWithBadRequestWhenCaseIdsInGetAssignmentsIsMalformed() throws Exception {
 
                 this.mockMvc.perform(get("/noc" +  GET_NOC_QUESTIONS)
-                                         .queryParam("case_id", "121324,%12345"))
+                    .queryParam("case_id", "121324,%12345"))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code",
                         oneOf("case-id-invalid", "case-id-invalid-length")))
@@ -285,7 +281,7 @@ public class NoticeOfChangeControllerTest {
     @Nested
     @DisplayName("GET /noc/verify-noc-answers")
     @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
-    class VerifyNoticeOfChangeAnswers extends BaseMvcTest {
+    class VerifyNoticeOfChangeAnswers extends BaseWebMvcTest {
 
         private static final String ENDPOINT_URL = "/noc" + VERIFY_NOC_ANSWERS;
 
@@ -380,7 +376,7 @@ public class NoticeOfChangeControllerTest {
     @Nested
     @DisplayName("POST /noc/noc-requests")
     @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
-    class PostNoticeOfChangeRequest extends BaseMvcTest {
+    class PostNoticeOfChangeRequest extends BaseWebMvcTest {
 
         private NoCRequestDetails noCRequestDetails;
         private RequestNoticeOfChangeResponse requestNoticeOfChangeResponse;
@@ -403,7 +399,7 @@ public class NoticeOfChangeControllerTest {
                 .willReturn(requestNoticeOfChangeResponse);
         }
 
-        @DisplayName("happy path test without mockMvc")
+        @DisplayName("happy path test without mockWebMVC")
         @Test
         void directCallHappyPath() {
             // ARRANGE
@@ -428,8 +424,8 @@ public class NoticeOfChangeControllerTest {
         @Test
         void shouldGetRequestNoticeOfChangeResponseForAValidRequest() throws Exception {
             this.mockMvc.perform(post("/noc" + REQUEST_NOTICE_OF_CHANGE_PATH)
-                                     .contentType(APPLICATION_JSON_VALUE)
-                                     .content(objectMapper.writeValueAsString(requestNoticeOfChangeRequest)))
+                .contentType(APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(requestNoticeOfChangeRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)));
@@ -479,9 +475,9 @@ public class NoticeOfChangeControllerTest {
                     .willThrow(AccessDeniedException.class);
 
             this.mockMvc.perform(post("/noc" + REQUEST_NOTICE_OF_CHANGE_PATH)
-                    .contentType(APPLICATION_JSON_VALUE)
-                    .content(objectMapper.writeValueAsString(requestNoticeOfChangeRequest)))
-                    .andExpect(status().isForbidden());
+                .contentType(APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(requestNoticeOfChangeRequest)))
+                .andExpect(status().isForbidden());
         }
 
         @DisplayName("should error if downstream service throws an exception")
@@ -501,7 +497,8 @@ public class NoticeOfChangeControllerTest {
         @Test
         void shouldFailWithInternalServerErrorIfExceptionThrown() throws Exception {
 
-            given(requestNoticeOfChangeService.requestNoticeOfChange(null));
+            given(requestNoticeOfChangeService.requestNoticeOfChange(any()))
+                .willThrow(new RuntimeException());
 
             this.mockMvc.perform(post("/noc" + REQUEST_NOTICE_OF_CHANGE_PATH)
                     .contentType(APPLICATION_JSON_VALUE)
@@ -512,6 +509,7 @@ public class NoticeOfChangeControllerTest {
         private void postCallShouldReturnBadRequestWithErrorMessage(
                                                             RequestNoticeOfChangeRequest requestNoticeOfChangeRequest,
                                                             String caseIdInvalid) throws Exception {
+
             this.mockMvc.perform(post("/noc" + REQUEST_NOTICE_OF_CHANGE_PATH)
                                      .contentType(APPLICATION_JSON_VALUE)
                                      .content(objectMapper.writeValueAsString(requestNoticeOfChangeRequest)))
@@ -523,7 +521,7 @@ public class NoticeOfChangeControllerTest {
     @Nested
     @DisplayName("POST /noc/check-noc-approval")
     @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
-    class PostCheckNoticeOfChangeApproval extends BaseMvcTest {
+    class PostCheckNoticeOfChangeApproval extends BaseWebMvcTest {
 
         private CallbackRequest request;
         private CaseDetails caseDetails;
@@ -545,7 +543,7 @@ public class NoticeOfChangeControllerTest {
                 .willReturn(changeOrganisationRequest);
         }
 
-        @DisplayName("happy path test without mockMvc")
+        @DisplayName("happy path test without mockWebMVC")
         @Test
         void directCallHappyPath() {
             changeOrganisationRequest.setApprovalStatus("1");
@@ -628,6 +626,7 @@ public class NoticeOfChangeControllerTest {
                                      .contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
+            
             verify(approvalService, never()).findAndTriggerNocDecisionEvent(CASE_ID);
         }
 
@@ -666,8 +665,8 @@ public class NoticeOfChangeControllerTest {
             request = new CallbackRequest(null, null, caseDetails);
 
             this.mockMvc.perform(post(ENDPOINT_URL)
-                                     .contentType(MediaType.APPLICATION_JSON)
-                                     .content(objectMapper.writeValueAsString(request)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.errors", hasItem(CASE_ID_INVALID)));
@@ -684,6 +683,7 @@ public class NoticeOfChangeControllerTest {
                                      .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is(CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID)));
+
         }
 
         @DisplayName("should error if changeOrganisationRequestField is invalid")
@@ -703,7 +703,7 @@ public class NoticeOfChangeControllerTest {
     @Nested
     @DisplayName("POST /noc/set-organisation-to-remove")
     @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
-    class PostSetOrganisationToRemove extends BaseMvcTest {
+    class PostSetOrganisationToRemove extends BaseWebMvcTest {
 
         private CallbackRequest request;
         private AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse;
@@ -738,7 +738,7 @@ public class NoticeOfChangeControllerTest {
                 .willReturn(changeOrganisationRequest);
         }
 
-        @DisplayName("happy path test without mockMvc")
+        @DisplayName("happy path test without mockWebMVC")
         @Test
         void directCallHappyPath() {
             aboutToSubmitCallbackResponse = AboutToSubmitCallbackResponse.builder()
@@ -894,7 +894,7 @@ public class NoticeOfChangeControllerTest {
     @Nested
     @DisplayName("GET /noc/noc-prepare")
     @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
-    class PrepareNoticeOfChangeEvent extends BaseMvcTest {
+    class PrepareNoticeOfChangeEvent extends BaseWebMvcTest {
 
         private static final String ENDPOINT_URL = "/noc" + NOC_PREPARE_PATH;
 
@@ -921,27 +921,27 @@ public class NoticeOfChangeControllerTest {
                                      .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(content().string("{\"data\":{\"ChangeOrganisationRequest\":"
-                                                + "{\"OrganisationToAdd\":null,"
-                                                + "\"OrganisationToRemove\":null,"
-                                                + "\"CaseRoleId\":null,"
-                                                + "\"RequestTimestamp\":null,"
-                                                + "\"ApprovalStatus\":null,"
-                                                + "\"CreatedBy\":null}},"
-                                                + "\"state\":null,"
-                                                + "\"errors\":null,"
-                                                + "\"warnings\":null,"
-                                                + "\"data_classification\":null,"
-                                                + "\"security_classification\":null,"
-                                                + "\"significant_item\":null"
-                                                + "}"));
+                .andExpect(jsonPath("$.data.length()", is(1)))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequest.OrganisationToAdd").hasJsonPath())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequest.OrganisationToAdd").value(nullValue()))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequest.OrganisationToRemove").value(nullValue()))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequest.CaseRoleId").value(nullValue()))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequest.RequestTimestamp").value(nullValue()))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequest.ApprovalStatus").value(nullValue()))
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequest.CreatedBy").value(nullValue()))
+                .andExpect(jsonPath("$.state").value(nullValue()))
+                .andExpect(jsonPath("$.errors").value(nullValue()))
+                .andExpect(jsonPath("$.warnings").value(nullValue()))
+                .andExpect(jsonPath("$.data_classification").value(nullValue()))
+                .andExpect(jsonPath("$.security_classification").value(nullValue()))
+                .andExpect(jsonPath("$.significant_item").value(nullValue()));
         }
     }
 
     @Nested
     @DisplayName("GET /noc/apply-decision")
     @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
-    class ApplyNoticeOfChangeDecision extends BaseMvcTest {
+    class ApplyNoticeOfChangeDecision extends BaseWebMvcTest {
 
         private static final String ENDPOINT_URL = "/noc" + APPLY_NOC_DECISION;
 

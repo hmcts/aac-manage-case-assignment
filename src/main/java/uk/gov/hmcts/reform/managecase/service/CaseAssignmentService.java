@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

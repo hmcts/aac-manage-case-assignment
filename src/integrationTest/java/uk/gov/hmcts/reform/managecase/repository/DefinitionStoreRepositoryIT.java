@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration
@@ -50,7 +50,7 @@ public class DefinitionStoreRepositoryIT {
 
         @Bean
         DefinitionStoreRepository definitionStoreRepository() {
-            initMocks(this);
+            openMocks(this);
             FieldType fieldType = FieldType.builder()
                 .regularExpression("regular expression")
                 .max(null)

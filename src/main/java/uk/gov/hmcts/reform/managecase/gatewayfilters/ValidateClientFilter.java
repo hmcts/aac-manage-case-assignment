@@ -21,6 +21,8 @@ import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTH
 
 public interface ValidateClientFilter {
 
+    String X_FORWARDED_PREFIX = "X-Forwarded-Prefix";
+
     @Shortcut
     static HandlerFilterFunction<ServerResponse, ServerResponse> validateClientFilter() {
         return (request, next) -> {
@@ -40,8 +42,13 @@ public interface ValidateClientFilter {
 
             ServerRequest withHeaders = ServerRequest
                 .from(request)
-                .header(AUTHORIZATION, securityUtils.getCaaSystemUserToken())
-                .header(SERVICE_AUTHORIZATION, securityUtils.getS2SToken())
+                .headers(headers -> headers.set(X_FORWARDED_PREFIX, "/ccd"))
+                .headers(headers -> {
+                    headers.remove(AUTHORIZATION);
+                    headers.remove(SERVICE_AUTHORIZATION);
+                    headers.set(AUTHORIZATION, securityUtils.getCaaSystemUserToken());
+                    headers.set(SERVICE_AUTHORIZATION, securityUtils.getS2SToken());
+                })
                 .build();
             return next.handle(withHeaders);
         };

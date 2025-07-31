@@ -51,6 +51,12 @@ spring:
   cloud:
     gateway:
       mvc:
+        forwarded-request-headers-filter:
+          enabled: false
+        remove-content-length-request-headers-filter:
+          enabled: false
+        transfer-encoding-normalization-request-headers-filter:
+          enabled: false
         http-client:
           type: AUTODETECT
         routes:

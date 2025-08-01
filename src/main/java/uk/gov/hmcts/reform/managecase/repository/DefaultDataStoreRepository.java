@@ -87,7 +87,7 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     @Override
     public CaseAccessMetadataResource findCaseAccessMetadataByCaseId(String caseId) {
         try {
-            return dataStoreApi.getCaseAccessMetadataByCaseId(getUserAuthToken(), caseId);
+            return dataStoreApi.getCaseAccessMetadataByCaseId(securityUtils.getUserBearerToken(), caseId);
         } catch (FeignException ex) {
             if (HttpStatus.NOT_FOUND.value() == ex.status()) {
                 throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);

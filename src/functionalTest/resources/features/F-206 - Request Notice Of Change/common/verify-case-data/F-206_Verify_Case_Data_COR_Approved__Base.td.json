@@ -23,7 +23,7 @@
           "OrgPolicyReference": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][respondentOrganisationPolicy][OrgPolicyReference]}",
           "OrgPolicyCaseAssignedRole": "${[scenarioContext][siblingContexts][case_snapshot][testData][actualResponse][body][data][respondentOrganisationPolicy][OrgPolicyCaseAssignedRole]}",
           "Organisation" : {
-            "OrganisationID": "[[ANYTHING_PRESENT]]"
+            "OrganisationID": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
           }
         },
 

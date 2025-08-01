@@ -379,7 +379,6 @@ dependencies {
   contractTestImplementation group: 'org.projectlombok', name: 'lombok', version: lombokVersion
   contractTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 
-  testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
 }
 
 bootJar {

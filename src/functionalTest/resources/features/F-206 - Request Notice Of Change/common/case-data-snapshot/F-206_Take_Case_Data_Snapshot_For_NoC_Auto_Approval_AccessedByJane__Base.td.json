@@ -1,0 +1,43 @@
+{
+  "_guid_": "F-206_Take_Case_Data_Snapshot_For_NoC_Auto_Approval_AccessedByJane__Base",
+  "_extends_": "F-206_Take_Case_Data_Snapshot__Base",
+
+  "expectedResponse": {
+    "body" : {
+      "data": {
+        "_extends_": "NoC_Case_Data_With_Org_Policies",
+        "applicantOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "QUK822N"
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "LESTKK0"
+          },
+          "PreviousOrganisations": [
+            {
+              "_extends_": "F-206_PreviousOrganisations"
+            }
+          ]
+        },
+        "otherPartyOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "LESTKK0"
+          }
+        }
+      },
+
+      "data_classification": {
+        "_extends_": "NoC_Case_Data_Classification_With_Org_Policies",
+
+        "respondentOrganisationPolicy": {
+          "value": {
+            "PreviousOrganisations": "[[ANY_NULLABLE]]"
+          }
+        }
+      }
+
+    }
+  }
+}

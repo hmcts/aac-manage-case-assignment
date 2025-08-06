@@ -1,18 +1,18 @@
 {
-  "_guid_": "S-206.7",
+  "_guid_": "S-206.26",
   "_extends_": "Request_NoC__Base",
 
-  "title": "(Happy Path) Solicitor having STANDARD access to case requests NoC to replace representation - auto-approval applies",
+  "title": "(Happy Path) CAA (also a solicitor for the same jurisdiction) requests NoC to replace representation Specific access - auto-approval applies",
 
   "specs": [
     "Richard - with the ability to create a case for a particular jurisdiction within an organisation",
-    "Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's",
+    "Jane - with a pui-caa role and a solicitor role for the same jurisdiction, within a different organisation from Richard's",
     "a citizen Mario, on behalf of whom Richard will create a case",
 
     "contains all correct answers in the correct format",
     "contains answers identifying case role R2",
 
-    "is made by Dil to place a NOC Request for C1"
+    "is made by Jane to place a NOC Request for C1"
   ],
 
   "users": {
@@ -20,12 +20,12 @@
       "_extends_": "ACA_Users_Richard"
     },
     "invokingUser": {
-      "_extends_": "ACA_Users_Dil"
+      "_extends_": "ACA_Users_CAA_Jane"
     }
   },
 
   "prerequisites": [
-    { "case_snapshot": "F-206_Take_Case_Data_Snapshot_For_NoC_Auto_Approval_Case_Created_By_Richard" }
+    { "case_snapshot": "F-206_Take_Case_Data_Snapshot_For_NoC_Auto_Approval_Case_Created_By_RichardAccessedByJane" }
   ],
 
   "request": {

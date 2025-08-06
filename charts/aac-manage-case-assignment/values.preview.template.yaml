@@ -32,7 +32,7 @@ ccd:
     s2s:
       enabled: false
     dataStore:
-      enabled: false
+      enabled: true
     adminWeb:
       enabled: false
     definitionImporter:

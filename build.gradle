@@ -227,6 +227,12 @@ dependencyCheck {
   suppressionFile = 'config/owasp/suppressions.xml'
 }
 
+tasks.register("printSuppressionFile") {
+  doLast {
+    println "SUPPRESSION_FILE=${dependencyCheck.suppressionFile}"
+  }
+}
+
 ext {
   set('springCloudVersion', '2025.0.0')
   set('spring-framework.version', '6.2.9')

@@ -349,7 +349,7 @@ dependencies {
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
   implementation group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: '0.2.0'
   implementation group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.4'
-  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.19.1-RELEASE'
+  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.19.2-RELEASE'
 
 
   testImplementation libraries.junit5

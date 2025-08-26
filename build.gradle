@@ -23,7 +23,7 @@ ext {
   junitPlatform       = '1.11.4'
   lombokVersion       = '1.18.38'
   pact_version        = '4.1.43'
-  reformLogging       = '6.1.4'
+  reformLogging       = '6.1.9'
   restAssured         = '5.5.1'
   beftaFwVersion      = '9.2.4'
   ccdTestDefinitionVersion = '7.25.4'

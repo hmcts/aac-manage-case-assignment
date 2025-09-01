@@ -21,9 +21,9 @@ ext {
 
   junit               = '5.11.4'
   junitPlatform       = '1.11.4'
-  lombokVersion       = '1.18.36'
+  lombokVersion       = '1.18.38'
   pact_version        = '4.1.43'
-  reformLogging       = '6.1.4'
+  reformLogging       = '6.1.9'
   restAssured         = '5.5.1'
   beftaFwVersion      = '9.2.4'
   ccdTestDefinitionVersion = '7.25.4'
@@ -328,7 +328,7 @@ dependencies {
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.5'
 
   // HMCTS
-  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.3'
+  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.4'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.2.0'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLogging
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: reformLogging
@@ -352,13 +352,13 @@ dependencies {
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
   implementation group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: '0.2.0'
   implementation group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.4'
-  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.19.1-RELEASE'
+  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.19.2-RELEASE'
 
 
   testImplementation libraries.junit5
   testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
   testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: ccdTestDefinitionVersion
-  testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.9', classifier: 'all'
+  testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.10', classifier: 'all'
   testImplementation group: 'io.rest-assured', name: 'rest-assured', version: restAssured
   testImplementation group: 'io.rest-assured', name: 'json-path', version: restAssured
   testImplementation group: 'io.rest-assured', name: 'xml-path', version: restAssured

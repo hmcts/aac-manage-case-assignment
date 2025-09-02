@@ -82,11 +82,6 @@ ccd:
         DEFINITION_STORE_DB_OPTIONS: ""
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_S2S_SECRET}
-      secrets:
-        DEFINITION_STORE_DB_PASSWORD:
-          secretRef: "{{ .Values.global.postgresSecret }}"
-          key: PASSWORD
-          disabled: true
 
   ccd-data-store-api:
     java:
@@ -97,7 +92,8 @@ ccd:
       devcpuRequests: '500m'
       environment:
         DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-        DATA_STORE_DB_USERNAME: hmcts
+        DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+        DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
         IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
@@ -117,11 +113,6 @@ ccd:
         CASE_DOCUMENT_AM_URL: ${CASE_DOCUMENT_AM_URL}
         UPLOAD_TIMESTAMP_FEATURED_CASE_TYPES: CARE_SUPERVISION_EPO
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,sscs,bulk_scan_orchestrator,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,aac_manage_case_assignment,wa_task_configuration_api,wa_task_monitor,ccd_case_document_am_api,hmc_cft_hearing_service,wa_task_management_api
-      secrets:
-        DATA_STORE_DB_PASSWORD:
-          secretRef: postgres
-          key: PASSWORD
-          disabled: false
 
   ccd-user-profile-api:
     java:
@@ -133,11 +124,6 @@ ccd:
         USER_PROFILE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
         USER_PROFILE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
         USER_PROFILE_DB_OPTIONS: ""
-      secrets:
-        USER_PROFILE_DB_PASSWORD:
-          secretRef: "{{ .Values.global.postgresSecret }}"
-          key: PASSWORD
-          disabled: true
 
   am-role-assignment-service:
     java:
@@ -163,15 +149,6 @@ ccd:
           username: "javapostgres"
           password: "javapassword"
         postgresHostname: ${SERVICE_NAME}-postgresql
-      secrets:
-        ROLE_ASSIGNMENT_DB_PASSWORD:
-          secretRef: "{{ .Values.global.postgresSecret }}"
-          key: PASSWORD
-          disabled: true
-      devmemoryRequests: 1024Mi
-      devcpuRequests: 250m
-      devmemoryLimits: 2048Mi
-      devcpuLimits: 1500m
 
 elastic:
   enabled: true

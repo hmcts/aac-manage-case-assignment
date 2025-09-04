@@ -313,7 +313,7 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLogging
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: reformLogging
-  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.19.1-RELEASE'
+  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.19.2-RELEASE'
 
 
   implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.0'

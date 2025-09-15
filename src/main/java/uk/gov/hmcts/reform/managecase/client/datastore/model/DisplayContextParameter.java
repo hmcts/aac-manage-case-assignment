@@ -36,7 +36,6 @@ public class DisplayContextParameter {
     }
 
     public static List<DisplayContextParameter> getDisplayContextParametersFor(String displayContextParameter) {
-        List<DisplayContextParameter> displayContextParameterTypeList = new ArrayList<>();
         List<String> displayContextParameters = new ArrayList<>();
 
         if (Strings.isNullOrEmpty(displayContextParameter)) {
@@ -50,6 +49,8 @@ public class DisplayContextParameter {
         }
 
         displayContextParameters.add(displayContextParameter.trim());
+
+        List<DisplayContextParameter> displayContextParameterTypeList = new ArrayList<>();
 
         for (String s : displayContextParameters) {
             Optional<DisplayContextParameterType> type = getParameterTypeFor(s);

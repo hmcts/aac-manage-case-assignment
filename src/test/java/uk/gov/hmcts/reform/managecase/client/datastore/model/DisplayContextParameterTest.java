@@ -26,7 +26,9 @@ public class DisplayContextParameterTest {
 
     @Test
     void testGetDisplayContextParametersFor_single() {
-        List<DisplayContextParameter> list =  DisplayContextParameter.getDisplayContextParametersFor("#LIST(someValue)");
+        List<DisplayContextParameter> list =  DisplayContextParameter.getDisplayContextParametersFor(
+            "#LIST(someValue)"
+        );
         assertEquals(1, list.size());
         assertEquals(DisplayContextParameterType.LIST, list.get(0).getType());
         assertEquals("someValue", list.get(0).getValue());
@@ -34,10 +36,14 @@ public class DisplayContextParameterTest {
 
     @Test
     void testGetDisplayContextParametersFor_multiple() {
-        List<DisplayContextParameter> list = DisplayContextParameter.getDisplayContextParametersFor("#LIST(someValue), #LIST(anotherValue)");
+        List<DisplayContextParameter> list = DisplayContextParameter.getDisplayContextParametersFor(
+            "#LIST(someValue), #LIST(anotherValue)"
+        );
         assertEquals(2, list.size());
-        assertTrue(list.stream().anyMatch(p -> p.getType() == DisplayContextParameterType.LIST && p.getValue().equals("someValue")));
-        assertTrue(list.stream().anyMatch(p -> p.getType() == DisplayContextParameterType.LIST && p.getValue().equals("anotherValue")));
+        assertTrue(list.stream().anyMatch(p -> p.getType() == DisplayContextParameterType.LIST 
+            && p.getValue().equals("someValue")));
+        assertTrue(list.stream().anyMatch(p -> p.getType() == DisplayContextParameterType.LIST 
+            && p.getValue().equals("anotherValue")));
     }
 
 }

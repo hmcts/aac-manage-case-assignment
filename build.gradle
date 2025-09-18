@@ -293,7 +293,7 @@ dependencies {
   implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.5'                 // idam-java-client
   implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'              // feign-form-spring
   implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'       // spring-cloud-starter-openfeign
-  implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'            // jaxb-runtime
+  implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.4'            // jaxb-runtime
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'                          // hibernate-types-60
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'                // java-properties-to-json
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-core', version: '4.0.5'                     // jaxb-runtime

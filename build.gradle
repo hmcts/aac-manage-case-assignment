@@ -21,7 +21,7 @@ ext {
 
   junit               = '5.11.4'
   junitPlatform       = '1.11.4'
-  lombokVersion       = '1.18.38'
+  lombokVersion       = '1.18.42'
   pact_version        = '4.1.43'
   reformLogging       = '6.1.9'
   restAssured         = '5.5.1'

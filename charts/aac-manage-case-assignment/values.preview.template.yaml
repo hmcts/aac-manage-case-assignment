@@ -124,6 +124,22 @@ ccd:
         CASE_DOCUMENT_AM_URL: ${CASE_DOCUMENT_AM_URL}
         UPLOAD_TIMESTAMP_FEATURED_CASE_TYPES: CARE_SUPERVISION_EPO
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,sscs,bulk_scan_orchestrator,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,aac_manage_case_assignment,wa_task_configuration_api,wa_task_monitor,ccd_case_document_am_api,hmc_cft_hearing_service,wa_task_management_api
+      postgresql:
+        enabled: true
+        primary:
+          persistence:
+            enabled: false
+          initdb:
+            scripts:
+              init.sql: |
+                CREATE DATABASE "data-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+                CREATE DATABASE "definition-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+                CREATE DATABASE "user-profile" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+                CREATE DATABASE "role-assignment" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        auth:
+          username: "javapostgres"
+          password: "javapassword"
+        postgresHostname: ${SERVICE_NAME}-postgresql
 
   ccd-user-profile-api:
     java:
@@ -154,22 +170,7 @@ ccd:
         ROLE_ASSIGNMENT_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
         ROLE_ASSIGNMENT_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
         ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified"
-      postgresql:
-        enabled: true
-        primary:
-          persistence:
-            enabled: false
-          initdb:
-            scripts:
-              init.sql: |
-                CREATE DATABASE "data-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-                CREATE DATABASE "definition-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-                CREATE DATABASE "user-profile" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-                CREATE DATABASE "role-assignment" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-        auth:
-          username: "javapostgres"
-          password: "javapassword"
-        postgresHostname: ${SERVICE_NAME}-postgresql
+     
 
 elastic:
   enabled: true

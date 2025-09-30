@@ -344,7 +344,7 @@ dependencies {
   implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.4.2'
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
   annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
-  implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.2'
+  implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.5'
   implementation group: 'org.projectlombok', name: 'lombok', version: lombokVersion
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
   implementation group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: '0.2.0'

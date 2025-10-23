@@ -296,7 +296,7 @@ dependencies {
   implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'            // jaxb-runtime
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'                          // hibernate-types-60
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'                // java-properties-to-json
-  implementation group: 'org.glassfish.jaxb', name: 'jaxb-core', version: '4.0.5'                     // jaxb-runtime
+  implementation group: 'org.glassfish.jaxb', name: 'jaxb-core', version: '4.0.6'                     // jaxb-runtime
   implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.16'                             // spring-boot-starter
   implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: '2.0.16'                          // spring-boot-starter
 
@@ -342,7 +342,7 @@ dependencies {
   implementation group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.3.0'
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.0'
   implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.4.2'
-  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
+  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.6'
   annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
   implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.5'
   implementation group: 'org.projectlombok', name: 'lombok', version: lombokVersion

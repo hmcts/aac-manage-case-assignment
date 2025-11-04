@@ -5,7 +5,7 @@ import java.net.ConnectException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executor;
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

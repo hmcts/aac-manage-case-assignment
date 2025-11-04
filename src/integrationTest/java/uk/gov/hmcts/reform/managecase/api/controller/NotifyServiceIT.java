@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.managecase.BaseTest;
+import uk.gov.hmcts.reform.managecase.BaseIT;
 import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequest;
 import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequestStatus;
 import uk.gov.hmcts.reform.managecase.service.NotifyService;
@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.managecase.service.NotifyService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class NotifyServiceIT extends BaseTest {
+class NotifyServiceIT extends BaseIT {
 
     @Autowired
     private NotifyService notifyService;

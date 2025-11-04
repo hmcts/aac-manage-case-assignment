@@ -45,7 +45,7 @@ class ChallengeAnswerValidatorTest {
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         answers = new ArrayList<>();
         answers.add(new SubmittedChallengeAnswer(QUESTION_ID_1, " T-e xt'VALUE"));

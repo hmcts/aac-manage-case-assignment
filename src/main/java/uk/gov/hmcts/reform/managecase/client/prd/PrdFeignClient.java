@@ -44,7 +44,7 @@ public class PrdFeignClient extends Client.Default {
                 502,
                 response.reason(),
                 response.request().httpMethod(),
-                null,
+                (Long) null,
                 response.request()
             );
         }

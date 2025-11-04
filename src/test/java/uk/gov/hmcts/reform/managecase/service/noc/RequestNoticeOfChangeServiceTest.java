@@ -50,7 +50,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
@@ -100,7 +100,7 @@ class RequestNoticeOfChangeServiceTest {
 
     @BeforeEach
     void setUp() {
-        initMocks(this);
+        openMocks(this);
         FindUsersByOrganisationResponse findUsersByOrganisationResponse = new FindUsersByOrganisationResponse(
             emptyList(), INVOKERS_ORGANISATION_IDENTIFIER);
         given(prdRepository.findUsersByOrganisation()).willReturn(findUsersByOrganisationResponse);

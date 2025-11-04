@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.managecase.api.payload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.SecurityClassification;
@@ -17,13 +17,14 @@ import java.util.Map;
  */
 @Data
 @Builder
-@ApiModel("About to Start Callback Response")
+@Schema(description = "About to Start Callback Response")
 public class AboutToStartCallbackResponse {
 
-    @ApiModelProperty("Case data as defined in case type definition. See `docs/api/case-data.md` for data structure.")
+    @Schema(description = "Case data as defined in case type definition."
+        + "See `docs/api/case-data.md` for data structure.")
     private Map<String, JsonNode> data;
     @JsonProperty("data_classification")
-    @ApiModelProperty("Same structure as `data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "
+    @Schema(description = "Same structure as `data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "
         + "as field's value.")
     private Map<String, JsonNode> dataClassification;
     @JsonProperty("security_classification")

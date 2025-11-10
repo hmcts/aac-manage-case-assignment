@@ -76,17 +76,6 @@ def vaultOverrides = [
 // vars needed for functional tests
 env.CALLBACK_FTA_ENABLED = "true" 
 
-  if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc') {
-    env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"	
-    env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"	
-    env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"	
-    env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
-  } else {
-    env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
-    env.DEFINITION_STORE_HOST = env.DEFINITION_STORE_URL_BASE
-    env.CCD_DATA_STORE_API_BASE_URL = "https:// ccd-data-store-api-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
-  }
-
 // Other env variables needed for BEFTA.
 env.S2S_URL_BASE = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 env.IDAM_API_URL_BASE = "https://idam-api.aat.platform.hmcts.net"

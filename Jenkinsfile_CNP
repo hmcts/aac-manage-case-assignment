@@ -35,7 +35,13 @@ def secrets = [
     secret('ccd-befta-jurisdiction3-solicitor1-pwd', 'CCD_BEFTA_JURISDICTION_3_SOLICITOR_1_PWD'),
     secret('ccd-befta-solicitor-4-pwd', 'CCD_BEFTA_SOLICITOR_4_PWD'),
     secret('ccd-befta-citizen-2-pwd', 'CCD_BEFTA_CITIZEN_2_PWD'),
-    secret('ccd-befta-pui-caa-1-pwd', 'CCD_BEFTA_PUI_CAA_1_PWD')
+    secret('ccd-befta-pui-caa-1-pwd', 'CCD_BEFTA_PUI_CAA_1_PWD'),
+
+    secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_OAUTH2_CLIENT_SECRET'),
+    secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_S2S_SECRET'),
+
+    secret('idam-data-store-system-user-username','ROLE_ASSIGNMENT_USER_EMAIL'),
+    secret('idam-data-store-system-user-password','ROLE_ASSIGNMENT_USER_PASSWORD')
   ],
   's2s-${env}': [
     secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_KEY'),

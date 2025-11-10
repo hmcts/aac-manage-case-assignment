@@ -102,9 +102,9 @@ if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME 
   env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
   // use aat environment for dependencies of master and CI/CD builds.	
 } else {
-  env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net.toLowerCase()"
-  env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net.toLowerCase()"
-  env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()"
+  env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
+  env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
+  env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
 }	
  
 env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"

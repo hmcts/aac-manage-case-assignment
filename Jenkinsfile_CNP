@@ -97,14 +97,14 @@ env.CALLBACK_FTA_ENABLED = "true" // NB: safe to enable outside of preview as th
   // Check if the build should be wired to an environment higher than 'preview'.	
 if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc') {
   environmentOfDependencies = env.BRANCH_NAME	
-  env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"	
-  env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"	
-  env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"	
+  env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
+  env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
+  env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
   // use aat environment for dependencies of master and CI/CD builds.	
 } else {
-    env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net.toLowerCase()"	
-    env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net.toLowerCase()"	
-    env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()"	
+    env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net.toLowerCase()"
+    env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net.toLowerCase()"
+    env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()"
 }	
  
 env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"

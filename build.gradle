@@ -332,7 +332,7 @@ dependencies {
 
 
 
-  implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.1.8'
+  implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.3'
   implementation group: 'com.vladmihalcea', name: 'hibernate-types-60', version: '2.21.1'
   implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.6'
   runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.6'

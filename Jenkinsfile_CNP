@@ -73,9 +73,6 @@ def vaultOverrides = [
   'preview' : 'aat'
 ]
 
-// vars needed for functional tests
-env.CALLBACK_FTA_ENABLED = "true" 
-
 // Other env variables needed for BEFTA.
 env.S2S_URL_BASE = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 env.IDAM_API_URL_BASE = "https://idam-api.aat.platform.hmcts.net"
@@ -105,8 +102,8 @@ if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME 
   env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"	
   // use aat environment for dependencies of master and CI/CD builds.	
 } else {
-    env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()"	
-    env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()"	
+    env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net.toLowerCase()"	
+    env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net.toLowerCase()"	
     env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()"	
 }	
  

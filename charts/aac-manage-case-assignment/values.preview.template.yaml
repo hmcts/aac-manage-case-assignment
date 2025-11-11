@@ -106,6 +106,9 @@ ccd:
         DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
         DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
         DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&sslmode=disable"
+        DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
+        USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
+        ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
         IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}

@@ -291,7 +291,7 @@ dependencies {
   implementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre'                      // java-properties-to-json
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.0.2'                    // spring-boot-starter-oauth2-client
   implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'              // spring-cloud-starter-openfeign
-  implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'                           // spring-cloud-starter-openfeign
+  implementation group: 'commons-io', name: 'commons-io', version: '2.21.0'                           // spring-cloud-starter-openfeign
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.5'              // idam-java-client
   implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '13.5'                 // idam-java-client
   implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'              // feign-form-spring

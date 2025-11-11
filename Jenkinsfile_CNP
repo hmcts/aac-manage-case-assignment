@@ -8,7 +8,7 @@ import uk.gov.hmcts.contino.GithubAPI
 
 def product = "aac"
 def component = "manage-case-assignment"
-def branchesToSync = ['demo', 'ithc', 'perftest', 'develop']
+def branchesToSync = ['ithc', 'perftest', 'develop']
 
 GradleBuilder builder = new GradleBuilder(this, product)
 

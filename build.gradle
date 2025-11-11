@@ -26,7 +26,7 @@ ext {
   reformLogging       = '6.1.9'
   restAssured         = '5.5.1'
   beftaFwVersion      = '9.2.4'
-  ccdTestDefinitionVersion = '7.27.7-prerelease-CME-537'
+  ccdTestDefinitionVersion = '7.25.4'
 }
 
 group = 'uk.gov.hmcts.reform'

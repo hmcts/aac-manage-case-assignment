@@ -93,19 +93,18 @@ env.BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP = "profile openid roles manage-use
 // temporary workaround for platform changes: turn BEFTA header checks to warning mode
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.CALLBACK_FTA_ENABLED = "true" // NB: safe to enable outside of preview as the above URLs provide a naturally isolated set of services.	
+env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()                 
+env.CCD_DATA_STORE_API_BASE_URL = "https://ccd-data-store-api-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
 
-  // Check if the build should be wired to an environment higher than 'preview'.	
-if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc') {
-  environmentOfDependencies = env.BRANCH_NAME	
-  env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
-  env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
-  env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
-  // use aat environment for dependencies of master and CI/CD builds.	
-} else {
-  env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
-  env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
-  env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
-}	
+//if (prsRunningInIsolation.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
+//  // NB: should only enable CALLBACK tests if PRs for MCA, Data-Store and Def-Store are all configured to run as one isolated group.
+//  env.CALLBACK_FTA_ENABLED = "true"
+//  // NB: this is the callback URL used when testing NOC so its an internal call: data-store.preview -> mca.preview.
+//  env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${env.BRANCH_NAME}-java.aac"
+//
+//} else {
+env.CALLBACK_FTA_ENABLED = "true" // in PREVIEW turn off the callback tests as other running pipelines may reset the published callback URLs.
+//}
  
 env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
 env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
@@ -158,6 +157,19 @@ withPipeline("java", product, component) {
     enableSlackNotifications('#ccd-pr-builds')
     // enablePactAs([AppPipelineDsl.PactRoles.PROVIDER]) TODO - enable this before merging
   }
+
+  // Check if the build should be wired to an environment higher than 'preview'.
+//  if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
+//    environmentOfDependencies = env.BRANCH_NAME
+//    // use aat environment for dependencies of master and CI/CD builds.
+//    if (env.BRANCH_NAME.startsWith("PR") || env.BRANCH_NAME == 'master') {
+//        environmentOfDependencies = "aat"
+//    }
+//  env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
+//  env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
+//  env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
+//  env.CALLBACK_FTA_ENABLED = "true" // NB: safe to enable outside of preview as the above URLs provide a naturally isolated set of services.
+//  }
 
   echo "FTA will use Definition Store: ${env.DEFINITION_STORE_URL_BASE}"
   echo "   ... published with MCA URL: ${env.MCA_API_BASE_URL}"

@@ -24,7 +24,7 @@ ext {
   lombokVersion       = '1.18.42'
   pact_version        = '4.1.43'
   reformLogging       = '6.1.9'
-  restAssured         = '5.5.1'
+  restAssured         = '5.5.6'
   beftaFwVersion      = '9.2.4'
   ccdTestDefinitionVersion = '7.27.7-prerelease-CME-537'
 }

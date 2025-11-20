@@ -102,6 +102,7 @@ ccd:
           key: PASSWORD
           disabled: true
       environment:
+        DATA_STORE_IDAM_KEY: ${CCD_DATA_S2S_SECRET}
         DATA_STORE_DB_HOST: '{{ .Release.Name }}-postgresql'
         DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
         DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"

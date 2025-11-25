@@ -1,12 +1,5 @@
 package uk.gov.hmcts.reform.managecase.api.controller.provider;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController;
 import uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController;
 import uk.gov.hmcts.reform.managecase.data.user.UserRepository;
@@ -17,37 +10,45 @@ import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 import uk.gov.hmcts.reform.managecase.service.NotifyService;
+import uk.gov.hmcts.reform.managecase.service.noc.ApplyNoCDecisionService;
 import uk.gov.hmcts.reform.managecase.service.noc.ChallengeAnswerValidator;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
-import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService;
 import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
-import uk.gov.hmcts.reform.managecase.service.noc.ApplyNoCDecisionService;
+import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @Configuration
 public class ContractConfig {
 
-    @MockBean
+    @MockitoBean
     PrdRepository prdRepository;
-    @MockBean
+    @MockitoBean
     DataStoreRepository dataStoreRepository;
-    @MockBean
+    @MockitoBean
     IdamRepository idamRepository;
-    @MockBean
+    @MockitoBean
     JacksonUtils jacksonUtils;
-    @MockBean
+    @MockitoBean
     SecurityUtils securityUtils;
-    @MockBean
+    @MockitoBean
     NoticeOfChangeQuestions noticeOfChangeQuestions;
-    @MockBean
+    @MockitoBean
     ChallengeAnswerValidator challengeAnswerValidator;
-    @MockBean
+    @MockitoBean
     DefinitionStoreRepository definitionStoreRepository;
-    @MockBean
+    @MockitoBean
     UserRepository userRepository;
-    @MockBean
+    @MockitoBean
     NotifyService notifyService;
 
 

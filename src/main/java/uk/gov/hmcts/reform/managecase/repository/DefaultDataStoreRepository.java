@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.managecase.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import feign.FeignException;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

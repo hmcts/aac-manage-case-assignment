@@ -23,6 +23,8 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisat
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.DataStoreApiClient;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdates;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
@@ -618,6 +620,154 @@ class DataStoreRepositoryTest {
 
         assertThatThrownBy(() ->
             repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build()))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage(CALLBACK_FAILED_ERRORS_MESSAGE);
+    }
+
+    @Test
+    @DisplayName("submitEventForCase throws NoCException with FAILED_SERVICE_VALIDATION when callback errors include a callback error message")
+    void shouldThrowNoCExceptionWhenEventSubmissionFailsWithCallbackErrorMessage() {
+        // ARRANGE
+        String callbackErrorMessage = "Some validation error from callback";
+        CaseDetails caseDetails = CaseDetails.builder()
+            .callbackResponseStatus(INCOMPLETE_CALLBACK)
+            .callbackErrorMessage(callbackErrorMessage)
+            .caseTypeId(CASE_TYPE_ID)
+            .build();
+
+        given(dataStoreApi.submitEventForCase(eq(SYSTEM_USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
+            .willReturn(caseDetails);
+
+        // ACT & ASSERT
+        NoCException exception = assertThrows(NoCException.class, () ->
+            repository.submitEventForCase(CASE_ID, CaseEventCreationPayload.builder().build()));
+
+        String expectedMessage = String.format(NoCValidationError.FAILED_SERVICE_VALIDATION.getErrorMessage(),
+                                               CASE_TYPE_ID);
+        assertThat(exception.getErrorMessage()).isEqualTo(expectedMessage);
+        assertThat(exception.getErrorCode()).isEqualTo(NoCValidationError.FAILED_SERVICE_VALIDATION.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("submitEventForCase throws NoCException with FAILED_SERVICE_VALIDATION when callback errors include a callback error message "
+        + "for NoC submission flow")
+    void shouldThrowNoCExceptionWhenSubmissionEventFailsWithCallbackErrorMessage() {
+        // ARRANGE
+        String callbackErrorMessage = "Some validation error from callback";
+        CaseUpdateViewEvent caseUpdateViewEvent = CaseUpdateViewEvent.builder()
+            .wizardPages(CaseUpdateViewEventFixture.getWizardPages())
+            .eventToken(EVENT_TOKEN)
+            .caseFields(getCaseViewFields())
+            .build();
+
+        given(dataStoreApi.getStartEventTrigger(SYSTEM_USER_TOKEN, CASE_ID, EVENT_ID)).willReturn(caseUpdateViewEvent);
+
+        StartEventResource startEventResource = StartEventResource.builder()
+            .caseDetails(CaseDetails.builder().data(new HashMap<>()).build())
+            .build();
+        given(dataStoreApi.getExternalStartEventTrigger(SYSTEM_USER_TOKEN, CASE_ID, EVENT_ID))
+            .willReturn(startEventResource);
+
+        given(dataStoreApi.submitEventForCase(any(String.class), any(String.class), any(CaseEventCreationPayload.class)))
+            .willReturn(CaseDetails.builder()
+                .callbackResponseStatus(INCOMPLETE_CALLBACK)
+                .callbackErrorMessage(callbackErrorMessage)
+                .caseTypeId(CASE_TYPE_ID)
+                .build());
+
+        // ACT & ASSERT
+        NoCException exception = assertThrows(NoCException.class, () ->
+            repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build()));
+
+        String expectedMessage = String.format(NoCValidationError.FAILED_SERVICE_VALIDATION.getErrorMessage(),
+            CASE_TYPE_ID);
+        assertThat(exception.getErrorMessage()).isEqualTo(expectedMessage);
+        assertThat(exception.getErrorCode()).isEqualTo(NoCValidationError.FAILED_SERVICE_VALIDATION.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("submitEventForCase throws NoCException with FAILED_SERVICE_VALIDATION when callback error message is whitespace")
+    void shouldThrowNoCExceptionWhenCallbackErrorMessageIsWhitespace() {
+        // ARRANGE
+        CaseDetails caseDetails = CaseDetails.builder()
+            .callbackResponseStatus(INCOMPLETE_CALLBACK)
+            .callbackErrorMessage("   ")
+            .caseTypeId(CASE_TYPE_ID)
+            .build();
+
+        given(dataStoreApi.submitEventForCase(eq(SYSTEM_USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
+            .willReturn(caseDetails);
+
+        // ACT & ASSERT
+        NoCException exception = assertThrows(NoCException.class, () ->
+            repository.submitEventForCase(CASE_ID, CaseEventCreationPayload.builder().build()));
+
+        String expectedMessage = String.format(NoCValidationError.FAILED_SERVICE_VALIDATION.getErrorMessage(),
+            CASE_TYPE_ID);
+        assertThat(exception.getErrorMessage()).isEqualTo(expectedMessage);
+        assertThat(exception.getErrorCode()).isEqualTo(NoCValidationError.FAILED_SERVICE_VALIDATION.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("submitEventForCase throws NoCException with FAILED_SERVICE_VALIDATION with different case type ID")
+    void shouldThrowNoCExceptionWithDifferentCaseTypeId() {
+        // ARRANGE
+        String differentCaseTypeId = "DIFFERENT_CASE_TYPE";
+        CaseDetails caseDetails = CaseDetails.builder()
+            .callbackResponseStatus(INCOMPLETE_CALLBACK)
+            .callbackErrorMessage("Validation failed")
+            .caseTypeId(differentCaseTypeId)
+            .build();
+
+        given(dataStoreApi.submitEventForCase(eq(SYSTEM_USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
+            .willReturn(caseDetails);
+
+        // ACT & ASSERT
+        NoCException exception = assertThrows(NoCException.class, () ->
+            repository.submitEventForCase(CASE_ID, CaseEventCreationPayload.builder().build()));
+
+        String expectedMessage = String.format(NoCValidationError.FAILED_SERVICE_VALIDATION.getErrorMessage(),
+            differentCaseTypeId);
+        assertThat(exception.getErrorMessage()).isEqualTo(expectedMessage);
+        assertThat(exception.getErrorCode()).isEqualTo(NoCValidationError.FAILED_SERVICE_VALIDATION.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("submitEventForCase throws RuntimeException when callback error message is null")
+    void shouldThrowRuntimeExceptionWhenCallbackErrorMessageIsNull() {
+        // ARRANGE
+        CaseDetails caseDetails = CaseDetails.builder()
+            .callbackResponseStatus(INCOMPLETE_CALLBACK)
+            .callbackErrorMessage(null)
+            .caseTypeId(CASE_TYPE_ID)
+            .build();
+
+        given(dataStoreApi.submitEventForCase(eq(SYSTEM_USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
+            .willReturn(caseDetails);
+
+        // ACT & ASSERT
+        assertThatThrownBy(() ->
+            repository.submitEventForCase(CASE_ID, CaseEventCreationPayload.builder().build()))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage(CALLBACK_FAILED_ERRORS_MESSAGE);
+    }
+
+    @Test
+    @DisplayName("submitEventForCase throws RuntimeException when callback error message is empty string")
+    void shouldThrowRuntimeExceptionWhenCallbackErrorMessageIsEmpty() {
+        // ARRANGE
+        CaseDetails caseDetails = CaseDetails.builder()
+            .callbackResponseStatus(INCOMPLETE_CALLBACK)
+            .callbackErrorMessage("")
+            .caseTypeId(CASE_TYPE_ID)
+            .build();
+
+        given(dataStoreApi.submitEventForCase(eq(SYSTEM_USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
+            .willReturn(caseDetails);
+
+        // ACT & ASSERT
+        assertThatThrownBy(() ->
+            repository.submitEventForCase(CASE_ID, CaseEventCreationPayload.builder().build()))
             .isInstanceOf(RuntimeException.class)
             .hasMessage(CALLBACK_FAILED_ERRORS_MESSAGE);
     }

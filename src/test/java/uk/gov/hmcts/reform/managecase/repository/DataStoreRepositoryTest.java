@@ -625,7 +625,8 @@ class DataStoreRepositoryTest {
     }
 
     @Test
-    @DisplayName("submitEventForCase throws NoCException with FAILED_SERVICE_VALIDATION when callback errors include a callback error message")
+    @DisplayName("submitEventForCase throws NoCException with FAILED_SERVICE_VALIDATION "
+        + "when callback errors include a callback error message")
     void shouldThrowNoCExceptionWhenEventSubmissionFailsWithCallbackErrorMessage() {
         // ARRANGE
         String callbackErrorMessage = "Some validation error from callback";
@@ -649,7 +650,8 @@ class DataStoreRepositoryTest {
     }
 
     @Test
-    @DisplayName("submitEventForCase throws NoCException with FAILED_SERVICE_VALIDATION when callback errors include a callback error message "
+    @DisplayName("submitEventForCase throws NoCException with FAILED_SERVICE_VALIDATION "
+        + "when callback errors include a callback error message "
         + "for NoC submission flow")
     void shouldThrowNoCExceptionWhenSubmissionEventFailsWithCallbackErrorMessage() {
         // ARRANGE
@@ -668,7 +670,9 @@ class DataStoreRepositoryTest {
         given(dataStoreApi.getExternalStartEventTrigger(SYSTEM_USER_TOKEN, CASE_ID, EVENT_ID))
             .willReturn(startEventResource);
 
-        given(dataStoreApi.submitEventForCase(any(String.class), any(String.class), any(CaseEventCreationPayload.class)))
+        given(dataStoreApi.submitEventForCase(any(String.class),
+                                              any(String.class),
+                                              any(CaseEventCreationPayload.class)))
             .willReturn(CaseDetails.builder()
                 .callbackResponseStatus(INCOMPLETE_CALLBACK)
                 .callbackErrorMessage(callbackErrorMessage)
@@ -677,7 +681,9 @@ class DataStoreRepositoryTest {
 
         // ACT & ASSERT
         NoCException exception = assertThrows(NoCException.class, () ->
-            repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build()));
+            repository.submitNoticeOfChangeRequestEvent(CASE_ID,
+                                                        EVENT_ID,
+                                                        ChangeOrganisationRequest.builder().build()));
 
         String expectedMessage = String.format(NoCValidationError.FAILED_SERVICE_VALIDATION.getErrorMessage(),
             CASE_TYPE_ID);
@@ -686,7 +692,8 @@ class DataStoreRepositoryTest {
     }
 
     @Test
-    @DisplayName("submitEventForCase throws NoCException with FAILED_SERVICE_VALIDATION when callback error message is whitespace")
+    @DisplayName("submitEventForCase throws NoCException with FAILED_SERVICE_VALIDATION "
+        + "when callback error message is whitespace")
     void shouldThrowNoCExceptionWhenCallbackErrorMessageIsWhitespace() {
         // ARRANGE
         CaseDetails caseDetails = CaseDetails.builder()

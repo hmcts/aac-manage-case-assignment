@@ -398,7 +398,9 @@ class DataStoreRepositoryTest {
         given(dataStoreApi.submitEventForCase(eq(SYSTEM_USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
             .willReturn(caseDetails);
 
-        assertThatThrownBy(() -> repository.submitEventForCase(CASE_ID, CaseEventCreationPayload.builder().build()))
+        CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder().build();
+
+        assertThatThrownBy(() -> repository.submitEventForCase(CASE_ID, caseEventCreationPayload))
             .isInstanceOf(RuntimeException.class)
             .hasMessage(CALLBACK_FAILED_ERRORS_MESSAGE);
     }
@@ -618,8 +620,10 @@ class DataStoreRepositoryTest {
                 .callbackResponseStatus(INCOMPLETE_CALLBACK)
                 .build());
 
+        ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder().build();
+
         assertThatThrownBy(() ->
-            repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, ChangeOrganisationRequest.builder().build()))
+            repository.submitNoticeOfChangeRequestEvent(CASE_ID, EVENT_ID, changeOrganisationRequest))
             .isInstanceOf(RuntimeException.class)
             .hasMessage(CALLBACK_FAILED_ERRORS_MESSAGE);
     }
@@ -639,9 +643,11 @@ class DataStoreRepositoryTest {
         given(dataStoreApi.submitEventForCase(eq(SYSTEM_USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
             .willReturn(caseDetails);
 
+        CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder().build();
+
         // ACT & ASSERT
         NoCException exception = assertThrows(NoCException.class, () ->
-            repository.submitEventForCase(CASE_ID, CaseEventCreationPayload.builder().build()));
+            repository.submitEventForCase(CASE_ID, caseEventCreationPayload));
 
         String expectedMessage = String.format(NoCValidationError.FAILED_SERVICE_VALIDATION.getErrorMessage(),
                                                CASE_TYPE_ID);
@@ -680,10 +686,11 @@ class DataStoreRepositoryTest {
                 .build());
 
         // ACT & ASSERT
+        ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder().build();
         NoCException exception = assertThrows(NoCException.class, () ->
             repository.submitNoticeOfChangeRequestEvent(CASE_ID,
                                                         EVENT_ID,
-                                                        ChangeOrganisationRequest.builder().build()));
+                                                        changeOrganisationRequest));
 
         String expectedMessage = String.format(NoCValidationError.FAILED_SERVICE_VALIDATION.getErrorMessage(),
             CASE_TYPE_ID);
@@ -705,9 +712,11 @@ class DataStoreRepositoryTest {
         given(dataStoreApi.submitEventForCase(eq(SYSTEM_USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
             .willReturn(caseDetails);
 
+        CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder().build();
+
         // ACT & ASSERT
         NoCException exception = assertThrows(NoCException.class, () ->
-            repository.submitEventForCase(CASE_ID, CaseEventCreationPayload.builder().build()));
+            repository.submitEventForCase(CASE_ID, caseEventCreationPayload));
 
         String expectedMessage = String.format(NoCValidationError.FAILED_SERVICE_VALIDATION.getErrorMessage(),
             CASE_TYPE_ID);
@@ -729,9 +738,11 @@ class DataStoreRepositoryTest {
         given(dataStoreApi.submitEventForCase(eq(SYSTEM_USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
             .willReturn(caseDetails);
 
+        CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder().build();
+
         // ACT & ASSERT
         NoCException exception = assertThrows(NoCException.class, () ->
-            repository.submitEventForCase(CASE_ID, CaseEventCreationPayload.builder().build()));
+            repository.submitEventForCase(CASE_ID, caseEventCreationPayload));
 
         String expectedMessage = String.format(NoCValidationError.FAILED_SERVICE_VALIDATION.getErrorMessage(),
             differentCaseTypeId);
@@ -752,9 +763,11 @@ class DataStoreRepositoryTest {
         given(dataStoreApi.submitEventForCase(eq(SYSTEM_USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
             .willReturn(caseDetails);
 
+        CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder().build();
+
         // ACT & ASSERT
         assertThatThrownBy(() ->
-            repository.submitEventForCase(CASE_ID, CaseEventCreationPayload.builder().build()))
+            repository.submitEventForCase(CASE_ID, caseEventCreationPayload))
             .isInstanceOf(RuntimeException.class)
             .hasMessage(CALLBACK_FAILED_ERRORS_MESSAGE);
     }
@@ -772,9 +785,11 @@ class DataStoreRepositoryTest {
         given(dataStoreApi.submitEventForCase(eq(SYSTEM_USER_TOKEN), eq(CASE_ID), any(CaseEventCreationPayload.class)))
             .willReturn(caseDetails);
 
+        CaseEventCreationPayload caseEventCreationPayload = CaseEventCreationPayload.builder().build();
+
         // ACT & ASSERT
         assertThatThrownBy(() ->
-            repository.submitEventForCase(CASE_ID, CaseEventCreationPayload.builder().build()))
+            repository.submitEventForCase(CASE_ID, caseEventCreationPayload))
             .isInstanceOf(RuntimeException.class)
             .hasMessage(CALLBACK_FAILED_ERRORS_MESSAGE);
     }

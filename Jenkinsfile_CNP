@@ -173,7 +173,6 @@ withPipeline("java", product, component) {
   echo "FTA will use Definition Store: ${env.DEFINITION_STORE_URL_BASE}"
   echo "   ... published with MCA URL: ${env.MCA_API_BASE_URL}"
   echo "CALLBACK FTA Enabled = ${env.CALLBACK_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
-  echo "ROLE_ASSIGNMENT_URL = ${env.ROLE_ASSIGNMENT_URL} on branch ${env.BRANCH_NAME}"
 
   syncBranchesWithMaster(branchesToSync)
   overrideVaultEnvironments(vaultOverrides)

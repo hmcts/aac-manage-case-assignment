@@ -337,7 +337,7 @@ dependencies {
   implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.13.0'
   runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.13.0'
   runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.13.0'
-  implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.8.0'
+  implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.8.1'
   implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
   implementation group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.3.0'
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'

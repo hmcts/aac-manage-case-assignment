@@ -1,39 +1,13 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.TextNode;
-import feign.FeignException;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties;
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
-import org.springframework.boot.actuate.endpoint.web.EndpointMediaTypes;
-import org.springframework.boot.actuate.endpoint.web.WebEndpointsSupplier;
-import org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpointsSupplier;
-import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.http.MediaType;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.test.web.servlet.MockMvc;
-
 import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
+import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.CallbackRequest;
-import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.SubmitCallbackResponse;
-import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
@@ -52,21 +26,45 @@ import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.managecase.service.noc.ApplyNoCDecisionService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
-import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService;
+import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import jakarta.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.util.Collections.emptyList;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
+import feign.FeignException;
+import jakarta.validation.ValidationException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
+import org.springframework.boot.actuate.endpoint.web.EndpointMediaTypes;
+import org.springframework.boot.actuate.endpoint.web.WebEndpointsSupplier;
+import org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpointsSupplier;
+import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -87,11 +85,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.defaultCaseDetails;
-import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOC_APPROVAL_DECISION_NOT_APPLIED_MESSAGE;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.NOC_PREPARE_PATH;
@@ -100,12 +98,12 @@ import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeContro
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.SET_ORGANISATION_TO_REMOVE_PATH;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS;
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS_MESSAGE;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_DETAILS_REQUIRED;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_EMPTY;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_ID_INVALID_LENGTH;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHALLENGE_QUESTION_ANSWERS_EMPTY;
-import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_DETAILS_REQUIRED;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
 
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert", "PMD.ExcessiveImports"})
 public class NoticeOfChangeControllerTest {
@@ -127,43 +125,43 @@ public class NoticeOfChangeControllerTest {
         @Autowired
         protected MockMvc mockMvc;
 
-        @MockBean
+        @MockitoBean
         protected NoticeOfChangeQuestions service;
 
-        @MockBean
+        @MockitoBean
         protected NoticeOfChangeApprovalService approvalService;
 
-        @MockBean
+        @MockitoBean
         protected PrepareNoCService prepareNoCService;
 
-        @MockBean
+        @MockitoBean
         protected VerifyNoCAnswersService verifyNoCAnswersService;
 
-        @MockBean
+        @MockitoBean
         protected ApplyNoCDecisionService applyNoCDecisionService;
 
-        @MockBean
+        @MockitoBean
         protected RequestNoticeOfChangeService requestNoticeOfChangeService;
 
-        @MockBean
+        @MockitoBean
         protected JacksonUtils jacksonUtils;
 
-        @MockBean
+        @MockitoBean
         protected WebEndpointsSupplier webEndpointsSupplier;
 
-        @MockBean
+        @MockitoBean
         protected ControllerEndpointsSupplier controllerEndpointsSupplier;
 
-        @MockBean
+        @MockitoBean
         protected EndpointMediaTypes endpointMediaTypes;
 
-        @MockBean
+        @MockitoBean
         protected CorsEndpointProperties corsEndpointProperties;
 
-        @MockBean
+        @MockitoBean
         protected WebEndpointProperties webEndpointProperties;
 
-        @MockBean
+        @MockitoBean
         protected WebMvcEndpointHandlerMapping webMvcEndpointHandlerMapping;
 
         @Autowired

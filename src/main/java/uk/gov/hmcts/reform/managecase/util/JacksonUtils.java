@@ -1,5 +1,14 @@
 package uk.gov.hmcts.reform.managecase.util;
 
+import uk.gov.hmcts.reform.managecase.domain.DynamicList;
+import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -10,14 +19,6 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.managecase.domain.DynamicList;
-import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 @Component
 public class JacksonUtils {
@@ -105,7 +106,7 @@ public class JacksonUtils {
     }
 
     /**
-     * Ex.:
+     * Ex.
      * {
      *   "value": {
      *     "code": "[Claimant]",

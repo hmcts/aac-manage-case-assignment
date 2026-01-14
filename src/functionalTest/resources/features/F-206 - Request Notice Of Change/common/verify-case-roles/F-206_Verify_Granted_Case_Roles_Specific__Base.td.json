@@ -1,0 +1,33 @@
+{
+  "_guid_": "F-206_Verify_Granted_Case_Roles_Specific__Base",
+  "_extends_": "Get_Assignments_In_My_Organisation_Base",
+
+  "request": {
+    "queryParams": {
+      "case_ids": "${[scenarioContext][parentContext][testData][request][body][case_id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "case_assignments": [
+        {
+          "case_id": "${}${[scenarioContext][testData][request][queryParams][case_ids]}",
+          "shared_with": [
+            {
+              "idam_id": "[[ANYTHING_PRESENT]]",
+              "first_name": "[[ANYTHING_PRESENT]]",
+              "last_name": "[[ANYTHING_PRESENT]]",
+              "email": "${[scenarioContext][testData][users][invokingUser][username]}",
+              "case_roles": [
+                "[ApplicantSolicitor]",
+                "[BARRISTER]",
+                "[RESPONDENTSOLICITOR]"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

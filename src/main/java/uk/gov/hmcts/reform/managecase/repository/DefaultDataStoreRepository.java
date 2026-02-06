@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.SearchCaseUserRolesReques
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdates;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseAccessMetadataResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -75,6 +76,18 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     public CaseViewResource findCaseByCaseId(String caseId) {
         try {
             return dataStoreApi.getCaseDetailsByCaseId(getUserAuthToken(), caseId);
+        } catch (FeignException ex) {
+            if (HttpStatus.NOT_FOUND.value() == ex.status()) {
+                throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
+            }
+            throw ex;
+        }
+    }
+
+    @Override
+    public CaseAccessMetadataResource findCaseAccessMetadataByCaseId(String caseId) {
+        try {
+            return dataStoreApi.getCaseAccessMetadataByCaseId(securityUtils.getUserBearerToken(), caseId);
         } catch (FeignException ex) {
             if (HttpStatus.NOT_FOUND.value() == ex.status()) {
                 throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);

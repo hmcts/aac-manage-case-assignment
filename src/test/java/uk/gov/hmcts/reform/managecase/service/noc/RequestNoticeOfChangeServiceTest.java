@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.IdamUser;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseAccessMetadataResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
@@ -54,6 +55,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.INVALID_CASE_ROLE_FIELD;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 
 @SuppressWarnings({"PMD.UseConcurrentHashMap",
     "PMD.AvoidDuplicateLiterals",
@@ -135,6 +137,16 @@ class RequestNoticeOfChangeServiceTest {
 
         List<CaseRole> caseRoles = List.of(CaseRole.builder().id(CASE_ASSIGNED_ROLE).name(DYNAMIC_LIST_LABEL).build());
         given(definitionStoreRepository.caseRoles(anyString(), anyString(), anyString())).willReturn(caseRoles);
+
+        CaseAccessMetadataResource caseAccessMetadataResource = CaseAccessMetadataResource.builder()
+            .accessGrants(List.of(
+                GrantType.SPECIFIC,GrantType.BASIC
+            ))
+            .accessProcess(GrantType.SPECIFIC.name())
+            .build();
+
+        given(dataStoreRepository.findCaseAccessMetadataByCaseId(CASE_ID)).willReturn(caseAccessMetadataResource);
+
     }
 
     @Test
@@ -300,6 +312,53 @@ class RequestNoticeOfChangeServiceTest {
         assertThat(caseIdCaptor.getValue()).isEqualTo(CASE_ID);
         assertThat(userIdCaptor.getValue()).isEqualTo(USER_INFO_UID);
         assertThat(organisationIdCaptor.getValue()).isEqualTo(INVOKERS_ORGANISATION_IDENTIFIER);
+        assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(APPROVED);
+    }
+
+    @Test
+    @DisplayName("Do not Generate a Notice Of Change Request with approval and Auto assignment of case roles")
+    void testUserNotAssignedCaserole() {
+        caseDetails.setJurisdiction(JURISDICTION_ONE);
+        nocAutoApprovedByAdminOrSolicitor(true);
+
+        CaseAccessMetadataResource caseAccessMetadataResource = CaseAccessMetadataResource.builder()
+            .accessGrants(List.of(
+                GrantType.SPECIFIC,GrantType.BASIC
+            ))
+            .accessProcess(GrantType.STANDARD.name())
+            .build();
+
+        given(dataStoreRepository.findCaseAccessMetadataByCaseId(CASE_ID)).willReturn(caseAccessMetadataResource);
+
+        RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
+            = service.requestNoticeOfChange(noCRequestDetails);
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<String> caseIdCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(dataStoreRepository).findCaseAccessMetadataByCaseId(caseIdCaptor.capture());
+
+        assertThat(caseIdCaptor.getValue()).isEqualTo(CASE_ID);
+        assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(APPROVED);
+    }
+
+    @Test
+    @DisplayName("Do not Generate a Notice Of Change Request with approval and Auto assignment of case roles")
+    void testUserNotAssignedCaseroleWhenAccessMetadataNull() {
+        caseDetails.setJurisdiction(JURISDICTION_ONE);
+        nocAutoApprovedByAdminOrSolicitor(true);
+
+        given(dataStoreRepository.findCaseAccessMetadataByCaseId(CASE_ID)).willReturn(null);
+
+        RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
+            = service.requestNoticeOfChange(noCRequestDetails);
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<String> caseIdCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(dataStoreRepository).findCaseAccessMetadataByCaseId(caseIdCaptor.capture());
+
+        assertThat(caseIdCaptor.getValue()).isEqualTo(CASE_ID);
         assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(APPROVED);
     }
 

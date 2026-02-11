@@ -27,7 +27,7 @@ java:
     S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
     CCD_DEFINITION_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-definition-store
-    ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service:4096
+    ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
     MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp,ccd_data,finrem_case_orchestration,divorce_frontend,iac,nfdiv_cos,fpl_case_service,civil_service,prl_cos_api
 
 ccd:
@@ -109,7 +109,7 @@ ccd:
         DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&sslmode=disable"
         DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
         USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
-        ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service:4096
+        ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
         IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}

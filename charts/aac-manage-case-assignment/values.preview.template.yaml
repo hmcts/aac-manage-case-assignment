@@ -55,6 +55,7 @@ ccd:
   ingressHost: ${SERVICE_FQDN}
 
   global:
+    amRoleAssignmentServiceUrl: http://${SERVICE_NAME}-am-role-assignment-service
     ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
     ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal

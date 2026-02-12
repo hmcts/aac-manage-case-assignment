@@ -126,24 +126,25 @@ withPipeline("java", product, component) {
      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Unit Tests/**/*'
      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Integration Tests/**/*'
 
-    publishHTML target: [
+     publishHTML target: [
           allowMissing         : true,
           alwaysLinkToLastBuild: true,
           keepAll              : true,
           reportDir            : 'Unit Tests',
           reportFiles          : "index.html",
           reportName           : "Unit Test Report"
-      ]
+     ]
 
-    publishHTML target: [
-      allowMissing         : true,
-      alwaysLinkToLastBuild: true,
-      keepAll              : true,
-      reportDir            : 'Integration Tests',
-      reportFiles          : "index.html",
-      reportName           : "Integration Test Report"
-    ]
+     publishHTML target: [
+          allowMissing         : true,
+          alwaysLinkToLastBuild: true,
+          keepAll              : true,
+          reportDir            : 'Integration Tests',
+          reportFiles          : "index.html",
+          reportName           : "Integration Test Report"
+     ]
   }
+
   onMaster {
     enableSlackNotifications('#ccd-master-builds')
     //enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])

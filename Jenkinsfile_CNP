@@ -98,6 +98,7 @@ env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.CALLBACK_FTA_ENABLED = "true" // NB: safe to enable outside of preview as the above URLs provide a naturally isolated set of services.	
 env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()                 
 env.CCD_DATA_STORE_API_BASE_URL = "https://ccd-data-store-api-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
+env.MCA_API_BASE_URL = "https://aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
 
 //if (prsRunningInIsolation.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
 //  // NB: should only enable CALLBACK tests if PRs for MCA, Data-Store and Def-Store are all configured to run as one isolated group.

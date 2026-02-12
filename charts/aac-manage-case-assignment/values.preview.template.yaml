@@ -189,7 +189,7 @@ elasticsearch:
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
-  esJavaOpts: "-Xmx512m -Xms512m"
+  esJavaOpts: "-Xmx1g -Xms512M"
   # Their tests delete the pod after succeeding, we pass --logs to the test command which fail if the pod has already been deleted
   # The tests do pass, at least as of 2023-01-19
   tests:
@@ -214,7 +214,7 @@ logstash:
   image: "hmctspublic.azurecr.io/imported/logstash/logstash"
   imageTag: "7.16.1"
   imagePullPolicy: "IfNotPresent"
-  logstashJavaOpts: "-Xmx1g -Xms512M"
+  logstashJavaOpts: "-Xmx1g -Xms1g"
   extraInitContainers: |
     - name: download-postgres-jdbc
       image: hmctspublic.azurecr.io/curl:7.70.0

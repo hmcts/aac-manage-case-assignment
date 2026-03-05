@@ -25,7 +25,7 @@ ext {
   reformLogging       = '6.1.9'
   restAssured         = '5.5.7'
   beftaFwVersion      = '9.2.4'
-  ccdTestDefinitionVersion = '7.27.7-prerelease-CME-537'
+  ccdTestDefinitionVersion = '7.26.7-prerelease-CCD-5329'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -152,6 +152,8 @@ tasks.register('functional', Test) {
     cucumberReports.reports = files("${cucumberReports.outputDir}/cucumber.json")
     cucumberReports.notFailingStatuses = ["skipped", "passed"]
 
+    def tags = (project.hasProperty('tags')) ? "(${project.property('tags')}) and not @Ignore" : 'not @Ignore'
+
     javaexec {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
@@ -159,12 +161,13 @@ tasks.register('functional', Test) {
               '--threads', '1',
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
               '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
-              '--tags', 'not @Ignore',
+              '--tags',  "${tags}",
               '--glue', 'uk.gov.hmcts.befta.player',
               '--glue', 'uk.gov.hmcts.reform.managecase.befta', 'src/functionalTest/resources/features'
       ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+      println 'args =' + args
     }
   }
 

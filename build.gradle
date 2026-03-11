@@ -380,7 +380,7 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-subclass', version: '5.21.0'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
-  testImplementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre' // For BEFTA
+  testImplementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre' // For BEFTA
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath

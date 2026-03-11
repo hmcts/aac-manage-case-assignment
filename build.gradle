@@ -346,7 +346,6 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.5'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLogging
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: reformLogging
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.19.2-RELEASE'
 
 

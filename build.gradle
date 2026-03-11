@@ -277,6 +277,7 @@ ext {
   jjwt                = '0.13.0'
   lombokVersion       = '1.18.42'
   pact_version        = '4.6.20'
+  appInsightsVersion = '2.6.4'
   reformLogging       = '8.0.0'
   restAssured         = '5.5.7'
   beftaFwVersion      = '9.2.4'
@@ -367,6 +368,8 @@ dependencies {
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
   implementation group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: '0.2.0'
   implementation group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.4'
+  implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
+  implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
 
 
   testImplementation libraries.junit5

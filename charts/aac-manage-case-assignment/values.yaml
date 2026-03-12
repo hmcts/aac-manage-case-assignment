@@ -1,3 +1,8 @@
+elastic:
+  enabled: false
+ccd:
+  enabled: false
+
 java:
   applicationPort: 4454
   image: 'hmctspublic.azurecr.io/aac/manage-case-assignment:latest'

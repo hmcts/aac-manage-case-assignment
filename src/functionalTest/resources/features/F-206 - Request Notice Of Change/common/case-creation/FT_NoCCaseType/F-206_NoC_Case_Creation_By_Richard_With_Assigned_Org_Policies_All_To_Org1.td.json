@@ -1,6 +1,7 @@
 {
   "_guid_": "F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies_All_To_Org1",
-  "_extends_": "NoC_Case_Creation_With_Org_Policies__Base",
+  "_extends_": "NoC_Case_Creation_With_Org_Policies_publicFields__Base",
+
 
   "specs": [
     "by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: which are all assigned to Dil's organisation"

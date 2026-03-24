@@ -80,6 +80,8 @@ public final class JwtIssuerVerificationApp {
         HttpRequest request = HttpRequest.newBuilder(URI.create(authoriseUri))
             .POST(HttpRequest.BodyPublishers.ofString(""))
             .header("Authorization", basicAuth(username, password))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .header("Accept", "application/json")
             .build();
 
         JsonNode response = jsonResponse(
@@ -100,6 +102,7 @@ public final class JwtIssuerVerificationApp {
             .POST(HttpRequest.BodyPublishers.ofString(""))
             .header("Authorization", basicAuth(clientId, clientSecret))
             .header("Content-Type", "application/x-www-form-urlencoded")
+            .header("Accept", "application/json")
             .build();
 
         JsonNode response = jsonResponse(httpClient.send(request, HttpResponse.BodyHandlers.ofString()), "token");

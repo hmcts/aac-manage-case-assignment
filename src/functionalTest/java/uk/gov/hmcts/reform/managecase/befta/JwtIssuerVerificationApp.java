@@ -58,6 +58,7 @@ public final class JwtIssuerVerificationApp {
         String clientId = requireEnv("BEFTA_OAUTH2_CLIENT_ID_OF_XUIWEBAPP");
         String clientSecret = requireEnv("BEFTA_OAUTH2_CLIENT_SECRET_OF_XUIWEBAPP");
         String redirectUri = requireEnv("BEFTA_OAUTH2_REDIRECT_URI_OF_XUIWEBAPP");
+        String scope = requireEnv("BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP");
 
         HttpClient httpClient = HttpClient.newHttpClient();
         String authorisationCode = authorisationCode(
@@ -66,17 +67,19 @@ public final class JwtIssuerVerificationApp {
             username,
             password,
             clientId,
-            redirectUri
+            redirectUri,
+            scope
         );
         return accessToken(httpClient, idamBaseUrl, clientId, clientSecret, redirectUri, authorisationCode);
     }
 
     private static String authorisationCode(HttpClient httpClient, String idamBaseUrl, String username, String password,
-                                            String clientId, String redirectUri)
+                                            String clientId, String redirectUri, String scope)
         throws IOException, InterruptedException {
         String authoriseUri = idamBaseUrl
             + "/oauth2/authorize?redirect_uri=" + encode(redirectUri)
-            + "&response_type=code&client_id=" + encode(clientId);
+            + "&response_type=code&client_id=" + encode(clientId)
+            + "&scope=" + encode(scope);
         HttpRequest request = HttpRequest.newBuilder(URI.create(authoriseUri))
             .POST(HttpRequest.BodyPublishers.ofString(""))
             .header("Authorization", basicAuth(username, password))

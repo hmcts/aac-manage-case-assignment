@@ -11,7 +11,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.Base64;
 
 public final class JwtIssuerVerificationApp {
 
@@ -61,69 +60,16 @@ public final class JwtIssuerVerificationApp {
         String scope = requireEnv("BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP");
 
         HttpClient httpClient = HttpClient.newHttpClient();
-        try {
-            String authorisationCode = authorisationCode(
-                httpClient,
-                idamBaseUrl,
-                username,
-                password,
-                clientId,
-                redirectUri,
-                scope
-            );
-            return accessToken(httpClient, idamBaseUrl, clientId, clientSecret, redirectUri, authorisationCode);
-        } catch (IllegalStateException exception) {
-            return passwordGrantAccessToken(
-                httpClient,
-                idamBaseUrl,
-                username,
-                password,
-                clientId,
-                clientSecret,
-                redirectUri,
-                scope,
-                exception
-            );
-        }
-    }
-
-    private static String authorisationCode(HttpClient httpClient, String idamBaseUrl, String username, String password,
-                                            String clientId, String redirectUri, String scope)
-        throws IOException, InterruptedException {
-        String authoriseUri = idamBaseUrl
-            + "/oauth2/authorize?redirect_uri=" + encode(redirectUri)
-            + "&response_type=code&client_id=" + encode(clientId)
-            + "&scope=" + encode(scope);
-        HttpRequest request = HttpRequest.newBuilder(URI.create(authoriseUri))
-            .POST(HttpRequest.BodyPublishers.ofString(""))
-            .header("Authorization", basicAuth(username, password))
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .header("Accept", "application/json")
-            .build();
-
-        JsonNode response = jsonResponse(
-            httpClient.send(request, HttpResponse.BodyHandlers.ofString()),
-            "authorisation"
+        return passwordGrantAccessToken(
+            httpClient,
+            idamBaseUrl,
+            username,
+            password,
+            clientId,
+            clientSecret,
+            redirectUri,
+            scope
         );
-        return requiredJsonText(response, "code", "authorisation response");
-    }
-
-    private static String accessToken(HttpClient httpClient, String idamBaseUrl, String clientId, String clientSecret,
-                                      String redirectUri, String code)
-        throws IOException, InterruptedException {
-        String tokenUri = idamBaseUrl
-            + "/oauth2/token?code=" + encode(code)
-            + "&redirect_uri=" + encode(redirectUri)
-            + "&grant_type=authorization_code";
-        HttpRequest request = HttpRequest.newBuilder(URI.create(tokenUri))
-            .POST(HttpRequest.BodyPublishers.ofString(""))
-            .header("Authorization", basicAuth(clientId, clientSecret))
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .header("Accept", "application/json")
-            .build();
-
-        JsonNode response = jsonResponse(httpClient.send(request, HttpResponse.BodyHandlers.ofString()), "token");
-        return requiredJsonText(response, "access_token", "token response");
     }
 
     private static String passwordGrantAccessToken(HttpClient httpClient,
@@ -133,8 +79,7 @@ public final class JwtIssuerVerificationApp {
                                                    String clientId,
                                                    String clientSecret,
                                                    String redirectUri,
-                                                   String scope,
-                                                   IllegalStateException authorisationFailure)
+                                                   String scope)
         throws IOException, InterruptedException {
         String tokenUri = idamBaseUrl + "/o/token";
         String formBody = "client_id=" + encode(clientId)
@@ -150,16 +95,11 @@ public final class JwtIssuerVerificationApp {
             .header("Accept", "application/json")
             .build();
 
-        try {
-            JsonNode response = jsonResponse(
-                httpClient.send(request, HttpResponse.BodyHandlers.ofString()),
-                "password grant token"
-            );
-            return requiredJsonText(response, "access_token", "password grant token response");
-        } catch (IllegalStateException passwordGrantFailure) {
-            passwordGrantFailure.addSuppressed(authorisationFailure);
-            throw passwordGrantFailure;
-        }
+        JsonNode response = jsonResponse(
+            httpClient.send(request, HttpResponse.BodyHandlers.ofString()),
+            "password grant token"
+        );
+        return requiredJsonText(response, "access_token", "password grant token response");
     }
 
     private static JsonNode jsonResponse(HttpResponse<String> response, String callName) throws IOException {
@@ -184,11 +124,6 @@ public final class JwtIssuerVerificationApp {
             throw new IllegalStateException("Missing required environment variable `" + name + "`");
         }
         return value;
-    }
-
-    private static String basicAuth(String username, String password) {
-        String credentials = username + ":" + password;
-        return "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
     }
 
     private static String encode(String value) {

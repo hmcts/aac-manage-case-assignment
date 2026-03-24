@@ -68,7 +68,8 @@ For JWT issuer-validation tests and related verifier assertions in this repo:
 - A single build-integrated verifier now acquires a real IDAM access token and compares its `iss` with `OIDC_ISSUER`.
 - The verifier lives in `src/functionalTest/java/uk/gov/hmcts/reform/managecase/befta/JwtIssuerVerificationApp.java`.
 - Gradle task `verifyFunctionalTestJwtIssuer` runs ahead of `smoke` and `functional` when `VERIFY_OIDC_ISSUER=true`.
-- The verifier uses the existing BEFTA OIDC client settings and CAA test-user credentials.
+- The verifier uses a real-token password-grant path with the existing BEFTA OIDC client settings and CAA test-user credentials.
+- The verifier is a pre-check for real-token `iss` alignment. It is not the BEFTA functional-test auth implementation and does not need full BEFTA auth-path parity.
 - Any mismatch text must stay in `iss` terms.
 
 ## Configuration and deployment note

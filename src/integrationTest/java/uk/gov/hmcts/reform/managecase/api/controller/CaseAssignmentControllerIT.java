@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import uk.gov.hmcts.reform.managecase.BaseIT;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;

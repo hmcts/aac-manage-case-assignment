@@ -61,16 +61,30 @@ public final class JwtIssuerVerificationApp {
         String scope = requireEnv("BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP");
 
         HttpClient httpClient = HttpClient.newHttpClient();
-        String authorisationCode = authorisationCode(
-            httpClient,
-            idamBaseUrl,
-            username,
-            password,
-            clientId,
-            redirectUri,
-            scope
-        );
-        return accessToken(httpClient, idamBaseUrl, clientId, clientSecret, redirectUri, authorisationCode);
+        try {
+            String authorisationCode = authorisationCode(
+                httpClient,
+                idamBaseUrl,
+                username,
+                password,
+                clientId,
+                redirectUri,
+                scope
+            );
+            return accessToken(httpClient, idamBaseUrl, clientId, clientSecret, redirectUri, authorisationCode);
+        } catch (IllegalStateException exception) {
+            return passwordGrantAccessToken(
+                httpClient,
+                idamBaseUrl,
+                username,
+                password,
+                clientId,
+                clientSecret,
+                redirectUri,
+                scope,
+                exception
+            );
+        }
     }
 
     private static String authorisationCode(HttpClient httpClient, String idamBaseUrl, String username, String password,
@@ -110,6 +124,42 @@ public final class JwtIssuerVerificationApp {
 
         JsonNode response = jsonResponse(httpClient.send(request, HttpResponse.BodyHandlers.ofString()), "token");
         return requiredJsonText(response, "access_token", "token response");
+    }
+
+    private static String passwordGrantAccessToken(HttpClient httpClient,
+                                                   String idamBaseUrl,
+                                                   String username,
+                                                   String password,
+                                                   String clientId,
+                                                   String clientSecret,
+                                                   String redirectUri,
+                                                   String scope,
+                                                   IllegalStateException authorisationFailure)
+        throws IOException, InterruptedException {
+        String tokenUri = idamBaseUrl + "/o/token";
+        String formBody = "client_id=" + encode(clientId)
+            + "&client_secret=" + encode(clientSecret)
+            + "&grant_type=password"
+            + "&redirect_uri=" + encode(redirectUri)
+            + "&username=" + encode(username)
+            + "&password=" + encode(password)
+            + "&scope=" + encode(scope);
+        HttpRequest request = HttpRequest.newBuilder(URI.create(tokenUri))
+            .POST(HttpRequest.BodyPublishers.ofString(formBody))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .header("Accept", "application/json")
+            .build();
+
+        try {
+            JsonNode response = jsonResponse(
+                httpClient.send(request, HttpResponse.BodyHandlers.ofString()),
+                "password grant token"
+            );
+            return requiredJsonText(response, "access_token", "password grant token response");
+        } catch (IllegalStateException passwordGrantFailure) {
+            passwordGrantFailure.addSuppressed(authorisationFailure);
+            throw passwordGrantFailure;
+        }
     }
 
     private static JsonNode jsonResponse(HttpResponse<String> response, String callName) throws IOException {

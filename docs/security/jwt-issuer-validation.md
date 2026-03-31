@@ -9,11 +9,27 @@
 - JWT issuer validation is enabled in the active `JwtDecoder`.
 - OIDC discovery and issuer enforcement are configured separately on purpose.
 - The enforced issuer must match the token `iss` claim.
+- See [HMCTS Guidance](#hmcts-guidance) for the central policy reference.
+
+## HMCTS Guidance
+
+- HMCTS guidance: [JWT iss Claim Validation guidance](https://tools.hmcts.net/confluence/spaces/SISM/pages/1958056812/JWT+iss+Claim+Validation+for+OIDC+and+OAuth+2+Tokens#JWTissClaimValidationforOIDCandOAuth2Tokens-Configurationrecommendation)
+- Use that guidance as the reference point for service-level issuer decisions and configuration recommendations.
+
+## Quick Reference
+
+| Topic | Current repo position |
+| --- | --- |
+| Validation model | Single configured issuer, not a multi-issuer allow-list |
+| Discovery source | `spring.security.oauth2.client.provider.oidc.issuer-uri` |
+| Enforced issuer | `oidc.issuer` / `OIDC_ISSUER` |
+| Current service wiring | Helm values, preview values, and Jenkins wiring are aligned to the same canonical FORGEROCK issuer pattern |
+| Runtime fallback | Main runtime config enforces `oidc.issuer` from `OIDC_ISSUER`, with a static local fallback, and does not derive it from discovery |
 
 ## Discovery vs enforced issuer
 
-- `spring.security.oauth2.client.provider.oidc.issuer-uri` is the discovery location. The service uses it to load OIDC metadata and the JWKS endpoint.
-- `oidc.issuer` / `OIDC_ISSUER` is the enforced issuer value. The active `JwtDecoder` validates the token `iss` claim against this value.
+- `spring.security.oauth2.client.provider.oidc.issuer-uri` is the discovery location used to load OIDC metadata and the JWKS endpoint.
+- `oidc.issuer` / `OIDC_ISSUER` is the enforced issuer value matched against the token `iss` claim.
 - These values can differ. Discovery can point at the public IDAM OIDC endpoint while enforcement pins the exact `iss` emitted in accepted access tokens.
 
 ## Runtime behavior
@@ -76,9 +92,13 @@ For JWT issuer-validation tests and related verifier assertions in this repo:
 
 Runtime configuration must still be correct:
 
-- `spring.security.oauth2.client.provider.oidc.issuer-uri` is used for discovery and JWKS lookup
-- `oidc.issuer` is the issuer value enforced during JWT validation
-- in this repo those map to `IDAM_OIDC_URL` and `OIDC_ISSUER`
+| Config area | Meaning in this repo |
+| --- | --- |
+| `IDAM_OIDC_URL` | Discovery base used for OIDC metadata and JWKS lookup |
+| `OIDC_ISSUER` | Enforced issuer matched against the token `iss` claim |
+| Change rule | If `OIDC_ISSUER` changes, update Helm, preview, and Jenkins together |
+
+Service-level issuer decisions should be checked against [HMCTS Guidance](#hmcts-guidance).
 
 Check these files when issuer behavior changes:
 
@@ -126,6 +146,9 @@ PY
 Only switch to multi-issuer validation if real environments genuinely require more than one accepted issuer during a
 migration window. If that happens, use an explicit allow-list rather than dropping issuer validation.
 
+If issuer strategy changes are proposed for this service, confirm them against the HMCTS configuration recommendation:
+[HMCTS Guidance](#hmcts-guidance)
+
 ## Acceptance Checklist
 
 Before merging JWT issuer-validation changes, confirm all of the following:
@@ -164,3 +187,7 @@ Do not merge if any of the following are true:
 - Requiring explicit `OIDC_ISSUER` with no static fallback in main runtime config is the preferred pattern, but it is not yet mandatory across all services.
 - Local or test-only fallbacks are acceptable only when they are static, intentional, and clearly scoped to non-production use.
 - The build enforces this policy with `verifyOidcIssuerPolicy`, which fails if `oidc.issuer` is derived from discovery config.
+
+## References
+
+- [HMCTS Guidance](#hmcts-guidance)

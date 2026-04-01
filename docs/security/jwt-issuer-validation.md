@@ -11,6 +11,7 @@
 - The enforced issuer must match the token `iss` claim.
 - See [HMCTS Guidance](#hmcts-guidance) for the central policy reference.
 
+<a id="hmcts-guidance"></a>
 ## HMCTS Guidance
 
 - HMCTS guidance: [JWT iss Claim Validation guidance](https://tools.hmcts.net/confluence/spaces/SISM/pages/1958056812/JWT+iss+Claim+Validation+for+OIDC+and+OAuth+2+Tokens#JWTissClaimValidationforOIDCandOAuth2Tokens-Configurationrecommendation)
@@ -23,8 +24,17 @@
 | Validation model | Single configured issuer, not a multi-issuer allow-list |
 | Discovery source | `spring.security.oauth2.client.provider.oidc.issuer-uri` |
 | Enforced issuer | `oidc.issuer` / `OIDC_ISSUER` |
-| Current service wiring | Helm values, preview values, and Jenkins wiring are aligned to the same canonical FORGEROCK issuer pattern |
+| Current service wiring | Helm values, preview values, and Jenkins files that explicitly set `OIDC_ISSUER` currently use FORGEROCK-style issuer values |
 | Runtime fallback | Main runtime config enforces `oidc.issuer` from `OIDC_ISSUER`, with a static local fallback, and does not derive it from discovery |
+
+### Guidance alignment
+
+| Item | Current repo state |
+| --- | --- |
+| Service issuer model | Single configured issuer |
+| Issuer pattern used for this service | Repo config currently uses FORGEROCK-style issuer values |
+| Repo wiring status | Helm values, preview values, and Jenkins files that explicitly set `OIDC_ISSUER` are aligned to that FORGEROCK issuer pattern |
+| External alignment check | Confirm the current HMCTS issuer matrix entry matches this repo before rollout |
 
 ## Discovery vs enforced issuer
 
@@ -159,14 +169,14 @@ Before merging JWT issuer-validation changes, confirm all of the following:
 - `issuer-uri` is used for discovery and JWKS lookup only.
 - `oidc.issuer` / `OIDC_ISSUER` is used as the enforced token `iss` value only.
 - `OIDC_ISSUER` is explicitly configured and not guessed from the discovery URL.
-- App config, Helm values, preview values, and CI/Jenkins values are aligned for the target environment.
+- App config, Helm values, preview values, and any Jenkins files that explicitly set `OIDC_ISSUER` are aligned for the target environment.
 - If `OIDC_ISSUER` changed, it was verified against a real token for the target environment.
 - There is a test that accepts a token with the expected issuer.
 - There is a test that rejects a token with an unexpected issuer.
 - There is a test that rejects an expired token.
 - There is decoder-level coverage using a signed token, not only validator-only coverage.
 - At least one failure assertion clearly proves issuer rejection, for example by checking for `iss`.
-- CI or build verification checks that a real token issuer matches `OIDC_ISSUER`, or the repo documents why that does not apply.
+- When `VERIFY_OIDC_ISSUER=true`, CI or build verification checks that a real token issuer matches `OIDC_ISSUER`, or the repo documents why that does not apply.
 - Comments and docs do not describe the old insecure behavior.
 - Any repo-specific difference from peer services is intentional and documented.
 

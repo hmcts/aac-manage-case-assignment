@@ -4,6 +4,7 @@ version: '2.4'
 services:
   manage-case-assignment:
     image: "hmctsprod.azurecr.io/aac/manage-case-assignment:${MANAGE_CASE_ASSIGNMENT_TAG:-latest}"
+    container_name: manage-case-assignment
     environment:
       SERVER_PORT: 4454
       IDAM_API_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam-api:5000}"

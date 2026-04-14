@@ -374,7 +374,7 @@ dependencies {
   testImplementation group: 'io.rest-assured', name: 'rest-assured', version: restAssured
   testImplementation group: 'io.rest-assured', name: 'json-path', version: restAssured
   testImplementation group: 'io.rest-assured', name: 'xml-path', version: restAssured
-  testImplementation group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '4.1'
+  testImplementation group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '4.4.2'
   testAnnotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.23.0'
   testImplementation group: 'org.mockito', name: 'mockito-subclass', version: '5.23.0'

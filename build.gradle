@@ -22,7 +22,6 @@ ext {
   junitPlatform       = '1.14.2'
   lombokVersion       = '1.18.42'
   pact_version        = '4.6.19'
-  reformLogging       = '6.1.9'
   restAssured         = '5.5.7'
   beftaFwVersion      = '9.2.4'
   ccdTestDefinitionVersion = '7.27.7-prerelease-CME-537'
@@ -274,7 +273,7 @@ ext {
   jjwt                = '0.13.0'
   lombokVersion       = '1.18.46'
   pact_version        = '4.6.20'
-  reformLogging       = '6.1.9'
+  reformLogging       = '8.0.0'
   restAssured         = '5.5.7'
   beftaFwVersion      = '9.2.4'
   ccdTestDefinitionVersion = '7.25.4'
@@ -343,7 +342,6 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.5'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLogging
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: reformLogging
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.19.2-RELEASE'
 
 

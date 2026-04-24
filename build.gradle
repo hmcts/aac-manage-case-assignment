@@ -334,6 +334,25 @@ tasks.register("printSuppressionFile") {
   }
 }
 
+ext {
+  set('springCloudVersion', '2025.0.0')
+  set('spring-framework.version', '6.2.14')
+  set('spring-security.version', '6.5.7')
+  set('log4j2.version', '2.24.3')
+  set('jackson.version', '2.18.2')
+  set('snakeyaml.version', '2.3')
+
+  junit               = '5.14.3'
+  junitPlatform       = '1.14.3'
+  jjwt                = '0.13.0'
+  lombokVersion       = '1.18.46'
+  pact_version        = '4.6.20'
+  reformLogging       = '6.1.9'
+  restAssured         = '5.5.7'
+  beftaFwVersion      = '9.2.4'
+  ccdTestDefinitionVersion = '7.25.4'
+}
+
 dependencyManagement {
   imports {
     mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
@@ -391,7 +410,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-web'
   implementation group: 'org.springframework.security', name: 'spring-security-config'
   implementation group: 'org.springframework.security', name: 'spring-security-rsa', version: '1.1.5'
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.16'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.17'
 
   // HMCTS
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.5'

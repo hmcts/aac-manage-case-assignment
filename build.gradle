@@ -18,14 +18,16 @@ ext {
   set('jackson.version', '2.18.2')
   set('snakeyaml.version', '2.3')
 
-  junit               = '5.14.2'
-  junitPlatform       = '1.14.2'
-  lombokVersion       = '1.18.42'
-  pact_version        = '4.6.19'
-  reformLogging       = '6.1.9'
+  junit               = '5.14.3'
+  junitPlatform       = '1.14.3'
+  jjwt                = '0.13.0'
+  lombokVersion       = '1.18.44'
+  pact_version        = '4.6.20'
+  reformLogging       = '8.0.0'
+  appInsightsVersion  = '2.6.4'
   restAssured         = '5.5.7'
   beftaFwVersion      = '9.2.4'
-  ccdTestDefinitionVersion = '7.27.7-prerelease-CME-537'
+  ccdTestDefinitionVersion = '7.25.4'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -105,6 +107,7 @@ tasks.register('smoke', Test) {
   group = "Verification"
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
+  dependsOn 'verifyFunctionalTestJwtIssuer'
 
   generateCucumberReports.enabled = false
 
@@ -143,6 +146,7 @@ tasks.register('functional', Test) {
   group = "Verification"
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
+  dependsOn 'verifyFunctionalTestJwtIssuer'
 
   generateCucumberReports.enabled = false
 
@@ -190,6 +194,75 @@ tasks.register('contract', Test) {
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
   include "uk/gov/hmcts/reform/managecase/api/controller/provider/**"
+}
+
+tasks.register('verifyFunctionalTestJwtIssuer', JavaExec) {
+  description = 'Verifies the functional and smoke test token iss matches OIDC_ISSUER'
+  group = 'Verification'
+  dependsOn 'functionalTestClasses'
+  onlyIf {
+    System.getenv('VERIFY_OIDC_ISSUER')?.toBoolean()
+  }
+  mainClass = 'uk.gov.hmcts.reform.managecase.befta.JwtIssuerVerificationApp'
+  classpath = sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+}
+
+tasks.register('verifyOidcIssuerPolicy') {
+  description = 'Fails if oidc.issuer is derived from discovery configuration or drifts from repo issuer wiring'
+  group = 'Verification'
+
+  doLast {
+    def policyFiles = [
+      'src/main/resources/application.yaml',
+      'src/integrationTest/resources/application-integration.yaml'
+    ]
+
+    def violations = policyFiles.findAll { path ->
+      def configFile = file(path)
+      configFile.exists() && configFile.readLines().any { line ->
+        def normalized = line.replaceAll(/\s+/, '')
+        normalized.startsWith('issuer:${OIDC_ISSUER:${IDAM_OIDC_URL')
+          || normalized.startsWith('issuer:${OIDC_ISSUER:${idam.api.url')
+      }
+    }
+
+    if (!violations.isEmpty()) {
+      throw new GradleException(
+        "OIDC issuer policy violation. Do not derive oidc.issuer from discovery config in: ${violations.join(', ')}"
+      )
+    }
+
+    def expectedIssuerSuffix = '/openam/oauth2/realms/root/realms/hmcts'
+
+    def exactExpectations = [
+      'charts/aac-manage-case-assignment/values.yaml':
+        'OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443'
+          + expectedIssuerSuffix,
+      'charts/aac-manage-case-assignment/values.preview.template.yaml':
+        'OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443' + expectedIssuerSuffix,
+      'Jenkinsfile_CNP':
+        'env.OIDC_ISSUER = "https://forgerock-am.service.core-compute-idam-aat2.internal:8443'
+          + expectedIssuerSuffix + '"',
+      'Jenkinsfile_nightly':
+        'env.OIDC_ISSUER = "https://forgerock-am.service.core-compute-idam-aat2.internal:8443'
+          + expectedIssuerSuffix + '"'
+    ]
+
+    def issuerDrift = exactExpectations.findAll { path, expectedLine ->
+      def configFile = file(path)
+      !configFile.exists() || !configFile.readLines().any { line -> line.trim() == expectedLine.trim() }
+    }.keySet()
+
+    if (!issuerDrift.isEmpty()) {
+      throw new GradleException(
+        "OIDC issuer config drift detected. Expected explicit FORGEROCK issuer wiring in: ${issuerDrift.join(', ')}"
+      )
+    }
+  }
+}
+
+tasks.named('check').configure {
+  dependsOn 'verifyOidcIssuerPolicy'
 }
 
 //tasks.register('runProviderPactVerification', Test) {
@@ -343,12 +416,13 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.5'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLogging
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: reformLogging
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.19.2-RELEASE'
 
 
   implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.1'
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.3'
+  implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
+  implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
   implementation group: 'com.vladmihalcea', name: 'hibernate-types-60', version: '2.21.1'
   implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: jjwt
   runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: jjwt

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import org.hibernate.validator.constraints.LuhnCheck;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;

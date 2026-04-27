@@ -61,10 +61,31 @@ Details of the relevant environment variables can be found in the `aca-docker/RE
  [Create users and roles](https://github.com/hmcts/ccd-docker#3-create-users-and-roles) steps in
  [ccd-docker](https://github.com/hmcts/ccd-docker) project.
 
-These tests can be run using:
+#### To Run the Functional Tests (FT)
+
+#####  All Functional Tests
+Will run all the FT's:
+
 ```bash
 ./gradlew functional
 ```
+
+#####  Some Functional Tests
+Will run both F-1023 and F-777:
+
+```bash
+./gradlew functional -P tags="@F-1023 or @F-777"
+```
+
+
+Will run only S-1023.5:
+
+```bash
+./gradlew functional -P tags="@S-1023.5"
+```
+
+These tests can be run using:
+
 
 ### Code quality checks
 We use [checkstyle](http://checkstyle.sourceforge.net/) and [PMD](https://pmd.github.io/).

@@ -19,7 +19,7 @@
 
   "prerequisites": [
     {
-      "Get_Organisation_Identifier": "Get_Organisation_Identifier__Base"
+      "Get_Organisation_Identifier": "Get_Organisation_Identifier_For_Caseworker_CAA__Prerequisite"
     }
   ],
 

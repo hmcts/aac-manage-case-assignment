@@ -9,6 +9,9 @@
   ],
 
   "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Caseworker_CAA"
+    },
     "S1": {
       "_extends_": "ACA_Users_Richard"
     }

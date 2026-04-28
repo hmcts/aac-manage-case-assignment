@@ -28,7 +28,7 @@ Run the application by executing:
 ```
 
 ### Consuming this service locally
-This image is available in the HMCTS azure container registry. Image url is: `hmctspublic.azurecr.io/aac/manage-case-assignment`
+This image is available in the HMCTS azure container registry. Image url is: `hmctsprod.azurecr.io/aac/manage-case-assignment`
 See required config in: [docker-compose.yml](docker-compose.yml)
 
 

@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRolesResponse;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.service.cau.CaseAssignedUserRolesOperation;
+import uk.gov.hmcts.reform.managecase.service.common.CallerOrganisationService;
 import uk.gov.hmcts.reform.managecase.service.common.UIDService;
 
 import java.util.ArrayList;
@@ -69,6 +70,7 @@ public class CaseAssignedUserRolesController {
     private final ApplicationParams applicationParams;
     private final UIDService caseReferenceService;
     private final CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
+    private final CallerOrganisationService callerOrganisationService;
     private final SecurityUtils securityUtils;
 
     @Autowired
@@ -76,10 +78,12 @@ public class CaseAssignedUserRolesController {
                                            UIDService caseReferenceService,
                                            @Qualifier("authorised") CaseAssignedUserRolesOperation
                                                caseAssignedUserRolesOperation,
+                                           CallerOrganisationService callerOrganisationService,
                                            SecurityUtils securityUtils) {
         this.applicationParams = applicationParams;
         this.caseReferenceService = caseReferenceService;
         this.caseAssignedUserRolesOperation = caseAssignedUserRolesOperation;
+        this.callerOrganisationService = callerOrganisationService;
         this.securityUtils = securityUtils;
     }
 
@@ -119,7 +123,7 @@ public class CaseAssignedUserRolesController {
         @Parameter(description = "List of Case-User-Role assignments to add", required = true)
         @RequestBody CaseAssignedUserRolesRequest caseAssignedUserRolesRequest
     ) {
-        validateRequest(clientS2SToken, caseAssignedUserRolesRequest);
+        validateRequest(clientS2SToken, caseAssignedUserRolesRequest, true);
         this.caseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRolesRequest.getCaseAssignedUserRoles());
         return ResponseEntity.status(HttpStatus.CREATED).body(new CaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
     }
@@ -161,7 +165,7 @@ public class CaseAssignedUserRolesController {
         @Parameter(description = "List of Case-User-Role assignments to add", required = true)
         @RequestBody CaseAssignedUserRolesRequest caseAssignedUserRolesRequest
     ) {
-        validateRequest(clientS2SToken, caseAssignedUserRolesRequest);
+        validateRequest(clientS2SToken, caseAssignedUserRolesRequest, false);
         this.caseAssignedUserRolesOperation.removeCaseUserRoles(caseAssignedUserRolesRequest
                                                                     .getCaseAssignedUserRoles());
         return ResponseEntity.status(HttpStatus.OK).body(new CaseAssignedUserRolesResponse(REMOVE_SUCCESS_MESSAGE));
@@ -235,7 +239,8 @@ public class CaseAssignedUserRolesController {
         }
     }
 
-    private void validateRequestParams(CaseAssignedUserRolesRequest addCaseAssignedUserRolesRequest) {
+    private void validateRequestParams(CaseAssignedUserRolesRequest addCaseAssignedUserRolesRequest,
+                                       boolean validateOrganisationContext) {
 
         List<String> errorMessages =
             Lists.newArrayList("Invalid data provided for the following inputs to the request:");
@@ -247,7 +252,14 @@ public class CaseAssignedUserRolesController {
         if (caseUserRoles.isEmpty()) {
             errorMessages.add(EMPTY_CASE_USER_ROLE_LIST);
         } else {
-            caseUserRoles.forEach(caseRole -> validateCaseAssignedUserRoleRequest(caseRole, errorMessages));
+            caseUserRoles.forEach(caseRole -> validateCaseAssignedUserRoleRequest(
+                caseRole,
+                errorMessages,
+                validateOrganisationContext
+            ));
+            if (validateOrganisationContext) {
+                validateOrganisationContext(caseUserRoles, errorMessages);
+            }
         }
 
         if (errorMessages.size() > 1) {
@@ -256,9 +268,26 @@ public class CaseAssignedUserRolesController {
         }
     }
 
+    private void validateOrganisationContext(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles,
+                                             List<String> errorMessages) {
+        String invokerOrganisationId = callerOrganisationService.getCallerOrganisationId();
+        if (caseUserRoles.stream()
+            .map(CaseAssignedUserRoleWithOrganisation::getOrganisationId)
+            .anyMatch(StringUtils::isBlank)) {
+            errorMessages.add(ORGANISATION_ID_INVALID);
+        }
+        caseUserRoles.stream()
+            .map(CaseAssignedUserRoleWithOrganisation::getOrganisationId)
+            .filter(StringUtils::isNotBlank)
+            .filter(organisationId -> !StringUtils.equalsIgnoreCase(organisationId, invokerOrganisationId))
+            .findAny()
+            .ifPresent(organisationId -> errorMessages.add(ORGANISATION_ID_INVALID));
+    }
+
 
     private void validateCaseAssignedUserRoleRequest(CaseAssignedUserRoleWithOrganisation caseRole,
-                                                     List<String> errorMessages) {
+                                                     List<String> errorMessages,
+                                                     boolean requireOrganisationId) {
         // case_id: has to be a valid 16-digit Luhn number
         if (!caseReferenceService.validateUID(caseRole.getCaseDataId())) {
             errorMessages.add(CASE_ID_INVALID);
@@ -271,8 +300,12 @@ public class CaseAssignedUserRolesController {
         if (caseRole.getCaseRole() == null || !caseRolePattern.matcher(caseRole.getCaseRole()).matches()) {
             errorMessages.add(CASE_ROLE_FORMAT_INVALID);
         }
-        // organisation_id: has to be a non-empty string, when present
-        if (caseRole.getOrganisationId() != null && caseRole.getOrganisationId().isEmpty()) {
+        // organisation_id: has to be a non-empty string when required
+        if (requireOrganisationId && StringUtils.isBlank(caseRole.getOrganisationId())) {
+            errorMessages.add(ORGANISATION_ID_INVALID);
+        } else if (!requireOrganisationId
+            && caseRole.getOrganisationId() != null
+            && caseRole.getOrganisationId().isEmpty()) {
             errorMessages.add(ORGANISATION_ID_INVALID);
         }
     }
@@ -286,11 +319,13 @@ public class CaseAssignedUserRolesController {
             : Stream.empty();
     }
 
-    private void validateRequest(String clientS2SToken, CaseAssignedUserRolesRequest request) {
+    private void validateRequest(String clientS2SToken,
+                                 CaseAssignedUserRolesRequest request,
+                                 boolean validateOrganisationContext) {
 
         String clientServiceName = securityUtils.getServiceNameFromS2SToken(clientS2SToken);
         if (applicationParams.getAuthorisedServicesForCaseUserRoles().contains(clientServiceName)) {
-            validateRequestParams(request);
+            validateRequestParams(request, validateOrganisationContext);
         } else {
             throw new CaseRoleAccessException(CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION);
         }

@@ -1,0 +1,14 @@
+{
+  "_guid_": "F-210-Base",
+  "_extends_": "Assign_Case_Access__Base",
+  "title": "Reject POST /case-users request when organisation_id does not match caller PRD organisation",
+
+  "s2sClientId": "aac_manage_case_assignment",
+  "userTokenClientId": "xuiwebapp",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Jane"
+    }
+  }
+}

@@ -1,7 +1,12 @@
 {
   "_guid_": "F-210-Base",
-  "_extends_": "Assign_Case_Access__Base",
   "title": "Reject POST /case-users request when organisation_id does not match caller PRD organisation",
+
+  "productName": "Manage Case Assignment Microservice",
+  "operationName": "Add Case-Assigned Users and Roles",
+
+  "method": "POST",
+  "uri": "/case-users",
 
   "s2sClientId": "aac_manage_case_assignment",
   "userTokenClientId": "xuiwebapp",
@@ -9,6 +14,17 @@
   "users": {
     "invokingUser": {
       "_extends_": "ACA_Users_CAA_Jane"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request"
+  },
+
+  "expectedResponse": {
+    "_extends_" : "Common_201_Response",
+    "body": {
+      "status_message" : "Case-User-Role assignments created successfully"
     }
   }
 }

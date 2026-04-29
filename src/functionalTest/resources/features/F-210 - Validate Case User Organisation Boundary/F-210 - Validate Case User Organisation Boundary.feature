@@ -14,7 +14,7 @@ Feature: F-210: Validate Case User Organisation Boundary
 
      When a request is prepared with appropriate values,
       And the request [contains a valid case-user assignment with a mismatched organisation_id],
-      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store],
+      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [Manage Case Assignment Microservice],
 
      Then a negative response is received,
       And the response has all the details as expected.
@@ -27,7 +27,7 @@ Feature: F-210: Validate Case User Organisation Boundary
 
      When a request is prepared with appropriate values,
       And the request [contains a valid case-user assignment with a matching organisation_id],
-      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store],
+      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [Manage Case Assignment Microservice],
 
      Then a positive response is received,
       And the response has all the details as expected.
@@ -40,7 +40,7 @@ Feature: F-210: Validate Case User Organisation Boundary
 
      When a request is prepared with appropriate values,
       And the request [contains a valid case-user assignment without organisation_id],
-      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store],
+      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [Manage Case Assignment Microservice],
 
      Then a negative response is received,
       And the response has all the details as expected.
@@ -53,7 +53,7 @@ Feature: F-210: Validate Case User Organisation Boundary
 
      When a request is prepared with appropriate values,
       And the request [contains a valid case-user assignment with a matching organisation_id for a case outside the caller organisation policies],
-      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store],
+      And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [Manage Case Assignment Microservice],
 
      Then a negative response is received,
       And the response has all the details as expected.

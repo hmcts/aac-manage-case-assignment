@@ -6,7 +6,8 @@
   "specs": [
     "CAA - with a PRD organisation",
     "intends to add a valid case-user assignment",
-    "supplies an organisation_id that does not match the caller PRD organisation"
+    "supplies an organisation_id that does not match the caller PRD organisation",
+    "contains a valid case-user assignment with a mismatched organisation_id"
   ],
 
   "request": {

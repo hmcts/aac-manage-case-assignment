@@ -32,7 +32,7 @@
   "expectedResponse": {
     "_extends_": "ACA_400_Response",
     "body": {
-      "message": "Invalid data provided for the following inputs to the request:\nCase ID has to be one for which a case role is represented by the invoker's organisation.",
+      "message": "Case ID has to be one for which a case role is represented by the invoker's organisation.",
       "errors": []
     }
   }

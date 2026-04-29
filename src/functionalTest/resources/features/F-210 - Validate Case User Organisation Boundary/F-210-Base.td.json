@@ -8,7 +8,7 @@
   "method": "POST",
   "uri": "/case-users",
 
-  "s2sClientId": "aac_manage_case_assignment",
+  "s2sClientId": "xui_webapp",
   "userTokenClientId": "xuiwebapp",
 
   "users": {

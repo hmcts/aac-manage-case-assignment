@@ -1,0 +1,52 @@
+{
+  "_guid_": "F-210_Prerequisite_Case_Creation_All_To_Org2",
+  "_extends_": "F-209_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies",
+
+  "specs": [
+    "As a prerequisite"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "applicantOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "LESTKK0"
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "LESTKK0"
+          }
+        },
+        "otherPartyOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "LESTKK0"
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "applicantOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "LESTKK0"
+          }
+        },
+        "respondentOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "LESTKK0"
+          }
+        },
+        "otherPartyOrganisationPolicy": {
+          "Organisation": {
+            "OrganisationID": "LESTKK0"
+          }
+        }
+      }
+    }
+  }
+}

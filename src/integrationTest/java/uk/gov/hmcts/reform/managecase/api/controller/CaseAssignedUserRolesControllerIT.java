@@ -12,11 +12,15 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ORGANISATION_ID_INVALID;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ORGANISATION_POLICY_ERROR;
+import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCaseDetailsByCaseIdViaExternalApi;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisationExternal;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 
 class CaseAssignedUserRolesControllerIT extends BaseIT {
 
@@ -28,6 +32,27 @@ class CaseAssignedUserRolesControllerIT extends BaseIT {
     private static final String DIFFERENT_ORG_ID = "ORG2";
     private static final String S2S_TOKEN =
         "Bearer eyJhbGciOiJub25lIn0.eyJzdWIiOiJhYWNfbWFuYWdlX2Nhc2VfYXNzaWdubWVudCJ9.";
+
+    @Test
+    @DisplayName("POST /case-users returns 201 when organisation_id matches caller PRD organisation"
+        + " and case organisation policies include the caller organisation")
+    void shouldReturn201WhenPostedOrganisationIdMatchesInvokerPrdOrganisation() throws Exception {
+        stubGetUsersByOrganisationExternal(
+            new FindUsersByOrganisationResponse(Collections.emptyList(), MATCHING_ORG_ID)
+        );
+        stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, caseDetails(MATCHING_ORG_ID, CASE_ROLE));
+
+        CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(List.of(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID, USER_ID, CASE_ROLE, MATCHING_ORG_ID)
+        ));
+
+        mockMvc.perform(post(CASE_USERS_PATH)
+                .header("ServiceAuthorization", S2S_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.status_message", is("Case-User-Role assignments created successfully")));
+    }
 
     @Test
     @DisplayName("POST /case-users returns 400 when organisation_id differs from caller PRD organisation")
@@ -46,5 +71,44 @@ class CaseAssignedUserRolesControllerIT extends BaseIT {
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message", containsString(ORGANISATION_ID_INVALID)));
+    }
+
+    @Test
+    @DisplayName("POST /case-users returns 400 when organisation_id is omitted")
+    void shouldReturn400WhenPostedOrganisationIdIsMissing() throws Exception {
+        stubGetUsersByOrganisationExternal(
+            new FindUsersByOrganisationResponse(Collections.emptyList(), MATCHING_ORG_ID)
+        );
+
+        CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(List.of(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID, USER_ID, CASE_ROLE)
+        ));
+
+        mockMvc.perform(post(CASE_USERS_PATH)
+                .header("ServiceAuthorization", S2S_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message", containsString(ORGANISATION_ID_INVALID)));
+    }
+
+    @Test
+    @DisplayName("POST /case-users returns 400 when caller organisation is not present on case organisation policies")
+    void shouldReturn400WhenCallerOrganisationNotPresentOnCasePolicies() throws Exception {
+        stubGetUsersByOrganisationExternal(
+            new FindUsersByOrganisationResponse(Collections.emptyList(), MATCHING_ORG_ID)
+        );
+        stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, caseDetails(DIFFERENT_ORG_ID, CASE_ROLE));
+
+        CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(List.of(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID, USER_ID, CASE_ROLE, MATCHING_ORG_ID)
+        ));
+
+        mockMvc.perform(post(CASE_USERS_PATH)
+                .header("ServiceAuthorization", S2S_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message", is(ORGANISATION_POLICY_ERROR)));
     }
 }

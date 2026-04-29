@@ -37,12 +37,19 @@ Choose one contract and keep tests aligned.
 - Existing valid same-org flows continue to work.
 
 ## Tests
-Add:
+Added:
 - Controller/unit test for mismatched organisation
 - Controller/unit test for matching organisation
 - Controller/unit test for blank organisation
-- Test for missing organisation if endpoint contract requires it
-- Update existing organisation-context functional coverage where appropriate
+- Controller/unit test for missing organisation
+- Integration test for matching organisation
+- Integration test for mismatched organisation
+- Integration test for missing organisation
+- Integration test for caller organisation not present on case organisation policies
+- Functional test for mismatched organisation
+- Functional test for matching organisation
+- Functional test for missing organisation
+- Functional test for caller organisation not present on case organisation policies
 
 ## Non-goals
 - Do not redesign PRD integration.

@@ -10,7 +10,7 @@
 
   "users": {
     "invokingUser": {
-      "_extends_": "ACA_Users_Caseworker_CAA"
+      "_extends_": "ACA_Users_Richard"
     },
     "S1": {
       "_extends_": "ACA_Users_Richard"
@@ -19,7 +19,7 @@
 
   "prerequisites": [
     {
-      "Get_Organisation_Identifier": "Get_Organisation_Identifier_For_Any_Org1_User__Prerequisite"
+      "Get_Organisation_Identifier": "Get_Organisation_Identifier_For_Richard__Prerequisite"
     }
   ],
 

@@ -10,12 +10,18 @@
     "contains a valid case-user assignment with a mismatched organisation_id"
   ],
 
+  "prerequisites": [
+    {
+      "Create_Case": "F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies_All_To_Org1"
+    }
+  ],
+
   "request": {
     "_extends_": "Common_Request",
     "body": {
       "case_users": [
         {
-          "case_id": "4716416216866173",
+          "case_id": "${[scenarioContext][childContexts][Create_Case][testData][actualResponse][body][id]}",
           "case_role": "[ApplicantSolicitor]",
           "user_id": "${[scenarioContext][testData][users][invokingUser][id]}",
           "organisation_id": "ORG-MISMATCH-FT"

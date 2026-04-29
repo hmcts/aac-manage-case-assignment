@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.managecase;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -49,6 +50,7 @@ public class BaseIT {
 
     @BeforeEach
     void setupDecoder() {
+        WireMock.configureFor("localhost", wiremockPort);
         Jwt dummyJwt = dummyJwt();
         when(dummyDecoder.decode(anyString())).thenReturn(dummyJwt);
         when(authentication.getPrincipal()).thenReturn(dummyJwt);

@@ -12,7 +12,7 @@
 
   "prerequisites": [
     {
-      "Create_Case": "F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies_All_To_Org1"
+      "Create_Case": "F-210_Prerequisite_Case_Creation_All_To_Org1"
     }
   ],
 

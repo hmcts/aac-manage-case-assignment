@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-210_NoC_Case_Creation_By_Jane_Token_Creation",
+  "_extends_": "NoC_Case_Creation_Token_Creation__Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Jane"
+    }
+  }
+}

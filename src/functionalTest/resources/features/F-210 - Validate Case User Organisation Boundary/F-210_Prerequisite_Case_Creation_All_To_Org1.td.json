@@ -4,5 +4,18 @@
 
   "specs": [
     "As a prerequisite"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Jane"
+    }
+  },
+
+  "prerequisites": [
+    {
+      "Token_Creation": "F-210_NoC_Case_Creation_By_Jane_Token_Creation",
+      "Get_Organisation_Identifier": "Get_Organisation_Identifier_For_Any_Org1_User__Prerequisite"
+    }
   ]
 }

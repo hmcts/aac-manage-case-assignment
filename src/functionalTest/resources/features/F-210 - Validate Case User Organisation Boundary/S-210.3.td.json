@@ -31,7 +31,7 @@
   "expectedResponse": {
     "_extends_": "ACA_400_Response",
     "body": {
-      "message": "Invalid data provided for the following inputs to the request:\nOrganisation ID is not valid",
+      "message": "Invalid data provided for the following inputs to the request:\nOrganisation ID is not valid\nOrganisation ID is not valid",
       "errors": []
     }
   }

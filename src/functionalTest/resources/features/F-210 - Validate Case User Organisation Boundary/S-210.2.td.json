@@ -27,5 +27,12 @@
         }
       ]
     }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "status_message": "Case-User-Role assignments created successfully"
+    }
   }
 }

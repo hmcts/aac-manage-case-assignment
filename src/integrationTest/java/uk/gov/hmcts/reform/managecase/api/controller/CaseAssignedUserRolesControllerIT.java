@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import uk.gov.hmcts.reform.managecase.BaseIT;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
@@ -40,7 +41,7 @@ class CaseAssignedUserRolesControllerIT extends BaseIT {
         stubGetUsersByOrganisationExternal(
             new FindUsersByOrganisationResponse(Collections.emptyList(), MATCHING_ORG_ID)
         );
-        stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, caseDetails(MATCHING_ORG_ID, CASE_ROLE));
+        stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, stubbedCaseDetails(CASE_ID, MATCHING_ORG_ID));
 
         CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(List.of(
             new CaseAssignedUserRoleWithOrganisation(CASE_ID, USER_ID, CASE_ROLE, MATCHING_ORG_ID)
@@ -98,7 +99,7 @@ class CaseAssignedUserRolesControllerIT extends BaseIT {
         stubGetUsersByOrganisationExternal(
             new FindUsersByOrganisationResponse(Collections.emptyList(), MATCHING_ORG_ID)
         );
-        stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, caseDetails(DIFFERENT_ORG_ID, CASE_ROLE));
+        stubGetCaseDetailsByCaseIdViaExternalApi(CASE_ID, stubbedCaseDetails(CASE_ID, DIFFERENT_ORG_ID));
 
         CaseAssignedUserRolesRequest request = new CaseAssignedUserRolesRequest(List.of(
             new CaseAssignedUserRoleWithOrganisation(CASE_ID, USER_ID, CASE_ROLE, MATCHING_ORG_ID)
@@ -110,5 +111,16 @@ class CaseAssignedUserRolesControllerIT extends BaseIT {
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message", is(ORGANISATION_POLICY_ERROR)));
+    }
+
+    private CaseDetails stubbedCaseDetails(String caseId, String organisationId) {
+        CaseDetails fixture = caseDetails(organisationId, CASE_ROLE);
+        return CaseDetails.builder()
+            .id(caseId)
+            .caseTypeId(fixture.getCaseTypeId())
+            .jurisdiction(fixture.getJurisdiction())
+            .state(fixture.getState())
+            .data(fixture.getData())
+            .build();
     }
 }

@@ -1,0 +1,14 @@
+{
+  "_guid_": "F-211-Base",
+  "_extends_": "Assign_Case_Access__Base",
+  "title": "Validate direct CCD Data Store POST /case-users contract",
+
+  "s2sClientId": "aac_manage_case_assignment",
+  "userTokenClientId": "xuiwebapp",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Jane"
+    }
+  }
+}

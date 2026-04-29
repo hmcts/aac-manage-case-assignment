@@ -1,0 +1,31 @@
+{
+  "_guid_": "S-211.4",
+  "_extends_": "F-211-Base",
+  "title": "Must allow direct POST /case-users when organisation_id matches the caller organisation for a case whose organisation policies do not contain the caller organisation",
+
+  "specs": [
+    "CAA - with a PRD organisation",
+    "intends to add a valid case-user assignment",
+    "contains a valid case-user assignment with a matching organisation_id for a case outside the caller organisation policies"
+  ],
+
+  "prerequisites": [
+    {
+      "Create_Case": "F-210_Prerequisite_Case_Creation_All_To_Org2"
+    }
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][childContexts][Create_Case][testData][actualResponse][body][id]}",
+          "case_role": "[ApplicantSolicitor]",
+          "user_id": "${[scenarioContext][testData][users][invokingUser][id]}",
+          "organisation_id": "QUK822N"
+        }
+      ]
+    }
+  }
+}

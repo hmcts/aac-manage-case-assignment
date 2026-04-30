@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
-import uk.gov.hmcts.reform.managecase.TestIdamConfiguration;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToStartCallbackRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.ApplyNoCDecisionRequest;
@@ -55,7 +54,6 @@ import org.springframework.boot.actuate.endpoint.web.EndpointMediaTypes;
 import org.springframework.boot.actuate.endpoint.web.WebEndpointsSupplier;
 import org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpointsSupplier;
 import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -119,7 +117,6 @@ public class NoticeOfChangeControllerTest {
         excludeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes =
             { SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class }))
     @AutoConfigureMockMvc(addFilters = false)
-    @ImportAutoConfiguration(TestIdamConfiguration.class)
     static class BaseWebMvcTest {
 
         @Autowired

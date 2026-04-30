@@ -12,9 +12,9 @@ Leaving a hardcoded default client secret in main application configuration crea
 
 ## Remediation
 
-The unused OAuth2 client registration was removed from application configuration. The unused OAuth2 client starter dependency, `oauth2Client` security configuration, and the test-only IDAM client registration shim were also removed.
+The unused Spring OAuth2 client registration and its hardcoded default secret have been removed. The service remains configured as an OAuth2 resource server for inbound bearer JWT validation, while the existing IDAM user-info lookup and S2S token generation wiring are unchanged.
 
-JWT resource-server validation remains configured through `spring-boot-starter-oauth2-resource-server` and the existing `JwtDecoder`.
+The unused OAuth2 client starter dependency, `oauth2Client` security configuration, and the test-only IDAM client registration shim were also removed.
 
 ## Verification
 
@@ -28,4 +28,10 @@ Compile the application and test sources:
 
 ```bash
 ./gradlew testClasses integrationTestClasses
+```
+
+Run the focused resource-server security sanity test:
+
+```bash
+./gradlew test --tests uk.gov.hmcts.reform.managecase.config.SecurityConfigurationTest
 ```

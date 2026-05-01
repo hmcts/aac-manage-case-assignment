@@ -12,7 +12,7 @@ Leaving a hardcoded default client secret in main application configuration crea
 
 ## Remediation
 
-The unused Spring OAuth2 client registration and its hardcoded default secret have been removed. The service remains configured as an OAuth2 resource server for inbound bearer JWT validation, while the existing IDAM user-info lookup and S2S token generation wiring are unchanged.
+The unused Spring OAuth2 client registration and its hardcoded default secret have been removed. The service remains configured as an OAuth2 resource server for inbound caller bearer JWT validation, while the existing S2S validation/authorisation wiring and outbound S2S token generation are unchanged.
 
 The unused OAuth2 client starter dependency, `oauth2Client` security configuration, and the test-only IDAM client registration shim were also removed.
 
@@ -21,7 +21,7 @@ The unused OAuth2 client starter dependency, `oauth2Client` security configurati
 Check that the default secret and OAuth2 client wiring are absent:
 
 ```bash
-rg "client-secret: internal|spring-boot-starter-oauth2-client|oauth2Client|TestIdamConfiguration"
+rg -n "client-secret: internal|spring-boot-starter-oauth2-client|\.oauth2Client\(|TestIdamConfiguration|ClientRegistrationRepository|OAuth2AuthorizedClient" --glob '!docs/**'
 ```
 
 Compile the application and test sources:

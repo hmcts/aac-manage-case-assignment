@@ -10,7 +10,7 @@ The service uses Spring Security as a resource server for bearer-token JWT valid
 
 Leaving a hardcoded default client secret in main application configuration creates avoidable security noise and could become a credential risk if future code starts using that client registration in a non-test environment.
 
-## Remediation
+## Resolution
 
 The unused Spring OAuth2 client registration and its hardcoded default secret have been removed. The service remains configured as an OAuth2 resource server for inbound caller bearer JWT validation, while the existing S2S validation/authorisation wiring and outbound S2S token generation are unchanged.
 

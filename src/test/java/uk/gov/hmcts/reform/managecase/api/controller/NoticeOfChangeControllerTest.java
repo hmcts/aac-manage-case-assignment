@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
+import uk.gov.hmcts.reform.managecase.config.JacksonObjectMapperConfig;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.managecase.domain.ApprovalStatus;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -59,6 +61,7 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -120,6 +123,7 @@ public class NoticeOfChangeControllerTest {
             { SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class }))
     @AutoConfigureMockMvc(addFilters = false)
     @ImportAutoConfiguration(TestIdamConfiguration.class)
+    @Import(JacksonObjectMapperConfig.class)
     static class BaseWebMvcTest {
 
         @Autowired
@@ -973,17 +977,38 @@ public class NoticeOfChangeControllerTest {
                 .andExpect(jsonPath("$.errors").doesNotExist());
         }
 
-        @DisplayName("should accept valid request which includes extra unknown fields")
+        @DisplayName("should fail with 400 bad request when request includes extra unknown fields")
         @Test
-        void shouldApplyNoticeOfChangeDecisionWithExtraUnknownField() throws Exception {
+        void shouldFailWhenApplyNoticeOfChangeDecisionContainsExtraUnknownField() throws Exception {
+            assertThat(objectMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)).isTrue();
+
             this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"case_details\": {}, \"extra_field\": \"value\"}"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.data.length()", is(1)))
-                .andExpect(jsonPath("$.data['FieldId']", is(FIELD_VALUE)))
-                .andExpect(jsonPath("$.errors").doesNotExist());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is("Unknown JSON property 'extra_field'.")));
+
+            verify(applyNoCDecisionService, never()).applyNoCDecision(any(ApplyNoCDecisionRequest.class));
+        }
+
+        @DisplayName("should fail with 400 bad request when nested case details includes extra unknown fields")
+        @Test
+        void shouldFailWhenApplyNoticeOfChangeDecisionContainsNestedExtraUnknownField() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "case_details": {
+                        "unexpected_case_detail": "value"
+                      }
+                    }
+                    """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(
+                    "Unknown JSON property 'case_details.unexpected_case_detail'."
+                )));
+
+            verify(applyNoCDecisionService, never()).applyNoCDecision(any(ApplyNoCDecisionRequest.class));
         }
 
         @DisplayName("should delegate to service domain for a valid request")
@@ -999,6 +1024,39 @@ public class NoticeOfChangeControllerTest {
             assertThat(captor.getValue().getCaseDetails().getId()).isEqualTo(CASE_ID);
             assertThat(captor.getValue().getCaseDetails().getCaseTypeId()).isEqualTo(CASE_TYPE_ID);
             assertThat(captor.getValue().getCaseDetails().getData().get(FIELD_ID).asText()).isEqualTo(FIELD_VALUE);
+        }
+
+        @DisplayName("should accept known CCD callback metadata fields")
+        @Test
+        void shouldAcceptKnownCcdCallbackMetadataFields() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "case_details": {
+                        "id": "1588234985453946",
+                        "case_type_id": "caseType",
+                        "case_data": {
+                          "FieldId": "FieldValue"
+                        }
+                      },
+                      "case_details_before": {
+                        "id": "1588234985453946",
+                        "case_type_id": "caseType",
+                        "case_data": {}
+                      },
+                      "event_id": "ApplyNoCDecision",
+                      "ignore_warning": false
+                    }
+                    """))
+                .andExpect(status().isOk());
+
+            ArgumentCaptor<ApplyNoCDecisionRequest> captor = ArgumentCaptor.forClass(ApplyNoCDecisionRequest.class);
+            verify(applyNoCDecisionService).applyNoCDecision(captor.capture());
+            assertThat(captor.getValue().getEventId()).isEqualTo("ApplyNoCDecision");
+            assertThat(captor.getValue().getIgnoreWarning()).isFalse();
+            assertThat(captor.getValue().getCaseDetails().getId()).isEqualTo(CASE_ID);
+            assertThat(captor.getValue().getCaseDetailsBefore().getId()).isEqualTo(CASE_ID);
         }
 
         @DisplayName("should fail with 400 bad request when case details is null")

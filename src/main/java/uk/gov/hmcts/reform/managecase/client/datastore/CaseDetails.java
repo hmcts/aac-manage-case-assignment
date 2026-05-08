@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.managecase.client.datastore;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -11,8 +10,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.LuhnCheck;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.SecurityClassification;
@@ -27,9 +28,9 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.CaseFieldPathUtils.getNestedCaseFieldByPath;
 
-@Data
+@Getter
+@EqualsAndHashCode
 @Builder
-@JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class CaseDetails {
@@ -55,8 +56,17 @@ public class CaseDetails {
     @LuhnCheck(message = ValidationError.CASE_ID_INVALID, ignoreNonDigitCharacters = false)
     private String id;
 
+    @JsonProperty("version")
+    private Integer version;
+
+    @JsonProperty("_links")
+    private JsonNode links;
+
+    @Setter
+    @JsonProperty("jurisdiction")
     private String jurisdiction;
 
+    @JsonProperty("state")
     private String state;
 
     @JsonProperty("case_type_id")
@@ -65,9 +75,21 @@ public class CaseDetails {
 
     @JsonProperty("case_data")
     @JsonAlias("data")
+    @Setter
     private Map<String, JsonNode> data;
     @JsonProperty("created_date")
+    @JsonAlias("created_on")
     private LocalDateTime createdDate;
+    @JsonProperty("last_modified")
+    @JsonAlias("last_modified_on")
+    private LocalDateTime lastModified;
+    @JsonProperty("last_state_modified_date")
+    @JsonAlias("last_state_modified_on")
+    private LocalDateTime lastStateModifiedDate;
+    @JsonProperty("created_by")
+    private String createdBy;
+    @JsonProperty("last_modified_by")
+    private String lastModifiedBy;
     @JsonProperty("security_classification")
     private SecurityClassification securityClassification;
     @JsonProperty("data_classification")
@@ -77,6 +99,16 @@ public class CaseDetails {
 
     @JsonProperty("callback_response_status")
     private String callbackResponseStatus;
+    @JsonProperty("after_submit_callback_response")
+    private JsonNode afterSubmitCallbackResponse;
+    @JsonProperty("callback_response_status_code")
+    private Integer callbackResponseStatusCode;
+    @JsonProperty("delete_draft_response_status")
+    private String deleteDraftResponseStatus;
+    @JsonProperty("delete_draft_response_status_code")
+    private Integer deleteDraftResponseStatusCode;
+    @JsonProperty("supplementary_data")
+    private JsonNode supplementaryData;
 
     public Optional<String> findChangeOrganisationRequestFieldName() {
         Optional<JsonNode> first = getData().values().stream()

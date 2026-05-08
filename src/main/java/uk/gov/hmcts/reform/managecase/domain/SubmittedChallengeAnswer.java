@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class SubmittedChallengeAnswer {
@@ -17,6 +17,7 @@ public class SubmittedChallengeAnswer {
             requiredMode = RequiredMode.REQUIRED, example = "Question1")
     private String questionId;
 
+    @JsonProperty("value")
     @Schema(description = "Submitted answer value", 
             requiredMode = RequiredMode.REQUIRED, example = "Answer for Question1")
     private String value;

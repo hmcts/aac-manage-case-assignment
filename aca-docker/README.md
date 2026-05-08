@@ -7,7 +7,7 @@
 ## Prerequisites
 
 - [Docker](https://www.docker.com)
-- psql (Tested with version 12.4)
+- psql (full SIDAM/IDAM only; tested with version 12.4)
 - `ccd-docker` environment configured and running,
 see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
 
@@ -22,9 +22,19 @@ see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
 
 ### IDAM Configuration
 
-- Create ACA test roles, services and users using scripts located in the bin directory.
+- Create ACA test users using scripts located in the bin directory.
 
-    Export following variables required for the scripts to run
+    The local setup follows `ccd-docker` and uses `idam-sim` by default. With `idam-sim`, run:
+
+    ```bash
+    ./bin/add-users.sh
+    ```
+
+    Do not run `add-idam-clients.sh` or `add-roles.sh` when using `idam-sim`. Those scripts call
+    full IDAM admin endpoints (`/services` and `/roles`) that are not available in the simulator.
+
+    Full SIDAM/IDAM only: export the admin credentials required for the client and role scripts:
+
     ```bash
     export IDAM_ADMIN_USER=<enter email>
     export IDAM_ADMIN_PASSWORD=<enter password>
@@ -32,22 +42,16 @@ see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
 
     The value for `IDAM_ADMIN_USER` and `IDAM_ADMIN_PASSWORD` details can be found on [confluence](https://tools.hmcts.net/confluence/x/eQP3P)
 
-    - To add idam client services (eg: `xuiwebapp`) :
+    - Full SIDAM/IDAM only: to add idam client services (eg: `xuiwebapp`) :
 
         ```bash
         ./bin/add-idam-clients.sh
         ```
 
-    - To add roles required to import ccd definition:
+    - Full SIDAM/IDAM only: to add IDAM roles:
 
         ```bash
         ./bin/add-roles.sh
-        ```
-
-    - To add users:
-
-        ```bash
-        ./bin/add-users.sh
         ```
 
     - To populate wiremock PRD data with user GUIDS
@@ -56,7 +60,12 @@ see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
         ./bin/findPrdUserIds.sh
         ```
 
-        This script updates placeholders in: 
+        With the default `idam-sim` setup this script resolves user IDs from
+        `IDAM_API_BASE_URL` using the simulator test-support account endpoint.
+        If that endpoint is not available, it falls back to the existing full
+        SIDAM/IDAM Postgres lookup on `localhost:5432`.
+
+        This script updates placeholders in:
 
         ```
         aca-docker/mocks/wiremock/__files/prd_users_organisation_01.json
@@ -66,12 +75,10 @@ see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
         You need to run this script every time you run `./bin/add-users.sh`, as adding users will
         generate new GUIDs.
 
-        The `aca-wiremock` container will need to be restarted to read in these new GUIDs
-
-        ```bash
-        cd aca-docker
-        docker-compose -f compose/aca.yml restart aca-wiremock
-        ```
+        If the `aca-wiremock` container is running, the script restarts it
+        automatically so WireMock reads the generated GUIDs. If Docker is not
+        available or the container is not running, restart `aca-wiremock`
+        manually before running functional tests.
 
 ### Run `ccd-docker` containers
 - Install and run CCD stack as advised [here](https://github.com/hmcts/ccd-docker).

@@ -124,6 +124,47 @@ about-to-start callback payload and send it to ACA `/noc/apply-decision`,
 guarding against missed CCD callback metadata fields such as
 `case_details_before`, `event_id`, and `ignore_warning`.
 
+## Local Callback Functional Testing
+
+Callback functional tests are tagged with `@callbackTests` and are skipped
+unless callback testing is explicitly enabled:
+
+```bash
+export CALLBACK_FTA_ENABLED=true
+```
+
+For local callback testing, CCD Data Store must be able to call back into the
+running AAC service. If CCD is running in Docker and AAC is running on the host,
+do not publish callback URLs using `localhost`, because `localhost` from inside
+the CCD container points at the CCD container itself.
+
+Use:
+
+```bash
+export TEST_URL=http://localhost:4454
+export MCA_API_BASE_URL=http://host.docker.internal:4454
+export CCD_DATA_STORE_API_BASE_URL=http://localhost:4452
+export DEFINITION_STORE_URL_BASE=http://localhost:4451
+export RD_PROFESSIONAL_API_BASE_URL=http://localhost:5544
+```
+
+The local ACA helper file already sets the main callback-related values:
+
+```bash
+source aca-docker/bin/env_variables_all.txt
+```
+
+After setting `MCA_API_BASE_URL`, reload the CCD test definitions before running
+the functional tests. The callback URLs are published into CCD definitions, so
+changing the environment after definition import will not update already-loaded
+callback URLs.
+
+Run the functional tests with:
+
+```bash
+./gradlew functional
+```
+
 `DownstreamResponseDecoderFactoryTest` verifies that provider-owned Feign
 responses can contain additive fields without breaking downstream response
 extraction.

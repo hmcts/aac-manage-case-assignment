@@ -587,6 +587,45 @@ public class NoticeOfChangeControllerTest {
 
         }
 
+        @DisplayName("should accept known CCD callback metadata fields")
+        @Test
+        void shouldAcceptKnownCcdCallbackMetadataFields() throws Exception {
+            changeOrganisationRequest.setApprovalStatus("1");
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content("""
+                                         {
+                                           "event_id": "nocRequest_autoApproval",
+                                           "ignore_warning": false,
+                                           "case_details_before": {
+                                             "id": "1588234985453946",
+                                             "case_data": {}
+                                           },
+                                           "case_details": {
+                                             "id": "1588234985453946",
+                                             "case_data": {
+                                               "ChangeOrganisationRequestField": {
+                                                 "OrganisationToAdd": {
+                                                   "OrganisationID": "123"
+                                                 },
+                                                 "OrganisationToRemove": {
+                                                   "OrganisationID": "789"
+                                                 },
+                                                 "CaseRoleId": {},
+                                                 "ApprovalStatus": "1"
+                                               }
+                                             }
+                                           }
+                                         }
+                                         """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)))
+                .andExpect(jsonPath("$.confirmation_body", is(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)));
+
+            verify(approvalService).findAndTriggerNocDecisionEvent(CASE_ID);
+        }
+
         @DisplayName("should return 200 status code if all data is valid (ApprovalStatus as a String)")
         @Test
         void shouldCheckForNoCApprovalWithStringForApprovalStatus() throws Exception {
@@ -809,6 +848,63 @@ public class NoticeOfChangeControllerTest {
                                     is("234")));
         }
 
+        @DisplayName("should accept known CCD callback metadata fields")
+        @Test
+        void shouldAcceptKnownCcdCallbackMetadataFields() throws Exception {
+            ChangeOrganisationRequest updatedCOR = ChangeOrganisationRequest.builder()
+                .organisationToAdd(Organisation.builder().organisationID("123").build())
+                .organisationToRemove(Organisation.builder().organisationID("234").build())
+                .caseRoleId(DynamicList.builder().build())
+                .requestTimestamp(LocalDateTime.now())
+                .approvalStatus("1")
+                .build();
+
+            aboutToSubmitCallbackResponse = AboutToSubmitCallbackResponse.builder()
+                .data(Map.of(
+                    "OrganisationPolicyField1",
+                    objectMapper.convertValue(organisationPolicy, JsonNode.class),
+                    "ChangeOrganisationRequestField",
+                    objectMapper.convertValue(updatedCOR, JsonNode.class))
+                )
+                .build();
+
+            caseDetails = caseDetails(changeOrganisationRequest, organisationPolicy);
+
+            given(requestNoticeOfChangeService.setOrganisationToRemove(any(), any(), any()))
+                .willReturn(aboutToSubmitCallbackResponse);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content("""
+                                         {
+                                           "event_id": "nocRequest_autoApproval",
+                                           "ignore_warning": false,
+                                           "case_details_before": {
+                                             "id": "1588234985453946",
+                                             "case_data": {}
+                                           },
+                                           "case_details": {
+                                             "id": "1588234985453946",
+                                             "case_data": {
+                                               "ChangeOrganisationRequestField": {
+                                                 "OrganisationToAdd": {
+                                                   "OrganisationID": "123"
+                                                 },
+                                                 "OrganisationToRemove": {
+                                                   "OrganisationID": null
+                                                 },
+                                                 "CaseRoleId": {},
+                                                 "ApprovalStatus": "1"
+                                               }
+                                             }
+                                           }
+                                         }
+                                         """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToRemove.OrganisationID",
+                                    is("234")));
+        }
+
         @DisplayName("should error if case reference in Case Details is empty")
         @Test
         void shouldFailIfCaseReferenceIsEmpty() throws Exception {
@@ -937,6 +1033,29 @@ public class NoticeOfChangeControllerTest {
                 .andExpect(jsonPath("$.data_classification").value(nullValue()))
                 .andExpect(jsonPath("$.security_classification").value(nullValue()))
                 .andExpect(jsonPath("$.significant_item").value(nullValue()));
+        }
+
+        @DisplayName("should accept known CCD callback metadata fields")
+        @Test
+        void shouldAcceptKnownCcdCallbackMetadataFields() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content("""
+                                         {
+                                           "event_id": "nocRequest_autoApproval",
+                                           "ignore_warning": false,
+                                           "case_details_before": {
+                                             "id": "1588234985453946",
+                                             "case_data": {}
+                                           },
+                                           "case_details": {
+                                             "id": "1588234985453946",
+                                             "case_data": {}
+                                           }
+                                         }
+                                         """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()", is(1)));
         }
     }
 

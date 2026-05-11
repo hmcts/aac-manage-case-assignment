@@ -22,7 +22,14 @@ public class CallbackRequest {
     @JsonProperty("case_details_before")
     private CaseDetails caseDetailsBefore;
 
+    @JsonProperty("ignore_warning")
+    private Boolean ignoreWarning;
+
     @Valid
     @JsonProperty("case_details")
     private CaseDetails caseDetails;
+
+    public CallbackRequest(String eventId, CaseDetails caseDetailsBefore, CaseDetails caseDetails) {
+        this(eventId, caseDetailsBefore, null, caseDetails);
+    }
 }

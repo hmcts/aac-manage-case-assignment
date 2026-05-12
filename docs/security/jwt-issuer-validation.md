@@ -24,7 +24,7 @@
 | Validation model | Single configured issuer, not a multi-issuer allow-list |
 | Discovery source | `spring.security.oauth2.client.provider.oidc.issuer-uri` |
 | Enforced issuer | `oidc.issuer` / `OIDC_ISSUER` |
-| Current service wiring | Helm values, preview values, and Jenkins files explicitly set `OIDC_ISSUER` to public IDAM `/o` issuer values |
+| Current service wiring | Helm values, preview values, and `Jenkinsfile_CNP` explicitly set `OIDC_ISSUER` to public IDAM `/o` issuer values |
 | Runtime fallback | Main runtime config enforces `oidc.issuer` from `OIDC_ISSUER`, with a static local fallback, and does not derive it from discovery |
 
 ### Guidance alignment
@@ -33,7 +33,7 @@
 | --- | --- |
 | Service issuer model | Single configured issuer |
 | Issuer pattern used for this service | Repo config currently uses public IDAM `/o` issuer values |
-| Repo wiring status | Helm values, preview values, `Jenkinsfile_CNP`, and `Jenkinsfile_nightly` are aligned to that public issuer pattern |
+| Repo wiring status | Helm values, preview values, and `Jenkinsfile_CNP` are aligned to that public issuer pattern |
 | External alignment check | AAT has been verified from a real token as `https://idam-web-public.aat.platform.hmcts.net/o`; confirm other target environments before rollout |
 
 ## Discovery vs enforced issuer

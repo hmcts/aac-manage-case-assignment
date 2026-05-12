@@ -239,8 +239,6 @@ tasks.register('verifyOidcIssuerPolicy') {
         'OIDC_ISSUER: https://idam-web-public.aat.platform.hmcts.net/o',
       'Jenkinsfile_CNP':
         'env.OIDC_ISSUER = "https://idam-web-public.aat.platform.hmcts.net/o"',
-      'Jenkinsfile_nightly':
-        'env.OIDC_ISSUER = "https://idam-web-public.aat.platform.hmcts.net/o"'
     ]
 
     def issuerDrift = exactExpectations.findAll { path, expectedLine ->

@@ -90,6 +90,7 @@ class DataStoreRepositoryTest {
     private static final String EVENT_TOKEN = "eventToken";
 
     public static final String USER_TOKEN = "Bearer user Token";
+    public static final String RAW_USER_TOKEN = "user Token";
     public static final String SYSTEM_USER_TOKEN = "Bearer system user Token";
     private static final String ORGANISATION = "ORGANISATION";
     private static final String ORGANISATION_OTHER = "ORGANISATION_OTHER";
@@ -460,7 +461,7 @@ class DataStoreRepositoryTest {
 
         given(dataStoreApi.getExternalStartEventTrigger(SYSTEM_USER_TOKEN, CASE_ID, EVENT_ID))
             .willReturn(startEventResource);
-        given(securityUtils.getUserBearerToken()).willReturn(USER_TOKEN);
+        given(securityUtils.getUserToken()).willReturn(RAW_USER_TOKEN);
 
         given(dataStoreApi.submitEventForCase(any(String.class), any(String.class),
             any(CaseEventCreationPayload.class))).willReturn(CaseDetails.builder().build());
@@ -480,13 +481,13 @@ class DataStoreRepositoryTest {
 
         // ASSERT
         verify(dataStoreApi).getStartEventTrigger(SYSTEM_USER_TOKEN, CASE_ID, EVENT_ID);
-        verify(securityUtils).getUserBearerToken();
+        verify(securityUtils).getUserToken();
         ArgumentCaptor<CaseEventCreationPayload> captor = ArgumentCaptor.forClass(CaseEventCreationPayload.class);
         verify(dataStoreApi).submitEventForCase(any(String.class), any(String.class), captor.capture());
 
         CaseEventCreationPayload caseEventCreationPayloadCaptorValue = captor.getValue();
         assertThat(caseEventCreationPayloadCaptorValue.getToken()).isEqualTo(EVENT_TOKEN);
-        assertThat(caseEventCreationPayloadCaptorValue.getOnBehalfOfUserToken()).isEqualTo(USER_TOKEN);
+        assertThat(caseEventCreationPayloadCaptorValue.getOnBehalfOfUserToken()).isEqualTo(RAW_USER_TOKEN);
 
         assertThat(caseEventCreationPayloadCaptorValue.getEvent().getDescription()).isEqualTo(NOC_REQUEST_DESCRIPTION);
         assertThat(caseEventCreationPayloadCaptorValue.getEvent().getEventId()).isEqualTo(EVENT_ID);

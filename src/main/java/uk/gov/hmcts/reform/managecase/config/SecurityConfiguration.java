@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.managecase.config;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.SET_ORGANISATION_TO_REMOVE_PATH;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +30,7 @@ import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
 public class SecurityConfiguration {
 
     public static final String AUTHORISATION = "ServiceAuthorization";
+    private static final String NOC_BASE_PATH = "/noc";
 
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
     private String issuerUri;
@@ -50,6 +54,16 @@ public class SecurityConfiguration {
         "/"
     };
 
+    private static final String[] CCD_CALLBACK_PATHS = {
+        NOC_BASE_PATH + APPLY_NOC_DECISION,
+        NOC_BASE_PATH + CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH,
+        NOC_BASE_PATH + SET_ORGANISATION_TO_REMOVE_PATH
+    };
+
+    static String[] ccdCallbackPaths() {
+        return CCD_CALLBACK_PATHS.clone();
+    }
+
     @Autowired
     public SecurityConfiguration(final ServiceAuthFilter serviceAuthFilter,
                                   final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter) {
@@ -67,7 +81,9 @@ public class SecurityConfiguration {
             .csrf(csrf -> csrf.disable()) // NOSONAR
             .formLogin(fl -> fl.disable())
             .logout(l -> l.disable())
-            .authorizeHttpRequests(aht -> aht.anyRequest().authenticated())
+            .authorizeHttpRequests(aht -> aht
+                .requestMatchers(CCD_CALLBACK_PATHS).permitAll()
+                .anyRequest().authenticated())
             .oauth2ResourceServer(o -> o.jwt(j -> j.jwtAuthenticationConverter(jwtAuthenticationConverter)))
             .oauth2Client(Customizer.withDefaults())
             ;

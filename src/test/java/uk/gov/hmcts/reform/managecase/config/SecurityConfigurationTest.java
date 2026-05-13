@@ -4,6 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.NOC_PREPARE_PATH;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.REQUEST_NOTICE_OF_CHANGE_PATH;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.SET_ORGANISATION_TO_REMOVE_PATH;
+import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.VERIFY_NOC_ANSWERS;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
@@ -33,6 +39,7 @@ class SecurityConfigurationTest {
     private static final String VALID_ISSUER = "http://fr-am:8080/openam/oauth2/hmcts";
     private static final String INVALID_ISSUER = "http://unexpected-issuer";
     private static final String KEY_ID = "unit-test-signing-key";
+    private static final String NOC_BASE_PATH = "/noc";
 
     @Test
     void shouldAcceptJwtFromConfiguredIssuer() {
@@ -60,6 +67,21 @@ class SecurityConfigurationTest {
         );
 
         assertThat(exception.getMessage()).contains("iss");
+    }
+
+    @Test
+    void shouldPermitOnlyCcdS2SCallbackPathsWithoutUserJwt() {
+        assertThat(SecurityConfiguration.ccdCallbackPaths())
+            .containsExactlyInAnyOrder(
+                NOC_BASE_PATH + APPLY_NOC_DECISION,
+                NOC_BASE_PATH + CHECK_NOTICE_OF_CHANGE_APPROVAL_PATH,
+                NOC_BASE_PATH + SET_ORGANISATION_TO_REMOVE_PATH
+            )
+            .doesNotContain(
+                NOC_BASE_PATH + NOC_PREPARE_PATH,
+                NOC_BASE_PATH + REQUEST_NOTICE_OF_CHANGE_PATH,
+                NOC_BASE_PATH + VERIFY_NOC_ANSWERS
+            );
     }
 
     private OAuth2TokenValidator<Jwt> validator() {

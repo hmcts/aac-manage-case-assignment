@@ -25,6 +25,7 @@
 | Discovery source | `spring.security.oauth2.client.provider.oidc.issuer-uri` |
 | Enforced issuer | `oidc.issuer` / `OIDC_ISSUER` |
 | Current service wiring | Helm values, preview values, and `Jenkinsfile_CNP` explicitly set `OIDC_ISSUER` to public IDAM `/o` issuer values |
+| Nightly wiring | `Jenkinsfile_nightly` still sets the ForgeRock AAT2 realm issuer and must be reviewed before relying on nightly issuer verification |
 | Runtime fallback | Main runtime config enforces `oidc.issuer` from `OIDC_ISSUER`, with a static local fallback, and does not derive it from discovery |
 
 ### Guidance alignment
@@ -34,6 +35,7 @@
 | Service issuer model | Single configured issuer |
 | Issuer pattern used for this service | Repo config currently uses public IDAM `/o` issuer values |
 | Repo wiring status | Helm values, preview values, and `Jenkinsfile_CNP` are aligned to that public issuer pattern |
+| Nightly status | `Jenkinsfile_nightly` is not aligned with the public issuer pattern |
 | External alignment check | AAT has been verified from a real token as `https://idam-web-public.aat.platform.hmcts.net/o`; confirm other target environments before rollout |
 
 ## Discovery vs enforced issuer
@@ -88,6 +90,23 @@ For JWT issuer-validation tests and related verifier assertions in this repo:
 - use issuer terminology for config, docs, and comments
 - use `iss` terminology for claim-level assertions and validator or decoder message checks
 
+## CCD submitted callbacks
+
+NoC auto-approval submits a CCD event that triggers a CCD submitted callback back into this service at
+`/noc/check-noc-approval`.
+
+For that callback to pass resource-server authentication, two separate conditions must both be true:
+
+- the callback `Authorization` header must be a bearer header, `Bearer <jwt>`
+- the JWT `iss` claim must exactly match `OIDC_ISSUER`
+
+These are different failure modes even though both can surface as `401 Unauthorized`.
+
+- A raw JWT without the `Bearer ` prefix is rejected before issuer validation is useful.
+- A correctly formatted bearer token is still rejected if its `iss` does not match `OIDC_ISSUER`.
+- `CaseEventCreationPayload.on_behalf_of_token` must therefore be populated from `SecurityUtils.getUserBearerToken()`,
+  not `SecurityUtils.getUserToken()`.
+
 ## Test and pipeline verification
 
 - Focused tests cover valid issuer, invalid issuer, and expired token cases across validator, decoder, and integration layers.
@@ -97,6 +116,7 @@ For JWT issuer-validation tests and related verifier assertions in this repo:
 - The verifier uses a real-token password-grant path with the existing BEFTA OIDC client settings and CAA test-user credentials.
 - The verifier is a pre-check for real-token `iss` alignment. It is not the BEFTA functional-test auth implementation and does not need full BEFTA auth-path parity.
 - Any mismatch text must stay in `iss` terms.
+- `DataStoreRepositoryTest` covers the NoC CCD event payload and should assert that `on_behalf_of_token` is a bearer token.
 
 ## Configuration and deployment note
 
@@ -127,6 +147,7 @@ Before rollout, confirm:
 - the `iss` claim in real caller tokens matches `OIDC_ISSUER`
 - no Jenkins or release-time override is still supplying an older issuer value
 - local and CI token acquisition paths still obtain tokens whose `iss` matches the configured enforced issuer
+- CCD submitted callbacks use a valid bearer `Authorization` header, not a raw JWT value
 
 ## How to derive `OIDC_ISSUER`
 
@@ -171,6 +192,7 @@ Before merging JWT issuer-validation changes, confirm all of the following:
 - `OIDC_ISSUER` is explicitly configured and not guessed from the discovery URL.
 - App config, Helm values, preview values, and any Jenkins files that explicitly set `OIDC_ISSUER` are aligned for the target environment.
 - If `OIDC_ISSUER` changed, it was verified against a real token for the target environment.
+- CCD submitted callbacks pass a bearer token, not a raw JWT, when using `on_behalf_of_token`.
 - There is a test that accepts a token with the expected issuer.
 - There is a test that rejects a token with an unexpected issuer.
 - There is a test that rejects an expired token.
@@ -186,6 +208,7 @@ Do not merge if any of the following are true:
 - only timestamp validation is active
 - `OIDC_ISSUER` was inferred rather than verified
 - Helm and CI/Jenkins issuer values disagree without explanation
+- CCD submitted callbacks receive a raw JWT where the callback endpoint expects `Bearer <jwt>`
 - only happy-path tests exist
 
 ## Configuration Policy

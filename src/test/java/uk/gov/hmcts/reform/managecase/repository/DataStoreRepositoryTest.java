@@ -460,6 +460,7 @@ class DataStoreRepositoryTest {
 
         given(dataStoreApi.getExternalStartEventTrigger(SYSTEM_USER_TOKEN, CASE_ID, EVENT_ID))
             .willReturn(startEventResource);
+        given(securityUtils.getUserBearerToken()).willReturn(USER_TOKEN);
 
         given(dataStoreApi.submitEventForCase(any(String.class), any(String.class),
             any(CaseEventCreationPayload.class))).willReturn(CaseDetails.builder().build());
@@ -479,11 +480,13 @@ class DataStoreRepositoryTest {
 
         // ASSERT
         verify(dataStoreApi).getStartEventTrigger(SYSTEM_USER_TOKEN, CASE_ID, EVENT_ID);
+        verify(securityUtils).getUserBearerToken();
         ArgumentCaptor<CaseEventCreationPayload> captor = ArgumentCaptor.forClass(CaseEventCreationPayload.class);
         verify(dataStoreApi).submitEventForCase(any(String.class), any(String.class), captor.capture());
 
         CaseEventCreationPayload caseEventCreationPayloadCaptorValue = captor.getValue();
         assertThat(caseEventCreationPayloadCaptorValue.getToken()).isEqualTo(EVENT_TOKEN);
+        assertThat(caseEventCreationPayloadCaptorValue.getOnBehalfOfUserToken()).isEqualTo(USER_TOKEN);
 
         assertThat(caseEventCreationPayloadCaptorValue.getEvent().getDescription()).isEqualTo(NOC_REQUEST_DESCRIPTION);
         assertThat(caseEventCreationPayloadCaptorValue.getEvent().getEventId()).isEqualTo(EVENT_ID);

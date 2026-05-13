@@ -108,8 +108,8 @@ These are different failure modes even though they can surface close together in
 - If `on_behalf_of_token` includes a `Bearer ` prefix, CCD later calls IDAM `/o/userinfo` with a malformed token and
   NoC submission can fail with `502 Bad Gateway` and an `invalid_token` log in data-store.
 - If the CCD submitted callback request reaches MCA and S2S is authorised as `ccd_data`, but Spring Security still
-  requires a user bearer token for that callback endpoint, NoC submission can fail with `Submitted callback failed` and
-  a callback `401 Unauthorized` log in data-store.
+  requires or processes a user bearer token for that callback endpoint, NoC submission can fail with
+  `Submitted callback failed` and a callback `401 Unauthorized` log in data-store.
 - If a bearer token is present on non-callback or user-authenticated requests, its `iss` claim must still exactly match
   `OIDC_ISSUER`.
 
@@ -155,8 +155,8 @@ Before rollout, confirm:
 - no Jenkins or release-time override is still supplying an older issuer value
 - local and CI token acquisition paths still obtain tokens whose `iss` matches the configured enforced issuer
 - NoC CCD event payloads use a raw access token in `on_behalf_of_token`, not a bearer header value
-- CCD submitted callback HTTP requests are accepted with authorised `ccd_data` S2S without requiring a user bearer
-  token
+- CCD submitted callback HTTP requests are handled by the callback security chain with authorised `ccd_data` S2S and
+  without OAuth resource-server bearer-token processing
 
 ## How to derive `OIDC_ISSUER`
 
@@ -202,7 +202,8 @@ Before merging JWT issuer-validation changes, confirm all of the following:
 - App config, Helm values, preview values, and any Jenkins files that explicitly set `OIDC_ISSUER` are aligned for the target environment.
 - If `OIDC_ISSUER` changed, it was verified against a real token for the target environment.
 - NoC CCD event payloads pass a raw access token, not a bearer header value, in `on_behalf_of_token`.
-- CCD submitted callback endpoints are S2S-authorised for `ccd_data` and do not require a user bearer token.
+- CCD submitted callback endpoints are S2S-authorised for `ccd_data` and do not run OAuth resource-server bearer-token
+  processing.
 - There is a test that accepts a token with the expected issuer.
 - There is a test that rejects a token with an unexpected issuer.
 - There is a test that rejects an expired token.
@@ -219,7 +220,7 @@ Do not merge if any of the following are true:
 - `OIDC_ISSUER` was inferred rather than verified
 - Helm and CI/Jenkins issuer values disagree without explanation
 - `on_behalf_of_token` is populated with a `Bearer `-prefixed value
-- CCD submitted callback endpoints require a user bearer token after S2S has already authorised `ccd_data`
+- CCD submitted callback endpoints require or process a user bearer token after S2S has already authorised `ccd_data`
 - only happy-path tests exist
 
 ## Configuration Policy

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -74,6 +75,22 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    @Order(1)
+    protected SecurityFilterChain ccdCallbackFilterChain(HttpSecurity http) throws Exception {
+        http
+            .securityMatcher(CCD_CALLBACK_PATHS)
+            .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
+            .sessionManagement(s -> s.sessionCreationPolicy(STATELESS))
+            .csrf(csrf -> csrf.disable()) // NOSONAR
+            .formLogin(fl -> fl.disable())
+            .logout(l -> l.disable())
+            .authorizeHttpRequests(aht -> aht.anyRequest().permitAll())
+            ;
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
@@ -81,9 +98,7 @@ public class SecurityConfiguration {
             .csrf(csrf -> csrf.disable()) // NOSONAR
             .formLogin(fl -> fl.disable())
             .logout(l -> l.disable())
-            .authorizeHttpRequests(aht -> aht
-                .requestMatchers(CCD_CALLBACK_PATHS).permitAll()
-                .anyRequest().authenticated())
+            .authorizeHttpRequests(aht -> aht.anyRequest().authenticated())
             .oauth2ResourceServer(o -> o.jwt(j -> j.jwtAuthenticationConverter(jwtAuthenticationConverter)))
             .oauth2Client(Customizer.withDefaults())
             ;

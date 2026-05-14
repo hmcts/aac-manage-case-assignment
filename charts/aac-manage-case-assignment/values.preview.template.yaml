@@ -106,6 +106,8 @@ ccd:
           disabled: true
       environment:
         DATA_STORE_IDAM_KEY: ${CCD_DATA_S2S_SECRET}
+        # TEMP: diagnose NoC callback auth headers; remove after pipeline proof run.
+        LOG_CALLBACK_DETAILS: "${LOG_CALLBACK_DETAILS}"
         DATA_STORE_DB_HOST: '{{ .Release.Name }}-postgresql'
         DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
         DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"

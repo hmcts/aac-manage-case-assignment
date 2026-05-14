@@ -197,7 +197,7 @@ tasks.register('contract', Test) {
 }
 
 tasks.register('verifyFunctionalTestJwtIssuer', JavaExec) {
-  description = 'Verifies the functional and smoke test token iss matches OIDC_ISSUER'
+  description = 'Verifies the functional and smoke test token iss appears in OIDC_ISSUER'
   group = 'Verification'
   dependsOn 'functionalTestClasses'
   onlyIf {
@@ -234,11 +234,13 @@ tasks.register('verifyOidcIssuerPolicy') {
 
     def exactExpectations = [
       'charts/aac-manage-case-assignment/values.yaml':
-        'OIDC_ISSUER: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o',
+        'OIDC_ISSUER: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o,https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/realms/root/realms/hmcts',
       'charts/aac-manage-case-assignment/values.preview.template.yaml':
-        'OIDC_ISSUER: https://idam-web-public.aat.platform.hmcts.net/o',
+        'OIDC_ISSUER: https://idam-web-public.aat.platform.hmcts.net/o,https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts',
       'Jenkinsfile_CNP':
-        'env.OIDC_ISSUER = "https://idam-web-public.aat.platform.hmcts.net/o"',
+        'env.OIDC_ISSUER = "https://idam-web-public.aat.platform.hmcts.net/o,https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts"',
+      'Jenkinsfile_nightly':
+        'env.OIDC_ISSUER = "https://idam-web-public.aat.platform.hmcts.net/o,https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts"',
     ]
 
     def issuerDrift = exactExpectations.findAll { path, expectedLine ->
@@ -248,7 +250,7 @@ tasks.register('verifyOidcIssuerPolicy') {
 
     if (!issuerDrift.isEmpty()) {
       throw new GradleException(
-        "OIDC issuer config drift detected. Expected explicit public IDAM issuer wiring in: ${issuerDrift.join(', ')}"
+        "OIDC issuer config drift detected. Expected explicit IDAM issuer allow-list wiring in: ${issuerDrift.join(', ')}"
       )
     }
   }

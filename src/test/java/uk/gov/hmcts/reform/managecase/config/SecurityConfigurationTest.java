@@ -16,6 +16,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.time.Instant;
 import java.util.Date;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
@@ -23,20 +24,24 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import java.time.Instant;
 
 class SecurityConfigurationTest {
 
     private static final String VALID_ISSUER = "http://fr-am:8080/openam/oauth2/hmcts";
+    private static final String SECOND_VALID_ISSUER = "http://idam-web-public/o";
     private static final String INVALID_ISSUER = "http://unexpected-issuer";
     private static final String KEY_ID = "unit-test-signing-key";
 
     @Test
     void shouldAcceptJwtFromConfiguredIssuer() {
         assertFalse(validator().validate(buildJwt(VALID_ISSUER, Instant.now().plusSeconds(300))).hasErrors());
+    }
+
+    @Test
+    void shouldAcceptJwtFromSecondConfiguredIssuer() {
+        assertFalse(validator().validate(buildJwt(SECOND_VALID_ISSUER, Instant.now().plusSeconds(300))).hasErrors());
     }
 
     @Test
@@ -65,7 +70,7 @@ class SecurityConfigurationTest {
     private OAuth2TokenValidator<Jwt> validator() {
         return new DelegatingOAuth2TokenValidator<>(
             new JwtTimestampValidator(),
-            new JwtIssuerValidator(VALID_ISSUER)
+            SecurityConfiguration.issuerValidator(VALID_ISSUER + ", " + SECOND_VALID_ISSUER)
         );
     }
 

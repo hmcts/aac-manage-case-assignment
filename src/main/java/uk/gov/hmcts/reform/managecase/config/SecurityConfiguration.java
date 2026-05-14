@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.managecase.config;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -10,11 +13,13 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
-import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -85,10 +90,38 @@ public class SecurityConfiguration {
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromOidcIssuerLocation(issuerUri);
         // See docs/security/jwt-issuer-validation.md for issuer-uri discovery and oidc.issuer enforcement.
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
-        OAuth2TokenValidator<Jwt> withIssuer = new JwtIssuerValidator(issuerOverride);
+        OAuth2TokenValidator<Jwt> withIssuer = issuerValidator(issuerOverride);
         OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
         jwtDecoder.setJwtValidator(validator);
 
         return jwtDecoder;
+    }
+
+    static OAuth2TokenValidator<Jwt> issuerValidator(String issuerOverride) {
+        List<String> allowedIssuers = allowedIssuers(issuerOverride);
+        return jwt -> {
+            String tokenIssuer = jwt.getClaimAsString(JwtClaimNames.ISS);
+            if (tokenIssuer == null && jwt.getIssuer() != null) {
+                tokenIssuer = jwt.getIssuer().toString();
+            }
+
+            if (allowedIssuers.contains(tokenIssuer)) {
+                return OAuth2TokenValidatorResult.success();
+            }
+
+            OAuth2Error error = new OAuth2Error(
+                "invalid_token",
+                "The iss claim is not valid",
+                null
+            );
+            return OAuth2TokenValidatorResult.failure(error);
+        };
+    }
+
+    private static List<String> allowedIssuers(String issuerOverride) {
+        return Arrays.stream(issuerOverride.split(","))
+            .map(String::trim)
+            .filter(issuer -> !issuer.isBlank())
+            .toList();
     }
 }

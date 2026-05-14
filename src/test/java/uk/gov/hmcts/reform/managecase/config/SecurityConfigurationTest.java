@@ -50,6 +50,22 @@ class SecurityConfigurationTest {
     }
 
     @Test
+    void shouldRejectJwtWithoutIssuer() {
+        assertTrue(validator().validate(buildJwtWithoutIssuer()).hasErrors());
+    }
+
+    @Test
+    void shouldIgnoreBlankConfiguredIssuerEntries() {
+        OAuth2TokenValidator<Jwt> validatorWithBlankEntries = new DelegatingOAuth2TokenValidator<>(
+            new JwtTimestampValidator(),
+            SecurityConfiguration.issuerValidator(" , " + VALID_ISSUER + ",, ")
+        );
+
+        assertFalse(validatorWithBlankEntries.validate(buildJwt(VALID_ISSUER, Instant.now().plusSeconds(300)))
+                        .hasErrors());
+    }
+
+    @Test
     void shouldRejectExpiredJwtEvenWhenIssuerMatches() {
         assertTrue(validator().validate(buildJwt(VALID_ISSUER, Instant.now().minusSeconds(180))).hasErrors());
     }
@@ -117,6 +133,16 @@ class SecurityConfigurationTest {
             .subject("user")
             .issuedAt(issuedAt)
             .expiresAt(expiresAt)
+            .build();
+    }
+
+    private Jwt buildJwtWithoutIssuer() {
+        Instant now = Instant.now();
+        return Jwt.withTokenValue("token")
+            .header("alg", "RS256")
+            .subject("user")
+            .issuedAt(now.minusSeconds(60))
+            .expiresAt(now.plusSeconds(300))
             .build();
     }
 }

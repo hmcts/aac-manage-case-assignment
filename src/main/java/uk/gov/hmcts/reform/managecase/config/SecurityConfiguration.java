@@ -17,7 +17,6 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
@@ -100,12 +99,7 @@ public class SecurityConfiguration {
     static OAuth2TokenValidator<Jwt> issuerValidator(String issuerOverride) {
         List<String> allowedIssuers = allowedIssuers(issuerOverride);
         return jwt -> {
-            String tokenIssuer = jwt.getClaimAsString(JwtClaimNames.ISS);
-            if (tokenIssuer == null && jwt.getIssuer() != null) {
-                tokenIssuer = jwt.getIssuer().toString();
-            }
-
-            if (allowedIssuers.contains(tokenIssuer)) {
+            if (jwt.getIssuer() != null && allowedIssuers.contains(jwt.getIssuer().toString())) {
                 return OAuth2TokenValidatorResult.success();
             }
 

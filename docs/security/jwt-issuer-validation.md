@@ -110,6 +110,21 @@ These are different failure modes even though both can surface as `401 Unauthori
   is missing, malformed, or has the wrong `iss`, NoC submission can fail with `Submitted callback failed` and a callback
   `401 Unauthorized` log in data-store.
 
+### Preview CCD Data Store dependency
+
+MCA preview currently enforces:
+
+```text
+OIDC_ISSUER=https://idam-web-public.aat.platform.hmcts.net/o
+```
+
+> **Key point:** CCD Data Store calls MCA for NoC submitted callbacks. Those callbacks must include a bearer token whose
+> `iss` claim matches MCA's `OIDC_ISSUER`. Valid S2S alone is not enough.
+
+For PR validation, BEFTA can be pointed at a CCD Data Store PR preview build that emits callback tokens with that
+issuer. Keep MCA on the single public IDAM issuer; do not make MCA accept both public IDAM and ForgeRock callback token
+issuers just to get NoC callback tests passing.
+
 ## Test and pipeline verification
 
 - Focused tests cover valid issuer, invalid issuer, and expired token cases across validator, decoder, and integration layers.

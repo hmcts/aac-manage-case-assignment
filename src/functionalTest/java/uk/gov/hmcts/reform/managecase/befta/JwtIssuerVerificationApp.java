@@ -11,6 +11,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.List;
 
 public final class JwtIssuerVerificationApp {
 
@@ -20,16 +22,30 @@ public final class JwtIssuerVerificationApp {
     }
 
     public static void main(String[] args) {
-        String expectedIssuer = requireEnv("OIDC_ISSUER");
+        List<String> allowedIssuers = configuredIssuers();
         String actualIssuer = resolveIssuerFromRealToken();
 
-        if (!expectedIssuer.equals(actualIssuer)) {
+        if (!allowedIssuers.contains(actualIssuer)) {
             throw new IllegalStateException(
-                "OIDC_ISSUER mismatch: expected `" + expectedIssuer + "` but token iss was `" + actualIssuer + "`"
+                "OIDC allowed issuer mismatch: expected one of `" + allowedIssuers + "` but token iss was `"
+                    + actualIssuer + "`"
             );
         }
 
-        System.out.println("Verified OIDC_ISSUER matches functional test token iss: " + actualIssuer);
+        System.out.println("Verified functional test token iss is allowed by OIDC issuer configuration: "
+                               + actualIssuer);
+    }
+
+    private static List<String> configuredIssuers() {
+        String configuredIssuerList = optionalEnv("OIDC_ALLOWED_ISSUERS", requireEnv("OIDC_ISSUER"));
+        List<String> allowedIssuers = Arrays.stream(configuredIssuerList.split(","))
+            .map(String::trim)
+            .filter(issuer -> !issuer.isBlank())
+            .toList();
+        if (allowedIssuers.isEmpty()) {
+            throw new IllegalStateException("OIDC issuer configuration did not contain any issuer values");
+        }
+        return allowedIssuers;
     }
 
     private static String resolveIssuerFromRealToken() {
@@ -124,6 +140,11 @@ public final class JwtIssuerVerificationApp {
             throw new IllegalStateException("Missing required environment variable `" + name + "`");
         }
         return value;
+    }
+
+    private static String optionalEnv(String name, String fallback) {
+        String value = System.getenv(name);
+        return value == null || value.isBlank() ? fallback : value;
     }
 
     private static String encode(String value) {

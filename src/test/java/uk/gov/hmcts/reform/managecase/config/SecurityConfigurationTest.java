@@ -16,6 +16,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.time.Instant;
 import java.util.Date;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
@@ -23,14 +24,14 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import java.time.Instant;
 
 class SecurityConfigurationTest {
 
     private static final String VALID_ISSUER = "http://fr-am:8080/openam/oauth2/hmcts";
+    private static final String CALLBACK_ISSUER =
+        "https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts";
     private static final String INVALID_ISSUER = "http://unexpected-issuer";
     private static final String KEY_ID = "unit-test-signing-key";
 
@@ -40,13 +41,40 @@ class SecurityConfigurationTest {
     }
 
     @Test
+    void shouldAcceptJwtFromAdditionalConfiguredIssuer() {
+        assertFalse(validator().validate(buildJwt(CALLBACK_ISSUER, Instant.now().plusSeconds(300))).hasErrors());
+    }
+
+    @Test
     void shouldRejectJwtFromUnexpectedIssuer() {
         assertTrue(validator().validate(buildJwt(INVALID_ISSUER, Instant.now().plusSeconds(300))).hasErrors());
     }
 
     @Test
+    void shouldRejectJwtWithoutIssuer() {
+        Instant now = Instant.now();
+        Jwt jwt = Jwt.withTokenValue("token")
+            .header("alg", "RS256")
+            .subject("user")
+            .issuedAt(now.minusSeconds(60))
+            .expiresAt(now.plusSeconds(300))
+            .build();
+
+        assertTrue(validator().validate(jwt).hasErrors());
+    }
+
+    @Test
     void shouldRejectExpiredJwtEvenWhenIssuerMatches() {
         assertTrue(validator().validate(buildJwt(VALID_ISSUER, Instant.now().minusSeconds(180))).hasErrors());
+    }
+
+    @Test
+    void shouldIgnoreBlankIssuerListEntries() {
+        OAuth2TokenValidator<Jwt> validator = SecurityConfiguration.issuerValidator(
+            " " + VALID_ISSUER + " , , " + CALLBACK_ISSUER + " "
+        );
+
+        assertFalse(validator.validate(buildJwt(CALLBACK_ISSUER, Instant.now().plusSeconds(300))).hasErrors());
     }
 
     @Test
@@ -65,7 +93,7 @@ class SecurityConfigurationTest {
     private OAuth2TokenValidator<Jwt> validator() {
         return new DelegatingOAuth2TokenValidator<>(
             new JwtTimestampValidator(),
-            new JwtIssuerValidator(VALID_ISSUER)
+            SecurityConfiguration.issuerValidator(VALID_ISSUER + "," + CALLBACK_ISSUER)
         );
     }
 

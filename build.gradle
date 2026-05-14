@@ -197,7 +197,7 @@ tasks.register('contract', Test) {
 }
 
 tasks.register('verifyFunctionalTestJwtIssuer', JavaExec) {
-  description = 'Verifies the functional and smoke test token iss matches OIDC_ISSUER'
+  description = 'Verifies the functional and smoke test token iss is allowed by OIDC issuer configuration'
   group = 'Verification'
   dependsOn 'functionalTestClasses'
   onlyIf {
@@ -233,22 +233,36 @@ tasks.register('verifyOidcIssuerPolicy') {
     }
 
     def exactExpectations = [
-      'charts/aac-manage-case-assignment/values.yaml':
-        'OIDC_ISSUER: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o',
-      'charts/aac-manage-case-assignment/values.preview.template.yaml':
-        'OIDC_ISSUER: https://idam-web-public.aat.platform.hmcts.net/o',
-      'Jenkinsfile_CNP':
-        'env.OIDC_ISSUER = "https://idam-web-public.aat.platform.hmcts.net/o"',
+      [
+        path: 'charts/aac-manage-case-assignment/values.yaml',
+        line: 'OIDC_ISSUER: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o'
+      ],
+      [
+        path: 'charts/aac-manage-case-assignment/values.preview.template.yaml',
+        line: 'OIDC_ISSUER: https://idam-web-public.aat.platform.hmcts.net/o'
+      ],
+      [
+        path: 'Jenkinsfile_CNP',
+        line: 'env.OIDC_ISSUER = "https://idam-web-public.aat.platform.hmcts.net/o"'
+      ],
+      [
+        path: 'charts/aac-manage-case-assignment/values.preview.template.yaml',
+        line: 'OIDC_ALLOWED_ISSUERS: https://idam-web-public.aat.platform.hmcts.net/o,https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts'
+      ],
+      [
+        path: 'Jenkinsfile_CNP',
+        line: 'env.OIDC_ALLOWED_ISSUERS = "https://idam-web-public.aat.platform.hmcts.net/o,https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts"'
+      ],
     ]
 
-    def issuerDrift = exactExpectations.findAll { path, expectedLine ->
-      def configFile = file(path)
-      !configFile.exists() || !configFile.readLines().any { line -> line.trim() == expectedLine.trim() }
-    }.keySet()
+    def issuerDrift = exactExpectations.findAll { expectation ->
+      def configFile = file(expectation.path)
+      !configFile.exists() || !configFile.readLines().any { line -> line.trim() == expectation.line.trim() }
+    }.collect { expectation -> expectation.path }
 
     if (!issuerDrift.isEmpty()) {
       throw new GradleException(
-        "OIDC issuer config drift detected. Expected explicit public IDAM issuer wiring in: ${issuerDrift.join(', ')}"
+        "OIDC issuer config drift detected. Expected explicit issuer wiring in: ${issuerDrift.join(', ')}"
       )
     }
   }

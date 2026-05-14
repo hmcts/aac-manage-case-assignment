@@ -26,6 +26,8 @@ java:
   environment:
     IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
     OIDC_ISSUER: https://idam-web-public.aat.platform.hmcts.net/o
+    # Allows CCD submitted callback bearer tokens while CCD/Data Store still emits ForgeRock-issued tokens.
+    OIDC_ALLOWED_ISSUERS: https://idam-web-public.aat.platform.hmcts.net/o,https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
     S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
     CCD_DEFINITION_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-definition-store

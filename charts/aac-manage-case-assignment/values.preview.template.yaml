@@ -25,8 +25,7 @@ java:
           alias: NOTIFY_MCA_API_KEY
   environment:
     IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
-    # TEMP: accept both public IDAM and ForgeRock issuers while CCD callbacks still emit ForgeRock tokens.
-    OIDC_ISSUER: https://idam-web-public.aat.platform.hmcts.net/o,https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
+    OIDC_ISSUER: https://idam-web-public.aat.platform.hmcts.net/o
     S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
     CCD_DEFINITION_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-definition-store
@@ -107,8 +106,6 @@ ccd:
           disabled: true
       environment:
         DATA_STORE_IDAM_KEY: ${CCD_DATA_S2S_SECRET}
-        # TEMP: diagnose NoC callback auth headers; remove after pipeline proof run.
-        LOG_CALLBACK_DETAILS: "${LOG_CALLBACK_DETAILS}"
         DATA_STORE_DB_HOST: '{{ .Release.Name }}-postgresql'
         DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
         DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"

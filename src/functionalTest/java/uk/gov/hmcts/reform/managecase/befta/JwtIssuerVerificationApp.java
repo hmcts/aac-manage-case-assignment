@@ -11,8 +11,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.List;
 
 public final class JwtIssuerVerificationApp {
 
@@ -22,17 +20,16 @@ public final class JwtIssuerVerificationApp {
     }
 
     public static void main(String[] args) {
-        List<String> expectedIssuers = allowedIssuers(requireEnv("OIDC_ISSUER"));
+        String expectedIssuer = requireEnv("OIDC_ISSUER");
         String actualIssuer = resolveIssuerFromRealToken();
 
-        if (!expectedIssuers.contains(actualIssuer)) {
+        if (!expectedIssuer.equals(actualIssuer)) {
             throw new IllegalStateException(
-                "OIDC_ISSUER mismatch: expected one of `" + expectedIssuers + "` but token iss was `"
-                    + actualIssuer + "`"
+                "OIDC_ISSUER mismatch: expected `" + expectedIssuer + "` but token iss was `" + actualIssuer + "`"
             );
         }
 
-        System.out.println("Verified OIDC_ISSUER allow-list contains functional test token iss: " + actualIssuer);
+        System.out.println("Verified OIDC_ISSUER matches functional test token iss: " + actualIssuer);
     }
 
     private static String resolveIssuerFromRealToken() {
@@ -127,13 +124,6 @@ public final class JwtIssuerVerificationApp {
             throw new IllegalStateException("Missing required environment variable `" + name + "`");
         }
         return value;
-    }
-
-    private static List<String> allowedIssuers(String configuredIssuers) {
-        return Arrays.stream(configuredIssuers.split(","))
-            .map(String::trim)
-            .filter(issuer -> !issuer.isBlank())
-            .toList();
     }
 
     private static String encode(String value) {

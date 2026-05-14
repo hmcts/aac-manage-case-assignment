@@ -35,7 +35,6 @@ class JwtIssuerValidationIT {
 
     private static final String DISCOVERY_ISSUER_PATH = "/o";
     private static final String ENFORCED_ISSUER = "https://issuer-to-enforce.example/openam/oauth2/hmcts";
-    private static final String SECOND_ENFORCED_ISSUER = "https://idam-web-public.example/o";
     private static final String UNEXPECTED_ISSUER = "https://unexpected-issuer.example/openam/oauth2/hmcts";
     private static final String KEY_ID = "test-signing-key";
 
@@ -57,18 +56,13 @@ class JwtIssuerValidationIT {
         SecurityConfiguration configuration =
             new SecurityConfiguration(mock(), new JwtGrantedAuthoritiesConverter(mock(IdamRepository.class)));
         ReflectionTestUtils.setField(configuration, "issuerUri", wireMock.baseUrl() + DISCOVERY_ISSUER_PATH);
-        ReflectionTestUtils.setField(configuration, "issuerOverride", ENFORCED_ISSUER + "," + SECOND_ENFORCED_ISSUER);
+        ReflectionTestUtils.setField(configuration, "issuerOverride", ENFORCED_ISSUER);
         jwtDecoder = configuration.jwtDecoder();
     }
 
     @Test
     void shouldDecodeJwtWhenTokenIssMatchesConfiguredIssuer() throws Exception {
         assertDoesNotThrow(() -> jwtDecoder.decode(signedToken(ENFORCED_ISSUER)));
-    }
-
-    @Test
-    void shouldDecodeJwtWhenTokenIssMatchesSecondConfiguredIssuer() throws Exception {
-        assertDoesNotThrow(() -> jwtDecoder.decode(signedToken(SECOND_ENFORCED_ISSUER)));
     }
 
     @Test

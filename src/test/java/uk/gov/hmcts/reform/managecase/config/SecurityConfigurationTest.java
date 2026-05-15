@@ -12,13 +12,18 @@ import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.env.YamlPropertySourceLoader;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.BadJwtException;
@@ -78,6 +83,13 @@ class SecurityConfigurationTest {
     }
 
     @Test
+    void shouldUseOidcIssuerWhenAllowedIssuersIsNotConfigured() throws IOException {
+        MockEnvironment environment = applicationEnvironment(Map.of("OIDC_ISSUER", VALID_ISSUER));
+
+        assertThat(environment.getProperty("oidc.allowed-issuers")).isEqualTo(VALID_ISSUER);
+    }
+
+    @Test
     void shouldThrowDecoderExceptionContainingIssWhenJwtHasUnexpectedIssuer() throws Exception {
         KeyPair keyPair = rsaKeyPair();
         JwtDecoder jwtDecoder = configuredJwtDecoder((RSAPublicKey) keyPair.getPublic());
@@ -101,6 +113,15 @@ class SecurityConfigurationTest {
         NimbusJwtDecoder delegate = NimbusJwtDecoder.withPublicKey(publicKey).build();
         delegate.setJwtValidator(validator());
         return delegate;
+    }
+
+    private MockEnvironment applicationEnvironment(Map<String, String> properties) throws IOException {
+        MockEnvironment environment = new MockEnvironment();
+        properties.forEach(environment::setProperty);
+        new YamlPropertySourceLoader()
+            .load("applicationYaml", new ClassPathResource("application.yaml"))
+            .forEach(propertySource -> environment.getPropertySources().addLast(propertySource));
+        return environment;
     }
 
     private String signedToken(String issuer, RSAPrivateKey privateKey) throws JOSEException {

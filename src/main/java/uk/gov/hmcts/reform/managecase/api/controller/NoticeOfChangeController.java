@@ -1,14 +1,15 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-
+import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -47,10 +48,6 @@ import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
 import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 import java.util.Optional;
 
 import static java.util.Collections.singletonList;
@@ -149,15 +146,15 @@ public class NoticeOfChangeController {
         responseCode = "400",
         description = """
             One or more of the following reasons:
-            1. Case ID can not be empty, 
-            2. Case ID has to be a valid 16-digit Luhn number, 
-            3. No NoC events available for this case type, 
-            4. Multiple NoC Request events found for the user, 
-            5. More than one change request found on the case, 
-            6. Ongoing NoC request in progress 
-            7. Insufficient privileges for notice of change request 
+            1. Case ID can not be empty,
+            2. Case ID has to be a valid 16-digit Luhn number,
+            3. No NoC events available for this case type,
+            4. Multiple NoC Request events found for the user,
+            5. More than one change request found on the case,
+            6. Ongoing NoC request in progress
+            7. Insufficient privileges for notice of change request
             8. No Organisation Policy for one or more of the roles available
-             for the notice of change request 
+             for the notice of change request
             """,
         content = @Content(
             mediaType = APPLICATION_JSON_VALUE,
@@ -240,7 +237,7 @@ public class NoticeOfChangeController {
                     value = """
                     {
                         "status": "BAD_REQUEST",
-                        "message": "The number of provided answers must match the number of questions 
+                        "message": "The number of provided answers must match the number of questions
                             - expected 1 answers, received 2",
                         "errors": []
                     }"""
@@ -474,7 +471,6 @@ public class NoticeOfChangeController {
     @Operation(summary = "Check for Notice of Change Approval", description = "Check for Notice of Change Approval")
     @ApiResponse(
         responseCode = "200",
-        description = StringUtils.EMPTY,
         content = @Content(
             schema = @Schema(implementation = SubmitCallbackResponse.class),
             mediaType = APPLICATION_JSON_VALUE
@@ -528,7 +524,6 @@ public class NoticeOfChangeController {
     @Operation(summary = "Set Organisation To Remove", description = "Set Organisation To Remove")
     @ApiResponse(
         responseCode = "200",
-        description = StringUtils.EMPTY,
         content = @Content(
             schema = @Schema(implementation = AboutToSubmitCallbackResponse.class),
             mediaType = APPLICATION_JSON_VALUE

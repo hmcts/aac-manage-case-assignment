@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.managecase.config;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +24,7 @@ import org.springframework.security.oauth2.server.resource.web.authentication.Be
 import org.springframework.security.web.SecurityFilterChain;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.managecase.security.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.managecase.security.OidcIssuerConfiguration;
 
 @Configuration
 public class SecurityConfiguration {
@@ -34,7 +34,10 @@ public class SecurityConfiguration {
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
     private String issuerUri;
 
-    @Value("${oidc.allowed-issuers}")
+    @Value("${oidc.issuer}")
+    private String issuer;
+
+    @Value("${oidc.allowed-issuers:}")
     private String allowedIssuers;
 
     private final ServiceAuthFilter serviceAuthFilter;
@@ -88,18 +91,15 @@ public class SecurityConfiguration {
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromOidcIssuerLocation(issuerUri);
         // See docs/security/jwt-issuer-validation.md for issuer-uri discovery and allowed issuer enforcement.
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
-        OAuth2TokenValidator<Jwt> withIssuer = issuerValidator(allowedIssuers);
+        OAuth2TokenValidator<Jwt> withIssuer = issuerValidator(issuer, allowedIssuers);
         OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
         jwtDecoder.setJwtValidator(validator);
 
         return jwtDecoder;
     }
 
-    static OAuth2TokenValidator<Jwt> issuerValidator(String configuredIssuers) {
-        List<String> allowedIssuers = Arrays.stream(configuredIssuers.split(","))
-            .map(String::trim)
-            .filter(issuer -> !issuer.isBlank())
-            .toList();
+    static OAuth2TokenValidator<Jwt> issuerValidator(String primaryIssuer, String configuredAllowedIssuers) {
+        Set<String> allowedIssuers = OidcIssuerConfiguration.allowedIssuers(primaryIssuer, configuredAllowedIssuers);
 
         return jwt -> {
             String tokenIssuer = jwt.getIssuer() == null ? null : jwt.getIssuer().toString();

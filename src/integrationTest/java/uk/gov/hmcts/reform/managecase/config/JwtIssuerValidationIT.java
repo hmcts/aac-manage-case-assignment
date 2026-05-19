@@ -58,7 +58,8 @@ class JwtIssuerValidationIT {
         SecurityConfiguration configuration =
             new SecurityConfiguration(mock(), new JwtGrantedAuthoritiesConverter(mock(IdamRepository.class)));
         ReflectionTestUtils.setField(configuration, "issuerUri", wireMock.baseUrl() + DISCOVERY_ISSUER_PATH);
-        ReflectionTestUtils.setField(configuration, "allowedIssuers", ENFORCED_ISSUER + "," + CALLBACK_ISSUER);
+        ReflectionTestUtils.setField(configuration, "issuer", ENFORCED_ISSUER);
+        ReflectionTestUtils.setField(configuration, "allowedIssuers", CALLBACK_ISSUER);
         jwtDecoder = configuration.jwtDecoder();
     }
 

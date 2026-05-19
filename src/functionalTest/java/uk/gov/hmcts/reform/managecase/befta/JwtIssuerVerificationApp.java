@@ -11,8 +11,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.List;
+import uk.gov.hmcts.reform.managecase.security.OidcIssuerConfiguration;
 
 public final class JwtIssuerVerificationApp {
 
@@ -37,15 +37,10 @@ public final class JwtIssuerVerificationApp {
     }
 
     private static List<String> configuredIssuers() {
-        String configuredIssuerList = optionalEnv("OIDC_ALLOWED_ISSUERS", requireEnv("OIDC_ISSUER"));
-        List<String> allowedIssuers = Arrays.stream(configuredIssuerList.split(","))
-            .map(String::trim)
-            .filter(issuer -> !issuer.isBlank())
-            .toList();
-        if (allowedIssuers.isEmpty()) {
-            throw new IllegalStateException("OIDC issuer configuration did not contain any issuer values");
-        }
-        return allowedIssuers;
+        return List.copyOf(OidcIssuerConfiguration.allowedIssuers(
+            requireEnv("OIDC_ISSUER"),
+            optionalEnv("OIDC_ALLOWED_ISSUERS", "")
+        ));
     }
 
     private static String resolveIssuerFromRealToken() {

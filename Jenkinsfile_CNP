@@ -96,9 +96,12 @@ env.BEFTA_OAUTH2_SCOPE_VARIABLES_OF_XUIWEBAPP = "profile openid roles manage-use
 // temporary workaround for platform changes: turn BEFTA header checks to warning mode
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.CALLBACK_FTA_ENABLED = "true" // NB: safe to enable outside of preview as the above URLs provide a naturally isolated set of services.
-env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
-env.CCD_DATA_STORE_API_BASE_URL = "https://ccd-data-store-api-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
-env.MCA_API_BASE_URL = "https://aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
+//env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
+//env.CCD_DATA_STORE_API_BASE_URL = "https://ccd-data-store-api-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
+//env.MCA_API_BASE_URL = "https://aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
+env.CCD_DATA_STORE_API_BASE_URL = "https://ccd-data-store-api-pr-2844.preview.platform.hmcts.net"
+env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-api-pr-1756.preview.platform.hmcts.net"
+env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
 
 
 env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"

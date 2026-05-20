@@ -161,8 +161,8 @@ withPipeline("java", product, component) {
     if (env.BRANCH_NAME.startsWith("PR") || env.BRANCH_NAME == 'master') {
        environmentOfDependencies = "aat"
     }
-    #env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
-    #env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
+    //env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
+    //env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
     env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-pr-2844.preview.platform.hmcts.net"
     env.DEFINITION_STORE_URL_BASE = "ccd-definition-store-api-pr-1756.preview.platform.hmcts.net"
     env.MCA_API_BASE_URL = "http://aac-manage-case-assignment-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"

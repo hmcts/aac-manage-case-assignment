@@ -25,8 +25,10 @@ java:
           alias: NOTIFY_MCA_API_KEY
   environment:
     S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-    CCD_DATA_STORE_API_BASE_URL: http://ccd-data-store-api-pr-2844-java.ccd
-    CCD_DEFINITION_STORE_API_BASE_URL: http://ccd-definition-store-api-pr-1756-java.ccd
+    #CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
+    #CCD_DEFINITION_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-definition-store
+    CCD_DATA_STORE_API_BASE_URL: https://ccd-data-store-api-pr-2844.preview.platform.hmcts.net
+    CCD_DEFINITION_STORE_API_BASE_URL: https://ccd-definition-store-api-pr-1756.preview.platform.hmcts.net
     #ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
     ROLE_ASSIGNMENT_URL: https://am-role-assignment-service-ccd-data-store-api-pr-2844.preview.platform.hmcts.net
     MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp,ccd_data,finrem_case_orchestration,divorce_frontend,iac,nfdiv_cos,fpl_case_service,civil_service,prl_cos_api
@@ -179,7 +181,7 @@ ccd:
       devcpuRequests: 250m
       devmemoryLimits: 2048Mi
       devcpuLimits: 1500m
-     
+
 
 elastic:
   enabled: true

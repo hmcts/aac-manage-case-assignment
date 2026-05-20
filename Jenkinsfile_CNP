@@ -172,6 +172,9 @@ withPipeline("java", product, component) {
   echo "FTA will use Definition Store: ${env.DEFINITION_STORE_URL_BASE}"
   echo "   ... published with MCA URL: ${env.MCA_API_BASE_URL}"
   echo "CALLBACK FTA Enabled = ${env.CALLBACK_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
+  echo "MCA API BASE URL = ${env.MCA_API_BASE_URL} on branch ${env.BRANCH_NAME}"
+  echo "DEFINITION_STORE_URL_BASE = ${env.DEFINITION_STORE_URL_BASE} on branch ${env.BRANCH_NAME}"
+  echo "CCD_DATA_STORE_API_BASE_URL = ${env.CCD_DATA_STORE_API_BASE_URL} on branch ${env.BRANCH_NAME}"
 
   syncBranchesWithMaster(branchesToSync)
   overrideVaultEnvironments(vaultOverrides)

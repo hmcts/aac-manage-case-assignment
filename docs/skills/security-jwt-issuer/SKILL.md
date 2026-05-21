@@ -15,7 +15,8 @@ Use this skill for JWT issuer validation changes in `aac-manage-case-assignment`
 2. Review [`src/main/java/uk/gov/hmcts/reform/managecase/config/SecurityConfiguration.java`](../../../src/main/java/uk/gov/hmcts/reform/managecase/config/SecurityConfiguration.java), [`src/main/resources/application.yaml`](../../../src/main/resources/application.yaml), [`charts/aac-manage-case-assignment/values.yaml`](../../../charts/aac-manage-case-assignment/values.yaml), [`Jenkinsfile_CNP`](../../../Jenkinsfile_CNP), and [`Jenkinsfile_parameterized`](../../../Jenkinsfile_parameterized).
 3. Confirm the split between discovery and enforcement:
    `spring.security.oauth2.client.provider.oidc.issuer-uri` is for discovery and JWKS.
-   `oidc.issuer` / `OIDC_ISSUER` is the enforced issuer matched against the token `iss` claim.
+   `oidc.issuer` / `OIDC_ISSUER` is the primary enforced issuer matched against the token `iss` claim.
+   `oidc.allowed-issuers` / `OIDC_ALLOWED_ISSUERS` adds optional extra enforced issuers.
 4. Search for `issuer`, `issuer-uri`, `JwtDecoder`, `JwtIssuerValidator`, `JwtTimestampValidator`, `OIDC_ISSUER`, and `VERIFY_OIDC_ISSUER` before changing behavior.
 5. Preserve the single build-integrated verifier pattern:
    use [`src/functionalTest/java/uk/gov/hmcts/reform/managecase/befta/JwtIssuerVerificationApp.java`](../../../src/functionalTest/java/uk/gov/hmcts/reform/managecase/befta/JwtIssuerVerificationApp.java)

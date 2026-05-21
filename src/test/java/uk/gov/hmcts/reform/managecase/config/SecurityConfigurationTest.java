@@ -47,7 +47,16 @@ class SecurityConfigurationTest {
 
     @Test
     void shouldAcceptJwtFromAdditionalConfiguredIssuer() {
-        assertFalse(validator().validate(buildJwt(CALLBACK_ISSUER, Instant.now().plusSeconds(300))).hasErrors());
+        assertFalse(validator(CALLBACK_ISSUER)
+            .validate(buildJwt(CALLBACK_ISSUER, Instant.now().plusSeconds(300)))
+            .hasErrors());
+    }
+
+    @Test
+    void shouldKeepPrimaryIssuerWhenAdditionalAllowedIssuersConfigured() {
+        assertFalse(validator(CALLBACK_ISSUER)
+            .validate(buildJwt(VALID_ISSUER, Instant.now().plusSeconds(300)))
+            .hasErrors());
     }
 
     @Test
@@ -74,19 +83,17 @@ class SecurityConfigurationTest {
     }
 
     @Test
-    void shouldIgnoreBlankIssuerListEntries() {
-        OAuth2TokenValidator<Jwt> validator = SecurityConfiguration.issuerValidator(
-            " " + VALID_ISSUER + " , , " + CALLBACK_ISSUER + " "
-        );
+    void shouldUseOidcIssuerAsPrimaryIssuer() throws IOException {
+        MockEnvironment environment = applicationEnvironment(Map.of("OIDC_ISSUER", VALID_ISSUER));
 
-        assertFalse(validator.validate(buildJwt(CALLBACK_ISSUER, Instant.now().plusSeconds(300))).hasErrors());
+        assertThat(environment.getProperty("oidc.issuer")).isEqualTo(VALID_ISSUER);
     }
 
     @Test
-    void shouldUseOidcIssuerWhenAllowedIssuersIsNotConfigured() throws IOException {
+    void shouldLeaveAllowedIssuersEmptyWhenAllowedIssuersIsNotConfigured() throws IOException {
         MockEnvironment environment = applicationEnvironment(Map.of("OIDC_ISSUER", VALID_ISSUER));
 
-        assertThat(environment.getProperty("oidc.allowed-issuers")).isEqualTo(VALID_ISSUER);
+        assertThat(environment.getProperty("oidc.allowed-issuers")).isEmpty();
     }
 
     @Test
@@ -103,9 +110,13 @@ class SecurityConfigurationTest {
     }
 
     private OAuth2TokenValidator<Jwt> validator() {
+        return validator(null);
+    }
+
+    private OAuth2TokenValidator<Jwt> validator(String additionalAllowedIssuers) {
         return new DelegatingOAuth2TokenValidator<>(
             new JwtTimestampValidator(),
-            SecurityConfiguration.issuerValidator(VALID_ISSUER + "," + CALLBACK_ISSUER)
+            SecurityConfiguration.issuerValidator(VALID_ISSUER, additionalAllowedIssuers)
         );
     }
 

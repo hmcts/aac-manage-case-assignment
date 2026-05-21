@@ -17,7 +17,7 @@
 
   "s2sClientId": "xui_webapp",
 
-  "uri": "/case-users",
+  "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/case-users",
 
   "request": {
     "headers": {

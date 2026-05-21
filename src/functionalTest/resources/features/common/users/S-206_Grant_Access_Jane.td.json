@@ -15,7 +15,7 @@
 
   "method": "POST",
 
-  "s2sClientId": "xui_webapp",
+  "s2sClientId": "aac_manage_case_assignment",
 
   "uri": "{{CCD_DATA_STORE_API_BASE_URL}}/case-users",
 

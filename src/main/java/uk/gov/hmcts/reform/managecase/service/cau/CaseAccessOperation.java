@@ -6,15 +6,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsAddRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
+import uk.gov.hmcts.reform.managecase.service.common.CallerOrganisationService;
 import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentService;
+import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
+import jakarta.validation.ValidationException;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,14 +37,20 @@ public class CaseAccessOperation {
 
     private final RoleAssignmentService roleAssignmentService;
     private final DataStoreRepository dataStoreRepository;
+    private final CallerOrganisationService callerOrganisationService;
+    private final JacksonUtils jacksonUtils;
     protected final SecurityUtils securityUtils;
 
     @Autowired
     public CaseAccessOperation(RoleAssignmentService roleAssignmentService, @Qualifier("defaultDataStoreRepository")
         DataStoreRepository dataStoreRepository,
+                               CallerOrganisationService callerOrganisationService,
+                               JacksonUtils jacksonUtils,
                                SecurityUtils securityUtils) {
         this.roleAssignmentService = roleAssignmentService;
         this.dataStoreRepository = dataStoreRepository;
+        this.callerOrganisationService = callerOrganisationService;
+        this.jacksonUtils = jacksonUtils;
         this.securityUtils = securityUtils;
     }
 
@@ -112,6 +124,7 @@ public class CaseAccessOperation {
     public void addCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
 
         final var cauRolesByCaseDetails = getMapOfCaseAssignedUserRolesByCaseDetails(caseUserRoles);
+        validateCaseOrganisationBoundaries(cauRolesByCaseDetails.keySet().stream().collect(Collectors.toList()));
         // load all existing case user roles upfront
         final var existingCaseUserRoles = findCaseUserRoles(cauRolesByCaseDetails);
         final var newUserCounts = getNewUserCountByCaseAndOrganisation(cauRolesByCaseDetails, existingCaseUserRoles);
@@ -151,6 +164,28 @@ public class CaseAccessOperation {
         if (!newUserCounts.isEmpty()) {
             dataStoreRepository.incrementCaseSupplementaryData(newUserCounts);
         }
+    }
+
+    private void validateCaseOrganisationBoundaries(List<CaseDetails> caseDetailsList) {
+        String callerOrganisationId = callerOrganisationService.getCallerOrganisationId();
+        boolean callerOrgPresentOnAllCases = caseDetailsList.stream()
+            .allMatch(caseDetails -> findPolicies(caseDetails).stream()
+                .map(OrganisationPolicy::getOrganisation)
+                .filter(Objects::nonNull)
+                .map(org -> org.getOrganisationID())
+                .filter(StringUtils::isNotBlank)
+                .anyMatch(organisationId -> organisationId.equalsIgnoreCase(callerOrganisationId)));
+
+        if (!callerOrgPresentOnAllCases) {
+            throw new ValidationException(ValidationError.ORGANISATION_POLICY_ERROR);
+        }
+    }
+
+    private List<OrganisationPolicy> findPolicies(CaseDetails caseDetails) {
+        List<JsonNode> policyNodes = caseDetails.findOrganisationPolicyNodes();
+        return policyNodes.stream()
+            .map(node -> jacksonUtils.convertValue(node, OrganisationPolicy.class))
+            .collect(Collectors.toList());
     }
 
     private Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> findAndFilterOnExistingCauRoles(

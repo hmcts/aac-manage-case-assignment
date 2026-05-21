@@ -13,14 +13,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.OngoingStubbing;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsAddRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.service.common.CallerOrganisationService;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentService;
+import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
+import jakarta.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,11 +42,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 
 @ExtendWith(MockitoExtension.class)
 public class CaseAccessOperationTest {
@@ -50,11 +56,20 @@ public class CaseAccessOperationTest {
     @Mock
     private RoleAssignmentService roleAssignmentService;
 
+    @Mock
+    private DataStoreRepository dataStoreRepository;
+
+    @Mock
+    private CallerOrganisationService callerOrganisationService;
+
+    @Mock
+    private JacksonUtils jacksonUtils;
+
+    @Mock
+    private uk.gov.hmcts.reform.managecase.security.SecurityUtils securityUtils;
+
     @InjectMocks
     private CaseAccessOperation caseAccessOperation;
-
-    @Mock(lenient = true)
-    private DataStoreRepository dataStoreRepository;
 
     private static final Long CASE_REFERENCE = 1234123412341236L;
     private static final Long CASE_REFERENCE_OTHER = 1111222233334444L;
@@ -84,22 +99,25 @@ public class CaseAccessOperationTest {
 
         @BeforeEach
         void setup() {
+            lenient().when(callerOrganisationService.getCallerOrganisationId()).thenReturn(ORGANISATION);
 
             CaseDetails caseDetails = CaseDetails.builder()
                 .id(String.valueOf(CASE_ID))
                 .id(CASE_REFERENCE.toString())
+                .data(caseDetails(ORGANISATION, CASE_ROLE).getData())
                 .build();
 
             CaseDetails caseDetailsOther = CaseDetails.builder()
                 .id(String.valueOf(CASE_ID_OTHER))
                 .id(CASE_REFERENCE_OTHER.toString())
+                .data(caseDetails(ORGANISATION, CASE_ROLE).getData())
                 .build();
 
-            doReturn(caseDetailsOther).when(dataStoreRepository)
+            lenient().doReturn(caseDetailsOther).when(dataStoreRepository)
                 .findCaseByCaseIdUsingExternalApi(String.valueOf(CASE_REFERENCE_OTHER));
-            doReturn(caseDetails).when(dataStoreRepository)
+            lenient().doReturn(caseDetails).when(dataStoreRepository)
                 .findCaseByCaseIdUsingExternalApi(String.valueOf(CASE_REFERENCE));
-            doReturn(null).when(dataStoreRepository)
+            lenient().doReturn(null).when(dataStoreRepository)
                 .findCaseByCaseIdUsingExternalApi(String.valueOf(CASE_NOT_FOUND_REFERENCE));
 
             Map<String, Long> orgIdToCountMap = new HashMap<>();
@@ -112,6 +130,9 @@ public class CaseAccessOperationTest {
             orgIdToCountMapOther.put(ORGANISATION_OTHER, 1L);
             caseReferenceToOrgIdCountMapOther = new HashMap<>();
             caseReferenceToOrgIdCountMapOther.put(CASE_REFERENCE_OTHER.toString(), orgIdToCountMapOther);
+
+            mockOrganisationPolicies(caseDetails, ORGANISATION);
+            mockOrganisationPolicies(caseDetailsOther, ORGANISATION);
         }
 
 
@@ -140,6 +161,31 @@ public class CaseAccessOperationTest {
             verify(dataStoreRepository, times(1))
                 .findCaseByCaseIdUsingExternalApi(CASE_REFERENCE.toString());
             verify(dataStoreRepository, never()).incrementCaseSupplementaryData(any());
+        }
+
+        @Test
+        @DisplayName("should reject add when caller organisation is not on case organisation policies")
+        void shouldRejectAddWhenCallerOrganisationNotPresentOnCase() {
+            CaseDetails caseDetailsWithoutCallerOrg = CaseDetails.builder()
+                .id(CASE_REFERENCE.toString())
+                .data(caseDetails(ORGANISATION_OTHER, CASE_ROLE).getData())
+                .build();
+
+            doReturn(caseDetailsWithoutCallerOrg).when(dataStoreRepository)
+                .findCaseByCaseIdUsingExternalApi(String.valueOf(CASE_REFERENCE));
+            mockOrganisationPolicies(caseDetailsWithoutCallerOrg, ORGANISATION_OTHER);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            );
+
+            ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> caseAccessOperation.addCaseUserRoles(caseUserRoles)
+            );
+
+            assertEquals(ValidationError.ORGANISATION_POLICY_ERROR, exception.getMessage());
+            verifyNoInteractions(roleAssignmentService);
         }
 
 
@@ -676,6 +722,16 @@ public class CaseAccessOperationTest {
         }
     }
 
+    private void mockOrganisationPolicies(CaseDetails caseDetails, String organisationId) {
+        lenient().when(jacksonUtils.convertValue(any(com.fasterxml.jackson.databind.JsonNode.class),
+                                                org.mockito.ArgumentMatchers.eq(uk.gov.hmcts.reform.managecase.domain
+                                                                                    .OrganisationPolicy.class)))
+            .thenReturn(uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy(
+                organisationId,
+                CASE_ROLE
+            ));
+    }
+
     @Nested()
     class GetCaseAssignUserRoles {
 
@@ -746,4 +802,3 @@ public class CaseAccessOperationTest {
             .thenReturn(secondCallCaseUserRoles);
     }
 }
-

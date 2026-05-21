@@ -1,0 +1,21 @@
+{
+  "_guid_": "F-210_Prerequisite_Case_Creation_All_To_Org1",
+  "_extends_": "F-206_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies_All_To_Org1",
+
+  "specs": [
+    "As a prerequisite"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_CAA_Jane"
+    }
+  },
+
+  "prerequisites": [
+    {
+      "Token_Creation": "F-210_NoC_Case_Creation_By_Jane_Token_Creation",
+      "Get_Organisation_Identifier": "Get_Organisation_Identifier_For_Any_Org1_User__Prerequisite"
+    }
+  ]
+}

@@ -29,6 +29,8 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.repository.CaseTypeDefinitionVersion;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentRequestResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
 
 import java.util.List;
 
@@ -298,6 +300,31 @@ public class WiremockFixtures {
                                     .withStatus(caseDetails == null ? HTTP_NOT_FOUND : HTTP_OK)
                                     .withBody(getJsonString(caseDetails))
                                     .withHeader("Content-Type", "application/json")));
+    }
+
+    public static void stubQueryRoleAssignments(String caseId, String userId) {
+        stubFor(WireMock.post(urlPathEqualTo("/am/role-assignments/query"))
+                    .atPriority(1)
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_OK)
+                                    .withBody(getJsonString(RoleAssignmentResponse.builder().roleAssignments(List.of())
+                                                         .build()))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubCreateRoleAssignments() {
+        stubFor(WireMock.post(urlEqualTo("/am/role-assignments"))
+                    .atPriority(1)
+                    .willReturn(aResponse()
+                                    .withStatus(HTTP_CREATED)
+                                    .withBody(getJsonString(RoleAssignmentRequestResponse.builder().build()))
+                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    public static void stubUpdateCaseSupplementaryData(String caseId) {
+        stubFor(WireMock.post(urlEqualTo(CASES + caseId + "/supplementary-data"))
+                    .atPriority(1)
+                    .willReturn(aResponse().withStatus(HTTP_OK)));
     }
 
     @SuppressWarnings({"PMD.AvoidThrowingRawExceptionTypes", "squid:S112"})

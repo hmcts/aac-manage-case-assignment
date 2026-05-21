@@ -1,0 +1,40 @@
+{
+  "_guid_": "S-210.1",
+  "_extends_": "F-210-Base",
+  "title": "Must return 400 when POST /case-users uses an organisation_id different from the caller PRD organisation",
+
+  "specs": [
+    "CAA - with a PRD organisation",
+    "intends to add a valid case-user assignment",
+    "supplies an organisation_id that does not match the caller PRD organisation",
+    "contains a valid case-user assignment with a mismatched organisation_id"
+  ],
+
+  "prerequisites": [
+    {
+      "Create_Case": "F-210_Prerequisite_Case_Creation_All_To_Org1"
+    }
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][childContexts][Create_Case][testData][actualResponse][body][id]}",
+          "case_role": "[ApplicantSolicitor]",
+          "user_id": "${[scenarioContext][testData][users][invokingUser][id]}",
+          "organisation_id": "ORG-MISMATCH-FT"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "message": "Invalid data provided for the following inputs to the request:\nOrganisation ID is not valid",
+      "errors": []
+    }
+  }
+}

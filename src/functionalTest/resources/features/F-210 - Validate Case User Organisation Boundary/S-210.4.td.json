@@ -1,0 +1,39 @@
+{
+  "_guid_": "S-210.4",
+  "_extends_": "F-210-Base",
+  "title": "Must return 400 when POST /case-users uses the caller organisation_id for a case whose organisation policies do not contain the caller organisation",
+
+  "specs": [
+    "CAA - with a PRD organisation",
+    "intends to add a valid case-user assignment",
+    "contains a valid case-user assignment with a matching organisation_id for a case outside the caller organisation policies"
+  ],
+
+  "prerequisites": [
+    {
+      "Create_Case": "F-210_Prerequisite_Case_Creation_All_To_Org2"
+    }
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][childContexts][Create_Case][testData][actualResponse][body][id]}",
+          "case_role": "[ApplicantSolicitor]",
+          "user_id": "${[scenarioContext][testData][users][invokingUser][id]}",
+          "organisation_id": "QUK822N"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "ACA_400_Response",
+    "body": {
+      "message": "Case ID has to be one for which a case role is represented by the invoker's organisation.",
+      "errors": []
+    }
+  }
+}

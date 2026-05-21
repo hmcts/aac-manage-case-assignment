@@ -1,0 +1,38 @@
+{
+  "_guid_": "S-210.2",
+  "_extends_": "F-210-Base",
+  "title": "Must allow POST /case-users when organisation_id matches the caller PRD organisation",
+
+  "specs": [
+    "CAA - with a PRD organisation",
+    "intends to add a valid case-user assignment",
+    "contains a valid case-user assignment with a matching organisation_id"
+  ],
+
+  "prerequisites": [
+    {
+      "Create_Case": "F-210_Prerequisite_Case_Creation_All_To_Org1"
+    }
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][childContexts][Create_Case][testData][actualResponse][body][id]}",
+          "case_role": "[ApplicantSolicitor]",
+          "user_id": "${[scenarioContext][testData][users][invokingUser][id]}",
+          "organisation_id": "QUK822N"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "status_message": "Case-User-Role assignments created successfully"
+    }
+  }
+}

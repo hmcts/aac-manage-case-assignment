@@ -9,10 +9,19 @@
   ],
 
   "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Richard"
+    },
     "S1": {
       "_extends_": "ACA_Users_Richard"
     }
   },
+
+  "prerequisites": [
+    {
+      "Get_Organisation_Identifier": "Get_Organisation_Identifier_For_Richard__Prerequisite"
+    }
+  ],
 
   "request": {
     "_extends_": "Common_Request",
@@ -22,7 +31,7 @@
           "case_id": "${[scenarioContext][ParentContext][childContexts][F-209_NoC_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}",
           "case_role": "[ApplicantSolicitor]",
           "user_id": "${[scenarioContext][testData][users][S1][id]}",
-          "organisation_id" : "LESTKK0"
+          "organisation_id": "${[scenarioContext][childContexts][Get_Organisation_Identifier][testData][actualResponse][body][organisationIdentifier]}"
         }
       ]
     }

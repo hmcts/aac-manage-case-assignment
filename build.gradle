@@ -24,8 +24,8 @@ ext {
   pact_version        = '4.6.19'
   reformLogging       = '6.1.9'
   restAssured         = '5.5.7'
-  beftaFwVersion      = '9.2.4'
-  ccdTestDefinitionVersion = '7.26.2_CCD-7641-0'
+  beftaFwVersion      = '9.2.6'
+  ccdTestDefinitionVersion = '7.26.3'
 }
 
 group = 'uk.gov.hmcts.reform'

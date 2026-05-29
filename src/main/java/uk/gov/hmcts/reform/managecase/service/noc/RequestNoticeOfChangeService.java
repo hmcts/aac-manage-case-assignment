@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.payload.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestNoticeOfChangeResponse;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseAccessMetadataResource;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.data.user.CachedUserRepository;
 import uk.gov.hmcts.reform.managecase.data.user.UserRepository;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
+import uk.gov.hmcts.reform.managecase.domain.GrantType;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
@@ -224,8 +227,27 @@ public class RequestNoticeOfChangeService {
         List<String> invokerOrgPolicyRoles =
             findInvokerOrgPolicyRoles(caseDetails, invokersOrganisation);
 
-        dataStoreRepository.assignCase(invokerOrgPolicyRoles, caseDetails.getId(),
-                                       securityUtils.getUserInfo().getUid(), invokersOrganisation.getOrganisationID());
+        /*
+        call the new endpoint GET /cases/{cid}/access-metadata to determine what roles the User is assigned.
+        Based on the response from the new API, If the user has STANDARD access to case, then
+        user will not be assigned any case roles to the case.
+        If the user does not have the STANDARD access to cases, then existing flow of Auto-assigning relevant
+        case-roles to the invoker will be checked.
+        */
+
+        CaseAccessMetadataResource caseAccessMetadataResource =
+            dataStoreRepository.findCaseAccessMetadataByCaseId(caseDetails.getId());
+        if (caseAccessMetadataResource != null) {
+            boolean hasStandardAccess = Optional.ofNullable(caseAccessMetadataResource.getAccessGrants()).stream()
+                .flatMap(Collection::stream)
+                .anyMatch(code -> GrantType.STANDARD.toString().equals(code.name()));
+            if (!hasStandardAccess) {
+                dataStoreRepository.assignCase(
+                    invokerOrgPolicyRoles, caseDetails.getId(),
+                    securityUtils.getUserInfo().getUid(), invokersOrganisation.getOrganisationID()
+                );
+            }
+        }
     }
 
     private boolean isRequestToAddOrReplaceRepresentationAndApproved(CaseDetails caseDetails,

@@ -10,6 +10,9 @@
         "supplementary_data" : {
           "orgs_assigned_users" : {
             "LESTKK0" : 0
+          },
+          "new_case" : {
+            "LESTKK0" : false
           }
         }
       }]

@@ -1,8 +1,8 @@
 plugins {
   id 'application'
   id 'jacoco'
-  id 'au.com.dius.pact' version '4.6.20'
-  id 'com.github.ben-manes.versions' version '0.53.0'
+  id 'au.com.dius.pact' version '4.7.1'
+  id 'com.github.ben-manes.versions' version '0.54.0'
   id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
   id 'io.spring.dependency-management' version '1.1.7'
   id 'org.owasp.dependencycheck' version '12.2.1'
@@ -13,19 +13,21 @@ plugins {
 
 ext {
   set('springCloudVersion', '2025.0.1')
-  set('spring-security.version', '6.4.2')
+  set('spring-security.version', '6.5.7')
   set('log4j2.version', '2.24.3')
   set('jackson.version', '2.18.2')
   set('snakeyaml.version', '2.3')
 
-  junit               = '5.14.2'
-  junitPlatform       = '1.14.2'
-  lombokVersion       = '1.18.42'
-  pact_version        = '4.6.19'
-  reformLogging       = '6.1.9'
+  junit               = '5.14.4'
+  junitPlatform       = '1.14.4'
+  jjwt                = '0.13.0'
+  lombokVersion       = '1.18.46'
+  pact_version        = '4.7.1'
+  appInsightsVersion = '2.6.4'
+  reformLogging       = '8.0.0'
   restAssured         = '5.5.7'
-  beftaFwVersion      = '9.2.4'
-  ccdTestDefinitionVersion = '7.27.7-prerelease-CME-537'
+  beftaFwVersion      = '9.2.6'
+  ccdTestDefinitionVersion = '7.26.3'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -152,6 +154,8 @@ tasks.register('functional', Test) {
     cucumberReports.reports = files("${cucumberReports.outputDir}/cucumber.json")
     cucumberReports.notFailingStatuses = ["skipped", "passed"]
 
+    def tags = (project.hasProperty('tags')) ? "(${project.property('tags')}) and not @Ignore" : 'not @Ignore'
+
     javaexec {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
       classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
@@ -159,12 +163,13 @@ tasks.register('functional', Test) {
               '--threads', '1',
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
               '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
-              '--tags', 'not @Ignore',
+              '--tags',  "${tags}",
               '--glue', 'uk.gov.hmcts.befta.player',
               '--glue', 'uk.gov.hmcts.reform.managecase.befta', 'src/functionalTest/resources/features'
       ]
       // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
       jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+      println 'args =' + args
     }
   }
 
@@ -261,25 +266,6 @@ tasks.register("printSuppressionFile") {
   }
 }
 
-ext {
-  set('springCloudVersion', '2025.0.0')
-  set('spring-framework.version', '6.2.14')
-  set('spring-security.version', '6.5.7')
-  set('log4j2.version', '2.24.3')
-  set('jackson.version', '2.18.2')
-  set('snakeyaml.version', '2.3')
-
-  junit               = '5.14.4'
-  junitPlatform       = '1.14.4'
-  jjwt                = '0.13.0'
-  lombokVersion       = '1.18.46'
-  pact_version        = '4.7.1'
-  reformLogging       = '6.1.9'
-  restAssured         = '5.5.7'
-  beftaFwVersion      = '9.2.6'
-  ccdTestDefinitionVersion = '7.25.4'
-}
-
 dependencyManagement {
   imports {
     mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
@@ -343,9 +329,7 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.5'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLogging
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: reformLogging
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '6.0.0-RELEASE'
-
 
   implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.2'
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
@@ -365,6 +349,8 @@ dependencies {
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
   implementation group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: '0.2.0'
   implementation group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.4'
+  implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
+  implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
 
 
   testImplementation libraries.junit5

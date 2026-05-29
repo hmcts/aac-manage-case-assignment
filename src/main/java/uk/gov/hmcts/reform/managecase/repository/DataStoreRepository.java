@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseAccessMetadataResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
@@ -20,6 +21,8 @@ public interface DataStoreRepository {
     void removeCaseUserRoles(List<CaseUserRole> caseUserRoles, String organisationId);
 
     CaseViewResource findCaseByCaseId(String caseId);
+
+    CaseAccessMetadataResource findCaseAccessMetadataByCaseId(String caseId);
 
     CaseDetails submitNoticeOfChangeRequestEvent(String caseId,
                                                  String eventId,

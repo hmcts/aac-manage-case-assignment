@@ -9,11 +9,14 @@
         {
           "_extends_" : "F_209_Search_Case_response_data_base",
           "supplementary_data" : {
-          "orgs_assigned_users" : {
-            "LESTKK0" : 1
+            "orgs_assigned_users" : {
+              "LESTKK0" : 1
+            },
+            "new_case" : {
+              "LESTKK0" : false
+            }
           }
         }
-      }
       ]
     }
   }

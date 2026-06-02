@@ -67,6 +67,7 @@ class RequestNoticeOfChangeServiceTest {
     private static final String CASE_ID = "1567934206391385";
     private static final String INCUMBENT_ORGANISATION_ID = "INCUMBENT_ORG_ID_1";
     private static final String CASE_ASSIGNED_ROLE = "CASE_ASSIGNED_ROLE";
+    private static final String OTHER_CASE_ASSIGNED_ROLE = "OTHER_CASE_ASSIGNED_ROLE";
     private static final String NOC_REQUEST_EVENT = "NocRequest";
     private static final String INVOKERS_ORGANISATION_IDENTIFIER = "PRD_ORG_IDENTIFIER";
     private static final String ORG_POLICY_REFERENCE = "orgPolicyReference";
@@ -308,10 +309,106 @@ class RequestNoticeOfChangeServiceTest {
                                                userIdCaptor.capture(),
                                                organisationIdCaptor.capture());
 
-        assertThat(caseRolesCaptor.getValue()).isNotEmpty();
+        assertThat(caseRolesCaptor.getValue()).containsOnly(CASE_ASSIGNED_ROLE);
         assertThat(caseIdCaptor.getValue()).isEqualTo(CASE_ID);
         assertThat(userIdCaptor.getValue()).isEqualTo(USER_INFO_UID);
         assertThat(organisationIdCaptor.getValue()).isEqualTo(INVOKERS_ORGANISATION_IDENTIFIER);
+        assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(APPROVED);
+    }
+
+    @Test
+    @DisplayName("Auto assignment grants only the requested role when the invoker's organisation owns "
+        + "multiple policies on the case")
+    void testApprovalCompleteAssignsOnlyRequestedRoleForMultiPolicySameOrg() {
+        caseDetails.setJurisdiction(JURISDICTION_ONE);
+
+        ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder().build();
+        updateCaseDetailsData(caseDetails, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
+
+        Organisation invokersOrganisation =
+            Organisation.builder().organisationID(INVOKERS_ORGANISATION_IDENTIFIER).build();
+        OrganisationPolicy requestedRolePolicy = new OrganisationPolicy(invokersOrganisation,
+                                                                        ORG_POLICY_REFERENCE,
+                                                                        CASE_ASSIGNED_ROLE,
+                                                                        Lists.newArrayList(), null);
+        // Same firm already represents another party on the case - this role must NOT be granted.
+        OrganisationPolicy otherRoleSameOrgPolicy = new OrganisationPolicy(invokersOrganisation,
+                                                                           ORG_POLICY_REFERENCE,
+                                                                           OTHER_CASE_ASSIGNED_ROLE,
+                                                                           Lists.newArrayList(), null);
+        updateCaseDetailsData(caseDetails, ORGANISATION_POLICY_KEY, requestedRolePolicy);
+        updateCaseDetailsData(caseDetails, "OrganisationPolicy2", otherRoleSameOrgPolicy);
+
+        setInvokerToActAsAnAdminOrSolicitor(true);
+
+        // convertValue is called 1 (COR) + 2 (org-policy nodes); the resolved roles are reused for
+        // auto-assignment, so the policy nodes are converted only once.
+        given(jacksonUtils.convertValue(any(JsonNode.class), any()))
+            .willReturn(changeOrganisationRequest)
+            .willReturn(requestedRolePolicy)
+            .willReturn(otherRoleSameOrgPolicy);
+
+        RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
+            = service.requestNoticeOfChange(noCRequestDetails);
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<String>> caseRolesCaptor = ArgumentCaptor.forClass(List.class);
+
+        verify(dataStoreRepository).assignCase(caseRolesCaptor.capture(),
+                                               any(String.class),
+                                               any(String.class),
+                                               any(String.class));
+
+        assertThat(caseRolesCaptor.getValue()).containsExactly(CASE_ASSIGNED_ROLE);
+        assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(APPROVED);
+    }
+
+    @Test
+    @DisplayName("Auto assignment grants the requested role only once when the invoker's organisation owns "
+        + "duplicate policies for that same role on the case")
+    void testApprovalCompleteAssignsRequestedRoleOnceForDuplicateSameOrgSameRolePolicies() {
+        caseDetails.setJurisdiction(JURISDICTION_ONE);
+
+        ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder().build();
+        updateCaseDetailsData(caseDetails, CHANGE_ORGANISATION_REQUEST_KEY, changeOrganisationRequest);
+
+        Organisation invokersOrganisation =
+            Organisation.builder().organisationID(INVOKERS_ORGANISATION_IDENTIFIER).build();
+        // Two policy nodes for the SAME org AND the SAME role - a data anomaly the service must tolerate
+        // without granting the role twice.
+        OrganisationPolicy duplicateRolePolicyOne = new OrganisationPolicy(invokersOrganisation,
+                                                                           ORG_POLICY_REFERENCE,
+                                                                           CASE_ASSIGNED_ROLE,
+                                                                           Lists.newArrayList(), null);
+        OrganisationPolicy duplicateRolePolicyTwo = new OrganisationPolicy(invokersOrganisation,
+                                                                           ORG_POLICY_REFERENCE,
+                                                                           CASE_ASSIGNED_ROLE,
+                                                                           Lists.newArrayList(), null);
+        updateCaseDetailsData(caseDetails, ORGANISATION_POLICY_KEY, duplicateRolePolicyOne);
+        updateCaseDetailsData(caseDetails, "OrganisationPolicy2", duplicateRolePolicyTwo);
+
+        setInvokerToActAsAnAdminOrSolicitor(true);
+
+        // convertValue is called 1 (COR) + 2 (org-policy nodes); the resolved roles are reused for
+        // auto-assignment, so the policy nodes are converted only once.
+        given(jacksonUtils.convertValue(any(JsonNode.class), any()))
+            .willReturn(changeOrganisationRequest)
+            .willReturn(duplicateRolePolicyOne)
+            .willReturn(duplicateRolePolicyTwo);
+
+        RequestNoticeOfChangeResponse requestNoticeOfChangeResponse
+            = service.requestNoticeOfChange(noCRequestDetails);
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<String>> caseRolesCaptor = ArgumentCaptor.forClass(List.class);
+
+        verify(dataStoreRepository).assignCase(caseRolesCaptor.capture(),
+                                               any(String.class),
+                                               any(String.class),
+                                               any(String.class));
+
+        // distinct() collapses the duplicate policies so the role is granted exactly once.
+        assertThat(caseRolesCaptor.getValue()).containsExactly(CASE_ASSIGNED_ROLE);
         assertThat(requestNoticeOfChangeResponse.getApprovalStatus()).isEqualTo(APPROVED);
     }
 
@@ -459,7 +556,7 @@ class RequestNoticeOfChangeServiceTest {
                 .caseRoleId(DynamicList.builder()
                                 .value(DynamicListElement.builder().code("Role1").build())
                                 .build())
-                .requestTimestamp(LocalDateTime.now())
+                    .requestTimestamp(LocalDateTime.of(2023, 1, 1, 0, 0))
                 .approvalStatus("1")
                 .build();
 
@@ -469,7 +566,7 @@ class RequestNoticeOfChangeServiceTest {
                 .caseRoleId(DynamicList.builder()
                                 .value(DynamicListElement.builder().code("Role1").build())
                                 .build())
-                .requestTimestamp(LocalDateTime.now())
+                .requestTimestamp(LocalDateTime.of(2023, 1, 1, 0, 0))
                 .approvalStatus("1")
                 .build();
 

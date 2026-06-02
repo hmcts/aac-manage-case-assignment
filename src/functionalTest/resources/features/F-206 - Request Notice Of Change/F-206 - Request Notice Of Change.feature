@@ -159,7 +159,7 @@ Scenario: (Happy Path) Solicitor having STANDARD access to case requests NoC to 
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Dil HAS been granted case roles R1 & R2 for the case but not R3] will get the expected response as in [F-206_Verify_Granted_Case_Roles_R1_R2_Dil],
+      And a call [to verify that Dil HAS been granted ONLY case role R2 for the case - and has NOT been granted R1 or R3] will get the expected response as in [F-206_Verify_Granted_Case_Roles_R2_Only_Dil],
       And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved_ReplaceRepresentation],
       And a call [to get Case Events API returns a NoCRequest event in which the user ID is set to invoking users email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data].
       And a call [to get Grant Access Metadata API returning Standard Grant Access for case] will get the expected response as in [F-206_Verify_NoC_Request_Access_Metadata],
@@ -182,7 +182,7 @@ Scenario: (Happy Path) Solicitor requests NoC for a non-represented litigant - a
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Dil HAS been granted case roles R1 & R2 for the case but not R3] will get the expected response as in [F-206_Verify_Granted_Case_Roles_R1_R2_Dil],
+      And a call [to verify that Dil HAS been granted ONLY case role R2 for the case - and has NOT been granted R1 or R3] will get the expected response as in [F-206_Verify_Granted_Case_Roles_R2_Only_Dil],
       And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved_AddRepresentation],
       And a call [to get Case Events API returns a NoCRequest event in which the user ID is set to invoking users email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data].
       And a call [to get Grant Access Metadata API returning Standard Grant Access for case] will get the expected response as in [F-206_Verify_NoC_Request_Access_Metadata],
@@ -296,7 +296,7 @@ Scenario: (Happy Path) CAA (also a solicitor for the same jurisdiction) requests
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Jane HAS been granted case roles R1 & R2 for the case but not R3] will get the expected response as in [F-206_Verify_Granted_Case_Roles_R1_R2_Jane],
+      And a call [to verify that Jane HAS been granted ONLY case role R2 for the case - and has NOT been granted R1 or R3] will get the expected response as in [F-206_Verify_Granted_Case_Roles_R2_Only_Jane],
       And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved_ReplaceRepresentation],
       And a call [to get Case Events API returns a NoCRequest event in which the user ID is set to invoking users email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data],
       And a call [to get Grant Access Metadata API returning NO Grant Access for case] will get the expected response as in [F-206_Verify_NoC_Request_Access_Metadata_Bill]
@@ -318,7 +318,7 @@ Scenario: (Happy Path) CAA (also a solicitor for the same jurisdiction) requests
 
      Then a positive response is received,
       And the response has all the details as expected,
-      And a call [to verify that Jane HAS been granted case roles R1 & R2 for the case but not R3] will get the expected response as in [F-206_Verify_Granted_Case_Roles_R1_R2_Jane],
+      And a call [to verify that Jane HAS been granted ONLY case role R2 for the case - and has NOT been granted R1 or R3] will get the expected response as in [F-206_Verify_Granted_Case_Roles_R2_Only_Jane],
       And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved_AddRepresentation],
       And a call [to get Case Events API returns a NoCRequest event in which the user ID is set to invoking users email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data],
       And a call [to get Grant Access Metadata API returning Standard Grant Access for case] will get the expected response as in [F-206_Verify_NoC_Request_Access_Metadata]
@@ -622,4 +622,32 @@ Scenario: Must return an error when the set of answers match more than one corre
     And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved_ReplaceRepresentation],
     And a call [to get Case Events API returns a NoCRequest event in which the user ID is set to invoking users email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data],
     And a call [to get Grant Access Metadata API returning Specific Grant Access for case] will get the expected response as in [F-206_Verify_NoC_Request_Access_Metadata_Jane]
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# CCD-7589 / regression for the NoC auto-assignment over-grant fix.
+# The invoker's organisation already represents one party on the case (R1, assigned to Dil's org at
+# creation). When Dil requests a NoC for a DIFFERENT role (R2) and auto-approval applies, the invoker
+# must be auto-assigned ONLY the requested role R2 - NOT R1, the other role the same org already owns.
+# The negative assertion (R1 absent from Dil's granted case roles) is the point of this scenario:
+# before the fix the invoker was over-granted every role the org owned (R1 & R2).
+@S-206.27 @callbackTests
+Scenario: (Happy Path) Solicitor requests NoC for a different role while their organisation already represents another party - only the requested role is auto-assigned
+
+    Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
+      And a user [Dil - with a solicitor role for the same jurisdiction, within a different organisation from Richard's],
+      And [a citizen Mario, on behalf of whom Richard will create a case] in the context,
+      And a successful call [by Richard to create a case C1 on behalf of Mario, which contains 3 Org Policies for 3 case roles: R1 which is assigned to Dil's organisation, R2 & R3 which are both assigned to Richard's organisation] as in [F-206_NoC_Auto_Approval_Case_Creation_By_Richard_With_Assigned_Org_Policies],
+
+     When a request is prepared with appropriate values,
+      And the request [is made by Dil to place a NOC Request for C1],
+      And the request [contains all correct answers in the correct format],
+      And the request [contains answers identifying case role R2],
+      And it is submitted to call the [Request NoC] operation of [Manage Case Assignment Microservice],
+
+     Then a positive response is received,
+      And the response has all the details as expected,
+      And a call [to verify that Dil HAS been granted ONLY case role R2 for the case - and has NOT been granted R1 or R3] will get the expected response as in [F-206_Verify_Granted_Case_Roles_R2_Only_Dil],
+      And a call [to verify there is NO pending NOC request on the case and the OrganisationPolicy for R2 HAS been updated] will get the expected response as in [F-206_Verify_Case_Data_COR_Approved_ReplaceRepresentation],
+      And a call [to get Case Events API returns a NoCRequest event in which the user ID is set to invoking users email address AND the proxied_by field set to the ID of the system user] will get the expected response as in [F-206_Verify_NoC_Request_Event_Data],
+      And a call [to get Grant Access Metadata API returning Standard Grant Access for case] will get the expected response as in [F-206_Verify_NoC_Request_Access_Metadata]
 

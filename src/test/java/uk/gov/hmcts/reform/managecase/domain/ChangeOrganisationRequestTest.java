@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.managecase.domain;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest.ChangeOrganisationRequestBuilder;
 
 import jakarta.validation.ValidationException;
@@ -49,10 +52,12 @@ class ChangeOrganisationRequestTest {
         );
     }
 
-    @Test
-    void shouldThrowValidationExceptionWhenApprovalStatusIsNull() {
+    @ParameterizedTest(name = "Approval Status = <{0}>")
+    @ValueSource(strings = {" "})
+    @NullAndEmptySource
+    void shouldThrowValidationExceptionWhenApprovalStatusIsBlank(String approvalStatus) {
 
-        request = requestBuilder.approvalStatus(null).build();
+        request = requestBuilder.approvalStatus(approvalStatus).build();
 
         assertThrows(ValidationException.class,
             () -> request.validateChangeOrganisationRequest(),

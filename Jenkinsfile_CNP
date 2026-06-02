@@ -99,12 +99,11 @@ env.OIDC_ALLOWED_ISSUERS = "https://forgerock-am.service.core-compute-idam-aat2.
 
 // temporary workaround for platform changes: turn BEFTA header checks to warning mode
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
-env.CALLBACK_FTA_ENABLED = "true" // NB: safe to enable outside of preview as the above URLs provide a naturally isolated set of services.	
-env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()                 
+env.CALLBACK_FTA_ENABLED = "true" // NB: safe to enable outside of preview as the above URLs provide a naturally isolated set of services.
+env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
 env.CCD_DATA_STORE_API_BASE_URL = "https://ccd-data-store-api-aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
 env.MCA_API_BASE_URL = "https://aac-manage-case-assignment-${env.BRANCH_NAME}.preview.platform.hmcts.net".toLowerCase()
 
- 
 env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
 env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
 env.PACT_BROKER_PORT = "443"
@@ -174,6 +173,9 @@ withPipeline("java", product, component) {
   echo "FTA will use Definition Store: ${env.DEFINITION_STORE_URL_BASE}"
   echo "   ... published with MCA URL: ${env.MCA_API_BASE_URL}"
   echo "CALLBACK FTA Enabled = ${env.CALLBACK_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
+  echo "MCA API BASE URL = ${env.MCA_API_BASE_URL} on branch ${env.BRANCH_NAME}"
+  echo "DEFINITION_STORE_URL_BASE = ${env.DEFINITION_STORE_URL_BASE} on branch ${env.BRANCH_NAME}"
+  echo "CCD_DATA_STORE_API_BASE_URL = ${env.CCD_DATA_STORE_API_BASE_URL} on branch ${env.BRANCH_NAME}"
 
   syncBranchesWithMaster(branchesToSync)
   overrideVaultEnvironments(vaultOverrides)

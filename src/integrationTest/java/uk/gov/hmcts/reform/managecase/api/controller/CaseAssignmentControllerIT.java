@@ -9,13 +9,13 @@ import org.junit.jupiter.api.Test;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import uk.gov.hmcts.reform.managecase.BaseIT;
+import uk.gov.hmcts.reform.managecase.TestFixtures;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseAssignmentRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.CaseUnassignmentRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RequestedCaseUnassignment;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRoleWithOrganisation;
-import uk.gov.hmcts.reform.managecase.TestFixtures;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,8 +35,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CASE_ROLE;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.CASE_ROLE2;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.IdamFixture.userDetails;
+import static uk.gov.hmcts.reform.managecase.TestFixtures.ORGANIZATION_ID;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.usersByOrganisation;
 import static uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController.ASSIGN_ACCESS_MESSAGE;
@@ -50,9 +53,6 @@ import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetCa
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetUsersByOrganisationExternal;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubIdamGetUserById;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubUnassignCase;
-import static uk.gov.hmcts.reform.managecase.TestFixtures.CASE_ROLE;
-import static uk.gov.hmcts.reform.managecase.TestFixtures.CASE_ROLE2;
-import static uk.gov.hmcts.reform.managecase.TestFixtures.ORGANIZATION_ID;
 
 @SuppressWarnings({ "PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions",
     "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveImports", "PMD.TooManyMethods",
@@ -290,6 +290,14 @@ public class CaseAssignmentControllerIT {
                 .andExpect(status().isBadRequest());
         }
 
+        @DisplayName("Must return 400 bad request response id caseIds are not numeric")
+        @Test
+        void shouldReturn400_whenCaseIdsAreNotNumeric() throws Exception {
+            this.mockMvc.perform(get(CASE_ASSIGNMENTS_PATH)
+                                     .queryParam("case_ids", "ABC"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is("Case ID should contain digits only")));
+        }
     }
 
     @Nested

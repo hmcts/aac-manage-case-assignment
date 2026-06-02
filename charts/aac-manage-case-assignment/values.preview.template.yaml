@@ -73,6 +73,7 @@ ccd:
     java:
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
       image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
+      #image: hmctsprod.azurecr.io/ccd/definition-store-api:pr-1756-820fedd-20260526090548
       imagePullPolicy: Always
       devmemoryRequests: 2048Mi
       devcpuRequests: 2000m
@@ -97,6 +98,8 @@ ccd:
   ccd-data-store-api:
     java:
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
+      image: hmctsprod.azurecr.io/ccd/data-store-api:latest
+      #image: hmctsprod.azurecr.io/ccd/data-store-api:pr-2844-c363f29-20260526115255
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'
       devmemoryLimits: '2048Mi'
@@ -182,7 +185,7 @@ ccd:
       devcpuRequests: 250m
       devmemoryLimits: 2048Mi
       devcpuLimits: 1500m
-     
+
 
 elastic:
   enabled: true

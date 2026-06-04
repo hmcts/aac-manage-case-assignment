@@ -3,7 +3,7 @@ appVersion: "1.0"
 description: A Helm chart for manage-case-assignment App
 name: aac-manage-case-assignment
 home: https://github.com/hmcts/aac-manage-case-assignment
-version: 0.2.26
+version: 0.2.27
 maintainers:
   - name: HMCTS CDM team
 dependencies:
@@ -18,7 +18,19 @@ dependencies:
     version: 7.17.3
     repository: 'https://helm.elastic.co'
     condition: elastic.enabled
-  - name: ccd
-    version: 9.2.3
+  - name: ccd-user-profile-api
+    version: 1.6.17
+    repository: 'oci://hmctsprod.azurecr.io/helm'
+    condition: ccd.enabled
+  - name: ccd-definition-store-api
+    version: 1.6.26
+    repository: 'oci://hmctsprod.azurecr.io/helm'
+    condition: ccd.enabled
+  - name: ccd-data-store-api
+    version: 2.0.40
+    repository: 'oci://hmctsprod.azurecr.io/helm'
+    condition: ccd.enabled
+  - name: am-role-assignment-service
+    version: 0.0.84
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: ccd.enabled

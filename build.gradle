@@ -77,7 +77,7 @@ tasks.withType(JavaCompile) {
 }
 
 tasks.withType(Copy).configureEach {
-  duplicatesStrategy 'exclude'
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 tasks.withType(Test) {
@@ -323,69 +323,69 @@ dependencies {
   // end::CVE Vulnerability dependency overrides                                                      // MAIN PARENT DEPENDENCY
 
   // Spring Deps
-  implementation group: 'org.springframework.boot', name: 'spring-boot-properties-migrator'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter'
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap'
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-gateway-mvc'
-  implementation group: 'org.springframework.retry', name: 'spring-retry'
-  implementation group: 'org.springframework.security', name: 'spring-security-web'
-  implementation group: 'org.springframework.security', name: 'spring-security-config'
-  implementation group: 'org.springframework.security', name: 'spring-security-rsa', version: '1.1.5'
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.17'
+  implementation 'org.springframework.boot:spring-boot-properties-migrator'
+  implementation 'org.springframework.boot:spring-boot-starter'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-aop'
+  implementation 'org.springframework.boot:spring-boot-starter-json'
+  implementation 'org.springframework.boot:spring-boot-starter-cache'
+  implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+  implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+  implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+  implementation 'org.springframework.cloud:spring-cloud-starter'
+  implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
+  implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+  implementation 'org.springframework.cloud:spring-cloud-starter-gateway-mvc'
+  implementation 'org.springframework.retry:spring-retry'
+  implementation 'org.springframework.security:spring-security-web'
+  implementation 'org.springframework.security:spring-security-config'
+  implementation 'org.springframework.security:spring-security-rsa:1.1.5'
+  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.17'
 
   // HMCTS
-  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.5'
-  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.4'
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLogging
-  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '6.0.0-RELEASE'
+  implementation 'com.github.hmcts:idam-java-client:3.0.5'
+  implementation 'com.github.hmcts:service-auth-provider-java-client:5.3.4'
+  implementation "com.github.hmcts.java-logging:logging:${reformLogging}"
+  implementation 'uk.gov.service.notify:notifications-java-client:6.0.0-RELEASE'
 
-  implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.2'
-  implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
-  implementation group: 'com.vladmihalcea', name: 'hibernate-types-60', version: '2.21.1'
-  implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: jjwt
-  runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: jjwt
-  runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: jjwt
-  implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.8.5'
-  implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
-  implementation group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.3.0'
-  implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '9.0'
-  implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.5.1'
-  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.8'
-  annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
-  implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.6'
-  implementation group: 'org.projectlombok', name: 'lombok', version: lombokVersion
-  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
-  implementation group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: '0.2.0'
-  implementation group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.4'
-  implementation group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
-  implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
+  implementation 'com.auth0:java-jwt:4.5.2'
+  implementation 'com.github.ben-manes.caffeine:caffeine:3.2.4'
+  implementation 'com.vladmihalcea:hibernate-types-60:2.21.1'
+  implementation "io.jsonwebtoken:jjwt-api:${jjwt}"
+  runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwt}"
+  runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwt}"
+  implementation 'io.projectreactor:reactor-core:3.8.5'
+  implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
+  implementation 'pl.jalokim.propertiestojson:java-properties-to-json:5.3.0'
+  implementation 'net.logstash.logback:logstash-logback-encoder:9.0'
+  implementation 'org.apache.httpcomponents.client5:httpclient5:5.5.1'
+  implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.8'
+  annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+  implementation 'org.modelmapper:modelmapper:3.2.6'
+  implementation "org.projectlombok:lombok:${lombokVersion}"
+  annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+  implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+  implementation 'org.reactivestreams:reactive-streams:1.0.4'
+  implementation "com.microsoft.azure:applicationinsights-logging-logback:${appInsightsVersion}"
+  implementation "com.microsoft.azure:applicationinsights-spring-boot-starter:${appInsightsVersion}"
 
 
   testImplementation libraries.junit5
-  testImplementation group: 'com.github.hmcts', name: 'befta-fw', version: beftaFwVersion
-  testImplementation group: 'com.github.hmcts', name: 'ccd-test-definitions', version: ccdTestDefinitionVersion
-  testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.10', classifier: 'all'
-  testImplementation group: 'io.rest-assured', name: 'rest-assured', version: restAssured
-  testImplementation group: 'io.rest-assured', name: 'json-path', version: restAssured
-  testImplementation group: 'io.rest-assured', name: 'xml-path', version: restAssured
-  testImplementation group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '4.5'
-  testAnnotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.6.3'
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.23.0'
-  testImplementation group: 'org.mockito', name: 'mockito-subclass', version: '5.23.0'
-  testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-  testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
-  testImplementation group: 'com.google.guava', name: 'guava', version: '33.6.0-jre' // For BEFTA
+  testImplementation "com.github.hmcts:befta-fw:${beftaFwVersion}"
+  testImplementation "com.github.hmcts:ccd-test-definitions:${ccdTestDefinitionVersion}"
+  testImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
+  testImplementation "io.rest-assured:rest-assured:${restAssured}"
+  testImplementation "io.rest-assured:json-path:${restAssured}"
+  testImplementation "io.rest-assured:xml-path:${restAssured}"
+  testImplementation 'nl.jqno.equalsverifier:equalsverifier:4.5'
+  testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+  testImplementation 'org.mockito:mockito-core:5.23.0'
+  testImplementation 'org.mockito:mockito-subclass:5.23.0'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-stub-runner'
+  testImplementation 'com.google.guava:guava:33.6.0-jre' // For BEFTA
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
@@ -395,13 +395,13 @@ dependencies {
 
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
-  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: pact_version
-  contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: pact_version
-  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: pact_version
-  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: pact_version
-  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: pact_version
-  contractTestImplementation group: 'org.projectlombok', name: 'lombok', version: lombokVersion
-  contractTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+  contractTestImplementation "au.com.dius.pact.consumer:junit5:${pact_version}"
+  contractTestRuntimeOnly "au.com.dius.pact.consumer:junit5:${pact_version}"
+  contractTestImplementation "au.com.dius.pact.provider:junit5:${pact_version}"
+  contractTestImplementation "au.com.dius.pact.provider:spring:${pact_version}"
+  contractTestImplementation "au.com.dius.pact.provider:junit5spring:${pact_version}"
+  contractTestImplementation "org.projectlombok:lombok:${lombokVersion}"
+  contractTestAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
 }
 

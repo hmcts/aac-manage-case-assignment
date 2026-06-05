@@ -223,10 +223,13 @@ pact {
   }
 }
 
-project.tasks['sonarqube'].dependsOn jacocoTestReport
+tasks.matching { it.name in ['sonar', 'sonarqube'] }.configureEach {
+  dependsOn jacocoTestReport
+}
 
-sonarqube {
+sonar {
   properties {
+    property "sonar.organization", "hmcts"
     property "sonar.projectName", "Reform::manage-case-assignment"
     property "sonar.projectKey", "uk.gov.hmcts.reform:manage-case-assignment"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation}"

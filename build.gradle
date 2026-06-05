@@ -330,7 +330,6 @@ dependencies {
   // end::CVE Vulnerability dependency overrides                                                      // MAIN PARENT DEPENDENCY
 
   // Spring Deps
-  implementation group: 'org.springframework.boot', name: 'spring-boot-properties-migrator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
@@ -344,7 +343,9 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-gateway-mvc'
+  implementation(group: 'org.springframework.cloud', name: 'spring-cloud-starter-gateway-mvc') {
+    exclude group: 'org.springframework.boot', module: 'spring-boot-properties-migrator'
+  }
   implementation group: 'org.springframework.retry', name: 'spring-retry'
   implementation group: 'org.springframework.security', name: 'spring-security-web'
   implementation group: 'org.springframework.security', name: 'spring-security-config'

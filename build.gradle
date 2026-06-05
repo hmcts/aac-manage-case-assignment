@@ -94,6 +94,12 @@ test {
   failFast = true
 }
 
+tasks.named('generateCucumberReports') {
+  onlyIf {
+    cucumberReports.reports?.files?.any { it.exists() } ?: false
+  }
+}
+
 tasks.register('integration', Test) {
   description = "Runs integration tests"
   group = "Verification"
@@ -118,8 +124,10 @@ tasks.register('smoke', JavaExec) {
     cucumberReports.reports = files("${cucumberReports.outputDir}/cucumber.json")
     cucumberReports.notFailingStatuses = ["skipped", "passed"]
 
+    file("${cucumberReports.outputDir}/cucumber.json").delete()
     file("$buildDir/test-results/test").mkdirs()
     file("$buildDir/test-results/smoke").mkdirs()
+    file("$buildDir/test-results/smoke/cucumber.xml").delete()
     copy {
       from "src/functionalTest/resources/DummyTest.xml"
       into "$buildDir/test-results/test"
@@ -155,7 +163,9 @@ tasks.register('functional', JavaExec) {
 
     def tags = (project.hasProperty('tags')) ? "(${project.property('tags')}) and not @Ignore" : 'not @Ignore'
 
+    file("${cucumberReports.outputDir}/cucumber.json").delete()
     file("$buildDir/test-results/functional").mkdirs()
+    file("$buildDir/test-results/functional/cucumber.xml").delete()
     setArgs([
             '--threads', '1',
             '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",

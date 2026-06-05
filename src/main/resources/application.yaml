@@ -50,26 +50,27 @@ spring:
             client-secret: internal
   cloud:
     gateway:
-      mvc:
-        forwarded-request-headers-filter:
-          enabled: false
-        remove-content-length-request-headers-filter:
-          enabled: false
-        transfer-encoding-normalization-request-headers-filter:
-          enabled: false
-        http-client:
-          type: AUTODETECT
-        routes:
-          - id: data-store
-            uri: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
-            predicates:
-              - Path=/ccd/**
-            filters:
-              - AllowedRoutesFilter
-              - ValidateClientFilter
-              - RemoveResponseHeader=Cookie
-              - RemoveResponseHeader=Set-Cookie
-              - StripPrefix=1
+      server:
+        webmvc:
+          forwarded-request-headers-filter:
+            enabled: false
+          remove-content-length-request-headers-filter:
+            enabled: false
+          transfer-encoding-normalization-request-headers-filter:
+            enabled: false
+          http-client:
+            type: AUTODETECT
+          routes:
+            - id: data-store
+              uri: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
+              predicates:
+                - Path=/ccd/**
+              filters:
+                - AllowedRoutesFilter
+                - ValidateClientFilter
+                - RemoveResponseHeader=Cookie
+                - RemoveResponseHeader=Set-Cookie
+                - StripPrefix=1
     discovery:
       client:
         composite-indicator:

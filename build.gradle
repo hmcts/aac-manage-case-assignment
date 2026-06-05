@@ -90,8 +90,14 @@ tasks.withType(Test) {
 }
 
 test {
-  generateCucumberReports.enabled = true
+  generateCucumberReports.enabled = false
   failFast = true
+}
+
+tasks.named('generateCucumberReports') {
+  onlyIf {
+    cucumberReports.reports?.files?.any { it.exists() } ?: false
+  }
 }
 
 tasks.register('integration', Test) {
@@ -102,53 +108,54 @@ tasks.register('integration', Test) {
   failFast = true
 }
 
-tasks.register('smoke', Test) {
+tasks.register('smoke', JavaExec) {
   description = "Runs smoke tests"
   group = "Verification"
-  testClassesDirs = sourceSets.functionalTest.output.classesDirs
-  classpath = sourceSets.functionalTest.runtimeClasspath
+  mainClass.set("uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain")
+  classpath = sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+  jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
 
   generateCucumberReports.enabled = false
+  finalizedBy tasks.named('generateCucumberReports')
 
-  new File("$buildDir/test-results/test").mkdirs()
-  copy {
-    from "src/functionalTest/resources/DummyTest.xml"
-    into "$buildDir/test-results/test"
-  }
-
-  doLast {
+  doFirst {
     generateCucumberReports.enabled = true
     cucumberReports.outputDir = file("${project.buildDir}/reports/tests/befta/smoke")
     cucumberReports.reports = files("${cucumberReports.outputDir}/cucumber.json")
     cucumberReports.notFailingStatuses = ["skipped", "passed"]
 
-    javaexec {
-      main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
-      classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-      args = [
-              '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
-              '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
-              '--tags', '@Smoke and not @Ignore',
-              '--glue', 'uk.gov.hmcts.befta.player',
-              '--glue', 'uk.gov.hmcts.reform.managecase.befta', 'src/functionalTest/resources/features'
-      ]
-      // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
-      jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+    file("${cucumberReports.outputDir}/cucumber.json").delete()
+    file("$buildDir/test-results/test").mkdirs()
+    file("$buildDir/test-results/smoke").mkdirs()
+    file("$buildDir/test-results/smoke/cucumber.xml").delete()
+    copy {
+      from "src/functionalTest/resources/DummyTest.xml"
+      into "$buildDir/test-results/test"
     }
+
+    setArgs([
+            '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
+            '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
+            '--tags', '@Smoke and not @Ignore',
+            '--glue', 'uk.gov.hmcts.befta.player',
+            '--glue', 'uk.gov.hmcts.reform.managecase.befta', 'src/functionalTest/resources/features'
+    ])
   }
 
   outputs.upToDateWhen { false }
 }
 
-tasks.register('functional', Test) {
+tasks.register('functional', JavaExec) {
   description = "Runs functional tests"
   group = "Verification"
-  testClassesDirs = sourceSets.functionalTest.output.classesDirs
-  classpath = sourceSets.functionalTest.runtimeClasspath
+  mainClass.set("uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain")
+  classpath = sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+  jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
 
   generateCucumberReports.enabled = false
+  finalizedBy tasks.named('generateCucumberReports')
 
-  doLast {
+  doFirst {
     generateCucumberReports.enabled = true
     cucumberReports.outputDir = file("${project.buildDir}/reports/tests/befta/functional")
     cucumberReports.reports = files("${cucumberReports.outputDir}/cucumber.json")
@@ -156,21 +163,18 @@ tasks.register('functional', Test) {
 
     def tags = (project.hasProperty('tags')) ? "(${project.property('tags')}) and not @Ignore" : 'not @Ignore'
 
-    javaexec {
-      main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
-      classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-      args = [
-              '--threads', '1',
-              '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
-              '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
-              '--tags',  "${tags}",
-              '--glue', 'uk.gov.hmcts.befta.player',
-              '--glue', 'uk.gov.hmcts.reform.managecase.befta', 'src/functionalTest/resources/features'
-      ]
-      // '--add-opens=...' added to suppress 'WARNING: An illegal reflective access operation has occurred' in uk.gov.hmcts.befta.util.CucumberStepAnnotationUtils
-      jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
-      println 'args =' + args
-    }
+    file("${cucumberReports.outputDir}/cucumber.json").delete()
+    file("$buildDir/test-results/functional").mkdirs()
+    file("$buildDir/test-results/functional/cucumber.xml").delete()
+    setArgs([
+            '--threads', '1',
+            '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
+            '--plugin', "junit:${buildDir}/test-results/functional/cucumber.xml",
+            '--tags',  "${tags}",
+            '--glue', 'uk.gov.hmcts.befta.player',
+            '--glue', 'uk.gov.hmcts.reform.managecase.befta', 'src/functionalTest/resources/features'
+    ])
+    println 'args =' + args
   }
 
   outputs.upToDateWhen { false }
@@ -223,10 +227,13 @@ pact {
   }
 }
 
-project.tasks['sonarqube'].dependsOn jacocoTestReport
+tasks.matching { it.name in ['sonar', 'sonarqube'] }.configureEach {
+  dependsOn jacocoTestReport
+}
 
-sonarqube {
+sonar {
   properties {
+    property "sonar.organization", "hmcts"
     property "sonar.projectName", "Reform::manage-case-assignment"
     property "sonar.projectKey", "uk.gov.hmcts.reform:manage-case-assignment"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation}"
@@ -279,7 +286,7 @@ ext {
   jjwt                = '0.13.0'
   lombokVersion       = '1.18.44'
   pact_version        = '4.6.20'
-  reformLogging       = '6.1.9'
+  reformLogging       = '8.0.0'
   restAssured         = '5.5.7'
   beftaFwVersion      = '9.2.6'
   ccdTestDefinitionVersion = '7.26.4'
@@ -323,7 +330,6 @@ dependencies {
   // end::CVE Vulnerability dependency overrides                                                      // MAIN PARENT DEPENDENCY
 
   // Spring Deps
-  implementation group: 'org.springframework.boot', name: 'spring-boot-properties-migrator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
@@ -337,7 +343,9 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-gateway-mvc'
+  implementation(group: 'org.springframework.cloud', name: 'spring-cloud-starter-gateway-mvc') {
+    exclude group: 'org.springframework.boot', module: 'spring-boot-properties-migrator'
+  }
   implementation group: 'org.springframework.retry', name: 'spring-retry'
   implementation group: 'org.springframework.security', name: 'spring-security-web'
   implementation group: 'org.springframework.security', name: 'spring-security-config'

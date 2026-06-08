@@ -19,8 +19,8 @@ ext {
   set('jackson.version', '2.18.2')
   set('snakeyaml.version', '2.3')
 
-  junit               = '6.0.3'
-  junitPlatform       = '6.0.3'
+  junit               = '6.1.0'
+  junitPlatform       = '6.1.0'
   jjwt                = '0.13.0'
   lombokVersion       = '1.18.46'
   pact_version        = '4.7.1'

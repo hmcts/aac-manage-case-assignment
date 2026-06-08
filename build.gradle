@@ -13,21 +13,21 @@ plugins {
 
 ext {
   set('springCloudVersion', '2025.0.1')
+  set('spring-framework.version', '6.2.14')
   set('spring-security.version', '6.5.7')
   set('log4j2.version', '2.24.3')
   set('jackson.version', '2.18.2')
   set('snakeyaml.version', '2.3')
 
-  junit               = '5.14.4'
-  junitPlatform       = '1.14.4'
+  junit               = '6.0.3'
+  junitPlatform       = '6.0.3'
   jjwt                = '0.13.0'
   lombokVersion       = '1.18.46'
   pact_version        = '4.7.1'
-  appInsightsVersion = '2.6.4'
   reformLogging       = '8.0.0'
   restAssured         = '5.5.7'
   beftaFwVersion      = '9.2.6'
-  ccdTestDefinitionVersion = '7.26.3'
+  ccdTestDefinitionVersion = '7.26.4'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -264,25 +264,6 @@ tasks.register("printSuppressionFile") {
     }
     println "SUPPRESSION_FILE=${suppressionFile}"
   }
-}
-
-ext {
-  set('springCloudVersion', '2025.0.0')
-  set('spring-framework.version', '6.2.14')
-  set('spring-security.version', '6.5.7')
-  set('log4j2.version', '2.24.3')
-  set('jackson.version', '2.18.2')
-  set('snakeyaml.version', '2.3')
-
-  junit               = '6.0.3'
-  junitPlatform       = '6.0.3'
-  jjwt                = '0.13.0'
-  lombokVersion       = '1.18.44'
-  pact_version        = '4.6.20'
-  reformLogging       = '6.1.9'
-  restAssured         = '5.5.7'
-  beftaFwVersion      = '9.2.6'
-  ccdTestDefinitionVersion = '7.26.4'
 }
 
 dependencyManagement {

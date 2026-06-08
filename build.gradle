@@ -24,6 +24,7 @@ ext {
   jjwt                = '0.13.0'
   lombokVersion       = '1.18.46'
   pact_version        = '4.7.1'
+  appInsightsVersion = '2.6.4'
   reformLogging       = '8.0.0'
   restAssured         = '5.5.7'
   beftaFwVersion      = '9.2.6'

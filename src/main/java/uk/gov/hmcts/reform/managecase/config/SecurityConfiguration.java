@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.managecase.config;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,15 +30,9 @@ public class SecurityConfiguration {
 
     public static final String AUTHORISATION = "ServiceAuthorization";
 
-    @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
-    private String issuerUri;
-
-    @Value("${oidc.issuer}")
-    private String issuer;
-
-    @Value("${oidc.allowed-issuers:}")
-    private String allowedIssuers;
-
+    private final String issuerUri;
+    private final String issuer;
+    private final String allowedIssuers;
     private final ServiceAuthFilter serviceAuthFilter;
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
@@ -56,10 +49,16 @@ public class SecurityConfiguration {
         "/"
     };
 
-    @Autowired
-    public SecurityConfiguration(final ServiceAuthFilter serviceAuthFilter,
-                                  final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter) {
+    public SecurityConfiguration(
+        @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}") final String issuerUri,
+        @Value("${oidc.issuer}") final String issuer,
+        @Value("${oidc.allowed-issuers:}") final String allowedIssuers,
+        final ServiceAuthFilter serviceAuthFilter,
+        final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter) {
         super();
+        this.issuerUri = issuerUri;
+        this.issuer = issuer;
+        this.allowedIssuers = allowedIssuers;
         this.serviceAuthFilter = serviceAuthFilter;
         jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);

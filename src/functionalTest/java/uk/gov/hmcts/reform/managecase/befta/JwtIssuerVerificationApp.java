@@ -11,18 +11,21 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.List;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.managecase.security.OidcIssuerConfiguration;
 
 public final class JwtIssuerVerificationApp {
 
+    private static final Logger LOG = LoggerFactory.getLogger(JwtIssuerVerificationApp.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private JwtIssuerVerificationApp() {
     }
 
     public static void main(String[] args) {
-        List<String> allowedIssuers = configuredIssuers();
+        Set<String> allowedIssuers = configuredIssuers();
         String actualIssuer = resolveIssuerFromRealToken();
 
         if (!allowedIssuers.contains(actualIssuer)) {
@@ -32,15 +35,14 @@ public final class JwtIssuerVerificationApp {
             );
         }
 
-        System.out.println("Verified functional test token iss is allowed by OIDC issuer configuration: "
-                               + actualIssuer);
+        LOG.info("Verified functional test token iss is allowed by OIDC issuer configuration: {}", actualIssuer);
     }
 
-    private static List<String> configuredIssuers() {
-        return List.copyOf(OidcIssuerConfiguration.allowedIssuers(
+    private static Set<String> configuredIssuers() {
+        return OidcIssuerConfiguration.allowedIssuers(
             requireEnv("OIDC_ISSUER"),
             optionalEnv("OIDC_ALLOWED_ISSUERS", "")
-        ));
+        );
     }
 
     private static String resolveIssuerFromRealToken() {

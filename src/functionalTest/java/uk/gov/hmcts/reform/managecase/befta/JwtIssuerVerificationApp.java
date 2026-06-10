@@ -12,13 +12,12 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.managecase.security.OidcIssuerConfiguration;
 
+@Slf4j
 public final class JwtIssuerVerificationApp {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JwtIssuerVerificationApp.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private JwtIssuerVerificationApp() {
@@ -35,7 +34,7 @@ public final class JwtIssuerVerificationApp {
             );
         }
 
-        LOG.info("Verified functional test token iss is allowed by OIDC issuer configuration: {}", actualIssuer);
+        log.info("Verified functional test token iss is allowed by OIDC issuer configuration: {}", actualIssuer);
     }
 
     private static Set<String> configuredIssuers() {

@@ -28,7 +28,9 @@ ext {
   reformLogging       = '8.0.0'
   restAssured         = '5.5.7'
   beftaFwVersion      = '9.2.6'
-  ccdTestDefinitionVersion = '7.26.5'
+  ccdTestDefinitionVersion = '7.27.7-prerelease-CME-537'
+  //latest is 7.26.5, but seems to be failing
+  //old value 7.27.7-prerelease-CME-537
 }
 
 group = 'uk.gov.hmcts.reform'

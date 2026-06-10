@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
+import uk.gov.hmcts.reform.managecase.config.JacksonObjectMapperConfig;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.config.SecurityConfiguration;
 import uk.gov.hmcts.reform.managecase.domain.ApprovalStatus;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -59,6 +61,7 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -120,6 +123,7 @@ public class NoticeOfChangeControllerTest {
             { SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class }))
     @AutoConfigureMockMvc(addFilters = false)
     @ImportAutoConfiguration(TestIdamConfiguration.class)
+    @Import(JacksonObjectMapperConfig.class)
     static class BaseWebMvcTest {
 
         @Autowired
@@ -583,6 +587,45 @@ public class NoticeOfChangeControllerTest {
 
         }
 
+        @DisplayName("should accept known CCD callback metadata fields")
+        @Test
+        void shouldAcceptKnownCcdCallbackMetadataFields() throws Exception {
+            changeOrganisationRequest.setApprovalStatus("1");
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content("""
+                                         {
+                                           "event_id": "nocRequest_autoApproval",
+                                           "ignore_warning": false,
+                                           "case_details_before": {
+                                             "id": "1588234985453946",
+                                             "case_data": {}
+                                           },
+                                           "case_details": {
+                                             "id": "1588234985453946",
+                                             "case_data": {
+                                               "ChangeOrganisationRequestField": {
+                                                 "OrganisationToAdd": {
+                                                   "OrganisationID": "123"
+                                                 },
+                                                 "OrganisationToRemove": {
+                                                   "OrganisationID": "789"
+                                                 },
+                                                 "CaseRoleId": {},
+                                                 "ApprovalStatus": "1"
+                                               }
+                                             }
+                                           }
+                                         }
+                                         """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_header", is(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)))
+                .andExpect(jsonPath("$.confirmation_body", is(CHECK_NOC_APPROVAL_DECISION_APPLIED_MESSAGE)));
+
+            verify(approvalService).findAndTriggerNocDecisionEvent(CASE_ID);
+        }
+
         @DisplayName("should return 200 status code if all data is valid (ApprovalStatus as a String)")
         @Test
         void shouldCheckForNoCApprovalWithStringForApprovalStatus() throws Exception {
@@ -805,6 +848,63 @@ public class NoticeOfChangeControllerTest {
                                     is("234")));
         }
 
+        @DisplayName("should accept known CCD callback metadata fields")
+        @Test
+        void shouldAcceptKnownCcdCallbackMetadataFields() throws Exception {
+            ChangeOrganisationRequest updatedCOR = ChangeOrganisationRequest.builder()
+                .organisationToAdd(Organisation.builder().organisationID("123").build())
+                .organisationToRemove(Organisation.builder().organisationID("234").build())
+                .caseRoleId(DynamicList.builder().build())
+                .requestTimestamp(LocalDateTime.now())
+                .approvalStatus("1")
+                .build();
+
+            aboutToSubmitCallbackResponse = AboutToSubmitCallbackResponse.builder()
+                .data(Map.of(
+                    "OrganisationPolicyField1",
+                    objectMapper.convertValue(organisationPolicy, JsonNode.class),
+                    "ChangeOrganisationRequestField",
+                    objectMapper.convertValue(updatedCOR, JsonNode.class))
+                )
+                .build();
+
+            caseDetails = caseDetails(changeOrganisationRequest, organisationPolicy);
+
+            given(requestNoticeOfChangeService.setOrganisationToRemove(any(), any(), any()))
+                .willReturn(aboutToSubmitCallbackResponse);
+
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content("""
+                                         {
+                                           "event_id": "nocRequest_autoApproval",
+                                           "ignore_warning": false,
+                                           "case_details_before": {
+                                             "id": "1588234985453946",
+                                             "case_data": {}
+                                           },
+                                           "case_details": {
+                                             "id": "1588234985453946",
+                                             "case_data": {
+                                               "ChangeOrganisationRequestField": {
+                                                 "OrganisationToAdd": {
+                                                   "OrganisationID": "123"
+                                                 },
+                                                 "OrganisationToRemove": {
+                                                   "OrganisationID": null
+                                                 },
+                                                 "CaseRoleId": {},
+                                                 "ApprovalStatus": "1"
+                                               }
+                                             }
+                                           }
+                                         }
+                                         """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.ChangeOrganisationRequestField.OrganisationToRemove.OrganisationID",
+                                    is("234")));
+        }
+
         @DisplayName("should error if case reference in Case Details is empty")
         @Test
         void shouldFailIfCaseReferenceIsEmpty() throws Exception {
@@ -934,6 +1034,29 @@ public class NoticeOfChangeControllerTest {
                 .andExpect(jsonPath("$.security_classification").value(nullValue()))
                 .andExpect(jsonPath("$.significant_item").value(nullValue()));
         }
+
+        @DisplayName("should accept known CCD callback metadata fields")
+        @Test
+        void shouldAcceptKnownCcdCallbackMetadataFields() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content("""
+                                         {
+                                           "event_id": "nocRequest_autoApproval",
+                                           "ignore_warning": false,
+                                           "case_details_before": {
+                                             "id": "1588234985453946",
+                                             "case_data": {}
+                                           },
+                                           "case_details": {
+                                             "id": "1588234985453946",
+                                             "case_data": {}
+                                           }
+                                         }
+                                         """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()", is(1)));
+        }
     }
 
     @Nested
@@ -973,17 +1096,38 @@ public class NoticeOfChangeControllerTest {
                 .andExpect(jsonPath("$.errors").doesNotExist());
         }
 
-        @DisplayName("should accept valid request which includes extra unknown fields")
+        @DisplayName("should fail with 400 bad request when request includes extra unknown fields")
         @Test
-        void shouldApplyNoticeOfChangeDecisionWithExtraUnknownField() throws Exception {
+        void shouldFailWhenApplyNoticeOfChangeDecisionContainsExtraUnknownField() throws Exception {
+            assertThat(objectMapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)).isTrue();
+
             this.mockMvc.perform(post(ENDPOINT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"case_details\": {}, \"extra_field\": \"value\"}"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.data.length()", is(1)))
-                .andExpect(jsonPath("$.data['FieldId']", is(FIELD_VALUE)))
-                .andExpect(jsonPath("$.errors").doesNotExist());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is("Unknown JSON property 'extra_field'.")));
+
+            verify(applyNoCDecisionService, never()).applyNoCDecision(any(ApplyNoCDecisionRequest.class));
+        }
+
+        @DisplayName("should fail with 400 bad request when nested case details includes extra unknown fields")
+        @Test
+        void shouldFailWhenApplyNoticeOfChangeDecisionContainsNestedExtraUnknownField() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "case_details": {
+                        "unexpected_case_detail": "value"
+                      }
+                    }
+                    """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(
+                    "Unknown JSON property 'case_details.unexpected_case_detail'."
+                )));
+
+            verify(applyNoCDecisionService, never()).applyNoCDecision(any(ApplyNoCDecisionRequest.class));
         }
 
         @DisplayName("should delegate to service domain for a valid request")
@@ -999,6 +1143,39 @@ public class NoticeOfChangeControllerTest {
             assertThat(captor.getValue().getCaseDetails().getId()).isEqualTo(CASE_ID);
             assertThat(captor.getValue().getCaseDetails().getCaseTypeId()).isEqualTo(CASE_TYPE_ID);
             assertThat(captor.getValue().getCaseDetails().getData().get(FIELD_ID).asText()).isEqualTo(FIELD_VALUE);
+        }
+
+        @DisplayName("should accept known CCD callback metadata fields")
+        @Test
+        void shouldAcceptKnownCcdCallbackMetadataFields() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "case_details": {
+                        "id": "1588234985453946",
+                        "case_type_id": "caseType",
+                        "case_data": {
+                          "FieldId": "FieldValue"
+                        }
+                      },
+                      "case_details_before": {
+                        "id": "1588234985453946",
+                        "case_type_id": "caseType",
+                        "case_data": {}
+                      },
+                      "event_id": "ApplyNoCDecision",
+                      "ignore_warning": false
+                    }
+                    """))
+                .andExpect(status().isOk());
+
+            ArgumentCaptor<ApplyNoCDecisionRequest> captor = ArgumentCaptor.forClass(ApplyNoCDecisionRequest.class);
+            verify(applyNoCDecisionService).applyNoCDecision(captor.capture());
+            assertThat(captor.getValue().getEventId()).isEqualTo("ApplyNoCDecision");
+            assertThat(captor.getValue().getIgnoreWarning()).isFalse();
+            assertThat(captor.getValue().getCaseDetails().getId()).isEqualTo(CASE_ID);
+            assertThat(captor.getValue().getCaseDetailsBefore().getId()).isEqualTo(CASE_ID);
         }
 
         @DisplayName("should fail with 400 bad request when case details is null")

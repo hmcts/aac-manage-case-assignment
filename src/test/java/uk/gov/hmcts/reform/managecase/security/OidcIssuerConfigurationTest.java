@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class OidcIssuerConfigurationTest {
 
@@ -44,9 +46,11 @@ class OidcIssuerConfigurationTest {
             .containsExactly(expectedIssuers);
     }
 
-    @Test
-    void shouldRejectBlankPrimaryIssuerEvenWhenAllowedIssuersAreConfigured() {
-        assertThatThrownBy(() -> OidcIssuerConfiguration.allowedIssuers(" ", SECONDARY_ISSUER))
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" "})
+    void shouldRejectBlankPrimaryIssuerEvenWhenAllowedIssuersAreConfigured(String primaryIssuer) {
+        assertThatThrownBy(() -> OidcIssuerConfiguration.allowedIssuers(primaryIssuer, SECONDARY_ISSUER))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("oidc.issuer must not be blank");
     }

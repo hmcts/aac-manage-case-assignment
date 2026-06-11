@@ -22,13 +22,11 @@ Use this skill for JWT issuer validation changes in `aac-manage-case-assignment`
    use [`src/functionalTest/java/uk/gov/hmcts/reform/managecase/befta/JwtIssuerVerificationApp.java`](../../../src/functionalTest/java/uk/gov/hmcts/reform/managecase/befta/JwtIssuerVerificationApp.java)
    and [`build.gradle`](../../../build.gradle) task `verifyFunctionalTestJwtIssuer`
    rather than duplicate smoke or functional verifier tests or Jenkins-side issuer-resolution scripts.
-6. Keep coverage focused across three layers:
-   validator-level tests in [`src/test/java/uk/gov/hmcts/reform/managecase/config/SecurityConfigurationTest.java`](../../../src/test/java/uk/gov/hmcts/reform/managecase/config/SecurityConfigurationTest.java),
-   decoder exception assertions in the same test class,
-   and decoder integration coverage in [`src/integrationTest/java/uk/gov/hmcts/reform/managecase/config/JwtIssuerValidationIT.java`](../../../src/integrationTest/java/uk/gov/hmcts/reform/managecase/config/JwtIssuerValidationIT.java).
+6. Keep coverage focused between validator-level tests in [`src/test/java/uk/gov/hmcts/reform/managecase/config/JwtIssuerValidatorTest.java`](../../../src/test/java/uk/gov/hmcts/reform/managecase/config/JwtIssuerValidatorTest.java)
+   and real decoder integration coverage in [`src/integrationTest/java/uk/gov/hmcts/reform/managecase/config/JwtDecoderIssuerValidationIT.java`](../../../src/integrationTest/java/uk/gov/hmcts/reform/managecase/config/JwtDecoderIssuerValidationIT.java).
 7. For issuer values, token `iss` diagnosis, test assertions, and rollout alignment, follow [`docs/security/jwt-issuer-validation.md`](../../../docs/security/jwt-issuer-validation.md) rather than duplicating that guidance here.
 8. Start verification with the narrowest useful test:
-   - `./gradlew test --tests uk.gov.hmcts.reform.managecase.config.SecurityConfigurationTest`
+   - `./gradlew test --tests uk.gov.hmcts.reform.managecase.config.JwtIssuerValidatorTest`
 9. Preserve in-flight local work and continue from the existing patch state rather than recreating it.
 
 ## References

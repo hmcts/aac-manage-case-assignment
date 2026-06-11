@@ -68,7 +68,7 @@ OAuth2TokenValidator<Jwt> validator =
 
 ## Tests
 
-`src/test/java/uk/gov/hmcts/reform/managecase/config/SecurityConfigurationTest.java` covers:
+`src/test/java/uk/gov/hmcts/reform/managecase/config/JwtIssuerValidatorTest.java` covers:
 
 - accepted token from the configured issuer
 - accepted token from an additional configured issuer
@@ -76,20 +76,19 @@ OAuth2TokenValidator<Jwt> validator =
 - rejected token with no issuer
 - rejected expired token from the configured issuer
 - primary issuer remains accepted when additional issuers are configured
-- decoder exception for an unexpected issuer, asserting that the exception message contains `iss`
 
 `src/test/java/uk/gov/hmcts/reform/managecase/security/OidcIssuerConfigurationTest.java` covers fallback to the
 primary issuer, blank additional issuer config, duplicate additional issuer config, and empty issuer rejection.
 
-`src/integrationTest/java/uk/gov/hmcts/reform/managecase/config/JwtIssuerValidationIT.java` adds WireMock-backed
-integration coverage for signed JWTs whose `iss` claim matches either configured issuer or does not match any
-configured issuer.
+`src/integrationTest/java/uk/gov/hmcts/reform/managecase/config/JwtDecoderIssuerValidationIT.java` adds WireMock-backed
+integration coverage for `SecurityConfiguration.jwtDecoder()` with signed JWTs whose `iss` claim matches either
+configured issuer or does not match any configured issuer. It asserts the real decoder rejection message contains
+`iss`.
 
-Coverage is intentionally three-layered in this repo:
+Coverage is intentionally split in this repo:
 
-- validator test
-- decoder exception test
-- integration test
+- fast validator unit test
+- real decoder integration test
 
 Controller integration tests based on `src/integrationTest/java/uk/gov/hmcts/reform/managecase/BaseIT.java` mock
 `JwtDecoder`, so they do not prove issuer validation.

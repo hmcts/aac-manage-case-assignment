@@ -1,0 +1,15 @@
+{
+  "_guid_": "F-206_Verify_Granted_Case_Roles_R2_R3_Only_Dil",
+  "_extends_": "F-206_Verify_Granted_Case_Roles_R2_R3_Only__Base",
+
+  "specs": [
+    "to verify that Dil HAS been granted ONLY case roles R2 and R3 for the case - and has STILL NOT been granted R1"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  }
+
+}

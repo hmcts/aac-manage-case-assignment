@@ -1,0 +1,31 @@
+{
+  "_guid_": "F-206_Request_NoC_By_Dil_For_R2",
+  "_extends_": "Request_NoC__Base",
+
+  "specs": [
+    "by Dil to place a NOC Request for C1 identifying case role R2, which is auto-approved"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_Dil"
+    }
+  },
+
+  "request": {
+    "body": {
+      "_extends_": "NoC_Auto_Approval_Valid_Answers_For_Case_Role_R2",
+
+      "case_id": "${[scenarioContext][siblingContexts][F-206_NoC_Auto_Approval_Case_Creation_By_Richard_With_Assigned_Org_Policies][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "status_message": "The Notice of Change request has been successfully submitted.",
+      "case_role": "[RespondentSolicitor]",
+      "approval_status": "APPROVED"
+    }
+  }
+}

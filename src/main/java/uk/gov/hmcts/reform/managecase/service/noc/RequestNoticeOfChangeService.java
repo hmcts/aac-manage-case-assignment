@@ -89,13 +89,16 @@ public class RequestNoticeOfChangeService {
         // Case data is therefore reloaded before checking if the NoCRequest has been auto-approved
         CaseDetails caseDetails = getCaseViaExternalApi(caseId);
 
-        boolean isApprovalComplete =
-            isNocRequestAutoApprovalCompleted(caseDetails, invokersOrganisation, caseRoleId);
+        List<String> invokerOrgPolicyRoles = isNocRequestAutoApproved(caseDetails)
+            ? findInvokerOrgPolicyRoles(caseDetails, invokersOrganisation, caseRoleId)
+            : List.of();
+
+        boolean isApprovalComplete = !invokerOrgPolicyRoles.isEmpty();
 
         // Auto-assign relevant case-roles to the invoker if required
         if (isApprovalComplete
             && isActingAsSolicitor(securityUtils.getUserInfo().getRoles(), caseDetails.getJurisdiction())) {
-            autoAssignCaseRoles(caseDetails, invokersOrganisation);
+            autoAssignCaseRoles(caseDetails, invokersOrganisation, invokerOrgPolicyRoles);
         }
 
         return RequestNoticeOfChangeResponse.builder()
@@ -116,14 +119,14 @@ public class RequestNoticeOfChangeService {
                 .filter(orgPolicy ->
                             orgPolicy.getOrgPolicyCaseAssignedRole()
                                 .equalsIgnoreCase(changeOrganisationRequest.getCaseRoleId().getValue().getCode()))
-                .collect(toList());
+                .toList();
 
         if (matchingOrganisationPolicyNodes.size() != 1) {
             throw new NoCException(INVALID_CASE_ROLE_FIELD);
         }
 
         changeOrganisationRequest
-            .setOrganisationToRemove(matchingOrganisationPolicyNodes.get(0).getOrganisation());
+            .setOrganisationToRemove(matchingOrganisationPolicyNodes.getFirst().getOrganisation());
 
         Map<String, JsonNode> data = new HashMap<>(caseDetails.getData());
         data.put(changeOrganisationKey, jacksonUtils.convertValue(changeOrganisationRequest, JsonNode.class));
@@ -200,14 +203,10 @@ public class RequestNoticeOfChangeService {
             );
     }
 
-    private boolean isNocRequestAutoApprovalCompleted(CaseDetails caseDetails,
-                                                      Organisation invokersOrganisation,
-                                                      String caseRoleId) {
-        Optional<ChangeOrganisationRequest> changeOrganisationRequest = getChangeOrganisationRequest(caseDetails);
-
-        return changeOrganisationRequest.isPresent()
-            && changeOrganisationRequest.get().getCaseRoleId() == null
-            && isRequestToAddOrReplaceRepresentationAndApproved(caseDetails, invokersOrganisation, caseRoleId);
+    private boolean isNocRequestAutoApproved(CaseDetails caseDetails) {
+        return getChangeOrganisationRequest(caseDetails)
+            .map(changeOrganisationRequest -> changeOrganisationRequest.getCaseRoleId() == null)
+            .orElse(false);
     }
 
     private Optional<ChangeOrganisationRequest> getChangeOrganisationRequest(CaseDetails caseDetails) {
@@ -223,10 +222,8 @@ public class RequestNoticeOfChangeService {
     }
 
     private void autoAssignCaseRoles(CaseDetails caseDetails,
-                                     Organisation invokersOrganisation) {
-        List<String> invokerOrgPolicyRoles =
-            findInvokerOrgPolicyRoles(caseDetails, invokersOrganisation);
-
+                                     Organisation invokersOrganisation,
+                                     List<String> invokerOrgPolicyRoles) {
         /*
         call the new endpoint GET /cases/{cid}/access-metadata to determine what roles the User is assigned.
         Based on the response from the new API, If the user has STANDARD access to case, then
@@ -250,12 +247,6 @@ public class RequestNoticeOfChangeService {
         }
     }
 
-    private boolean isRequestToAddOrReplaceRepresentationAndApproved(CaseDetails caseDetails,
-                                                                     Organisation organisation,
-                                                                     String caseRoleId) {
-        return findInvokerOrgPolicyRoles(caseDetails, organisation).contains(caseRoleId);
-    }
-
     private List<OrganisationPolicy> findPolicies(CaseDetails caseDetails) {
         List<JsonNode> policyNodes = caseDetails.findOrganisationPolicyNodes();
         return policyNodes.stream()
@@ -263,12 +254,15 @@ public class RequestNoticeOfChangeService {
             .collect(toList());
     }
 
-    private List<String> findInvokerOrgPolicyRoles(CaseDetails caseDetails, Organisation organisation) {
+    private List<String> findInvokerOrgPolicyRoles(CaseDetails caseDetails, Organisation organisation,
+                                                   String caseRoleId) {
         List<OrganisationPolicy> policies = findPolicies(caseDetails);
         return policies.stream()
             .filter(policy -> policy.getOrganisation() != null
-                && organisation.getOrganisationID().equalsIgnoreCase(policy.getOrganisation().getOrganisationID()))
+                && organisation.getOrganisationID().equalsIgnoreCase(policy.getOrganisation().getOrganisationID())
+                && caseRoleId.equalsIgnoreCase(policy.getOrgPolicyCaseAssignedRole()))
             .map(OrganisationPolicy::getOrgPolicyCaseAssignedRole)
+            .distinct()
             .collect(toList());
     }
 }

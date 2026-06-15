@@ -17,17 +17,18 @@ import java.util.Date;
 final class JwtTestTokens {
 
     static final String KEY_ID = "test-signing-key";
+    private static final Instant ISSUED_AT = Instant.parse("2024-01-01T00:00:00Z");
+    private static final Instant EXPIRES_AT = Instant.parse("2099-01-01T00:00:00Z");
 
     private JwtTestTokens() {
     }
 
     static String signedToken(String issuer, RSAPrivateKey privateKey) throws JOSEException {
-        Instant now = Instant.now();
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
             .issuer(issuer)
             .subject("test-user")
-            .issueTime(Date.from(now.minusSeconds(60)))
-            .expirationTime(Date.from(now.plusSeconds(300)))
+            .issueTime(Date.from(ISSUED_AT))
+            .expirationTime(Date.from(EXPIRES_AT))
             .build();
 
         SignedJWT signedJwt = new SignedJWT(

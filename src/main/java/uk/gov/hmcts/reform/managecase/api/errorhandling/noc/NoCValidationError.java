@@ -34,7 +34,9 @@ public enum NoCValidationError {
                                   + " expected %s answers, received %s",
                               "answers-mismatch-questions"),
     NO_ANSWER_PROVIDED("No answer has been provided for question ID '%s'",
-                       "no-answer-provided-for-question");
+                       "no-answer-provided-for-question"),
+    FAILED_SERVICE_VALIDATION("Failed service validation: %s",
+                              "failed-service-noc-validation-id");
 
 
 

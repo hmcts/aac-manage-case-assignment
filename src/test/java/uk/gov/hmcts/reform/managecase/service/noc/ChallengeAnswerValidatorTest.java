@@ -79,6 +79,34 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
+    void shouldSuccessfullyIdentifyMatchingCaseRoleWhenCaseValueHasSmartApostrophe() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Mike's Company"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${SmartApostropheField}:[Defendant]", fieldType(TEXT))
+        );
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        String result = challengeAnswerValidator
+            .getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails);
+
+        assertThat(result, is("[Defendant]"));
+    }
+
+    @Test
+    void shouldSuccessfullyIdentifyMatchingCaseRoleWhenSubmittedValueHasSmartApostrophe() {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Mike’s Company"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${StraightApostropheField}:[Defendant]", fieldType(TEXT))
+        );
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        String result = challengeAnswerValidator
+            .getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails);
+
+        assertThat(result, is("[Defendant]"));
+    }
+
+    @Test
     void shouldErrorWhenThereAreMoreAnswersThanQuestions() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
@@ -216,7 +244,7 @@ class ChallengeAnswerValidatorTest {
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${AnotherField1}:[Defendant],"
                                   + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
-        challengeQuestions.get(0).setIgnoreNullFields(true);
+        challengeQuestions.getFirst().setIgnoreNullFields(true);
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         NoCException exception = assertThrows(NoCException.class,
@@ -248,7 +276,7 @@ class ChallengeAnswerValidatorTest {
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${AnotherField1}:[Defendant],"
                                   + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
-        challengeQuestions.get(0).setIgnoreNullFields(true);
+        challengeQuestions.getFirst().setIgnoreNullFields(true);
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         NoCException exception = assertThrows(NoCException.class,
@@ -283,7 +311,7 @@ class ChallengeAnswerValidatorTest {
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${ApplicantField}:[Defendant],"
                                   + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
-        challengeQuestions.get(0).setIgnoreNullFields(true);
+        challengeQuestions.getFirst().setIgnoreNullFields(true);
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         NoCException exception = assertThrows(NoCException.class,
@@ -301,7 +329,7 @@ class ChallengeAnswerValidatorTest {
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${ApplicantField}:[Defendant],"
                                   + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
-        challengeQuestions.get(0).setIgnoreNullFields(true);
+        challengeQuestions.getFirst().setIgnoreNullFields(true);
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         NoCException exception = assertThrows(NoCException.class,
@@ -381,7 +409,7 @@ class ChallengeAnswerValidatorTest {
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${Applicant2Field}:[Defendant],"
                 + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
-        challengeQuestions.get(0).setIgnoreNullFields(true);
+        challengeQuestions.getFirst().setIgnoreNullFields(true);
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         NoCException exception = assertThrows(NoCException.class,
@@ -399,7 +427,7 @@ class ChallengeAnswerValidatorTest {
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${Applicant2Field}:[Defendant],"
                 + "${TextField}:[respondent1],${TextField}:[respondent2]", fieldType(TEXT)));
-        challengeQuestions.get(0).setIgnoreNullFields(true);
+        challengeQuestions.getFirst().setIgnoreNullFields(true);
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         String result = challengeAnswerValidator
@@ -414,7 +442,7 @@ class ChallengeAnswerValidatorTest {
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${TextField}:[respondent2]",
                               fieldType(TEXT)));
-        challengeQuestions.get(0).setIgnoreNullFields(true);
+        challengeQuestions.getFirst().setIgnoreNullFields(true);
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         NoCException exception = assertThrows(NoCException.class,
@@ -432,7 +460,7 @@ class ChallengeAnswerValidatorTest {
         List<ChallengeQuestion> challengeQuestions = singletonList(
             challengeQuestion(QUESTION_ID_1, "${TextField}:[Claimant],${TextField}:[respondent2]",
                               fieldType(TEXT)));
-        challengeQuestions.get(0).setIgnoreNullFields(true);
+        challengeQuestions.getFirst().setIgnoreNullFields(true);
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 
         NoCException exception = assertThrows(NoCException.class,
@@ -501,34 +529,37 @@ class ChallengeAnswerValidatorTest {
     }
 
     private String caseDataString() {
-        return "{\n"
-            + "    \"DateField\": \"1985-07-25\",\n"
-            + "    \"TextField\": \"TextValue\",\n"
-            + "    \"ApplicantField\": \"\",\n"
-            + "    \"Applicant2Field\": \"Name2\",\n"
-            + "    \"EmailField\": \"test@email.com\",\n"
-            + "    \"NumberField\": \"12345\",\n"
-            + "    \"ComplexField\": {\n"
-            + "        \"ComplexNestedField\": {\n"
-            + "            \"NestedNumberField\": \"67890\",\n"
-            + "            \"NestedCollectionTextField\": []\n"
-            + "        },\n"
-            + "        \"ComplexTextField\": \"ComplexTextValue\"\n"
-            + "    },\n"
-            + "    \"PhoneUKField\": \"01234 567890\",\n"
-            + "    \"YesOrNoField\": \"No\",\n"
-            + "    \"DateTimeField\": \"2020-12-15T12:30:15.000\",\n"
-            + "    \"MoneyGBPField\": \"25000\",\n"
-            + "    \"TextAreaField\": null,\n"
-            + "    \"AddressUKField\": {\n"
-            + "        \"County\": \"CountValue\",\n"
-            + "        \"Country\": \"CountryValue\",\n"
-            + "        \"PostCode\": \"PST CDE\",\n"
-            + "        \"PostTown\": \"TownValue\",\n"
-            + "        \"AddressLine1\": \"BuildingValue\",\n"
-            + "        \"AddressLine2\": \"AddressLine2Value\",\n"
-            + "        \"AddressLine3\": \"AddressLine3Value\"\n"
-            + "    }\n"
-            + "}";
+        return """
+            {
+                "DateField": "1985-07-25",
+                "TextField": "TextValue",
+                "SmartApostropheField": "Mike’s Company",
+                "StraightApostropheField": "Mike's Company",
+                "ApplicantField": "",
+                "Applicant2Field": "Name2",
+                "EmailField": "test@email.com",
+                "NumberField": "12345",
+                "ComplexField": {
+                    "ComplexNestedField": {
+                        "NestedNumberField": "67890",
+                        "NestedCollectionTextField": []
+                    },
+                    "ComplexTextField": "ComplexTextValue"
+                },
+                "PhoneUKField": "01234 567890",
+                "YesOrNoField": "No",
+                "DateTimeField": "2020-12-15T12:30:15.000",
+                "MoneyGBPField": "25000",
+                "TextAreaField": null,
+                "AddressUKField": {
+                    "County": "CountValue",
+                    "Country": "CountryValue",
+                    "PostCode": "PST CDE",
+                    "PostTown": "TownValue",
+                    "AddressLine1": "BuildingValue",
+                    "AddressLine2": "AddressLine2Value",
+                    "AddressLine3": "AddressLine3Value"
+                }
+            }""";
     }
 }

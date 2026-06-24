@@ -42,7 +42,7 @@ public class ChallengeAnswerValidator {
                                        ChallengeQuestionsResult challengeQuestions) {
         List<String> matchingCaseRoleIds = caseRoleCorrectAnswers.keySet().stream()
             .filter(caseRoleId -> caseRoleCorrectAnswers.get(caseRoleId) == challengeQuestions.getQuestions().size())
-            .collect(toList());
+            .toList();
 
         if (matchingCaseRoleIds.isEmpty()) {
             throw new NoCException(ANSWERS_NOT_MATCH_LITIGANT);
@@ -52,7 +52,7 @@ public class ChallengeAnswerValidator {
             throw new NoCException(ANSWERS_NOT_IDENTIFY_LITIGANT);
         }
 
-        return matchingCaseRoleIds.get(0);
+        return matchingCaseRoleIds.getFirst();
     }
 
     private Map<String, Integer> getCaseRoleCorrectAnswers(List<SubmittedChallengeAnswer> answers,
@@ -120,6 +120,6 @@ public class ChallengeAnswerValidator {
     }
 
     private String formattedString(String textValue) {
-        return whitespace().or(anyOf("-'")).removeFrom(textValue);
+        return whitespace().or(anyOf("-'’")).removeFrom(textValue);
     }
 }

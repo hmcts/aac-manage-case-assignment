@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
@@ -78,25 +80,15 @@ class ChallengeAnswerValidatorTest {
         assertThat(result, is("[Claimant]"));
     }
 
-    @Test
-    void shouldSuccessfullyIdentifyMatchingCaseRoleWhenCaseValueHasSmartApostrophe() {
-        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Mike's Company"));
+    @ParameterizedTest
+    @CsvSource({
+        "Mike's Company, StraightApostropheField",
+        "Mike’s Company, SmartApostropheField"
+    })
+    void shouldSuccessfullyIdentifyMatchingCaseRoleWhenApostrophesDiffer(String answer, String field) {
+        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, answer));
         List<ChallengeQuestion> challengeQuestions = singletonList(
-            challengeQuestion(QUESTION_ID_1, "${SmartApostropheField}:[Defendant]", fieldType(TEXT))
-        );
-        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
-
-        String result = challengeAnswerValidator
-            .getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails);
-
-        assertThat(result, is("[Defendant]"));
-    }
-
-    @Test
-    void shouldSuccessfullyIdentifyMatchingCaseRoleWhenSubmittedValueHasSmartApostrophe() {
-        answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, "Mike’s Company"));
-        List<ChallengeQuestion> challengeQuestions = singletonList(
-            challengeQuestion(QUESTION_ID_1, "${StraightApostropheField}:[Defendant]", fieldType(TEXT))
+            challengeQuestion(QUESTION_ID_1, "${" + field + "}:[Defendant]", fieldType(TEXT))
         );
         ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
 

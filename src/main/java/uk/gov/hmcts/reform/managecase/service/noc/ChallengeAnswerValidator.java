@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.managecase.service.noc;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
@@ -26,6 +27,12 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDef
 @Component
 @SuppressWarnings({"PMD.AvoidLiteralsInIfCondition", "PMD.UseConcurrentHashMap"})
 public class ChallengeAnswerValidator {
+
+    private final ApplicationParams applicationParams;
+
+    public ChallengeAnswerValidator(ApplicationParams applicationParams) {
+        this.applicationParams = applicationParams;
+    }
 
     public String getMatchingCaseRole(ChallengeQuestionsResult challengeQuestions,
                                       List<SubmittedChallengeAnswer> submittedAnswers,
@@ -120,6 +127,6 @@ public class ChallengeAnswerValidator {
     }
 
     private String formattedString(String textValue) {
-        return whitespace().or(anyOf("-'’")).removeFrom(textValue);
+        return whitespace().or(anyOf(applicationParams.getChallengeAnswerStripCharacters())).removeFrom(textValue);
     }
 }

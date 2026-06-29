@@ -9,7 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
@@ -25,6 +27,7 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.ANSWERS_NOT_IDENTIFY_LITIGANT;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.ANSWERS_NOT_MATCH_LITIGANT;
 
@@ -40,6 +43,9 @@ class ChallengeAnswerValidatorTest {
     @InjectMocks
     private ChallengeAnswerValidator challengeAnswerValidator;
 
+    @Mock
+    private ApplicationParams applicationParams;
+
     private List<SubmittedChallengeAnswer> answers;
     private CaseDetails caseDetails;
 
@@ -48,6 +54,7 @@ class ChallengeAnswerValidatorTest {
     @BeforeEach
     void setUp() throws JsonProcessingException {
         MockitoAnnotations.openMocks(this);
+        when(applicationParams.getChallengeAnswerStripCharacters()).thenReturn("-'’");
 
         answers = new ArrayList<>();
         answers.add(new SubmittedChallengeAnswer(QUESTION_ID_1, " T-e xt'VALUE"));
@@ -83,7 +90,9 @@ class ChallengeAnswerValidatorTest {
     @ParameterizedTest
     @CsvSource({
         "Mike's Company, StraightApostropheField",
-        "Mike’s Company, SmartApostropheField"
+        "Mike’s Company, SmartApostropheField",
+        "Mike's Company, SmartApostropheField",
+        "Mike’s Company, StraightApostropheField"
     })
     void shouldSuccessfullyIdentifyMatchingCaseRoleWhenApostrophesDiffer(String answer, String field) {
         answers = singletonList(new SubmittedChallengeAnswer(QUESTION_ID_1, answer));

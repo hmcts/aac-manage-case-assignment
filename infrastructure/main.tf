@@ -28,7 +28,7 @@ module "key-vault" {
   common_tags                          = var.common_tags
   create_managed_identity              = true
   additional_managed_identities_access = var.additional_managed_identities_access
-  grant_preview_jenkins_access = var.env == "aat"
+  grant_preview_jenkins_access         = var.env == "aat"
 }
 
 resource "azurerm_key_vault_secret" "app_insights_connection_string" {

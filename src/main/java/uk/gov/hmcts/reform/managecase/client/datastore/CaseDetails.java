@@ -110,6 +110,9 @@ public class CaseDetails {
     @JsonProperty("supplementary_data")
     private JsonNode supplementaryData;
 
+    @JsonProperty("callback_error_message")
+    private String callbackErrorMessage;
+
     public Optional<String> findChangeOrganisationRequestFieldName() {
         Optional<JsonNode> first = getData().values().stream()
             .map(node -> node.findParents(ORGANISATION_TO_ADD))

@@ -120,7 +120,6 @@ public class NoticeOfChangeControllerTest {
         excludeFilters = @ComponentScan.Filter(type = ASSIGNABLE_TYPE, classes =
             { SecurityConfiguration.class, JwtGrantedAuthoritiesConverter.class }))
     @AutoConfigureMockMvc(addFilters = false)
-    @ImportAutoConfiguration(TestIdamConfiguration.class)
     @Import(JacksonObjectMapperConfig.class)
     static class BaseWebMvcTest {
 

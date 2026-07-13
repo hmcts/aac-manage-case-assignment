@@ -27,7 +27,7 @@ ext {
   appInsightsVersion = '2.6.4'
   reformLogging       = '8.0.0'
   restAssured         = '5.5.7'
-  beftaFwVersion      = '9.2.6'
+  beftaFwVersion      = '9.2.7'
   ccdTestDefinitionVersion = '7.27.7-prerelease-CME-537'
 }
 

@@ -2,11 +2,13 @@ package uk.gov.hmcts.reform.managecase.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import feign.FeignException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.CaseCouldNotBeFoundException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.UpdateSupplementaryDataException;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseEventCreationPayload;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.SearchCaseUserRolesReques
 import uk.gov.hmcts.reform.managecase.client.datastore.StartEventResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.SupplementaryDataUpdates;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseAccessMetadataResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseUpdateViewEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewField;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
@@ -33,6 +36,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CASE_NOT_FOUND;
+import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError.FAILED_SERVICE_VALIDATION;
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.PENDING;
 
 @Repository("defaultDataStoreRepository")
@@ -75,6 +79,18 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
     public CaseViewResource findCaseByCaseId(String caseId) {
         try {
             return dataStoreApi.getCaseDetailsByCaseId(getUserAuthToken(), caseId);
+        } catch (FeignException ex) {
+            if (HttpStatus.NOT_FOUND.value() == ex.status()) {
+                throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
+            }
+            throw ex;
+        }
+    }
+
+    @Override
+    public CaseAccessMetadataResource findCaseAccessMetadataByCaseId(String caseId) {
+        try {
+            return dataStoreApi.getCaseAccessMetadataByCaseId(securityUtils.getUserBearerToken(), caseId);
         } catch (FeignException ex) {
             if (HttpStatus.NOT_FOUND.value() == ex.status()) {
                 throw new CaseCouldNotBeFoundException(CASE_NOT_FOUND);
@@ -270,6 +286,12 @@ public class DefaultDataStoreRepository implements DataStoreRepository {
                                     String userAuthToken) {
         CaseDetails caseDetails = dataStoreApi.submitEventForCase(userAuthToken, caseId, caseEventCreationPayload);
         if (INCOMPLETE_CALLBACK.equalsIgnoreCase(caseDetails.getCallbackResponseStatus())) {
+            if (StringUtils.isNotEmpty(caseDetails.getCallbackErrorMessage())) {
+                throw new NoCException(String.format(
+                    FAILED_SERVICE_VALIDATION.getErrorMessage(),
+                    caseDetails.getCaseTypeId()),
+                                       FAILED_SERVICE_VALIDATION.getErrorCode());
+            }
             throw new RuntimeException(CALLBACK_FAILED_ERRORS_MESSAGE);
         }
         return caseDetails;

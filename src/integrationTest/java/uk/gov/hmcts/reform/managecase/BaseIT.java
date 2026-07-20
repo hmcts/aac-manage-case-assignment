@@ -26,8 +26,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("integration")
 @SpringBootTest(classes = {
-    Application.class,
-    TestIdamConfiguration.class
+    Application.class
 })
 @AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureWireMock(port = 0, stubs = "classpath:/wiremock-stubs")

@@ -331,7 +331,7 @@ dependencies {
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLogging
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '6.0.1-RELEASE'
 
-  implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.2'
+  implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.0'
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
   implementation group: 'com.vladmihalcea', name: 'hibernate-types-60', version: '2.21.1'
   implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: jjwt

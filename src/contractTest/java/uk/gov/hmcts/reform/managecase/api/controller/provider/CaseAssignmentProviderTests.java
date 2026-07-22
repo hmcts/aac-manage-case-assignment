@@ -70,7 +70,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidation
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
 @TestPropertySource(locations = "/application.properties")
 @IgnoreNoPactsToVerify
-public class NocCaseAssignmentProviderTests {
+public class CaseAssignmentProviderTests {
 
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
     private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";

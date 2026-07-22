@@ -16,6 +16,7 @@ import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -67,6 +68,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidation
 @Provider("acc_manageCaseAssignment")
 @PactBroker(url = "${PACT_BROKER_URL:http://localhost:80}")
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
+@TestPropertySource(locations = "/application.properties")
 @IgnoreNoPactsToVerify
 public class NocCaseAssignmentProviderTests {
 

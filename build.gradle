@@ -203,16 +203,14 @@ tasks.register('runProviderPactVerification', Test) {
   group = 'Verification'
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
-  systemProperty 'pact.verifier.publishResults',
-      project.findProperty('pact.verifier.publishResults') ?: 'true'
+  if (project.hasProperty('pact.verifier.publishResults')) {
+    systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+  }
   systemProperty 'pact.provider.version', project.pactVersion
-  // Temporary provider version tag for local broker verification results.
-  systemProperty 'pact.provider.tag',
-      project.findProperty('pact.provider.tag') ?: 'Dev'
-  // Keep local verification isolated from any globally configured broker.
-  systemProperty 'PACT_BROKER_URL',
-      project.findProperty('pact.broker.url') ?: 'http://localhost:80'
 }
+
+runProviderPactVerification.finalizedBy pactVerify
+
 
 def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --short HEAD'.execute().text.trim()

@@ -198,18 +198,18 @@ tasks.register('contract', Test) {
   include "uk/gov/hmcts/reform/managecase/api/controller/provider/**"
 }
 
-tasks.register('runProviderPactVerification', Test) {
-  description = 'Verifies provider Pacts from the broker and publishes the verification results'
-  group = 'Verification'
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
-  if (project.hasProperty('pact.verifier.publishResults')) {
-    systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
-  }
-  systemProperty 'pact.provider.version', project.pactVersion
-}
-
-runProviderPactVerification.finalizedBy pactVerify
+//tasks.register('runProviderPactVerification', Test) {
+//  description = 'Verifies provider Pacts from the broker and publishes the verification results'
+//  group = 'Verification'
+//  testClassesDirs = sourceSets.contractTest.output.classesDirs
+//  classpath = sourceSets.contractTest.runtimeClasspath
+//  if (project.hasProperty('pact.verifier.publishResults')) {
+//    systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+//  }
+//  systemProperty 'pact.provider.version', project.pactVersion
+//}
+//
+//runProviderPactVerification.finalizedBy pactVerify
 
 
 def getCheckedOutGitCommitHash() {

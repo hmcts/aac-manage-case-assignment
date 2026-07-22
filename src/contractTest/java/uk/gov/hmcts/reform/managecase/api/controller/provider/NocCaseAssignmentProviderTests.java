@@ -43,7 +43,7 @@ import static org.mockito.BDDMockito.given;
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
 @TestPropertySource(locations = "/application.properties")
 @IgnoreNoPactsToVerify
-public class NocCaseAssignmentVerificationTests {
+public class NocCaseAssignmentProviderTests {
 
         private static final String ORG_POLICY_ROLE = "caseworker-probate";
     private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";

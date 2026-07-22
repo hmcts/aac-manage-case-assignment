@@ -21,8 +21,7 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -30,90 +29,129 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 public class ContractConfig {
 
-    @MockBean
-    PrdRepository prdRepository;
-    @MockBean
-    DataStoreRepository dataStoreRepository;
-    @MockBean
-    IdamRepository idamRepository;
-    @MockBean
-    JacksonUtils jacksonUtils;
-    @MockBean
-    SecurityUtils securityUtils;
-    @MockBean
-    NoticeOfChangeQuestions noticeOfChangeQuestions;
-    @MockBean
-    ChallengeAnswerValidator challengeAnswerValidator;
-    @MockBean
-    DefinitionStoreRepository definitionStoreRepository;
-    @MockBean
-    UserRepository userRepository;
-    @MockBean
-    NotifyService notifyService;
-
-
-    @Autowired
-    ModelMapper modelMapper;
+    @Bean
+    public PrdRepository prdRepository() {
+        return Mockito.mock(PrdRepository.class);
+    }
 
     @Bean
-    @Primary
-    public CaseAssignmentController caseAssignmentController() {
-        return new CaseAssignmentController(caseAssignmentService(), modelMapper);
+    public DataStoreRepository dataStoreRepository() {
+        return Mockito.mock(DataStoreRepository.class);
+    }
+
+    @Bean
+    public IdamRepository idamRepository() {
+        return Mockito.mock(IdamRepository.class);
+    }
+
+    @Bean
+    public JacksonUtils jacksonUtils() {
+        return Mockito.mock(JacksonUtils.class);
+    }
+
+    @Bean
+    public SecurityUtils securityUtils() {
+        return Mockito.mock(SecurityUtils.class);
+    }
+
+    @Bean
+    public NoticeOfChangeQuestions noticeOfChangeQuestions() {
+        return Mockito.mock(NoticeOfChangeQuestions.class);
+    }
+
+    @Bean
+    public ChallengeAnswerValidator challengeAnswerValidator() {
+        return Mockito.mock(ChallengeAnswerValidator.class);
+    }
+
+    @Bean
+    public DefinitionStoreRepository definitionStoreRepository() {
+        return Mockito.mock(DefinitionStoreRepository.class);
+    }
+
+    @Bean
+    public UserRepository userRepository() {
+        return Mockito.mock(UserRepository.class);
+    }
+
+    @Bean
+    public NotifyService notifyService() {
+        return Mockito.mock(NotifyService.class);
     }
 
     @Bean
     @Primary
-    public NoticeOfChangeController noticeOfChangeController() {
+    public CaseAssignmentController caseAssignmentController(CaseAssignmentService caseAssignmentService,
+                                                              ModelMapper modelMapper) {
+        return new CaseAssignmentController(caseAssignmentService, modelMapper);
+    }
+
+    @Bean
+    @Primary
+    public NoticeOfChangeController noticeOfChangeController(
+        NoticeOfChangeQuestions noticeOfChangeQuestions,
+        NoticeOfChangeApprovalService noticeOfChangeApprovalService,
+        VerifyNoCAnswersService verifyNoCAnswersService,
+        PrepareNoCService prepareNoCService,
+        RequestNoticeOfChangeService requestNoticeOfChangeService,
+        ApplyNoCDecisionService applyNoCDecisionService,
+        JacksonUtils jacksonUtils) {
         return new NoticeOfChangeController(noticeOfChangeQuestions,
-                                            noticeOfChangeApprovalService(),
-                                            verifyNoCAnswersService(),
-                                            prepareNoCService(),
-                                            requestNoticeOfChangeService(),
-                                            applyNoCDecisionService(),
+                                            noticeOfChangeApprovalService,
+                                            verifyNoCAnswersService,
+                                            prepareNoCService,
+                                            requestNoticeOfChangeService,
+                                            applyNoCDecisionService,
                                             jacksonUtils);
     }
 
+    @Bean
     public CaseAssignmentService caseAssignmentService() {
-        return new CaseAssignmentService(prdRepository,
-                                         dataStoreRepository,
-                                         idamRepository,
-                                         jacksonUtils,
-                                         securityUtils);
+        return new CaseAssignmentService(prdRepository(),
+                                         dataStoreRepository(),
+                                         idamRepository(),
+                                         jacksonUtils(),
+                                         securityUtils());
     }
 
+    @Bean
     public NoticeOfChangeApprovalService noticeOfChangeApprovalService() {
-        return new NoticeOfChangeApprovalService(dataStoreRepository);
+        return new NoticeOfChangeApprovalService(dataStoreRepository());
     }
 
+    @Bean
     public VerifyNoCAnswersService verifyNoCAnswersService() {
-        return new VerifyNoCAnswersService(noticeOfChangeQuestions,
-                                           challengeAnswerValidator,
-                                           prdRepository,
-                                           jacksonUtils);
+        return new VerifyNoCAnswersService(noticeOfChangeQuestions(),
+                                           challengeAnswerValidator(),
+                                           prdRepository(),
+                                           jacksonUtils());
     }
 
+    @Bean
     public PrepareNoCService prepareNoCService() {
-        return new PrepareNoCService(prdRepository,
-                                     securityUtils,
-                                     jacksonUtils,
-                                     definitionStoreRepository);
+        return new PrepareNoCService(prdRepository(),
+                                     securityUtils(),
+                                     jacksonUtils(),
+                                     definitionStoreRepository());
     }
 
+    @Bean
     public RequestNoticeOfChangeService requestNoticeOfChangeService() {
-        return new RequestNoticeOfChangeService(noticeOfChangeQuestions,
-                                                dataStoreRepository,
-                                                definitionStoreRepository,
-                                                prdRepository,
-                                                jacksonUtils,
-                                                securityUtils,
-                                                userRepository);
+        return new RequestNoticeOfChangeService(noticeOfChangeQuestions(),
+                                                dataStoreRepository(),
+                                                definitionStoreRepository(),
+                                                prdRepository(),
+                                                jacksonUtils(),
+                                                securityUtils(),
+                                                userRepository());
     }
 
+    @Bean
     public ApplyNoCDecisionService applyNoCDecisionService() {
-        return new ApplyNoCDecisionService(prdRepository,
-                                           dataStoreRepository,
-                                           notifyService,
-                                           jacksonUtils,
+        return new ApplyNoCDecisionService(prdRepository(),
+                                           dataStoreRepository(),
+                                           notifyService(),
+                                           jacksonUtils(),
                                            new ObjectMapper());
     }
 }

@@ -88,4 +88,50 @@ public class CaseDetailsTest {
         // ASSERT
         assertThat(caseDetails.findChangeOrganisationRequestNode()).isNotPresent();
     }
+
+    @Test
+    @DisplayName("Deserialises known CCD case metadata from internal and external APIs")
+    void shouldDeserialiseKnownCcdCaseMetadata() throws JsonProcessingException {
+        String json = """
+            {
+              "id": "1588234985453946",
+              "version": 4,
+              "jurisdiction": "AUTOTEST1",
+              "case_type": "FT_MasterCaseType",
+              "created_on": "2026-05-07T16:10:00",
+              "last_modified_on": "2026-05-07T17:10:00",
+              "last_state_modified_on": "2026-05-07T17:05:00",
+              "state": "CaseCreated",
+              "security_classification": "PUBLIC",
+              "data": {
+                "OrganisationPolicy1": {
+                  "OrgPolicyCaseAssignedRole": "[Creator]"
+                }
+              },
+              "data_classification": {},
+              "supplementary_data": null,
+              "after_submit_callback_response": null,
+              "callback_response_status_code": null,
+              "callback_response_status": null,
+              "delete_draft_response_status_code": null,
+              "delete_draft_response_status": null,
+              "_links": {
+                "self": {
+                  "href": "http://ccd-data-store-api/cases/1588234985453946"
+                }
+              }
+            }
+            """;
+
+        CaseDetails caseDetails = objectMapper.readValue(json, CaseDetails.class);
+
+        assertThat(caseDetails.getId()).isEqualTo("1588234985453946");
+        assertThat(caseDetails.getVersion()).isEqualTo(4);
+        assertThat(caseDetails.getCaseTypeId()).isEqualTo("FT_MasterCaseType");
+        assertThat(caseDetails.getCreatedDate()).isEqualTo(LocalDateTime.of(2026, Month.MAY, 7, 16, 10));
+        assertThat(caseDetails.getLastModified()).isEqualTo(LocalDateTime.of(2026, Month.MAY, 7, 17, 10));
+        assertThat(caseDetails.getLastStateModifiedDate()).isEqualTo(LocalDateTime.of(2026, Month.MAY, 7, 17, 5));
+        assertThat(caseDetails.getLinks().get("self").get("href").asText())
+            .isEqualTo("http://ccd-data-store-api/cases/1588234985453946");
+    }
 }

@@ -16,18 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController;
 import uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
-import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
-import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
-import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
-import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
-import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.util.List;
 
@@ -45,39 +39,8 @@ import static org.mockito.BDDMockito.given;
 @IgnoreNoPactsToVerify
 public class NocCaseAssignmentProviderTests {
 
-        private static final String ORG_POLICY_ROLE = "caseworker-probate";
-    private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";
-    private static final String ORG_POLICY_ROLE3 = "Role1";
-    private static final String ORG_POLICY_ROLE4 = "Role2";
-    private static final String ORGANIZATION_ID = "TEST_ORG";
-    private static final String ASSIGNEE_ID = "0a5874a4-3f38-4bbd-ba4c";
-    private static final String BEAR_TOKEN = "TestBearToken";
-
-    private static final String ASSIGNEE_ID2 = "38130f09-0010-4c12-afd1-2563bb25d1d3";
-    private static final String ASSIGNEE_ID3 = "userId";
-    private static final String CASE_ID = "12345678";
-    private static final String CASE_ID2 = "87654321";
-    private static final String CASE_ROLE = "[CR1]";
-    private static final String CASE_ROLE2 = "[CR2]";
-
-    private static final String TEST_APP_ORG_ID = "appOrgId";
-    private static final String TEST_APP_ORG_NAME = "appOrgName";
-
-    @Autowired
-    DataStoreRepository dataStoreRepository;
-    @Autowired
-    PrdRepository prdRepository;
-    @Autowired
-    IdamRepository idamRepository;
-    @Autowired
-    JacksonUtils jacksonUtils;
-    @Autowired
-    SecurityUtils securityUtils;
     @Autowired
     NoticeOfChangeQuestions noticeOfChangeQuestions;
-
-    @Autowired
-    CaseAssignmentController caseAssignmentController;
 
     @Autowired
     NoticeOfChangeController noticeOfChangeController;
@@ -99,7 +62,7 @@ public class NocCaseAssignmentProviderTests {
     void before(PactVerificationContext context) {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         //System.getProperties().setProperty("pact.verifier.publishResults", "true");
-        testTarget.setControllers(caseAssignmentController, noticeOfChangeController);
+        testTarget.setControllers(noticeOfChangeController);
         if (context != null) {
             context.setTarget(testTarget);
         }

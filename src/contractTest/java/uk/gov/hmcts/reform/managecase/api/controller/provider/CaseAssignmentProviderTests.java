@@ -82,8 +82,8 @@ public class CaseAssignmentProviderTests {
 
     private static final String ASSIGNEE_ID2 = "38130f09-0010-4c12-afd1-2563bb25d1d3";
     private static final String ASSIGNEE_ID3 = "userId";
-    private static final String CASE_ID = "12345678";
-    private static final String CASE_ID2 = "87654321";
+    private static final String CASE_ID = "1588234985453946";
+    private static final String CASE_ID2 = "1588234985453953";
     private static final String CASE_ROLE = "[CR1]";
     private static final String CASE_ROLE2 = "[CR2]";
     private static final String NOC_CASE_ID = "1234567812345670";

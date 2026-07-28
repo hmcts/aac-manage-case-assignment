@@ -50,7 +50,7 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixtur
     consumerVersionSelectors = {@VersionSelector(tag = "master")})
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
 @IgnoreNoPactsToVerify
-public class NocCaseAssignmentProviderTests {
+public class CaseAssignmentProviderTests {
 
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
     private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";

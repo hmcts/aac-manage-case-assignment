@@ -192,6 +192,8 @@ elasticsearch:
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
+  esMajorVersion: 7
+  imageTag: "7.17.3"
   createCert: false
   protocol: http
   esJavaOpts: "-Xmx1g -Xms512M"

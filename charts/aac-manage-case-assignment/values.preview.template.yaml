@@ -192,12 +192,16 @@ elasticsearch:
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
+  createCert: false
+  protocol: http
   esJavaOpts: "-Xmx1g -Xms512M"
   # Their tests delete the pod after succeeding, we pass --logs to the test command which fail if the pod has already been deleted
   # The tests do pass, at least as of 2023-01-19
   tests:
     enabled: false
   extraEnvs:
+    - name: xpack.security.enabled
+      value: "false"
     - name: discovery.type
       value: single-node
     - name: cluster.initial_master_nodes

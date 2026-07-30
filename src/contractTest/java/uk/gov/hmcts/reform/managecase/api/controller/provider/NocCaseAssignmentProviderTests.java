@@ -14,7 +14,6 @@ import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
@@ -31,9 +30,10 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(SpringExtension.class)
 @Provider("acc_manageCaseAssignment_Noc")
-@PactBroker(url = "${PACT_BROKER_URL:http://localhost:80}")
+@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
+    host = "${PACT_BROKER_URL:localhost}",
+    port = "${PACT_BROKER_PORT:80}")
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
-@TestPropertySource(locations = "/application.properties")
 @IgnoreNoPactsToVerify
 public class NocCaseAssignmentProviderTests {
 
@@ -45,7 +45,8 @@ public class NocCaseAssignmentProviderTests {
 
     @PactBrokerConsumerVersionSelectors
     public static SelectorBuilder consumerVersionSelectors() {
-        return new SelectorBuilder().latestTag("Dev");
+        return new SelectorBuilder()
+            .latestTag(System.getenv().getOrDefault("PACT_CONSUMER_TAG", "master"));
     }
 
     @TestTemplate

@@ -175,6 +175,28 @@ public class CaseAssignmentProviderTests {
             .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE2));
     }
 
+    @State("The user cannot be assigned to the case")
+    public void toNotAssignUserToCase() throws IOException {
+
+        given(prdRepository.findUsersByOrganisation())
+            .willReturn(usersByOrganisation(user(ASSIGNEE_ID), user(ASSIGNEE_ID2), user(ASSIGNEE_ID3)));
+
+        given(dataStoreRepository.findCaseByCaseIdUsingExternalApi(TestFixtures.CASE_ID))
+            .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE3,
+                                                                    ORG_POLICY_ROLE4));
+        given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(TestFixtures.CASE_ID))
+            .willReturn(TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE3,
+                                                                    ORG_POLICY_ROLE4));
+
+        UserDetails userDetails = UserDetails.builder()
+            .id(ASSIGNEE_ID).roles(List.of("caseworker-AUTOTEST2-solicitor")).build();
+        given(idamRepository.getCaaSystemUserAccessToken()).willReturn(BEAR_TOKEN);
+        given(idamRepository.getUserByUserId(ASSIGNEE_ID, BEAR_TOKEN)).willReturn(userDetails);
+        given(idamRepository.getUserByUserId(ASSIGNEE_ID3, BEAR_TOKEN)).willReturn(userDetails);
+
+        given(securityUtils.hasSolicitorAndJurisdictionRoles(anyList(), anyString())).willReturn(false);
+    }
+
     @State({"Case assignments exist for case Ids"})
     public void toGetExistingCaseAssignments() throws IOException {
         given(prdRepository.findUsersByOrganisation())

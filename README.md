@@ -51,9 +51,9 @@ To run all integration tests execute the following command:
 ./gradlew integration
 ```
 
-### Provider Pact tests with a local Pact Broker
+### Provider Pact tests
 
-The provider Pact tests load the latest consumer Pact tagged `Dev` from the Pact Broker. To run them locally, first start the Postgres database and Pact Broker services from the [Pact Broker Docker repository](https://github.com/pact-foundation/pact-broker-docker):
+In order to run the provider Pact tests locally, first start the Postgres database and Pact Broker services from the [Pact Broker Docker repository](https://github.com/pact-foundation/pact-broker-docker):
 
 ```bash
 git clone https://github.com/pact-foundation/pact-broker-docker.git
@@ -61,7 +61,10 @@ cd pact-broker-docker
 docker compose up -d postgres pact-broker
 ```
 
-From this repository, run the provider verification and publish the verification results back to the local broker:
+Second, from the consumer repository, ensure that you have published the consumer pact under test to the local broker with the `Dev` tag. 
+
+
+Finally, from this repository, run the provider verification and publish the verification results back to the local Pact Broker:
 
 ```bash
 PACT_BROKER_SCHEME=http \
@@ -73,7 +76,8 @@ PACT_CONSUMER_TAG=Dev \
   --rerun-tasks
 ```
 
-The consumer Pact must already be published to the local broker with the `Dev` tag. When finished, stop the broker with `docker compose down` from the `pact-broker-docker` directory.
+
+When finished, stop the broker with `docker compose down` from the `pact-broker-docker` directory.
 
 ### Functional tests
 These are the tests run against an environment. For example if you would like to test your local

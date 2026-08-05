@@ -38,7 +38,29 @@ class RoleAssignmentCategoryServiceTest {
     class GetRoleCategory {
 
         @Test
-        void shouldGetRoleCategoryForSolicitorUser() {
+        void shouldGetRoleCategoryForUserWithPuiCaseManagerRole() {
+
+            given(caseAssignmentService.getAssigneeRoles(USER_ID))
+                .willReturn(asList("caseworker", "pui-case-manager"));
+
+            RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
+
+            assertThat(roleCategory, is(PROFESSIONAL));
+        }
+
+        @Test
+        void shouldGetRoleCategoryForUserWithSolicitorRole() {
+
+            given(caseAssignmentService.getAssigneeRoles(USER_ID))
+                .willReturn(asList("caseworker", "solicitor"));
+
+            RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
+
+            assertThat(roleCategory, is(PROFESSIONAL));
+        }
+
+        @Test
+        void shouldGetRoleCategoryForUserWithRoleWithSolicitorSuffix() {
 
             given(caseAssignmentService.getAssigneeRoles(USER_ID))
                 .willReturn(asList("caseworker", "caseworker-autotest1-solicitor"));

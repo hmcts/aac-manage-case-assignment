@@ -13,12 +13,10 @@ idam:
   api:
     url: http://localhost:${wiremock.server.port:5000}
   caa:
-    # Test-only credentials matched by the WireMock IDAM token stub.
-    username: master.caa@gmail.com
-    password: Pa55word11
+    username: ${BEFTA_IDAM_CAA_USERNAME}
+    password: ${BEFTA_IDAM_CAA_PASSWORD}
   s2s-auth:
-    # Test-only value used by the WireMock S2S lease stub.
-    totp_secret: AAAAAAAAAAAAAAAA
+    totp_secret: ${BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT}
     url: http://localhost:${wiremock.server.port:4502}/s2s
 
 spring:

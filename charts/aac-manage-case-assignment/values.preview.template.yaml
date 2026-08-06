@@ -247,8 +247,8 @@ logstash:
       input  {
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
-          jdbc_user => "{{ .Values.postgresql.auth.username}}"
-          jdbc_password => "{{ .Values.postgresql.auth.password}}"
+    jdbc_user => "{{ .Values.auth.username}}"
+    jdbc_password => "{{ .Values.auth.password}}"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"

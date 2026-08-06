@@ -13,6 +13,8 @@ idam:
   api:
     url: http://localhost:${wiremock.server.port:5000}
   s2s-auth:
+    # Test-only value used by the WireMock S2S lease stub.
+    totp_secret: AAAAAAAAAAAAAAAA
     url: http://localhost:${wiremock.server.port:4502}/s2s
 
 spring:

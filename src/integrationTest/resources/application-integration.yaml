@@ -12,6 +12,10 @@ ccd:
 idam:
   api:
     url: http://localhost:${wiremock.server.port:5000}
+  caa:
+    # Test-only credentials matched by the WireMock IDAM token stub.
+    username: master.caa@gmail.com
+    password: Pa55word11
   s2s-auth:
     # Test-only value used by the WireMock S2S lease stub.
     totp_secret: AAAAAAAAAAAAAAAA

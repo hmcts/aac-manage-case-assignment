@@ -282,6 +282,12 @@ repositories {
   }
 }
 
+configurations.configureEach {
+  resolutionStrategy.dependencySubstitution {
+    substitute module('javax.mail:mail') using module('com.sun.mail:jakarta.mail:1.6.8') because 'Fix CVE-2025-7962'
+  }
+}
+
 ext.libraries = [
   junit5: [
     "org.junit.jupiter:junit-jupiter-api:${junit}",

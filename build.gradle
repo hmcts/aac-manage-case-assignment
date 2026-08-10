@@ -3,6 +3,7 @@ plugins {
   id 'jacoco'
   id 'au.com.dius.pact' version '4.7.4'
   id 'com.github.ben-manes.versions' version '0.56.0'
+  id 'com.diffplug.spotless' version '8.8.0'
   id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
   id 'io.spring.dependency-management' version '1.1.7'
   id 'org.owasp.dependencycheck' version '12.2.1'
@@ -71,6 +72,26 @@ sourceSets {
     resources.srcDir file('src/contractTest/resources')
   }
 
+}
+
+spotless {
+  enforceCheck false
+  ratchetFrom 'origin/master'
+
+  java {
+    target 'src/*/java/**/*.java'
+
+    removeUnusedImports()
+    forbidWildcardImports()
+
+    googleJavaFormat('1.36.1')
+      .aosp()
+      .reflowLongStrings()
+      .formatJavadoc(true)
+      .reorderImports(true)
+
+    trimTrailingWhitespace()
+  }
 }
 
 tasks.withType(JavaCompile) {

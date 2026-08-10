@@ -1,35 +1,36 @@
 package uk.gov.hmcts.reform.managecase.service.casedataaccesscontrol;
 
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
-
-import java.util.List;
-import java.util.regex.Pattern;
-
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.CITIZEN;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.JUDICIAL;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.LEGAL_OPERATIONS;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.PROFESSIONAL;
 
+import org.springframework.stereotype.Service;
+
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
+
+import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class RoleAssignmentCategoryService {
 
     private static final Pattern PROFESSIONAL_ROLE =
-        Pattern.compile("^pui-case-manager$|^solicitor$|" +
-                            ".+-solicitor$|^caseworker-.+-localAuthority$", Pattern.CASE_INSENSITIVE);
+            Pattern.compile(
+                    "^pui-case-manager$|^solicitor$|"
+                            + ".+-solicitor$|^caseworker-.+-localAuthority$",
+                    Pattern.CASE_INSENSITIVE);
     private static final Pattern CITIZEN_ROLE =
-        Pattern.compile("^citizen(-.*)?$|^letter-holder$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern JUDICIAL_ROLE = Pattern.compile(".+-panelmember$",
-        Pattern.CASE_INSENSITIVE);
+            Pattern.compile("^citizen(-.*)?$|^letter-holder$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern JUDICIAL_ROLE =
+            Pattern.compile(".+-panelmember$", Pattern.CASE_INSENSITIVE);
 
-    private final CaseAssignmentService  caseAssignmentService;
+    private final CaseAssignmentService caseAssignmentService;
 
     public RoleAssignmentCategoryService(CaseAssignmentService caseAssignmentService) {
         this.caseAssignmentService = caseAssignmentService;
     }
-
 
     public RoleCategory getRoleCategory(String userId) {
         final var idamUserRoles = caseAssignmentService.getAssigneeRoles(userId);

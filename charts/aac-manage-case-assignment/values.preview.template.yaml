@@ -254,7 +254,7 @@ logstash:
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
           jdbc_user => "{{ index .Values.ccd \"ccd-data-store-api\" \"postgresql\" \"auth\" \"username\" }}"
-          jdbc_password_filepath => "/etc/logstash/postgresql/password"
+          jdbc_password => "{{ index .Values.ccd \"ccd-data-store-api\" \"postgresql\" \"auth\" \"password\" }}"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"

@@ -145,7 +145,7 @@ ccd:
                 CREATE DATABASE "role-assignment" WITH OWNER = {{ .Values.auth.username}} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
         auth:
           username: "{{ .Values.postgresql.auth.username}}"
-          password: "{{ .Values.postgresql.auth.password}}"
+          password: "javapassword"
         postgresHostname: ${SERVICE_NAME}-postgresql
 
   ccd-user-profile-api:

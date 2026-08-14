@@ -6,6 +6,7 @@
   ],
   "labels": ["Renovate Dependencies"],
   "schedule": ["* 16-19 * * 1-5"],
+  "platformAutomerge": false,
   "automergeSchedule": ["* * 31 2 *"],
   "packageRules": [
     {

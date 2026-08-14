@@ -139,13 +139,13 @@ ccd:
           initdb:
             scripts:
               init.sql: |
-                CREATE DATABASE "data-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-                CREATE DATABASE "definition-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-                CREATE DATABASE "user-profile" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-                CREATE DATABASE "role-assignment" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+                CREATE DATABASE "data-store" WITH OWNER = ${POSTGRES_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+                CREATE DATABASE "definition-store" WITH OWNER = ${POSTGRES_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+                CREATE DATABASE "user-profile" WITH OWNER = ${POSTGRES_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+                CREATE DATABASE "role-assignment" WITH OWNER = ${POSTGRES_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
         auth:
-          username: "javapostgres"
-          password: "javapassword"
+          username: "${POSTGRES_USERNAME}"
+          password: "${POSTGRES_PASSWORD}"
         postgresHostname: ${SERVICE_NAME}-postgresql
 
   ccd-user-profile-api:
@@ -253,7 +253,7 @@ logstash:
       input  {
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
-          jdbc_user => "javapostgres"
+          jdbc_user => "${POSTGRES_USERNAME}"
           jdbc_password_filepath => "/etc/logstash/postgresql/password"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"

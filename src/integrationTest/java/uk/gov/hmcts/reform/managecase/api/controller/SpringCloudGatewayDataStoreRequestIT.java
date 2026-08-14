@@ -67,6 +67,7 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
     @DisplayName("SpringCloudGateway preserves data-store response headers")
     @Test
     void shouldPreserveDataStoreResponseHeaders() throws Exception {
+        //data store headers often get stripped in library upgrade and must be retained
         String s2SToken = generateDummyS2SToken(SERVICE_NAME);
         this.mockMvc.perform(post(PATH)
             .contentType(MediaType.APPLICATION_JSON)

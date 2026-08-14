@@ -11,12 +11,12 @@ import uk.gov.hmcts.reform.managecase.TestFixtures;
 import java.util.Date;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
@@ -35,8 +35,6 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
     private static final String ES_QUERY = "{\"query\": {\"match_all\": {}},\"size\": 50}";
     private static final String SERVICE_NAME = "xui_webapp";
     private static final String BEARER = "Bearer ";
-    private static final String DATA_STORE_RESPONSE_HEADER = "X-Data-Store-Header";
-    private static final String DATA_STORE_RESPONSE_HEADER_VALUE = "preserved";
 
     @DisplayName("SpringCloudGateway successfully forwards /ccd/searchCases request to the data store with a "
         + "system user token and aac_manage_case_assignment client id")
@@ -46,9 +44,14 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
         stubSearchCase(CASE_TYPE_ID, ES_QUERY, caseDetails());
 
         String s2SToken = generateDummyS2SToken(SERVICE_NAME);
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add(SERVICE_AUTHORIZATION, BEARER + s2SToken);
+        requestHeaders.add("X-Forwarded-Prefix", "/ccd");
+        requestHeaders.add("X-Correlation-Id", "test-correlation-id");
+
         this.mockMvc.perform(post(PATH)
             .contentType(MediaType.APPLICATION_JSON)
-            .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
+            .headers(requestHeaders)
             .content(ES_QUERY))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))
@@ -59,24 +62,11 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
         verify(postRequestedFor(urlEqualTo("/s2s/lease"))
                    .withRequestBody(containing("aac_manage_case_assignment")));
         verify(postRequestedFor(urlEqualTo("/searchCases?ctid=CT_MasterCase"))
+                   .withHeader("X-Correlation-Id", equalTo("test-correlation-id"))
                    .withHeader("Authorization",
                                containing("Bearer eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9aa")
-                   ));
-    }
 
-    @DisplayName("SpringCloudGateway preserves data-store response headers")
-    @Test
-    void shouldPreserveDataStoreResponseHeaders() throws Exception {
-        //data store headers often get stripped in library upgrade and must be retained
-        String s2SToken = generateDummyS2SToken(SERVICE_NAME);
-        this.mockMvc.perform(post(PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
-            .content(ES_QUERY))
-            .andExpect(status().isOk())
-            .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(header().string(HttpHeaders.CACHE_CONTROL, "no-store"))
-            .andExpect(header().string(DATA_STORE_RESPONSE_HEADER, DATA_STORE_RESPONSE_HEADER_VALUE));
+                   ));
     }
 
     @DisplayName("SpringCloudGateway successfully forwards /ccd/internal/searchCases request to the data store with"

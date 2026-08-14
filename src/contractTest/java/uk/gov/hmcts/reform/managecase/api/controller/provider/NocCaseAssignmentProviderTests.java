@@ -14,6 +14,7 @@ import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController;
@@ -70,7 +71,7 @@ public class NocCaseAssignmentProviderTests {
     private static final String TEST_APP_ORG_ID = "appOrgId";
     private static final String TEST_APP_ORG_NAME = "appOrgName";
 
-    @Autowired
+    @MockitoBean
     DataStoreRepository dataStoreRepository;
     @Autowired
     PrdRepository prdRepository;

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,23 +10,16 @@ import uk.gov.hmcts.reform.managecase.TestFixtures;
 
 import java.util.Date;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static java.net.HttpURLConnection.HTTP_OK;
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.S2S_TOKEN;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.SYS_USER_TOKEN;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCaseWithPrefix;
 import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
@@ -75,19 +67,6 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
     @DisplayName("SpringCloudGateway preserves data-store response headers")
     @Test
     void shouldPreserveDataStoreResponseHeaders() throws Exception {
-        stubFor(WireMock.post(urlEqualTo("/searchCases?ctid=" + CASE_TYPE_ID))
-                    .withRequestBody(equalToJson(ES_QUERY))
-                    .withHeader(HttpHeaders.AUTHORIZATION, equalTo(SYS_USER_TOKEN))
-                    .withHeader(SERVICE_AUTHORIZATION, equalTo(S2S_TOKEN))
-                    .willReturn(aResponse()
-                                    .withStatus(HTTP_OK)
-                                    .withBody("{"
-                                                  + "\"cases\":[" + objectMapper.writeValueAsString(caseDetails())
-                                                  + "]}")
-                                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                                    .withHeader(HttpHeaders.CACHE_CONTROL, "no-store")
-                                    .withHeader(DATA_STORE_RESPONSE_HEADER, DATA_STORE_RESPONSE_HEADER_VALUE)));
-
         String s2SToken = generateDummyS2SToken(SERVICE_NAME);
         this.mockMvc.perform(post(PATH)
             .contentType(MediaType.APPLICATION_JSON)

@@ -178,11 +178,13 @@ withPipeline("java", product, component) {
   syncBranchesWithMaster(branchesToSync)
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
-  sh '''
-    test -n "$DEFINITION_STORE_DB_USERNAME" || exit 11
-    test -n "$DATASTORE_POSTGRES_PASSWORD" || exit 12
-    echo "PostgreSQL secrets are present"
-  '''
+  if (!env.DEFINITION_STORE_DB_USERNAME?.trim()) {
+    error('DEFINITION_STORE_DB_USERNAME is missing')
+  }
+  if (!env.DATASTORE_POSTGRES_PASSWORD?.trim()) {
+    error('DATASTORE_POSTGRES_PASSWORD is missing')
+  }
+  echo 'PostgreSQL secrets are present'
 
   enableAksStagingDeployment()
   disableLegacyDeployment()

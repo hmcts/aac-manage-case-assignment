@@ -42,7 +42,7 @@ def secrets = [
     secret('ccd-data-s2s-secret', 'CCD_DATA_S2S_SECRET'),
     secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_KEY'),
     secret('definition-store-api-POSTGRES-USER-V15', 'DEFINITION_STORE_DB_USERNAME'),
-    secret('data-store-api-POSTGRES-PASS-V15', 'DATASTORE_POSTGRES_PASSWORD'),
+    secret('definition-store-api-POSTGRES-PASS-V15', 'DEFINITION_POSTGRES_PASSWORD'),
 
     secret('idam-data-store-system-user-username','IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
     secret('idam-data-store-system-user-password','IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
@@ -181,8 +181,8 @@ withPipeline("java", product, component) {
   if (!env.DEFINITION_STORE_DB_USERNAME?.trim()) {
     error('DEFINITION_STORE_DB_USERNAME is missing')
   }
-  if (!env.DATASTORE_POSTGRES_PASSWORD?.trim()) {
-    error('DATASTORE_POSTGRES_PASSWORD is missing')
+  if (!env.DEFINITION_POSTGRES_PASSWORD?.trim()) {
+    error('DEFINITION_POSTGRES_PASSWORD is missing')
   }
   echo 'PostgreSQL secrets are present'
 

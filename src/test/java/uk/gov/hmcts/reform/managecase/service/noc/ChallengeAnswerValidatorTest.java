@@ -79,6 +79,37 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
+    void shouldSuccessfullyIdentifyPartyNameContainingHyphen() {
+        answers = singletonList(new SubmittedChallengeAnswer(
+            QUESTION_ID_1, "Stockton‑on‑Tees Borough Council"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${partyName}:[Defendant]", fieldType(TEXT))
+        );
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        String result = challengeAnswerValidator
+            .getMatchingCaseRole(challengeQuestionsResult, answers, caseDetails);
+
+        assertThat(result, is("[Defendant]"));
+    }
+
+    @Test
+    void shouldNotMatchAsciiHyphenToNonBreakingHyphenInPartyName() {
+        answers = singletonList(new SubmittedChallengeAnswer(
+            QUESTION_ID_1, "Stockton-on-Tees Borough Council"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${partyName}:[Defendant]", fieldType(TEXT))
+        );
+        ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(challengeQuestions);
+
+        NoCException exception = assertThrows(NoCException.class,
+            () -> challengeAnswerValidator.getMatchingCaseRole(challengeQuestionsResult,
+                answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+    }
+
+    @Test
     void shouldErrorWhenThereAreMoreAnswersThanQuestions() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(
@@ -504,6 +535,7 @@ class ChallengeAnswerValidatorTest {
         return "{\n"
             + "    \"DateField\": \"1985-07-25\",\n"
             + "    \"TextField\": \"TextValue\",\n"
+            + "    \"partyName\": \"Stockton‑on‑Tees Borough Council\",\n"
             + "    \"ApplicantField\": \"\",\n"
             + "    \"Applicant2Field\": \"Name2\",\n"
             + "    \"EmailField\": \"test@email.com\",\n"

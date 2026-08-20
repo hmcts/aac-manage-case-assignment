@@ -94,7 +94,8 @@ ccd:
   ccd-data-store-api:
     java:
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
-      image: hmctsprod.azurecr.io/ccd/data-store-api:latest
+      #image: hmctsprod.azurecr.io/ccd/data-store-api:latest
+      image: hmctsprod.azurecr.io/ccd/data-store-api:pr-2948
       #image: hmctsprod.azurecr.io/ccd/data-store-api:pr-2844-c363f29-20260526115255
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'

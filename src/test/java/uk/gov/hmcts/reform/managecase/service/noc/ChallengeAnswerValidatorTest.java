@@ -110,6 +110,23 @@ class ChallengeAnswerValidatorTest {
     }
 
     @Test
+    void shouldNotMatchAsciiApostropheToCurlyApostropheInPartyName() {
+        caseDetails.getData().put("partyName",
+            objectMapper.getNodeFactory().textNode("Ms Rebekah Jean Parker of Layton’s Solicitors"));
+        answers = singletonList(new SubmittedChallengeAnswer(
+            QUESTION_ID_1, "Layton's Solicitors"));
+        List<ChallengeQuestion> challengeQuestions = singletonList(
+            challengeQuestion(QUESTION_ID_1, "${partyName}:[Defendant]", fieldType(TEXT))
+        );
+
+        NoCException exception = assertThrows(NoCException.class,
+            () -> challengeAnswerValidator.getMatchingCaseRole(
+                new ChallengeQuestionsResult(challengeQuestions), answers, caseDetails));
+
+        assertThat(exception.getErrorCode(), is(ANSWERS_NOT_MATCH_LITIGANT.getErrorCode()));
+    }
+
+    @Test
     void shouldErrorWhenThereAreMoreAnswersThanQuestions() {
         List<ChallengeQuestion> challengeQuestions = new ArrayList<>();
         challengeQuestions.add(

@@ -196,20 +196,21 @@ tasks.register('contract', Test) {
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
   include "uk/gov/hmcts/reform/managecase/api/controller/provider/**"
+  systemProperty 'pact_do_not_track', 'true'
 }
 
-//tasks.register('runProviderPactVerification', Test) {
-//  testClassesDirs = sourceSets.contractTest.output.classesDirs
-//  classpath = sourceSets.contractTest.runtimeClasspath
-//  if (project.hasProperty('pact.verifier.publishResults')) {
-//    systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
-//  }
-//  systemProperty 'pact.provider.version', project.pactVersion
-//}
-//
-//tasks.named('runProviderPactVerification').configure {
-//  finalizedBy 'pactVerify'
-//}
+tasks.register('runProviderPactVerification', Test) {
+  description = 'Verifies provider Pacts from the broker and publishes the verification results'
+  group = 'Verification'
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  if (project.hasProperty('pact.verifier.publishResults')) {
+    systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+  }
+  systemProperty 'pact_do_not_track', 'true'
+  systemProperty 'pact.provider.version', project.pactVersion
+  finalizedBy pactVerify
+}
 
 def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --short HEAD'.execute().text.trim()
@@ -420,6 +421,20 @@ tasks.register('runRemoteDemo', JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   doFirst() {
     configRemoteRunTask(it, 'demo')
+  }
+}
+
+[
+  tasks.named('contract'),
+  tasks.named('runProviderPactVerification')
+].each { contractTestTask ->
+  contractTestTask.configure {
+    doFirst {
+      def mockitoCore = classpath.find { it.name.startsWith('mockito-core-') }
+      if (mockitoCore != null) {
+        jvmArgs("-javaagent:${mockitoCore.absolutePath}")
+      }
+    }
   }
 }
 

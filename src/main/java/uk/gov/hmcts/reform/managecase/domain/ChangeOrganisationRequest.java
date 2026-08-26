@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.managecase.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.validation.ValidationException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -16,11 +15,10 @@ import java.time.LocalDateTime;
 
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.CHANGE_ORG_REQUEST_FIELD_MISSING_OR_INVALID;
 
-@Data
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChangeOrganisationRequest {
 
     @JsonProperty("OrganisationToAdd")
@@ -37,6 +35,7 @@ public class ChangeOrganisationRequest {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime requestTimestamp;
 
+    @Setter
     @JsonProperty("ApprovalStatus")
     private String approvalStatus;
 

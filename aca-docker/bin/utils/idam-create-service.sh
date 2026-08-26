@@ -32,6 +32,10 @@ if [ $STATUS -eq 201 ]; then
   echo "Service created sucessfully"
 elif [ $STATUS -eq 409 ]; then
   echo "Service already exists!"
+elif [ $STATUS -eq 404 ]; then
+  echo "IDAM /services endpoint not found at ${IDAM_API_BASE_URL:-http://localhost:5000}/services"
+  echo "This script requires full SIDAM/IDAM. If using idam-sim, do not run add-idam-clients.sh."
+  exit 1
 else
   echo "ERROR: HTTPCODE = $STATUS"
   exit 1

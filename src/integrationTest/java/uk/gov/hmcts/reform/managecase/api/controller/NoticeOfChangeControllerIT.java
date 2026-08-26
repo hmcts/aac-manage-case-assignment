@@ -512,6 +512,24 @@ public class NoticeOfChangeControllerIT {
                 .andExpect(jsonPath("$.errors[0]", is(CASE_DETAILS_REQUIRED)));
         }
 
+        @Test
+        void shouldRejectUnknownTopLevelRequestProperty() throws Exception {
+            this.mockMvc.perform(post(ENDPOINT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "case_details": {
+                        "id": "1588234985453946",
+                        "case_type_id": "caseType",
+                        "case_data": {}
+                      },
+                      "extra_field": "value"
+                    }
+                    """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is("Unknown JSON property 'extra_field'.")));
+        }
+
         private String orgPolicyAsString(String organisationId,
                                          String organisationName,
                                          String orgPolicyReference,

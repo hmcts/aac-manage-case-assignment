@@ -43,4 +43,17 @@ class ApplicationParamsTest {
 
     }
 
+    @Test
+    void shouldGetChallengeAnswerStripCharacters() {
+        final var challengeAnswerStripCharacters = "-'’";
+
+        ReflectionTestUtils.setField(
+            applicationParams,
+            "challengeAnswerStripCharacters",
+            challengeAnswerStripCharacters
+        );
+
+        assertEquals(challengeAnswerStripCharacters, applicationParams.getChallengeAnswerStripCharacters());
+    }
+
 }

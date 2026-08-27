@@ -226,6 +226,10 @@ pact {
 
 project.tasks['sonarqube'].dependsOn jacocoTestReport
 
+tasks.named('sonarResolver') {
+  dependsOn tasks.named('processResources')
+}
+
 sonarqube {
   properties {
     property "sonar.projectName", "Reform::manage-case-assignment"

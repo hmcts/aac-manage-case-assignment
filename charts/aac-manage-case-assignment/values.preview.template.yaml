@@ -139,13 +139,13 @@ ccd:
           initdb:
             scripts:
               init.sql: |
-                CREATE DATABASE "data-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-                CREATE DATABASE "definition-store" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-                CREATE DATABASE "user-profile" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-                CREATE DATABASE "role-assignment" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+                CREATE DATABASE "data-store" WITH OWNER = ${DEFINITION_STORE_DB_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+                CREATE DATABASE "definition-store" WITH OWNER = ${DEFINITION_STORE_DB_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+                CREATE DATABASE "user-profile" WITH OWNER = ${DEFINITION_STORE_DB_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+                CREATE DATABASE "role-assignment" WITH OWNER = ${DEFINITION_STORE_DB_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
         auth:
-          username: "javapostgres"
-          password: "javapassword"
+          username: "${DEFINITION_STORE_DB_USERNAME}"
+          password: "${DEFINITION_STORE_DB_PASSWORD}"
         postgresHostname: ${SERVICE_NAME}-postgresql
 
   ccd-user-profile-api:
@@ -228,9 +228,15 @@ logstash:
   extraVolumes: |
     - name: logstash-lib
       emptyDir: {}
+    - name: postgresql-credentials
+      secret:
+        secretName: "{{ .Release.Name }}-postgresql"
   extraVolumeMounts: |
     - name: logstash-lib
       mountPath: /usr/share/logstash/ccd
+    - name: postgresql-credentials
+      mountPath: /etc/logstash/postgresql
+      readOnly: true
   logstashConfig:
     logstash.yml: |
       http.host: 0.0.0.0
@@ -247,8 +253,8 @@ logstash:
       input  {
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
-          jdbc_user => "javapostgres"
-          jdbc_password => "javapassword"
+          jdbc_user => "${DEFINITION_STORE_DB_USERNAME}"
+          jdbc_password_filepath => "/etc/logstash/postgresql/password"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"

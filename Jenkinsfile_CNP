@@ -42,6 +42,9 @@ def secrets = [
     secret('ccd-data-s2s-secret', 'CCD_DATA_S2S_SECRET'),
     secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_KEY'),
 
+    secret('definition-store-api-POSTGRES-USER-V15', 'DEFINITION_STORE_DB_USERNAME'),
+    secret('definition-store-api-POSTGRES-PASS-V15', 'DEFINITION_STORE_DB_PASSWORD'),
+
     secret('idam-data-store-system-user-username','IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
     secret('idam-data-store-system-user-password','IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
     secret('idam-data-store-client-secret', 'IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET')
@@ -176,6 +179,28 @@ withPipeline("java", product, component) {
   syncBranchesWithMaster(branchesToSync)
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
+
+  afterAlways('checkPostgresSecrets') {
+    sh '''
+      test -n "$DEFINITION_STORE_DB_USERNAME" || {
+        echo "DEFINITION_STORE_DB_USERNAME is not set"
+        exit 1
+      }
+      test -n "$DEFINITION_STORE_DB_PASSWORD" || {
+        echo "DEFINITION_STORE_DB_PASSWORD is not set"
+        exit 1
+      }
+
+      rendered_preview_values=$(mktemp)
+      trap 'rm -f "$rendered_preview_values"' EXIT
+      envsubst '$DEFINITION_STORE_DB_USERNAME $DEFINITION_STORE_DB_PASSWORD' < charts/aac-manage-case-assignment/values.preview.template.yaml > "$rendered_preview_values"
+
+      if grep -Fq '\${DEFINITION_STORE_DB_USERNAME}' "$rendered_preview_values" || grep -Fq '\${DEFINITION_STORE_DB_PASSWORD}' "$rendered_preview_values"; then
+        echo "Preview PostgreSQL credentials were not rendered correctly"
+        exit 1
+      fi
+    '''
+  }
 
   enableAksStagingDeployment()
   disableLegacyDeployment()

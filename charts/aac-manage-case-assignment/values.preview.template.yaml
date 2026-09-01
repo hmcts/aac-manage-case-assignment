@@ -1,3 +1,7 @@
+global:
+  postgresUsername: javapostgres
+  postgresSecret: ${SERVICE_NAME}-postgresql
+
 java:
   devmemoryRequests: 2048Mi
   devcpuRequests: 2000m
@@ -94,7 +98,8 @@ ccd:
   ccd-data-store-api:
     java:
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
-      image: hmctsprod.azurecr.io/ccd/data-store-api:latest
+      #image: hmctsprod.azurecr.io/ccd/data-store-api:latest
+      image: hmctsprod.azurecr.io/ccd/data-store-api:pr-2948
       #image: hmctsprod.azurecr.io/ccd/data-store-api:pr-2844-c363f29-20260526115255
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'
@@ -144,8 +149,7 @@ ccd:
                 CREATE DATABASE "user-profile" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
                 CREATE DATABASE "role-assignment" WITH OWNER = javapostgres ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
         auth:
-          username: "javapostgres"
-          password: "javapassword"
+          username: javapostgres
         postgresHostname: ${SERVICE_NAME}-postgresql
 
   ccd-user-profile-api:
@@ -228,9 +232,15 @@ logstash:
   extraVolumes: |
     - name: logstash-lib
       emptyDir: {}
+    - name: postgresql-credentials
+      secret:
+        secretName: "{{ .Release.Name }}-postgresql"
   extraVolumeMounts: |
     - name: logstash-lib
       mountPath: /usr/share/logstash/ccd
+    - name: postgresql-credentials
+      mountPath: /etc/logstash/postgresql
+      readOnly: true
   logstashConfig:
     logstash.yml: |
       http.host: 0.0.0.0
@@ -247,8 +257,8 @@ logstash:
       input  {
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
-          jdbc_user => "javapostgres"
-          jdbc_password => "javapassword"
+          jdbc_user => '{{ tpl .Values.global.postgresUsername $ }}'
+          jdbc_password_filepath => "/etc/logstash/postgresql/password"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"

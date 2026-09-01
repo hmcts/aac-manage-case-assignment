@@ -12,7 +12,14 @@ ccd:
 idam:
   api:
     url: http://localhost:${wiremock.server.port:5000}
+  caa:
+    username: ${BEFTA_IDAM_CAA_USERNAME:master.caa@gmail.com}
+    password: ${BEFTA_IDAM_CAA_PASSWORD:}
+  noc-approver:
+    username: ${BEFTA_IDAM_NOC_APPROVER_USERNAME:noc.approver@gmail.com}
+    password: ${BEFTA_IDAM_NOC_APPROVER_PASSWORD:}
   s2s-auth:
+    totp_secret: ${BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT:integration-test-secret}
     url: http://localhost:${wiremock.server.port:4502}/s2s
 
 spring:

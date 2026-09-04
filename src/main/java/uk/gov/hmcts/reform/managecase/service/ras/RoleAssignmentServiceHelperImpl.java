@@ -129,8 +129,8 @@ public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHel
             return getRoleAssignmentResponse(userId, requestEntity);
         } catch (Exception e) {
             log.warn("Error while retrieving Role Assignments", e);
-            if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getStatusCode().value() == HttpStatus.NOT_FOUND.value()) {
+            if (e instanceof HttpClientErrorException httpClientErrorException
+                && httpClientErrorException.getStatusCode().value() == HttpStatus.NOT_FOUND.value()) {
                 throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENTS_NOT_FOUND,
                                                                   userId, e.getMessage()));
             } else {
@@ -141,8 +141,8 @@ public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHel
 
     private RuntimeException mapException(Exception exception, ResourceNotFoundException resourceNotFoundException) {
 
-        if (exception instanceof HttpClientErrorException
-            && ((HttpClientErrorException) exception).getStatusCode().value() == HttpStatus.NOT_FOUND.value()) {
+        if (exception instanceof HttpClientErrorException httpClientErrorException
+            && httpClientErrorException.getStatusCode().value() == HttpStatus.NOT_FOUND.value()) {
             return resourceNotFoundException;
         } else {
             return mapException(exception, "getting");
@@ -151,8 +151,8 @@ public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHel
 
     private RuntimeException mapException(Exception exception, String processDescription) {
 
-        if (exception instanceof HttpClientErrorException
-            && ((HttpClientErrorException) exception).getStatusCode().is4xxClientError()) {
+        if (exception instanceof HttpClientErrorException httpClientErrorException
+            && httpClientErrorException.getStatusCode().is4xxClientError()) {
             return new BadRequestException(
                 String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, processDescription, exception.getMessage()));
         } else {

@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentAttributesResour
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentQuery;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentRequestResource;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResource;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsAddRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleRequestResource;
@@ -132,6 +133,10 @@ public class RoleAssignmentService {
                      )
             )
             .collect(Collectors.toList());
+    }
+
+    public RoleAssignmentResponse getRoleAssignments(String userId) {
+        return roleAssignmentServiceHelper.getRoleAssignments(userId);
     }
 
     private boolean isValidRoleAssignment(RoleAssignment roleAssignment) {

@@ -8,15 +8,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 import uk.gov.hmcts.reform.managecase.service.casedataaccesscontrol.RoleAssignmentCategoryService;
+import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentService;
+import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentsMapper;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.CITIZEN;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.ENFORCEMENT;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.JUDICIAL;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.LEGAL_OPERATIONS;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.PROFESSIONAL;
@@ -29,6 +37,12 @@ class RoleAssignmentCategoryServiceTest {
 
     @Mock
     private CaseAssignmentService caseAssignmentService;
+
+    @Mock
+    private RoleAssignmentService roleAssignmentService;
+
+    @Mock
+    private RoleAssignmentsMapper roleAssignmentsMapper;
 
     @InjectMocks
     private RoleAssignmentCategoryService roleAssignmentCategoryService;
@@ -101,6 +115,29 @@ class RoleAssignmentCategoryServiceTest {
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
             assertThat(roleCategory, is(LEGAL_OPERATIONS));
+        }
+
+        @Test
+        void shouldGetRoleCategoryForEnforcementUser() {
+
+            given(caseAssignmentService.getAssigneeRoles(USER_ID))
+                .willReturn(singletonList("some-user"));
+
+            RoleAssignment enforcementRole = RoleAssignment.builder()
+                .roleName("bailiff-manager")
+                .grantType(STANDARD.name())
+                .build();
+
+            given(roleAssignmentService.getRoleAssignments(USER_ID))
+                .willReturn(new RoleAssignmentResponse());
+            given(roleAssignmentsMapper.toRoleAssignments(any(RoleAssignmentResponse.class)))
+                .willReturn(RoleAssignments.builder()
+                                .roleAssignmentsList(singletonList(enforcementRole))
+                                .build());
+
+            RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
+
+            assertThat(roleCategory, is(ENFORCEMENT));
         }
 
     }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.api.payload;
 
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 
 import java.time.Instant;
 import java.util.List;
@@ -28,5 +29,9 @@ public class RoleAssignment {
         final var machineTimestamp = Instant.now();
         return (beginTime == null || machineTimestamp.isAfter(beginTime))
             && (endTime == null || machineTimestamp.isBefore(endTime));
+    }
+
+    public boolean isGrantType(GrantType grantType) {
+        return getGrantType() != null && grantType.name().equals(getGrantType());
     }
 }

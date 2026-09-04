@@ -217,12 +217,12 @@ public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHel
             return false;
         }
 
-        List<RoleAssignmentResource> roleAssignments = body.getRoleAssignments();
-        if (roleAssignments == null) {
+        List<RoleAssignmentResource> roleAssignmentsInBody = body.getRoleAssignments();
+        if (roleAssignmentsInBody == null) {
             return false;
         }
 
-        return !roleAssignments.isEmpty();
+        return !roleAssignmentsInBody.isEmpty();
     }
 
 }

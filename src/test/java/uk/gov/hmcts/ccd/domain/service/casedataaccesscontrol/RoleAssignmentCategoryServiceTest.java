@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 import uk.gov.hmcts.reform.managecase.service.casedataaccesscontrol.RoleAssignmentCategoryService;
-import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentServiceHelper;
+import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentService;
 import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentsMapper;
 
 import static java.util.Arrays.asList;
@@ -39,7 +39,7 @@ class RoleAssignmentCategoryServiceTest {
     private CaseAssignmentService caseAssignmentService;
 
     @Mock
-    private RoleAssignmentServiceHelper roleAssignmentServiceHelper;
+    private RoleAssignmentService roleAssignmentService;
 
     @Mock
     private RoleAssignmentsMapper roleAssignmentsMapper;
@@ -128,7 +128,7 @@ class RoleAssignmentCategoryServiceTest {
                 .grantType(STANDARD.name())
                 .build();
 
-            given(roleAssignmentServiceHelper.getRoleAssignments(USER_ID))
+            given(roleAssignmentService.getRoleAssignments(USER_ID))
                 .willReturn(new RoleAssignmentResponse());
             given(roleAssignmentsMapper.toRoleAssignments(any(RoleAssignmentResponse.class)))
                 .willReturn(RoleAssignments.builder()

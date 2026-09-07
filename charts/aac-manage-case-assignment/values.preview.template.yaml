@@ -159,8 +159,8 @@ ccd:
       imagePullPolicy: Always
       environment:
         USER_PROFILE_DB_HOST: "{{ .Release.Name }}-postgresql"
-        USER_PROFILE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
-        USER_PROFILE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+        USER_PROFILE_DB_USERNAME: "${DEFINITION_STORE_DB_USERNAME}"
+        USER_PROFILE_DB_PASSWORD: "${DEFINITION_STORE_DB_PASSWORD}"
         USER_PROFILE_DB_OPTIONS: ""
       secrets:
         USER_PROFILE_DB_PASSWORD:

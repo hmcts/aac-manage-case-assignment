@@ -26,8 +26,26 @@ void suppressCves(String reportName = Globals.REPORT_NAME) {
             .collect { it.name.text() } as Set<String>
 
     if (!unSuppressedCves.isEmpty()) {
-        // Suppression file must be specified as 'suppressionFile=...' in build.gradle.
-        File suppressionFile = project.file(dependencyCheck.getSuppressionFile())
+        // The build config uses suppressionFiles; use the first configured file
+        // and retain compatibility with plugin versions exposing suppressionFile.
+        def configuredSuppressionFiles = dependencyCheck.getSuppressionFiles()
+        if (configuredSuppressionFiles?.metaClass?.respondsTo(configuredSuppressionFiles, "getOrNull")) {
+            configuredSuppressionFiles = configuredSuppressionFiles.getOrNull()
+        } else if (configuredSuppressionFiles?.metaClass?.respondsTo(configuredSuppressionFiles, "get")) {
+            configuredSuppressionFiles = configuredSuppressionFiles.get()
+        }
+        def configuredSuppressionFile = configuredSuppressionFiles instanceof Collection
+                ? configuredSuppressionFiles.find { it }
+                : configuredSuppressionFiles
+        if (!configuredSuppressionFile) {
+            configuredSuppressionFile = dependencyCheck.getSuppressionFile()
+            if (configuredSuppressionFile?.metaClass?.respondsTo(configuredSuppressionFile, "getOrNull")) {
+                configuredSuppressionFile = configuredSuppressionFile.getOrNull()
+            } else if (configuredSuppressionFile?.metaClass?.respondsTo(configuredSuppressionFile, "get")) {
+                configuredSuppressionFile = configuredSuppressionFile.get()
+            }
+        }
+        File suppressionFile = project.file(configuredSuppressionFile)
         validateSection(suppressionFile, new XmlSlurper(false, false).parse(suppressionFile))
 
         String suppressionXml = new String(suppressionFile.readBytes(), "UTF-8")

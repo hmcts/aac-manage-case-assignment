@@ -13,7 +13,7 @@ BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
 
 DB_USER_NAME=openidm
-DB_PASSWORD=openidm
+DB_PASSWORD=${IDAM_DB_PASSWORD:?IDAM_DB_PASSWORD must be set}
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=openidm

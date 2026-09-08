@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.4.9")
+@Library("Infrastructure@2.5.4")
 
 import uk.gov.hmcts.contino.GradleBuilder
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -41,6 +41,8 @@ def secrets = [
     secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_S2S_SECRET'),
     secret('ccd-data-s2s-secret', 'CCD_DATA_S2S_SECRET'),
     secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_KEY'),
+    secret('data-store-api-POSTGRES-USER-V15', 'DATASTORE_POSTGRES_USERNAME'),
+    secret('data-store-api-POSTGRES-PASS-V15', 'DATASTORE_POSTGRES_PASSWORD'),
 
     secret('idam-data-store-system-user-username','IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
     secret('idam-data-store-system-user-password','IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
@@ -176,6 +178,34 @@ withPipeline("java", product, component) {
   syncBranchesWithMaster(branchesToSync)
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
+
+  afterAlways('checkPostgresSecrets') {
+    sh '''
+    test -n "$DATASTORE_POSTGRES_USERNAME" || {
+      echo "DATASTORE_POSTGRES_USERNAME is not set"
+      exit 1
+    }
+    test -n "$DATASTORE_POSTGRES_PASSWORD" || {
+      echo "DATASTORE_POSTGRES_PASSWORD is not set"
+      exit 1
+    }
+    case "$DATASTORE_POSTGRES_USERNAME" in
+      (*[!A-Za-z0-9_]*|'')
+        echo "DATASTORE_POSTGRES_USERNAME contains unsafe PostgreSQL identifier characters"
+        exit 1
+        ;;
+    esac
+
+    rendered_preview_values=$(mktemp)
+    trap 'rm -f "$rendered_preview_values"' EXIT
+    envsubst '$DATASTORE_POSTGRES_USERNAME $DATASTORE_POSTGRES_PASSWORD' < charts/aac-manage-case-assignment/values.preview.template.yaml > "$rendered_preview_values"
+
+    if grep -Fq '\${DATASTORE_POSTGRES_USERNAME}' "$rendered_preview_values" || grep -Fq '\${DATASTORE_POSTGRES_PASSWORD}' "$rendered_preview_values"; then
+      echo "Preview PostgreSQL credentials were not rendered correctly"
+      exit 1
+    fi
+    '''
+  }
 
   enableAksStagingDeployment()
   disableLegacyDeployment()

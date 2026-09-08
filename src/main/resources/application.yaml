@@ -77,19 +77,19 @@ idam:
     url: ${IDAM_API_URL:http://localhost:5000}
   client:
     id: aac_manage_case_assignment
-    secret: ${IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
+    secret: ${IDAM_CLIENT_SECRET:}
     scope: openid roles profile manage-user
     # same for all environments - not used in mca but configured as idam mandates for token generation
     redirect_uri: https://manage-case-assignment/oauth2redirect
   caa:
-    username: ${IDAM_CAA_USERNAME:master.caa@gmail.com}
-    password: ${IDAM_CAA_PASSWORD:Pa55word11}
+    username: ${IDAM_CAA_USERNAME:}
+    password: ${IDAM_CAA_PASSWORD:}
   noc-approver:
-    username: ${IDAM_NOC_APPROVER_USERNAME:noc.approver@gmail.com}
-    password: ${IDAM_NOC_APPROVER_PASSWORD:Pa55word11}
+    username: ${IDAM_NOC_APPROVER_USERNAME:}
+    password: ${IDAM_NOC_APPROVER_PASSWORD:}
   s2s-auth:
     microservice: aac_manage_case_assignment
-    totp_secret: ${MANAGE_CASE_S2S_KEY:AAAAAAAAAAAAAAAA}
+    totp_secret: ${MANAGE_CASE_S2S_KEY:}
     url: ${S2S_URL:http://localhost:4502}
   s2s-authorised:
     services: ${MANAGE_CASE_S2S_AUTHORISED_SERVICES:xui_webapp,ccd_data,finrem_case_orchestration,prl_cos_api,et_cos,et_sya_api}
@@ -123,7 +123,7 @@ mca:
       enabled: ${MCA_CONDITIONAL_APIS_CASE_ASSIGNMENTS_ENABLED:true}
 
 notify:
-  api-key: ${NOTIFY_MCA_API_KEY:notify-test-api-key}
+  api-key: ${NOTIFY_MCA_API_KEY:}
   email-template-id: ${NOTIFY_EMAIL_TEMPLATE_ID:a60215dd-08bb-475e-956c-e97fdb7e448c}
 
 role:

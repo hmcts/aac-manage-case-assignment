@@ -78,7 +78,7 @@ tasks.withType(JavaCompile) {
 }
 
 tasks.withType(Copy).configureEach {
-  duplicatesStrategy 'exclude'
+  duplicatesStrategy = 'exclude'
 }
 
 tasks.withType(Test) {

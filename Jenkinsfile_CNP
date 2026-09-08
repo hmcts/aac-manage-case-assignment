@@ -180,7 +180,9 @@ withPipeline("java", product, component) {
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
 
-  sh '''
+  stage('checkPostgresSecrets') {
+    node {
+      sh '''
     test -n "$DATASTORE_POSTGRES_USERNAME" || {
       echo "DATASTORE_POSTGRES_USERNAME is not set"
       exit 1
@@ -204,7 +206,9 @@ withPipeline("java", product, component) {
       echo "Preview PostgreSQL credentials were not rendered correctly"
       exit 1
     fi
-  '''
+      '''
+    }
+  }
 
   enableAksStagingDeployment()
   disableLegacyDeployment()

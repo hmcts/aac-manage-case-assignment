@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -40,6 +40,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ROLE_ASSIGNMENTS_CLIENT_ERROR;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ROLE_ASSIGNMENT_SERVICE_ERROR;
@@ -188,7 +190,7 @@ class RoleAssignmentServiceHelperTest {
         assertEquals(response, roleAssignmentServiceHelper.getRoleAssignments("user-1"));
 
         ArgumentCaptor<HttpEntity<Object>> requestCaptor = ArgumentCaptor.forClass(HttpEntity.class);
-        org.mockito.Mockito.verify(restTemplate, org.mockito.Mockito.times(2))
+        verify(restTemplate, times(2))
             .exchange(any(URI.class), eq(HttpMethod.GET), requestCaptor.capture(), eq(RoleAssignmentResponse.class));
 
         assertTrue(requestCaptor.getAllValues().get(0).getHeaders().getIfNoneMatch().isEmpty());
@@ -214,7 +216,7 @@ class RoleAssignmentServiceHelperTest {
         assertEquals(response, roleAssignmentServiceHelper.getRoleAssignments("user-1"));
 
         ArgumentCaptor<HttpEntity<Object>> requestCaptor = httpEntityCaptor();
-        org.mockito.Mockito.verify(restTemplate, org.mockito.Mockito.times(2))
+        verify(restTemplate, times(2))
             .exchange(any(URI.class), eq(HttpMethod.GET), requestCaptor.capture(), eq(RoleAssignmentResponse.class));
 
         assertEquals(List.of("\"cache-key\""), requestCaptor.getAllValues().get(1).getHeaders().getIfNoneMatch());
@@ -235,7 +237,7 @@ class RoleAssignmentServiceHelperTest {
         assertNull(roleAssignmentServiceHelper.getRoleAssignments("user-1"));
 
         ArgumentCaptor<HttpEntity<Object>> requestCaptor = httpEntityCaptor();
-        org.mockito.Mockito.verify(restTemplate, org.mockito.Mockito.times(2))
+        verify(restTemplate, times(2))
             .exchange(any(URI.class), eq(HttpMethod.GET), requestCaptor.capture(), eq(RoleAssignmentResponse.class));
 
         assertFalse(requestCaptor.getAllValues().get(1).getHeaders().containsKey(HttpHeaders.IF_NONE_MATCH));
@@ -258,7 +260,7 @@ class RoleAssignmentServiceHelperTest {
         assertNull(roleAssignmentServiceHelper.getRoleAssignments("user-1"));
 
         ArgumentCaptor<HttpEntity<Object>> requestCaptor = httpEntityCaptor();
-        org.mockito.Mockito.verify(restTemplate, org.mockito.Mockito.times(2))
+        verify(restTemplate, times(2))
             .exchange(any(URI.class), eq(HttpMethod.GET), requestCaptor.capture(), eq(RoleAssignmentResponse.class));
 
         assertFalse(requestCaptor.getAllValues().get(1).getHeaders().containsKey(HttpHeaders.IF_NONE_MATCH));

@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.ResourceNotFoundExceptio
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
-import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentService;
+import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentServiceHelper;
 import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentsMapper;
 
 @Service
@@ -33,15 +33,15 @@ public class RoleAssignmentCategoryService {
     private static final List<String> ENFORCEMENT_ROLES = List.of("bailiff-manager", "bailiff");
 
     private final CaseAssignmentService  caseAssignmentService;
-    private final RoleAssignmentService roleAssignmentService;
+    private final RoleAssignmentServiceHelper roleAssignmentServiceHelper;
     private final RoleAssignmentsMapper roleAssignmentsMapper;
 
     public RoleAssignmentCategoryService(CaseAssignmentService caseAssignmentService,
-                                         RoleAssignmentService roleAssignmentService,
+                                         RoleAssignmentServiceHelper roleAssignmentServiceHelper,
                                          RoleAssignmentsMapper roleAssignmentsMapper) {
         this.caseAssignmentService = caseAssignmentService;
         this.roleAssignmentsMapper = roleAssignmentsMapper;
-        this.roleAssignmentService = roleAssignmentService;
+        this.roleAssignmentServiceHelper = roleAssignmentServiceHelper;
     }
 
     public RoleCategory getRoleCategory(String userId) {
@@ -74,7 +74,7 @@ public class RoleAssignmentCategoryService {
     private boolean hasEnforcementRole(String userId) {
         RoleAssignments roleAssignments;
         try {
-            roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentService
+            roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentServiceHelper
                                                                           .getRoleAssignments(userId));
         } catch (ResourceNotFoundException ex) {
             return false;

@@ -31,6 +31,8 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -191,5 +193,107 @@ class RoleAssignmentServiceHelperTest {
 
         assertTrue(requestCaptor.getAllValues().get(0).getHeaders().getIfNoneMatch().isEmpty());
         assertEquals(List.of("\"cache-key\""), requestCaptor.getAllValues().get(1).getHeaders().getIfNoneMatch());
+    }
+
+    @Test
+    void shouldCacheEtagWithoutGzipPostfixWhenGettingRoleAssignments() {
+        RoleAssignmentResponse response = RoleAssignmentResponse.builder()
+            .roleAssignments(List.of(RoleAssignmentResource.builder().roleName("bailiff-manager").build()))
+            .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setETag("\"cache-key\"");
+
+        doReturn(
+            new ResponseEntity<>(response, headers, HttpStatus.OK),
+            new ResponseEntity<>(HttpStatus.NOT_MODIFIED)
+        ).when(restTemplate).exchange(any(URI.class), eq(HttpMethod.GET),
+                                      any(HttpEntity.class), eq(RoleAssignmentResponse.class));
+
+        assertEquals(response, roleAssignmentServiceHelper.getRoleAssignments("user-1"));
+        assertEquals(response, roleAssignmentServiceHelper.getRoleAssignments("user-1"));
+
+        ArgumentCaptor<HttpEntity<Object>> requestCaptor = httpEntityCaptor();
+        org.mockito.Mockito.verify(restTemplate, org.mockito.Mockito.times(2))
+            .exchange(any(URI.class), eq(HttpMethod.GET), requestCaptor.capture(), eq(RoleAssignmentResponse.class));
+
+        assertEquals(List.of("\"cache-key\""), requestCaptor.getAllValues().get(1).getHeaders().getIfNoneMatch());
+    }
+
+    @Test
+    void shouldNotCacheEtagWhenGettingRoleAssignmentsReturnsNullBody() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setETag("\"cache-key\"");
+
+        doReturn(
+            new ResponseEntity<RoleAssignmentResponse>(null, headers, HttpStatus.OK),
+            new ResponseEntity<>(HttpStatus.NOT_MODIFIED)
+        ).when(restTemplate).exchange(any(URI.class), eq(HttpMethod.GET),
+                                      any(HttpEntity.class), eq(RoleAssignmentResponse.class));
+
+        assertNull(roleAssignmentServiceHelper.getRoleAssignments("user-1"));
+        assertNull(roleAssignmentServiceHelper.getRoleAssignments("user-1"));
+
+        ArgumentCaptor<HttpEntity<Object>> requestCaptor = httpEntityCaptor();
+        org.mockito.Mockito.verify(restTemplate, org.mockito.Mockito.times(2))
+            .exchange(any(URI.class), eq(HttpMethod.GET), requestCaptor.capture(), eq(RoleAssignmentResponse.class));
+
+        assertFalse(requestCaptor.getAllValues().get(1).getHeaders().containsKey(HttpHeaders.IF_NONE_MATCH));
+    }
+
+    @Test
+    void shouldNotCacheEtagWhenGettingRoleAssignmentsReturnsNullRoleAssignments() {
+        RoleAssignmentResponse response = RoleAssignmentResponse.builder().build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setETag("\"cache-key\"");
+
+        doReturn(
+            new ResponseEntity<>(response, headers, HttpStatus.OK),
+            new ResponseEntity<>(HttpStatus.NOT_MODIFIED)
+        ).when(restTemplate).exchange(any(URI.class), eq(HttpMethod.GET),
+                                      any(HttpEntity.class), eq(RoleAssignmentResponse.class));
+
+        assertEquals(response, roleAssignmentServiceHelper.getRoleAssignments("user-1"));
+        assertNull(roleAssignmentServiceHelper.getRoleAssignments("user-1"));
+
+        ArgumentCaptor<HttpEntity<Object>> requestCaptor = httpEntityCaptor();
+        org.mockito.Mockito.verify(restTemplate, org.mockito.Mockito.times(2))
+            .exchange(any(URI.class), eq(HttpMethod.GET), requestCaptor.capture(), eq(RoleAssignmentResponse.class));
+
+        assertFalse(requestCaptor.getAllValues().get(1).getHeaders().containsKey(HttpHeaders.IF_NONE_MATCH));
+    }
+
+    @Test
+    void shouldThrow404WhenGettingRoleAssignments() {
+        Exception exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        doThrow(exception).when(restTemplate).exchange(any(URI.class), eq(HttpMethod.GET),
+                                                       any(HttpEntity.class), eq(RoleAssignmentResponse.class));
+
+        final ResourceNotFoundException expectedException =
+            assertThrows(ResourceNotFoundException.class, () -> roleAssignmentServiceHelper
+                .getRoleAssignments("user-1"));
+
+        assertEquals("No Role Assignments found for userId=user-1 when getting from Role Assignment Service because "
+                         + "of 404 NOT_FOUND", expectedException.getMessage());
+    }
+
+    @Test
+    void shouldThrow500WhenGettingRoleAssignments() {
+        Exception exception = new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+        doThrow(exception).when(restTemplate).exchange(any(URI.class), eq(HttpMethod.GET),
+                                                       any(HttpEntity.class), eq(RoleAssignmentResponse.class));
+
+        final ServiceException expectedException =
+            assertThrows(ServiceException.class, () -> roleAssignmentServiceHelper
+                .getRoleAssignments("user-1"));
+
+        assertEquals("Problem getting Role Assignments from Role Assignment Service because of "
+                         + "500 INTERNAL_SERVER_ERROR", expectedException.getMessage());
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private ArgumentCaptor<HttpEntity<Object>> httpEntityCaptor() {
+        return ArgumentCaptor.forClass((Class) HttpEntity.class);
     }
 }

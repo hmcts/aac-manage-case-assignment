@@ -10,6 +10,9 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.SPECIFIC;
 
 @DisplayName("RoleAssignmentResourceTest")
 class RoleAssignmentResourceTest {
@@ -36,6 +39,38 @@ class RoleAssignmentResourceTest {
         roleAssignments.getRoleAssignmentsList().get(0).isNotExpiredRoleAssignment();
         assertThat(roleAssignments.getRoleAssignmentsList().get(0).isNotExpiredRoleAssignment(), is(false));
         assertThat(roleAssignments.getRoleAssignmentsList().get(1).isNotExpiredRoleAssignment(), is(false));
+    }
+
+    @Test
+    @DisplayName("shouldPassForIsGrantType")
+    void shouldPassForIsGrantType() {
+        RoleAssignment roleAssignment = RoleAssignment.builder().grantType(SPECIFIC.name()).build();
+
+        assertThat(roleAssignment.isGrantType(SPECIFIC), is(true));
+    }
+
+    @Test
+    @DisplayName("shouldNotPassForIsGrantType")
+    void shouldNotPassForIsGrantType() {
+        RoleAssignment roleAssignment = RoleAssignment.builder().grantType(null).build();
+
+        assertThat(roleAssignment.isGrantType(SPECIFIC), is(false));
+    }
+
+    @Test
+    @DisplayName("shouldNotPassForIsGrantTypeWhenGrantTypeDoesNotMatch")
+    void shouldNotPassForIsGrantTypeWhenGrantTypeDoesNotMatch() {
+        RoleAssignment roleAssignment = RoleAssignment.builder().grantType(STANDARD.name()).build();
+
+        assertThat(roleAssignment.isGrantType(SPECIFIC), is(false));
+    }
+
+    @Test
+    @DisplayName("shouldThrowWhenRequestedGrantTypeIsNullAndRoleGrantTypeIsSet")
+    void shouldThrowWhenRequestedGrantTypeIsNullAndRoleGrantTypeIsSet() {
+        RoleAssignment roleAssignment = RoleAssignment.builder().grantType(SPECIFIC.name()).build();
+
+        assertThrows(NullPointerException.class, () -> roleAssignment.isGrantType(null));
     }
 
 

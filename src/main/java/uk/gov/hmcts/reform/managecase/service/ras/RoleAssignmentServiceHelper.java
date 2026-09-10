@@ -14,4 +14,6 @@ public interface RoleAssignmentServiceHelper {
     RoleAssignmentRequestResponse createRoleAssignment(RoleAssignmentRequestResource assignmentRequest);
 
     RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds);
+
+    RoleAssignmentResponse getRoleAssignments(String userId);
 }

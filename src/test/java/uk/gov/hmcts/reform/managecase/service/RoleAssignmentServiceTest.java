@@ -89,6 +89,18 @@ class RoleAssignmentServiceTest {
         assertThat(caseAssignedUserRole.get(0).getCaseDataId(), is(CASE_ID));
     }
 
+    @Test
+    void shouldGetRoleAssignmentsForUser() {
+
+        given(roleAssignmentServiceHelper.getRoleAssignments(USER_ID))
+            .willReturn(mockedRoleAssignmentResponse);
+
+        RoleAssignmentResponse response = roleAssignmentService.getRoleAssignments(USER_ID);
+
+        verify(roleAssignmentServiceHelper).getRoleAssignments(USER_ID);
+        assertThat(response, is(mockedRoleAssignmentResponse));
+    }
+
     private RoleAssignments getRoleAssignments() {
 
         final Instant currentTIme = Instant.now();

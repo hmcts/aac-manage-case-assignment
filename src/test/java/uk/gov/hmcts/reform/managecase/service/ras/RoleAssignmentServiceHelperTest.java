@@ -2,12 +2,14 @@ package uk.gov.hmcts.reform.managecase.service.ras;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
@@ -15,13 +17,19 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.BadRequestException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ResourceNotFoundException;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.ServiceException;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentQuery;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentRequestResource;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentRequestResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResource;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleRequestResource;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,6 +38,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ROLE_ASSIGNMENTS_CLIENT_ERROR;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ROLE_ASSIGNMENT_SERVICE_ERROR;
 
@@ -56,11 +65,13 @@ class RoleAssignmentServiceHelperTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
+        when(securityUtils.authorizationHeaders()).thenAnswer(invocation -> new HttpHeaders());
         String roleBaseUrl = "roleBaseURL";
+        given(applicationParams.roleAssignmentBaseURL()).willReturn(roleBaseUrl);
         given(applicationParams.amQueryRoleAssignmentsURL()).willReturn(roleBaseUrl);
         String deleteRoleUrl = "deleteRoleUrl";
         given(applicationParams.amDeleteByQueryRoleAssignmentsURL()).willReturn(deleteRoleUrl);
+        given(applicationParams.amGetRoleAssignmentsURL()).willReturn(roleBaseUrl);
         roleAssignmentServiceHelper = new RoleAssignmentServiceHelperImpl(restTemplate,
                                                                           applicationParams, securityUtils);
     }
@@ -123,5 +134,62 @@ class RoleAssignmentServiceHelperTest {
                 .deleteRoleAssignmentsByQuery(roleAssignmentQueryList));
         assertEquals(String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, "deleting", HttpStatus.BAD_REQUEST),
                      actualException.getMessage());
+    }
+
+    @Test
+    void shouldCreateRoleAssignment() {
+        RoleAssignmentRequestResource roleAssignmentRequest = RoleAssignmentRequestResource.builder()
+            .roleRequest(RoleRequestResource.builder().assignerId("user-1").build())
+            .requestedRoles(List.of(RoleAssignmentResource.builder().roleName("[ROLE]").build()))
+            .build();
+
+        RoleAssignmentRequestResponse response = RoleAssignmentRequestResponse.builder()
+            .roleAssignmentResponse(roleAssignmentRequest)
+            .build();
+
+        doReturn(ResponseEntity.ok(response)).when(restTemplate)
+            .exchange(eq("roleBaseURL"), eq(HttpMethod.POST),
+                      any(HttpEntity.class), eq(RoleAssignmentRequestResponse.class));
+
+        assertEquals(response, roleAssignmentServiceHelper.createRoleAssignment(roleAssignmentRequest));
+    }
+
+    @Test
+    void shouldFindRoleAssignmentsByCasesAndUsers() {
+        RoleAssignmentResponse response = RoleAssignmentResponse.builder()
+            .roleAssignments(List.of(RoleAssignmentResource.builder().roleName("[ROLE]").build()))
+            .build();
+
+        doReturn(ResponseEntity.ok(response)).when(restTemplate)
+            .exchange(eq("roleBaseURL"), eq(HttpMethod.POST),
+                      any(HttpEntity.class), eq(RoleAssignmentResponse.class));
+
+        assertEquals(response, roleAssignmentServiceHelper.findRoleAssignmentsByCasesAndUsers(caseIds, userIds));
+    }
+
+    @Test
+    void shouldCacheEtagWhenGettingRoleAssignments() {
+        RoleAssignmentResponse response = RoleAssignmentResponse.builder()
+            .roleAssignments(List.of(RoleAssignmentResource.builder().roleName("bailiff-manager").build()))
+            .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setETag("\"cache-key--gzip\"");
+
+        doReturn(
+            new ResponseEntity<>(response, headers, HttpStatus.OK),
+            new ResponseEntity<>(HttpStatus.NOT_MODIFIED)
+        ).when(restTemplate).exchange(any(URI.class), eq(HttpMethod.GET),
+                                      any(HttpEntity.class), eq(RoleAssignmentResponse.class));
+
+        assertEquals(response, roleAssignmentServiceHelper.getRoleAssignments("user-1"));
+        assertEquals(response, roleAssignmentServiceHelper.getRoleAssignments("user-1"));
+
+        ArgumentCaptor<HttpEntity<Object>> requestCaptor = ArgumentCaptor.forClass(HttpEntity.class);
+        org.mockito.Mockito.verify(restTemplate, org.mockito.Mockito.times(2))
+            .exchange(any(URI.class), eq(HttpMethod.GET), requestCaptor.capture(), eq(RoleAssignmentResponse.class));
+
+        assertTrue(requestCaptor.getAllValues().get(0).getHeaders().getIfNoneMatch().isEmpty());
+        assertEquals(List.of("\"cache-key\""), requestCaptor.getAllValues().get(1).getHeaders().getIfNoneMatch());
     }
 }

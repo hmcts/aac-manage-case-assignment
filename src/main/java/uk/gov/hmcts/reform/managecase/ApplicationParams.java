@@ -4,6 +4,10 @@ import org.springframework.beans.factory.annotation.Value;
 
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.ServiceException;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 @Named
@@ -101,5 +105,17 @@ public class ApplicationParams {
 
     public List<String> getAuthorisedServicesForCaseUserRoles() {
         return authorisedServicesForCaseUserRoles;
+    }
+
+    public String amGetRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/actors/{uid}";
+    }
+
+    public static String encode(final String stringToEncode) {
+        try {
+            return URLEncoder.encode(stringToEncode, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new ServiceException(e.getMessage());
+        }
     }
 }

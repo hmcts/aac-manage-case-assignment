@@ -10,6 +10,8 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.SPECIFIC;
 
 @DisplayName("RoleAssignmentResourceTest")
 class RoleAssignmentResourceTest {
@@ -38,6 +40,29 @@ class RoleAssignmentResourceTest {
         assertThat(roleAssignments.getRoleAssignmentsList().get(1).isNotExpiredRoleAssignment(), is(false));
     }
 
+    @Test
+    @DisplayName("shouldPassForIsGrantType")
+    void shouldPassForIsGrantType() {
+        RoleAssignment roleAssignment = RoleAssignment.builder().grantType(SPECIFIC.name()).build();
+
+        assertThat(roleAssignment.isGrantType(SPECIFIC), is(true));
+    }
+
+    @Test
+    @DisplayName("shouldNotPassForIsGrantType")
+    void shouldNotPassForIsGrantType() {
+        RoleAssignment roleAssignment = RoleAssignment.builder().grantType(null).build();
+
+        assertThat(roleAssignment.isGrantType(SPECIFIC), is(false));
+    }
+
+    @Test
+    @DisplayName("shouldNotPassForIsGrantTypeWhenGrantTypeDoesNotMatch")
+    void shouldNotPassForIsGrantTypeWhenGrantTypeDoesNotMatch() {
+        RoleAssignment roleAssignment = RoleAssignment.builder().grantType(STANDARD.name()).build();
+
+        assertThat(roleAssignment.isGrantType(SPECIFIC), is(false));
+    }
 
     private RoleAssignments getRoleAssignments(final long oneHour) {
 

@@ -32,6 +32,6 @@ public class RoleAssignment {
     }
 
     public boolean isGrantType(GrantType grantType) {
-        return getGrantType() != null && grantType.name().equals(getGrantType());
+        return grantType != null && grantType.name().equals(getGrantType());
     }
 }

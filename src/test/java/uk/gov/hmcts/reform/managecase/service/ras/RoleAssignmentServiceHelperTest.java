@@ -2,9 +2,11 @@ package uk.gov.hmcts.reform.managecase.service.ras;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -42,11 +44,14 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ROLE_ASSIGNMENTS_CLIENT_ERROR;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ROLE_ASSIGNMENT_SERVICE_ERROR;
 
+@ExtendWith(MockitoExtension.class)
 class RoleAssignmentServiceHelperTest {
+
+    private static final String ROLE_BASE_URL = "roleBaseURL";
+    private static final String DELETE_ROLE_URL = "deleteRoleUrl";
 
     @Mock
     private RestTemplate restTemplate;
@@ -60,6 +65,9 @@ class RoleAssignmentServiceHelperTest {
     @Mock
     private RoleAssignmentResponse mockedRoleAssignmentResponse;
 
+    @Captor
+    private ArgumentCaptor<HttpEntity<Object>> requestCaptor;
+
     private RoleAssignmentServiceHelper roleAssignmentServiceHelper;
 
     private final List<String> caseIds = Arrays.asList("111", "222");
@@ -68,20 +76,14 @@ class RoleAssignmentServiceHelperTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        when(securityUtils.authorizationHeaders()).thenAnswer(invocation -> new HttpHeaders());
-        String roleBaseUrl = "roleBaseURL";
-        given(applicationParams.roleAssignmentBaseURL()).willReturn(roleBaseUrl);
-        given(applicationParams.amQueryRoleAssignmentsURL()).willReturn(roleBaseUrl);
-        String deleteRoleUrl = "deleteRoleUrl";
-        given(applicationParams.amDeleteByQueryRoleAssignmentsURL()).willReturn(deleteRoleUrl);
-        given(applicationParams.amGetRoleAssignmentsURL()).willReturn(roleBaseUrl);
+        given(securityUtils.authorizationHeaders()).willAnswer(invocation -> new HttpHeaders());
         roleAssignmentServiceHelper = new RoleAssignmentServiceHelperImpl(restTemplate,
                                                                           applicationParams, securityUtils);
     }
 
     @Test
     void shouldThrow404_FindRoleAssignmentsByCasesAndUsers() {
+        stubQueryRoleAssignmentsUrl();
         Exception exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
                                                        eq(RoleAssignmentResponse.class));
@@ -94,6 +96,7 @@ class RoleAssignmentServiceHelperTest {
 
     @Test
     void shouldThrow400_FindRoleAssignmentsByCasesAndUsers() {
+        stubQueryRoleAssignmentsUrl();
         Exception exception = new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
                                                        eq(RoleAssignmentResponse.class));
@@ -106,6 +109,7 @@ class RoleAssignmentServiceHelperTest {
 
     @Test
     void shouldThrow500_FindRoleAssignmentsByCasesAndUsers() {
+        stubQueryRoleAssignmentsUrl();
         Exception exception = new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
                                                        eq(RoleAssignmentResponse.class));
@@ -118,6 +122,7 @@ class RoleAssignmentServiceHelperTest {
 
     @Test
     void shouldThrow500_deleteRoleAssignmentsByQuery() {
+        stubDeleteByQueryRoleAssignmentsUrl();
         Exception exception = new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
                                                        eq(Void.class));
@@ -130,6 +135,7 @@ class RoleAssignmentServiceHelperTest {
 
     @Test
     void shouldThrow400_deleteRoleAssignmentsByQuery() {
+        stubDeleteByQueryRoleAssignmentsUrl();
         Exception exception = new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
                                                        eq(Void.class));
@@ -142,6 +148,7 @@ class RoleAssignmentServiceHelperTest {
 
     @Test
     void shouldCreateRoleAssignment() {
+        stubRoleAssignmentBaseUrl();
         RoleAssignmentRequestResource roleAssignmentRequest = RoleAssignmentRequestResource.builder()
             .roleRequest(RoleRequestResource.builder().assignerId("user-1").build())
             .requestedRoles(List.of(RoleAssignmentResource.builder().roleName("[ROLE]").build()))
@@ -152,7 +159,7 @@ class RoleAssignmentServiceHelperTest {
             .build();
 
         doReturn(ResponseEntity.ok(response)).when(restTemplate)
-            .exchange(eq("roleBaseURL"), eq(HttpMethod.POST),
+            .exchange(eq(ROLE_BASE_URL), eq(HttpMethod.POST),
                       any(HttpEntity.class), eq(RoleAssignmentRequestResponse.class));
 
         assertEquals(response, roleAssignmentServiceHelper.createRoleAssignment(roleAssignmentRequest));
@@ -160,12 +167,13 @@ class RoleAssignmentServiceHelperTest {
 
     @Test
     void shouldFindRoleAssignmentsByCasesAndUsers() {
+        stubQueryRoleAssignmentsUrl();
         RoleAssignmentResponse response = RoleAssignmentResponse.builder()
             .roleAssignments(List.of(RoleAssignmentResource.builder().roleName("[ROLE]").build()))
             .build();
 
         doReturn(ResponseEntity.ok(response)).when(restTemplate)
-            .exchange(eq("roleBaseURL"), eq(HttpMethod.POST),
+            .exchange(eq(ROLE_BASE_URL), eq(HttpMethod.POST),
                       any(HttpEntity.class), eq(RoleAssignmentResponse.class));
 
         assertEquals(response, roleAssignmentServiceHelper.findRoleAssignmentsByCasesAndUsers(caseIds, userIds));
@@ -173,6 +181,7 @@ class RoleAssignmentServiceHelperTest {
 
     @Test
     void shouldCacheEtagWhenGettingRoleAssignments() {
+        stubGetRoleAssignmentsUrl();
         RoleAssignmentResponse response = RoleAssignmentResponse.builder()
             .roleAssignments(List.of(RoleAssignmentResource.builder().roleName("bailiff-manager").build()))
             .build();
@@ -189,7 +198,6 @@ class RoleAssignmentServiceHelperTest {
         assertEquals(response, roleAssignmentServiceHelper.getRoleAssignments("user-1"));
         assertEquals(response, roleAssignmentServiceHelper.getRoleAssignments("user-1"));
 
-        ArgumentCaptor<HttpEntity<Object>> requestCaptor = ArgumentCaptor.forClass(HttpEntity.class);
         verify(restTemplate, times(2))
             .exchange(any(URI.class), eq(HttpMethod.GET), requestCaptor.capture(), eq(RoleAssignmentResponse.class));
 
@@ -199,6 +207,7 @@ class RoleAssignmentServiceHelperTest {
 
     @Test
     void shouldCacheEtagWithoutGzipPostfixWhenGettingRoleAssignments() {
+        stubGetRoleAssignmentsUrl();
         RoleAssignmentResponse response = RoleAssignmentResponse.builder()
             .roleAssignments(List.of(RoleAssignmentResource.builder().roleName("bailiff-manager").build()))
             .build();
@@ -215,15 +224,17 @@ class RoleAssignmentServiceHelperTest {
         assertEquals(response, roleAssignmentServiceHelper.getRoleAssignments("user-1"));
         assertEquals(response, roleAssignmentServiceHelper.getRoleAssignments("user-1"));
 
-        ArgumentCaptor<HttpEntity<Object>> requestCaptor = httpEntityCaptor();
         verify(restTemplate, times(2))
             .exchange(any(URI.class), eq(HttpMethod.GET), requestCaptor.capture(), eq(RoleAssignmentResponse.class));
+
+        assertTrue(requestCaptor.getAllValues().get(0).getHeaders().getIfNoneMatch().isEmpty());
 
         assertEquals(List.of("\"cache-key\""), requestCaptor.getAllValues().get(1).getHeaders().getIfNoneMatch());
     }
 
     @Test
     void shouldNotCacheEtagWhenGettingRoleAssignmentsReturnsNullBody() {
+        stubGetRoleAssignmentsUrl();
         HttpHeaders headers = new HttpHeaders();
         headers.setETag("\"cache-key\"");
 
@@ -236,7 +247,6 @@ class RoleAssignmentServiceHelperTest {
         assertNull(roleAssignmentServiceHelper.getRoleAssignments("user-1"));
         assertNull(roleAssignmentServiceHelper.getRoleAssignments("user-1"));
 
-        ArgumentCaptor<HttpEntity<Object>> requestCaptor = httpEntityCaptor();
         verify(restTemplate, times(2))
             .exchange(any(URI.class), eq(HttpMethod.GET), requestCaptor.capture(), eq(RoleAssignmentResponse.class));
 
@@ -245,6 +255,7 @@ class RoleAssignmentServiceHelperTest {
 
     @Test
     void shouldNotCacheEtagWhenGettingRoleAssignmentsReturnsNullRoleAssignments() {
+        stubGetRoleAssignmentsUrl();
         RoleAssignmentResponse response = RoleAssignmentResponse.builder().build();
 
         HttpHeaders headers = new HttpHeaders();
@@ -259,7 +270,6 @@ class RoleAssignmentServiceHelperTest {
         assertEquals(response, roleAssignmentServiceHelper.getRoleAssignments("user-1"));
         assertNull(roleAssignmentServiceHelper.getRoleAssignments("user-1"));
 
-        ArgumentCaptor<HttpEntity<Object>> requestCaptor = httpEntityCaptor();
         verify(restTemplate, times(2))
             .exchange(any(URI.class), eq(HttpMethod.GET), requestCaptor.capture(), eq(RoleAssignmentResponse.class));
 
@@ -268,6 +278,7 @@ class RoleAssignmentServiceHelperTest {
 
     @Test
     void shouldThrow404WhenGettingRoleAssignments() {
+        stubGetRoleAssignmentsUrl();
         Exception exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(exception).when(restTemplate).exchange(any(URI.class), eq(HttpMethod.GET),
                                                        any(HttpEntity.class), eq(RoleAssignmentResponse.class));
@@ -282,6 +293,7 @@ class RoleAssignmentServiceHelperTest {
 
     @Test
     void shouldThrow500WhenGettingRoleAssignments() {
+        stubGetRoleAssignmentsUrl();
         Exception exception = new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
         doThrow(exception).when(restTemplate).exchange(any(URI.class), eq(HttpMethod.GET),
                                                        any(HttpEntity.class), eq(RoleAssignmentResponse.class));
@@ -294,8 +306,20 @@ class RoleAssignmentServiceHelperTest {
                          + "500 INTERNAL_SERVER_ERROR", expectedException.getMessage());
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private ArgumentCaptor<HttpEntity<Object>> httpEntityCaptor() {
-        return ArgumentCaptor.forClass((Class) HttpEntity.class);
+    private void stubRoleAssignmentBaseUrl() {
+        given(applicationParams.roleAssignmentBaseURL()).willReturn(ROLE_BASE_URL);
     }
+
+    private void stubQueryRoleAssignmentsUrl() {
+        given(applicationParams.amQueryRoleAssignmentsURL()).willReturn(ROLE_BASE_URL);
+    }
+
+    private void stubGetRoleAssignmentsUrl() {
+        given(applicationParams.amGetRoleAssignmentsURL()).willReturn(ROLE_BASE_URL);
+    }
+
+    private void stubDeleteByQueryRoleAssignmentsUrl() {
+        given(applicationParams.amDeleteByQueryRoleAssignmentsURL()).willReturn(DELETE_ROLE_URL);
+    }
+
 }

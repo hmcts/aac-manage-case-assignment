@@ -10,7 +10,6 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.SPECIFIC;
 
@@ -64,15 +63,6 @@ class RoleAssignmentResourceTest {
 
         assertThat(roleAssignment.isGrantType(SPECIFIC), is(false));
     }
-
-    @Test
-    @DisplayName("shouldThrowWhenRequestedGrantTypeIsNullAndRoleGrantTypeIsSet")
-    void shouldThrowWhenRequestedGrantTypeIsNullAndRoleGrantTypeIsSet() {
-        RoleAssignment roleAssignment = RoleAssignment.builder().grantType(SPECIFIC.name()).build();
-
-        assertThrows(NullPointerException.class, () -> roleAssignment.isGrantType(null));
-    }
-
 
     private RoleAssignments getRoleAssignments(final long oneHour) {
 

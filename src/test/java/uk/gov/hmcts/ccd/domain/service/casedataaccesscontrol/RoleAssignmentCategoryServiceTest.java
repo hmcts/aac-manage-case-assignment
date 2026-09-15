@@ -123,7 +123,7 @@ class RoleAssignmentCategoryServiceTest {
         void shouldGetRoleCategoryForEnforcementUser() {
 
             given(caseAssignmentService.getAssigneeRoles(USER_ID))
-                .willReturn(singletonList("some-user"));
+                .willReturn(singletonList("bailiff-manager-user"));
 
             RoleAssignment enforcementRole = RoleAssignment.builder()
                 .roleName("bailiff-manager")
@@ -146,7 +146,7 @@ class RoleAssignmentCategoryServiceTest {
         void shouldFallbackToLegalOperationsWhenRoleAssignmentsAreUnavailable() {
 
             given(caseAssignmentService.getAssigneeRoles(USER_ID))
-                .willReturn(singletonList("some-user"));
+                .willReturn(singletonList("invalidUser"));
             given(roleAssignmentServiceHelper.getRoleAssignments(USER_ID))
                 .willThrow(new ResourceNotFoundException("not found"));
 
@@ -212,7 +212,7 @@ class RoleAssignmentCategoryServiceTest {
         void shouldFallbackToLegalOperationsWhenStandardGrantTypeRoleIsNotEnforcementRole() {
 
             given(caseAssignmentService.getAssigneeRoles(USER_ID))
-                .willReturn(singletonList("some-user"));
+                .willReturn(singletonList("caseworker-user"));
 
             RoleAssignment nonEnforcementStandardRole = RoleAssignment.builder()
                 .roleName("caseworker")
@@ -235,7 +235,7 @@ class RoleAssignmentCategoryServiceTest {
         void shouldGetEnforcementWhenAtLeastOneStandardEnforcementRoleExists() {
 
             given(caseAssignmentService.getAssigneeRoles(USER_ID))
-                .willReturn(singletonList("some-user"));
+                .willReturn(singletonList("bailiff-user"));
 
             RoleAssignment nonMatchingRole = RoleAssignment.builder()
                 .roleName("caseworker")

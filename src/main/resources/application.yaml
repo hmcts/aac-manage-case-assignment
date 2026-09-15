@@ -43,7 +43,7 @@ spring:
       client:
         provider:
           oidc:
-            issuer-uri: ${IDAM_OIDC_URL:http://localhost:5000}/o
+            issuer-uri: ${IDAM_OIDC_URL:idam.api.url}/o
   cloud:
     gateway:
       mvc:
@@ -75,12 +75,17 @@ springdoc:
 idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
+  oidc:
+    url: ${IDAM_OIDC_URL:http://localhost:9002}/o
+    use_oidc_api: true
   client:
     id: aac_manage_case_assignment
     secret: ${IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
     scope: openid roles profile manage-user
     # same for all environments - not used in mca but configured as idam mandates for token generation
     redirect_uri: https://manage-case-assignment/oauth2redirect
+  security:
+    allowed-issuers: ${OIDC_ALLOWED_ISSUERS:http://idam-web-public:9002/o,http://fr-am:8080/openam/oauth2/hmcts}
   caa:
     username: ${IDAM_CAA_USERNAME:master.caa@gmail.com}
     password: ${IDAM_CAA_PASSWORD:Pa55word11}

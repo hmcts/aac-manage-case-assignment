@@ -43,29 +43,28 @@ spring:
       client:
         provider:
           oidc:
-            issuer-uri: ${IDAM_OIDC_URL:http://localhost:5000}/o
+            issuer-uri: ${IDAM_OIDC_URL:idam.api.url}/o
   cloud:
     gateway:
-      mvc:
-        forwarded-request-headers-filter:
-          enabled: false
-        remove-content-length-request-headers-filter:
-          enabled: false
-        transfer-encoding-normalization-request-headers-filter:
-          enabled: false
-        http-client:
-          type: AUTODETECT
-        routes:
-          - id: data-store
-            uri: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
-            predicates:
-              - Path=/ccd/**
-            filters:
-              - AllowedRoutesFilter
-              - ValidateClientFilter
-              - RemoveResponseHeader=Cookie
-              - RemoveResponseHeader=Set-Cookie
-              - StripPrefix=1
+      server:
+        webmvc:
+          forwarded-request-headers-filter:
+            enabled: false
+          remove-content-length-request-headers-filter:
+            enabled: false
+          transfer-encoding-normalization-request-headers-filter:
+            enabled: false
+          routes:
+            - id: data-store
+              uri: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
+              predicates:
+                - Path=/ccd/**
+              filters:
+                - AllowedRoutesFilter
+                - ValidateClientFilter
+                - RemoveResponseHeader=Cookie
+                - RemoveResponseHeader=Set-Cookie
+                - StripPrefix=1
     discovery:
       client:
         composite-indicator:
@@ -75,12 +74,17 @@ springdoc:
 idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
+  oidc:
+    url: ${IDAM_OIDC_URL:http://localhost:9002}
+    use_oidc_api: true
   client:
     id: aac_manage_case_assignment
     secret: ${IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
     scope: openid roles profile manage-user
     # same for all environments - not used in mca but configured as idam mandates for token generation
     redirect_uri: https://manage-case-assignment/oauth2redirect
+  security:
+    allowed-issuers: ${OIDC_ALLOWED_ISSUERS:http://idam-web-public:9002/o,http://fr-am:8080/openam/oauth2/hmcts}
   caa:
     username: ${IDAM_CAA_USERNAME:master.caa@gmail.com}
     password: ${IDAM_CAA_PASSWORD:Pa55word11}
@@ -93,8 +97,6 @@ idam:
     url: ${S2S_URL:http://localhost:4502}
   s2s-authorised:
     services: ${MANAGE_CASE_S2S_AUTHORISED_SERVICES:xui_webapp,ccd_data,finrem_case_orchestration,prl_cos_api,et_cos,et_sya_api}
-oidc:
-  issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
 ccd:
   data-store:

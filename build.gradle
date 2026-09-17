@@ -185,6 +185,11 @@ jacocoTestReport {
     csv.required = false
     xml.outputLocation = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
   }
+}
+
+tasks.register('jacocoTestCoverageVerification', org.gradle.testing.jacoco.tasks.JacocoCoverageVerification) {
+  executionData(test, integration)
+  sourceSets(sourceSets.main)
   violationRules {
     rule {
       limit {
@@ -201,7 +206,7 @@ jacocoTestReport {
   }
 }
 
-check.dependsOn jacocoTestReport
+check.dependsOn jacocoTestReport, jacocoTestCoverageVerification
 
 project.ext {
   pactVersion = getCheckedOutGitCommitHash()

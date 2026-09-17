@@ -185,7 +185,23 @@ jacocoTestReport {
     csv.required = false
     xml.outputLocation = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
   }
+  violationRules {
+    rule {
+      limit {
+        counter = 'LINE'
+        value = 'COVEREDRATIO'
+        minimum = 0.70
+      }
+      limit {
+        counter = 'BRANCH'
+        value = 'COVEREDRATIO'
+        minimum = 0.55
+      }
+    }
+  }
 }
+
+check.dependsOn jacocoTestReport
 
 project.ext {
   pactVersion = getCheckedOutGitCommitHash()

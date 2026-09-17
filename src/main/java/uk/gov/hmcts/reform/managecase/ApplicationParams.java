@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Named
@@ -101,5 +104,13 @@ public class ApplicationParams {
 
     public List<String> getAuthorisedServicesForCaseUserRoles() {
         return authorisedServicesForCaseUserRoles;
+    }
+
+    public String amGetRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/actors/{uid}";
+    }
+
+    public static String encode(final String stringToEncode) {
+        return URLEncoder.encode(stringToEncode, StandardCharsets.UTF_8);
     }
 }

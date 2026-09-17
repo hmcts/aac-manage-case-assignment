@@ -4,10 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.ServiceException;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Named
@@ -112,10 +111,6 @@ public class ApplicationParams {
     }
 
     public static String encode(final String stringToEncode) {
-        try {
-            return URLEncoder.encode(stringToEncode, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new ServiceException(e.getMessage());
-        }
+        return URLEncoder.encode(stringToEncode, StandardCharsets.UTF_8);
     }
 }

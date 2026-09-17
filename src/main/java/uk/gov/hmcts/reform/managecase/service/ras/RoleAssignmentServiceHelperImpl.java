@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.collect.Maps.newConcurrentMap;
 import static org.springframework.http.HttpHeaders.ETAG;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ROLE_ASSIGNMENTS_CLIENT_ERROR;
 import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.ROLE_ASSIGNMENT_SERVICE_ERROR;
@@ -46,7 +45,7 @@ public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHel
     private final SecurityUtils securityUtils;
 
     // UserId as a key, Pair<ETag, RoleAssignmentResponse> as a value
-    private final Map<String, Pair<String, RoleAssignmentResponse>> roleAssignments = newConcurrentMap();
+    private final Map<String, Pair<String, RoleAssignmentResponse>> roleAssignments = new HashMap<>();
     private static final String GZIP_POSTFIX = "--gzip";
     public static final String ROLE_ASSIGNMENTS_NOT_FOUND =
         "No Role Assignments found for userId=%s when getting from Role Assignment Service because of %s";

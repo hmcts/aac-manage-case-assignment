@@ -30,6 +30,9 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableE
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.data.user.UserRepository;
@@ -143,6 +146,39 @@ public class CaseAssignmentProviderTests {
         if (context != null) {
             context.setTarget(testTarget);
         }
+    }
+
+    @State("NoC questions exist for case with given id")
+    public void toGetNoCQuestions() {
+        given(noticeOfChangeQuestions.getChallengeQuestions(anyString()))
+            .willReturn(ChallengeQuestionsResult.builder()
+                .questions(List.of(
+                    ChallengeQuestion.builder()
+                        .caseTypeId("FT_NoCCaseType")
+                        .order(6)
+                        .questionText("What's the name of the party you wish to represent?")
+                        .answerField("")
+                        .answerFieldType(FieldType.builder().id("Text").type("Text")
+                            .min("0").max("10").regularExpression("asdsa")
+                            .fixedListItems(emptyList()).complexFields(emptyList()).build())
+                        .challengeQuestionId("NoCChallenge")
+                        .questionId("NoC_Challenge_Name")
+                        .displayContextParameter("1")
+                        .ignoreNullFields(true)
+                        .build(),
+                    ChallengeQuestion.builder()
+                        .caseTypeId("FT_NoCCaseType")
+                        .order(7)
+                        .questionText("significant date?")
+                        .answerField("")
+                        .answerFieldType(FieldType.builder().id("Date").type("Date")
+                            .min("0").max("10").regularExpression("asdsa")
+                            .fixedListItems(emptyList()).complexFields(emptyList()).build())
+                        .displayContextParameter("#DATETIMEENTRY(dd-MM-yyyy)")
+                        .challengeQuestionId("NoCChallenge")
+                        .questionId("NoC_Challenge_Name2")
+                        .build()))
+                .build());
     }
 
     @State({"Assign a user to a case"})

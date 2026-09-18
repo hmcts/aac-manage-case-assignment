@@ -27,16 +27,16 @@ public final class CaseFieldPathUtils {
      * @param path The full stop (".") separated path
      * @return The case field; empty if no such field exists
      */
-    public static <T extends CommonField> Optional<T> getFieldDefinitionByPath(CaseTypeDefinition caseTypeDefinition,
-                                                                               String path) {
+    public static Optional<CaseFieldDefinition> getFieldDefinitionByPath(CaseTypeDefinition caseTypeDefinition,
+                                                                         String path) {
         if (StringUtils.isBlank(path)) {
             return Optional.empty();
         }
         List<String> pathElements = getPathElements(path);
 
-        Optional<CaseFieldDefinition> topLevelCaseField = caseTypeDefinition.getCaseField(pathElements.get(0));
+        Optional<CaseFieldDefinition> topLevelCaseField = caseTypeDefinition.getCaseField(pathElements.getFirst());
 
-        return topLevelCaseField.flatMap(field -> getFieldDefinitionByPath((T) field,
+        return topLevelCaseField.flatMap(field -> getFieldDefinitionByPath(field,
                                                                            getPathElementsTailAsString(pathElements)));
     }
 
@@ -48,12 +48,22 @@ public final class CaseFieldPathUtils {
      * @return The nested field. The case field passed in is returned if the path is empty;
      *         empty if no such field exists
      */
-    public static <T extends CommonField> Optional<T> getFieldDefinitionByPath(T caseFieldDefinition, String path) {
+    public static Optional<CaseFieldDefinition> getFieldDefinitionByPath(CaseFieldDefinition caseFieldDefinition,
+                                                                         String path) {
         if (StringUtils.isBlank(path)) {
             return Optional.of(caseFieldDefinition);
         }
 
         return getFieldDefinitionByPath(caseFieldDefinition.getFieldTypeDefinition(), path, false);
+    }
+
+    public static Optional<CommonField> getFieldDefinitionByPath(CommonField caseField, String path) {
+        if (StringUtils.isBlank(path)) {
+            return Optional.of(caseField);
+        }
+
+        return getFieldDefinitionByPath(caseField.getFieldTypeDefinition(), path, false)
+            .map(CommonField.class::cast);
     }
 
     /**
@@ -67,17 +77,19 @@ public final class CaseFieldPathUtils {
      *                           would simply be for ChildField
      * @return The nested field; empty if no such field exists
      */
-    public static <T extends CommonField> Optional<T> getFieldDefinitionByPath(FieldTypeDefinition fieldTypeDefinition,
-                                                                               String path,
-                                                                               boolean pathIncludesParent) {
+    public static Optional<CaseFieldDefinition> getFieldDefinitionByPath(FieldTypeDefinition fieldTypeDefinition,
+                                                                         String path,
+                                                                         boolean pathIncludesParent) {
         if (StringUtils.isBlank(path) || fieldTypeDefinition.getChildren().isEmpty()
             || pathIncludesParent && splitPath(path).length == 1) {
             return Optional.empty();
         }
         List<String> pathElements = getPathElements(path);
 
-        return reduce((List<T>)fieldTypeDefinition.getChildren(),
-                      pathIncludesParent ? getPathElementsTail(pathElements) : pathElements);
+        return reduce(
+            fieldTypeDefinition.getChildren(),
+            pathIncludesParent ? getPathElementsTail(pathElements) : pathElements
+        );
     }
 
     /**
@@ -89,7 +101,7 @@ public final class CaseFieldPathUtils {
      */
     public static JsonNode getNestedCaseFieldByPath(Map<String, JsonNode> caseData, String path) {
         List<String> pathElements = getPathElements(path);
-        JsonNode topLevelNode = caseData.get(pathElements.get(0));
+        JsonNode topLevelNode = caseData.get(pathElements.getFirst());
 
         return pathElements.size() > 1 && topLevelNode != null && !topLevelNode.isNull()
             ? getNestedCaseFieldByPath(topLevelNode, getPathElementsTailAsString(pathElements))
@@ -117,24 +129,25 @@ public final class CaseFieldPathUtils {
         return path.trim().split(SEPARATOR_REGEX);
     }
 
-    private static <T extends CommonField> Optional<T> reduce(List<T> caseFields, List<String> pathElements) {
+    private static Optional<CaseFieldDefinition> reduce(List<CaseFieldDefinition> caseFields,
+                                                        List<String> pathElements) {
         return caseFields.stream()
-            .filter(e -> e.getId().equals(pathElements.get(0)))
+            .filter(e -> e.getId().equals(pathElements.getFirst()))
             .findFirst()
             .flatMap(caseField -> {
                 if (1 == pathElements.size()) {
                     return Optional.of(caseField);
                 } else {
-                    List<T> newCaseFields = (List<T>) caseField.getFieldTypeDefinition().getChildren();
+                    List<CaseFieldDefinition> newCaseFields = caseField.getFieldTypeDefinition().getChildren();
                     return reduce(newCaseFields, getPathElementsTail(pathElements));
                 }
             });
     }
 
     private static JsonNode reduce(JsonNode caseFields, List<String> pathElements) {
-        String firstPathElement = pathElements.get(0);
+        String firstPathElement = pathElements.getFirst();
 
-        JsonNode caseField = Optional.ofNullable(caseFields.get(firstPathElement)).orElse(null);
+        JsonNode caseField = caseFields.get(firstPathElement);
 
         if (caseField == null || pathElements.size() == 1) {
             return caseField;

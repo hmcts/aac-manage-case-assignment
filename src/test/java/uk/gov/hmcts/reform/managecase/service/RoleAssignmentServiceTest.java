@@ -86,7 +86,7 @@ class RoleAssignmentServiceTest {
             roleAssignmentService.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
 
         assertEquals(2, caseAssignedUserRole.size());
-        assertThat(caseAssignedUserRole.get(0).getCaseDataId(), is(CASE_ID));
+        assertThat(caseAssignedUserRole.getFirst().getCaseDataId(), is(CASE_ID));
     }
 
     private RoleAssignments getRoleAssignments() {
@@ -210,7 +210,7 @@ class RoleAssignmentServiceTest {
 
             // create map by userID (NB: this relies on the test data using a unique user_id for each query)
             Map<String, RoleAssignmentQuery> queryMapByUser = actualRoleAssignmentQueries.stream()
-                .collect(Collectors.toMap(query -> query.getActorId().get(0), query -> query));
+                .collect(Collectors.toMap(query -> query.getActorId().getFirst(), query -> query));
 
             expectedDeleteRequests.forEach(expectedDeleteRequest -> assertAll(
                 () -> assertTrue(queryMapByUser.containsKey(expectedDeleteRequest.getUserId())),
@@ -237,11 +237,11 @@ class RoleAssignmentServiceTest {
 
                 // verify data
                 () -> Assertions.assertEquals(
-                    expectedDeleteRequest.getCaseId(), actualRoleAssignmentQuery.getAttributes().getCaseId().get(0)
+                    expectedDeleteRequest.getCaseId(), actualRoleAssignmentQuery.getAttributes().getCaseId().getFirst()
                 ),
                 () -> Assertions.assertEquals(expectedDeleteRequest.getUserId(), actualRoleAssignmentQuery.getActorId()
-                    .get(0)),
-                () -> Assertions.assertEquals(RoleType.CASE.name(), actualRoleAssignmentQuery.getRoleType().get(0)),
+                    .getFirst()),
+                () -> Assertions.assertEquals(RoleType.CASE.name(), actualRoleAssignmentQuery.getRoleType().getFirst()),
                 () -> assertArrayEquals(
                     expectedDeleteRequest.getRoleNames().toArray(), actualRoleAssignmentQuery.getRoleName().toArray()
                 )
@@ -269,8 +269,7 @@ class RoleAssignmentServiceTest {
             RoleAssignmentRequestResource roleAssignments = roleAssignmentService.createCaseRoleAssignments(
                 caseDetails,
                 USER_ID,
-                roles.stream().collect(
-                    Collectors.toList()),
+                new ArrayList<>(roles),
                 replaceExisting
             );
 
@@ -282,9 +281,7 @@ class RoleAssignmentServiceTest {
             assertAll(
                 () -> assertCorrectlyPopulatedRoleAssignment(
                     caseDetails,
-                    USER_ID,
-                    roles.stream().collect(Collectors.joining()),
-                    ROLE_CATEGORY_4_USER_1,
+                    String.join("", roles),
                     roleAssignments
                 )
             );
@@ -298,7 +295,7 @@ class RoleAssignmentServiceTest {
             final var roles = Set.of("[ROLE1]");
             final var roleAssignmentsAddRequest = RoleAssignmentsAddRequest.builder()
                 .caseDetails(caseDetails)
-                .roleNames(roles.stream().collect(Collectors.toList()))
+                .roleNames(new ArrayList<>(roles))
                 .userId(USER_ID).build();
 
             addRequest.add(roleAssignmentsAddRequest);
@@ -315,16 +312,14 @@ class RoleAssignmentServiceTest {
 
 
         private void assertCorrectlyPopulatedRoleAssignment(final CaseDetails expectedCaseDetails,
-                                                            final String expectedUserId,
                                                             final String expectedRoleName,
-                                                            final RoleCategory expectedRoleCategory,
                                                             final RoleAssignmentRequestResource actualRoleAssignment) {
 
             assertNotNull(actualRoleAssignment);
 
-            actualRoleAssignment.getRequestedRoles().stream()
+            actualRoleAssignment.getRequestedRoles()
                 .forEach(roleAssignmentResource -> assertAll(
-                    () -> Assertions.assertEquals(expectedUserId, roleAssignmentResource.getActorId()),
+                    () -> Assertions.assertEquals(USER_ID, roleAssignmentResource.getActorId()),
                     () -> Assertions.assertEquals(expectedRoleName, roleAssignmentResource.getRoleName()),
 
                     // defaults
@@ -336,7 +331,7 @@ class RoleAssignmentServiceTest {
                     ),
                     () -> Assertions.assertEquals(GrantType.SPECIFIC.name(), roleAssignmentResource.getGrantType()),
                     () -> Assertions.assertEquals(
-                        expectedRoleCategory.name(),
+                        ROLE_CATEGORY_4_USER_1.name(),
                         roleAssignmentResource.getRoleCategory()
                     ),
                     () -> assertFalse(roleAssignmentResource.getReadOnly()),
@@ -344,26 +339,25 @@ class RoleAssignmentServiceTest {
 
                     // attributes match case
                     () -> Assertions.assertEquals(
-                        Optional.of(expectedCaseDetails.getReferenceAsString()),
+                        expectedCaseDetails.getReferenceAsString(),
                         roleAssignmentResource.getAttributes().getCaseId()
                     ),
                     () -> Assertions.assertEquals(
-                        Optional.of(expectedCaseDetails.getJurisdiction()),
+                        expectedCaseDetails.getJurisdiction(),
                         roleAssignmentResource.getAttributes().getJurisdiction()
                     ),
                     () -> Assertions.assertEquals(
-                        Optional.of(expectedCaseDetails.getCaseTypeId()),
+                        expectedCaseDetails.getCaseTypeId(),
                         roleAssignmentResource.getAttributes().getCaseType()
                     )
                 ));
         }
 
         private CaseDetails createCaseDetails() {
-            final var caseDetails = CaseDetails.builder()
+            return CaseDetails.builder()
                 .id("123456L")
                 .jurisdiction("test-jurisdiction")
                 .caseTypeId("case-type-id").build();
-            return caseDetails;
         }
 
     }

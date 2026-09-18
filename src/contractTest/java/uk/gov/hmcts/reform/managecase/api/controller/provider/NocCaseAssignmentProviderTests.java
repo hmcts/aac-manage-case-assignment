@@ -179,4 +179,34 @@ public class NocCaseAssignmentProviderTests {
         when(prdRepository.findOrganisationAddress(any()))
             .thenReturn(new FindOrganisationResponse(emptyList(), TEST_APP_ORG_ID, TEST_APP_ORG_NAME));
     }
+
+    @State("Get list of cases")
+    public void toGetListOfCases() {
+        // The interaction does not require additional repository setup.
+    }
+
+    @State("Handle caa case types")
+    public void toHandleCaaCaseTypes() {
+        // The interaction does not require additional repository setup.
+    }
+
+    @State("A valid submit NoC event is requested")
+    public void toSubmitValidNoCEvent() {
+        // The interaction does not require additional repository setup.
+    }
+
+    @State("A NoC answer request with invalid case ID")
+    public void toSubmitNoCAnswerWithInvalidCaseId() {
+        // The interaction does not require additional repository setup.
+    }
+
+    @State("A valid NoC answers verification request")
+    public void toVerifyValidNoCAnswers() {
+        // The interaction does not require additional repository setup.
+    }
+
+    @State("An invalid NoC answer request")
+    public void toVerifyInvalidNoCAnswers() {
+        // The interaction does not require additional repository setup.
+    }
 }

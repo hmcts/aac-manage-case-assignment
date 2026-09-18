@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.managecase.api.payload;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,10 +35,16 @@ public class  RoleAssignmentAttributesResource implements Serializable {
 
     private static final long serialVersionUID = -490395457914850791L;
 
-    private Optional<String> jurisdiction;
-    private Optional<String> caseType;
-    private Optional<String> caseId;
-    private Optional<String> region;
-    private Optional<String> location;
-    private Optional<String> contractType;
+    @JsonProperty("jurisdiction")
+    private transient Optional<String> jurisdiction;
+    @JsonProperty("caseType")
+    private transient Optional<String> caseType;
+    @JsonProperty("caseId")
+    private transient Optional<String> caseId;
+    @JsonProperty("region")
+    private transient Optional<String> region;
+    @JsonProperty("location")
+    private transient Optional<String> location;
+    @JsonProperty("contractType")
+    private transient Optional<String> contractType;
 }

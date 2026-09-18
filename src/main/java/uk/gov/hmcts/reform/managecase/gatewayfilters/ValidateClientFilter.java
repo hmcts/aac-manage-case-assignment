@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.managecase.gatewayfilters;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.server.mvc.common.Shortcut;
@@ -11,6 +9,10 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.function.HandlerFilterFunction;
 import org.springframework.web.servlet.function.ServerRequest;
 import org.springframework.web.servlet.function.ServerResponse;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
 
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
@@ -30,9 +32,17 @@ public interface ValidateClientFilter {
             SecurityUtils securityUtils = getApplicationContext(request).getBean(SecurityUtils.class);
             ApplicationParams applicationParams = getApplicationContext(request).getBean(ApplicationParams.class);
 
-            String service = securityUtils.getServiceNameFromS2SToken(
-                request.headers().firstHeader(SERVICE_AUTHORIZATION)
-            );
+            String serviceAuthorization = request.headers().firstHeader(SERVICE_AUTHORIZATION);
+            if (serviceAuthorization == null) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Missing service authorization token");
+            }
+
+            String service;
+            try {
+                service = securityUtils.getServiceNameFromS2SToken(serviceAuthorization);
+            } catch (JWTDecodeException exception) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid service authorization token");
+            }
             if (!applicationParams.getCcdDataStoreAllowedService().equals(service)
                     || !applicationParams.getCcdDefinitionStoreAllowedService().equals(service)) {
                 String errorMessage = String.format("forbidden client id %s for the /ccd endpoint", service);

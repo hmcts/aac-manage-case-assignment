@@ -25,30 +25,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @Configuration
 public class ContractConfig {
 
-    @MockitoBean
+    @Autowired
     PrdRepository prdRepository;
-    @MockitoBean
+    @Autowired
     DataStoreRepository dataStoreRepository;
-    @MockitoBean
+    @Autowired
     IdamRepository idamRepository;
-    @MockitoBean
+    @Autowired
     JacksonUtils jacksonUtils;
-    @MockitoBean
+    @Autowired
     SecurityUtils securityUtils;
-    @MockitoBean
+    @Autowired
     NoticeOfChangeQuestions noticeOfChangeQuestions;
-    @MockitoBean
+    @Autowired
     ChallengeAnswerValidator challengeAnswerValidator;
-    @MockitoBean
+    @Autowired
     DefinitionStoreRepository definitionStoreRepository;
-    @MockitoBean
+    @Autowired
     UserRepository userRepository;
-    @MockitoBean
+    @Autowired
     NotifyService notifyService;
 
 

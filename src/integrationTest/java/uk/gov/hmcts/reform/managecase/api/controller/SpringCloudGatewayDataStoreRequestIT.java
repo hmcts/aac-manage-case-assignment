@@ -121,6 +121,25 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
             .andExpect(status().isForbidden());
     }
 
+    @DisplayName("SpringCloudGateway fails with 403 when service authorization is missing")
+    @Test
+    void shouldReturn403_whenServiceAuthorizationIsMissing() throws Exception {
+        this.mockMvc.perform(post(PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(ES_QUERY))
+            .andExpect(status().isForbidden());
+    }
+
+    @DisplayName("SpringCloudGateway fails with 403 when service authorization is malformed")
+    @Test
+    void shouldReturn403_whenServiceAuthorizationIsMalformed() throws Exception {
+        this.mockMvc.perform(post(PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(SERVICE_AUTHORIZATION, BEARER + "not-a-jwt")
+            .content(ES_QUERY))
+            .andExpect(status().isForbidden());
+    }
+
     @SuppressWarnings("PMD.LawOfDemeter")
     public static String generateDummyS2SToken(String serviceName) {
         return Jwts.builder()
@@ -130,4 +149,3 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
                 .compact();
     }
 }
-

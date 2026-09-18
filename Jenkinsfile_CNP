@@ -142,7 +142,8 @@ withPipeline("java", product, component) {
 
   onMaster {
     enableSlackNotifications('#ccd-master-builds')
-    enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
+    // Pact provider verification is disabled until CME-513, CME-1245 and CME-658 are completed.
+    // enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
   }
 
   onDemo {
@@ -150,7 +151,8 @@ withPipeline("java", product, component) {
   }
   onPR {
     enableSlackNotifications('#ccd-pr-builds')
-    enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
+    // Pact provider verification is disabled until CME-513, CME-1245 and CME-658 are completed.
+    // enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
   }
 
   // Check if the build should be wired to an environment higher than 'preview'.

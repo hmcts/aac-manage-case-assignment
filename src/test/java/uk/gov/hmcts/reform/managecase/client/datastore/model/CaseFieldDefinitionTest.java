@@ -69,6 +69,56 @@ class CaseFieldDefinitionTest {
             .hasMessageContaining("has no nested elements with code Missing");
     }
 
+    @Test
+    void shouldApplyComplexAclToNestedDottedPathAndRemoveSiblingAcl() {
+        CaseFieldDefinition nestedFirst = complexChild("First");
+        CaseFieldDefinition nestedSecond = complexChild("Second");
+        CaseFieldDefinition parent = complexChild("Parent");
+        parent.getFieldTypeDefinition().setComplexFields(List.of(nestedFirst, nestedSecond));
+
+        CaseFieldDefinition root = complexChild("Root");
+        root.getFieldTypeDefinition().setComplexFields(List.of(parent));
+        root.setAccessControlLists(List.of(acl("caseworker")));
+
+        ComplexACL nestedAcl = new ComplexACL();
+        nestedAcl.setRole("caseworker");
+        nestedAcl.setListElementCode("Parent.First");
+        nestedAcl.setUpdate(true);
+        root.setComplexACLs(List.of(nestedAcl));
+
+        root.propagateACLsToNestedFields();
+
+        assertThat(nestedFirst.getAccessControlLists()).containsExactly(nestedAcl);
+        assertThat(nestedSecond.getAccessControlListByRole("caseworker")).isEmpty();
+    }
+
+    @Test
+    void shouldPropagateAclsThroughCollectionComplexFields() {
+        CaseFieldDefinition collectionItem = complexChild("CollectionItem");
+        FieldTypeDefinition collectionElementType = new FieldTypeDefinition();
+        collectionElementType.setType(FieldTypeDefinition.COMPLEX);
+        collectionElementType.setComplexFields(List.of(collectionItem));
+
+        CaseFieldDefinition root = complexChild("Root");
+        FieldTypeDefinition collectionType = new FieldTypeDefinition();
+        collectionType.setType(FieldTypeDefinition.COLLECTION);
+        collectionType.setCollectionFieldTypeDefinition(collectionElementType);
+        root.setFieldTypeDefinition(collectionType);
+        root.setAccessControlLists(List.of(acl("caseworker")));
+
+        root.propagateACLsToNestedFields();
+
+        assertThat(collectionType.getChildren()).containsExactly(collectionItem);
+        assertThat(collectionItem.getAccessControlListByRole("caseworker")).isPresent();
+    }
+
+    private AccessControlList acl(String role) {
+        AccessControlList acl = new AccessControlList();
+        acl.setRole(role);
+        acl.setRead(true);
+        return acl;
+    }
+
     private CaseFieldDefinition complexChild(String id) {
         CaseFieldDefinition field = new CaseFieldDefinition();
         field.setId(id);

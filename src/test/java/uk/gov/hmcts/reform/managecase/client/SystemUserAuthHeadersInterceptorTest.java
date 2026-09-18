@@ -1,45 +1,42 @@
 package uk.gov.hmcts.reform.managecase.client;
 
 import feign.RequestTemplate;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 class SystemUserAuthHeadersInterceptorTest {
 
-    public static final String SYSTEM_USER_TOKEN = "fdsf";
-    public static final String S2S_TOKEN = "dcdsfda";
-    @InjectMocks
-    private SystemUserAuthHeadersInterceptor interceptor;
+    @Test
+    void shouldAddSystemUserAndExperimentalHeaders() {
+        SecurityUtils securityUtils = mock(SecurityUtils.class);
+        when(securityUtils.getCaaSystemUserToken()).thenReturn("system-user-token");
+        when(securityUtils.getS2SToken()).thenReturn("s2s-token");
+        RequestTemplate template = new RequestTemplate();
 
-    @Mock
-    private SecurityUtils securityUtils;
-    private RequestTemplate template;
+        new SystemUserAuthHeadersInterceptor(securityUtils).apply(template);
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        template = new RequestTemplate();
+        assertThat(template.headers().get(AUTHORIZATION)).containsExactly("system-user-token");
+        assertThat(template.headers().get(SERVICE_AUTHORIZATION)).containsExactly("s2s-token");
+        assertThat(template.headers().get("experimental")).containsExactly("true");
     }
 
     @Test
-    @DisplayName("System user auth headers should apply")
-    void shouldApplyAuthHeaders() {
-        given(securityUtils.getCaaSystemUserToken()).willReturn(SYSTEM_USER_TOKEN);
-        given(securityUtils.getS2SToken()).willReturn(S2S_TOKEN);
+    void shouldPreserveExistingAuthHeaders() {
+        SecurityUtils securityUtils = mock(SecurityUtils.class);
+        RequestTemplate template = new RequestTemplate();
+        template.header(AUTHORIZATION, "existing-user");
+        template.header(SERVICE_AUTHORIZATION, "existing-s2s");
 
-        interceptor.apply(template);
+        new SystemUserAuthHeadersInterceptor(securityUtils).apply(template);
 
-        assertThat(template.headers().get(AUTHORIZATION)).containsOnly(SYSTEM_USER_TOKEN);
-        assertThat(template.headers().get(SERVICE_AUTHORIZATION)).containsOnly(S2S_TOKEN);
+        assertThat(template.headers().get(AUTHORIZATION)).containsExactly("existing-user");
+        assertThat(template.headers().get(SERVICE_AUTHORIZATION)).containsExactly("existing-s2s");
+        assertThat(template.headers().get("experimental")).containsExactly("true");
     }
 }

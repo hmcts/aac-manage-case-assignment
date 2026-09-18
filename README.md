@@ -67,9 +67,7 @@ Second, from the consumer repository, ensure that you have published the consume
 Finally, from this repository, run the provider verification and publish the verification results back to the local Pact Broker:
 
 ```bash
-PACT_BROKER_SCHEME=http \
-PACT_BROKER_URL=localhost \
-PACT_BROKER_PORT=9292 \
+PACT_BROKER_URL=http://localhost:9292 \
 PACT_CONSUMER_TAG=Dev \
 ./gradlew runProviderPactVerification \
   -Ppact.verifier.publishResults=true \

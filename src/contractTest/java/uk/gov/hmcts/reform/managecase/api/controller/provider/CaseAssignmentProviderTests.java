@@ -68,9 +68,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidation
 
 @ExtendWith(SpringExtension.class)
 @Provider("acc_manageCaseAssignment")
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-    host = "${PACT_BROKER_URL:localhost}",
-    port = "${PACT_BROKER_PORT:80}")
+@PactBroker(url = "${PACT_BROKER_URL:http://localhost:80}")
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
 @IgnoreNoPactsToVerify
 public class CaseAssignmentProviderTests {

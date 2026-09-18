@@ -30,7 +30,7 @@ class CaseTypeDefinitionTest {
 
         assertThat(caseType.getJurisdictionId()).isEqualTo("PROBATE");
         assertThat(caseType.hasDraftEnabledEvent()).isTrue();
-        assertThat(caseType.hasEventId("submit")).isTrue();
+        assertThat(caseType.hasEventId("Submit")).isTrue();
         assertThat(caseType.findCaseEvent("SUBMIT")).containsSame(event);
         assertThat(caseType.getClassificationForField("SensitiveField"))
             .isEqualTo(SecurityClassification.RESTRICTED);

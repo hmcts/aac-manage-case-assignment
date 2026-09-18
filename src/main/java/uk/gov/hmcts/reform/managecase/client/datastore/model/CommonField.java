@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import java.util.Optional;
 
+@SuppressWarnings("unused")
 public interface CommonField extends CommonDCPModel {
 
     FieldTypeDefinition getFieldTypeDefinition();
@@ -52,8 +53,8 @@ public interface CommonField extends CommonDCPModel {
      * @return A nested CaseField or 'this' when path is blank
      */
     @JsonIgnore
-    default <T extends CommonField> Optional<T> getComplexFieldNestedField(String path) {
-        return (Optional<T>) CaseFieldPathUtils.getFieldDefinitionByPath(this, path);
+    default Optional<CommonField> getComplexFieldNestedField(String path) {
+        return CaseFieldPathUtils.getFieldDefinitionByPath(this, path);
     }
 
 }

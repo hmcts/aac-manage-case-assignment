@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,5 +45,23 @@ class RestExceptionHandlerTest {
         assertThat(((ApiError) response.getBody()).getMessage()).isEqualTo("invalid role");
         assertThat(CaseAssignedUserRoleException.class.getAnnotation(ResponseStatus.class).code())
             .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @Test
+    void shouldMapNoCErrorToStructuredBadRequest() {
+        var response = handler.handleNoCException(new NoCException("invalid answers", "answers-invalid"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        var body = (uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCApiError) response.getBody();
+        assertThat(body.getMessage()).isEqualTo("invalid answers");
+        assertThat(body.getCode()).isEqualTo("answers-invalid");
+    }
+
+    @Test
+    void shouldMapUnexpectedExceptionToInternalServerError() {
+        var response = handler.handleAll(new IllegalStateException("unexpected"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(((ApiError) response.getBody()).getMessage()).isEqualTo("unexpected");
     }
 }

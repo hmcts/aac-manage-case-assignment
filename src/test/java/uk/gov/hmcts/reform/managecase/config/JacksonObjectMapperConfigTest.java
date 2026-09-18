@@ -15,7 +15,8 @@ class JacksonObjectMapperConfigTest {
 
         assertThat(mapper.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)).isFalse();
         assertThat(mapper.isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)).isFalse();
-        assertThat(mapper.getFactory().isEnabled(com.fasterxml.jackson.core.JsonParser.Feature.STRICT_DUPLICATE_DETECTION))
+        assertThat(mapper.getFactory().isEnabled(
+            com.fasterxml.jackson.core.JsonParser.Feature.STRICT_DUPLICATE_DETECTION))
             .isTrue();
     }
 

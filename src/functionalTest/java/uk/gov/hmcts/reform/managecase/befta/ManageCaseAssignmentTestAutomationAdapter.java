@@ -53,7 +53,7 @@ public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutoma
             }
         } else if (key.toString().startsWith("caseIdAsStringFrom")) {
             String childContext = key.toString().replace("caseIdAsStringFrom_","");
-            System.out.println("context: " + childContext);
+            BeftaUtils.defaultLog("context: " + childContext);
             try {
                 long longRef = (long) ReflectionUtils.deepGetFieldInObject(
                     scenarioContext,"ParentContext.childContexts." + childContext

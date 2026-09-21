@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.List;
 import java.util.Map;
@@ -24,38 +26,20 @@ class CaseFieldPathUtilsTest {
     @Nested
     class GetNestedCaseFieldByPathTest {
 
-        @Test
-        void shouldFindTopLevelField() throws JsonProcessingException {
+        @ParameterizedTest
+        @CsvSource({
+            "TextField, TextValue",
+            "ComplexField.ComplexNestedField.NestedNumberField, 67890",
+            "' ComplexField.ComplexNestedField.NestedNumberField ', 67890"
+        })
+        void shouldFindFieldByPath(String path, String expectedValue) throws JsonProcessingException {
             Map<String, JsonNode> caseData = createCaseData();
-            JsonNode result = CaseFieldPathUtils.getNestedCaseFieldByPath(caseData, "TextField");
+
+            JsonNode result = CaseFieldPathUtils.getNestedCaseFieldByPath(caseData, path);
 
             assertAll(
                 () -> assertThat(result.isTextual(), is(true)),
-                () -> assertThat(result.asText(), is("TextValue"))
-            );
-        }
-
-        @Test
-        void shouldFindNestedField() throws JsonProcessingException {
-            Map<String, JsonNode> caseData = createCaseData();
-            JsonNode result = CaseFieldPathUtils.getNestedCaseFieldByPath(caseData,
-                "ComplexField.ComplexNestedField.NestedNumberField");
-
-            assertAll(
-                () -> assertThat(result.isTextual(), is(true)),
-                () -> assertThat(result.asText(), is("67890"))
-            );
-        }
-
-        @Test
-        void shouldFindNestedFieldWhenPathContainsWhitespace() throws JsonProcessingException {
-            Map<String, JsonNode> caseData = createCaseData();
-            JsonNode result = CaseFieldPathUtils.getNestedCaseFieldByPath(caseData,
-                " ComplexField.ComplexNestedField.NestedNumberField ");
-
-            assertAll(
-                () -> assertThat(result.isTextual(), is(true)),
-                () -> assertThat(result.asText(), is("67890"))
+                () -> assertThat(result.asText(), is(expectedValue))
             );
         }
 

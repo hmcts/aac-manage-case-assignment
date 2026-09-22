@@ -79,10 +79,12 @@ public interface ValidateClientFilter {
             String definitionStoreService = applicationParams.getCcdDefinitionStoreAllowedService();
             return Objects.equals(dataStoreService, definitionStoreService) ? dataStoreService : null;
         }
-        if (!dataStoreRoute) {
+        if (!dataStoreRoute && !definitionStoreRoute) {
             return null;
         }
-        return applicationParams.getCcdDataStoreAllowedService();
+        return dataStoreRoute
+            ? applicationParams.getCcdDataStoreAllowedService()
+            : applicationParams.getCcdDefinitionStoreAllowedService();
     }
 
     static boolean matchesConfiguredRoute(String requestUri, List<String> allowedUrls) {

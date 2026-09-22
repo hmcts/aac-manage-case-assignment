@@ -160,6 +160,19 @@ class GatewayFiltersTest {
             .hasMessageContaining("forbidden client id " + DEFINITION_STORE_SERVICE_NAME);
     }
 
+    @Test
+    void allowsOverlappingRouteWhenBothBackendsUseTheSameService() throws Exception {
+        ApplicationParams applicationParams = applicationParams(List.of("/invalid.*"), List.of("/invalid.*"));
+        SecurityUtils securityUtils = mock(SecurityUtils.class);
+        when(securityUtils.getServiceNameFromS2SToken("incoming-s2s-token")).thenReturn(SERVICE_NAME);
+
+        ServerResponse response = ValidateClientFilter.validateClientFilter().filter(
+            request("/ccd/invalid?ctid=CT_MasterCase", applicationParams,
+                securityUtils, "incoming-s2s-token"), nextHandler());
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK);
+    }
+
     private ApplicationParams applicationParams(List<String> dataStoreUrls, List<String> definitionStoreUrls) {
         return applicationParams(dataStoreUrls, definitionStoreUrls, SERVICE_NAME, SERVICE_NAME);
     }

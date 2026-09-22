@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
@@ -73,12 +74,15 @@ public interface ValidateClientFilter {
         boolean definitionStoreRoute = matchesConfiguredRoute(requestUri,
             applicationParams.getCcdDefinitionStoreAllowedUrls());
 
-        if (dataStoreRoute == definitionStoreRoute) {
+        if (dataStoreRoute && definitionStoreRoute) {
+            String dataStoreService = applicationParams.getCcdDataStoreAllowedService();
+            String definitionStoreService = applicationParams.getCcdDefinitionStoreAllowedService();
+            return Objects.equals(dataStoreService, definitionStoreService) ? dataStoreService : null;
+        }
+        if (!dataStoreRoute) {
             return null;
         }
-        return dataStoreRoute
-            ? applicationParams.getCcdDataStoreAllowedService()
-            : applicationParams.getCcdDefinitionStoreAllowedService();
+        return applicationParams.getCcdDataStoreAllowedService();
     }
 
     static boolean matchesConfiguredRoute(String requestUri, List<String> allowedUrls) {

@@ -19,6 +19,6 @@ class AccessControlListTest {
 
         assertThat(duplicate).usingRecursiveComparison().isEqualTo(acl);
         assertThat(duplicate).isNotSameAs(acl);
-        assertThat(acl.toString()).isEqualTo("ACL{role='caseworker', crud=CRD}");
+        assertThat(acl).hasToString("ACL{role='caseworker', crud=CRD}");
     }
 }

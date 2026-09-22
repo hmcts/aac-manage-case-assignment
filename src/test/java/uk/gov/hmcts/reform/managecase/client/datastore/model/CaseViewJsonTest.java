@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.managecase.config.JacksonObjectMapperConfig;
 
+import java.time.Month;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CaseViewJsonTest {
@@ -71,7 +73,7 @@ class CaseViewJsonTest {
 
     @Test
     void shouldMapAuditEventToCaseViewEvent() {
-        var created = java.time.LocalDateTime.of(2026, 9, 18, 12, 0);
+        var created = java.time.LocalDateTime.of(2026, Month.SEPTEMBER, 18, 12, 0);
         AuditEvent auditEvent = new AuditEvent();
         auditEvent.setId(42L);
         auditEvent.setEventId("Submit");

@@ -43,8 +43,10 @@ class GatewayFiltersTest {
     void rejectsUrlNotConfiguredForDataStoreOrDefinitionStore() {
         ApplicationParams applicationParams = applicationParams(List.of("/searchCases.*"), List.of());
         ServerRequest request = request("/ccd/not-allowed", applicationParams);
+        HandlerFunction<ServerResponse> nextHandler = nextHandler();
+        var filter = AllowedRoutesFilter.allowedRoutesFilter();
 
-        assertThatThrownBy(() -> AllowedRoutesFilter.allowedRoutesFilter().filter(request, nextHandler()))
+        assertThatThrownBy(() -> filter.filter(request, nextHandler))
             .isInstanceOf(ResponseStatusException.class)
             .hasMessageContaining("Uri not allowed: /ccd/not-allowed");
     }
@@ -82,8 +84,10 @@ class GatewayFiltersTest {
         SecurityUtils securityUtils = mock(SecurityUtils.class);
         when(securityUtils.getServiceNameFromS2SToken("incoming-s2s-token")).thenReturn("unknown-service");
         ServerRequest request = request(DATA_STORE_PATH, applicationParams, securityUtils, "incoming-s2s-token");
+        HandlerFunction<ServerResponse> nextHandler = nextHandler();
+        var filter = ValidateClientFilter.validateClientFilter();
 
-        assertThatThrownBy(() -> ValidateClientFilter.validateClientFilter().filter(request, nextHandler()))
+        assertThatThrownBy(() -> filter.filter(request, nextHandler))
             .isInstanceOf(ResponseStatusException.class)
             .hasMessageContaining("forbidden client id unknown-service");
     }
@@ -94,8 +98,9 @@ class GatewayFiltersTest {
         SecurityUtils securityUtils = mock(SecurityUtils.class);
 
         ServerRequest missingHeaderRequest = request(DATA_STORE_PATH, applicationParams, securityUtils);
-        assertThatThrownBy(() -> ValidateClientFilter.validateClientFilter()
-            .filter(missingHeaderRequest, nextHandler()))
+        var filter = ValidateClientFilter.validateClientFilter();
+        HandlerFunction<ServerResponse> nextHandler = nextHandler();
+        assertThatThrownBy(() -> filter.filter(missingHeaderRequest, nextHandler))
             .isInstanceOf(ResponseStatusException.class)
             .hasMessageContaining("Missing service authorization token");
 
@@ -104,8 +109,7 @@ class GatewayFiltersTest {
         ServerRequest malformedHeaderRequest = request(DATA_STORE_PATH, applicationParams, securityUtils,
             "malformed-token");
 
-        assertThatThrownBy(() -> ValidateClientFilter.validateClientFilter()
-            .filter(malformedHeaderRequest, nextHandler()))
+        assertThatThrownBy(() -> filter.filter(malformedHeaderRequest, nextHandler))
             .isInstanceOf(ResponseStatusException.class)
             .hasMessageContaining("Invalid service authorization token");
     }

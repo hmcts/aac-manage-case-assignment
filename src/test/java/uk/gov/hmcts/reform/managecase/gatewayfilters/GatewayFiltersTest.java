@@ -26,7 +26,9 @@ import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTH
 class GatewayFiltersTest {
 
     private static final String DATA_STORE_PATH = "/ccd/searchCases?ctid=CT_MasterCase";
+    private static final String DEFINITION_STORE_PATH = "/ccd/case-types/CT_MasterCase";
     private static final String SERVICE_NAME = "xui_webapp";
+    private static final String DEFINITION_STORE_SERVICE_NAME = "xui_manage_org";
 
     @Test
     void allowsConfiguredDataStoreUrlIncludingQueryString() throws Exception {
@@ -114,12 +116,61 @@ class GatewayFiltersTest {
             .hasMessageContaining("Invalid service authorization token");
     }
 
+    @Test
+    void allowsTheServiceConfiguredForTheDefinitionStoreRoute() throws Exception {
+        ApplicationParams applicationParams = applicationParams(List.of("/searchCases.*"),
+            List.of("/case-types.*"), SERVICE_NAME, DEFINITION_STORE_SERVICE_NAME);
+        SecurityUtils securityUtils = mock(SecurityUtils.class);
+        when(securityUtils.getServiceNameFromS2SToken("definition-store-token"))
+            .thenReturn(DEFINITION_STORE_SERVICE_NAME);
+
+        ServerResponse response = ValidateClientFilter.validateClientFilter().filter(
+            request(DEFINITION_STORE_PATH, applicationParams, securityUtils, "definition-store-token"),
+            nextHandler());
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void allowsQuerySpecificDataStoreRoute() throws Exception {
+        ApplicationParams applicationParams = applicationParams(List.of("/searchCases\\?ctid=CT_MasterCase"),
+            List.of());
+        SecurityUtils securityUtils = mock(SecurityUtils.class);
+        when(securityUtils.getServiceNameFromS2SToken("incoming-s2s-token")).thenReturn(SERVICE_NAME);
+
+        ServerResponse response = ValidateClientFilter.validateClientFilter().filter(
+            request(DATA_STORE_PATH, applicationParams, securityUtils, "incoming-s2s-token"),
+            nextHandler());
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void rejectsDefinitionStoreServiceOnDataStoreRoute() {
+        ApplicationParams applicationParams = applicationParams(List.of("/searchCases.*"),
+            List.of("/case-types.*"), SERVICE_NAME, DEFINITION_STORE_SERVICE_NAME);
+        SecurityUtils securityUtils = mock(SecurityUtils.class);
+        when(securityUtils.getServiceNameFromS2SToken("definition-store-token"))
+            .thenReturn(DEFINITION_STORE_SERVICE_NAME);
+
+        assertThatThrownBy(() -> ValidateClientFilter.validateClientFilter().filter(
+            request(DATA_STORE_PATH, applicationParams, securityUtils, "definition-store-token"),
+            nextHandler()))
+            .isInstanceOf(ResponseStatusException.class)
+            .hasMessageContaining("forbidden client id " + DEFINITION_STORE_SERVICE_NAME);
+    }
+
     private ApplicationParams applicationParams(List<String> dataStoreUrls, List<String> definitionStoreUrls) {
+        return applicationParams(dataStoreUrls, definitionStoreUrls, SERVICE_NAME, SERVICE_NAME);
+    }
+
+    private ApplicationParams applicationParams(List<String> dataStoreUrls, List<String> definitionStoreUrls,
+                                                String dataStoreService, String definitionStoreService) {
         ApplicationParams applicationParams = mock(ApplicationParams.class);
         when(applicationParams.getCcdDataStoreAllowedUrls()).thenReturn(dataStoreUrls);
         when(applicationParams.getCcdDefinitionStoreAllowedUrls()).thenReturn(definitionStoreUrls);
-        when(applicationParams.getCcdDataStoreAllowedService()).thenReturn(SERVICE_NAME);
-        when(applicationParams.getCcdDefinitionStoreAllowedService()).thenReturn(SERVICE_NAME);
+        when(applicationParams.getCcdDataStoreAllowedService()).thenReturn(dataStoreService);
+        when(applicationParams.getCcdDefinitionStoreAllowedService()).thenReturn(definitionStoreService);
         return applicationParams;
     }
 

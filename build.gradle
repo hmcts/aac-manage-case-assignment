@@ -179,7 +179,7 @@ tasks.register('functional', Test) {
 }
 
 jacocoTestReport {
-  executionData(test, integration)
+  executionData(test)
   reports {
     xml.required = true
     csv.required = false
@@ -188,7 +188,7 @@ jacocoTestReport {
 }
 
 tasks.named('jacocoTestCoverageVerification') {
-  executionData(test, integration)
+  executionData(test)
   sourceSets(sourceSets.main)
   violationRules {
     rule {

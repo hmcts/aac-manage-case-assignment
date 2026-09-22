@@ -20,9 +20,15 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController;
 import uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
+import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.data.user.UserRepository;
+import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
@@ -202,7 +208,24 @@ public class NocCaseAssignmentProviderTests {
 
     @State("A valid NoC answers verification request")
     public void toVerifyValidNoCAnswers() {
-        // The interaction does not require additional repository setup.
+        CaseDetails caseDetails = TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE);
+        ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
+            .challengeQuestionId("NoC")
+            .answers(List.of(new ChallengeAnswer("[field]:" + ORG_POLICY_ROLE)))
+            .build();
+        ChallengeQuestionsResult challengeQuestions = new ChallengeQuestionsResult(List.of(challengeQuestion));
+
+        given(noticeOfChangeQuestions.challengeQuestions(anyString()))
+            .willReturn(NoCRequestDetails.builder()
+                .caseViewResource(new CaseViewResource())
+                .caseDetails(caseDetails)
+                .challengeQuestionsResult(challengeQuestions)
+                .build());
+        given(challengeAnswerValidator.getMatchingCaseRole(any(), any(), eq(caseDetails)))
+            .willReturn(ORG_POLICY_ROLE);
+        given(prdRepository.findUsersByOrganisation()).willReturn(usersByOrganisation(user(ASSIGNEE_ID)));
+        given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
+            .willReturn(organisationPolicy(ORGANIZATION_ID, ORG_POLICY_ROLE));
     }
 
     @State("An invalid NoC answer request")

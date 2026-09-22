@@ -15,6 +15,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
+import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
 import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.config.SecurityConfiguration;
@@ -84,6 +85,23 @@ class CaseAssignmentControllerSecurityTest {
             .andExpect(status().isOk());
     }
 
+    @Test
+    void rejectsRequestWithValidUserButMissingServiceToken() throws Exception {
+        mockMvc.perform(get(CaseAssignmentController.CASE_ASSIGNMENTS_PATH)
+                .param("case_ids", "1588234985453946")
+                .header("Authorization", "Bearer user-token"))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void rejectsRequestWithInvalidServiceToken() throws Exception {
+        mockMvc.perform(get(CaseAssignmentController.CASE_ASSIGNMENTS_PATH)
+                .param("case_ids", "1588234985453946")
+                .header("Authorization", "Bearer user-token")
+                .header(ServiceAuthFilter.AUTHORISATION, "Bearer rejected-s2s-token"))
+            .andExpect(status().isForbidden());
+    }
+
     private Jwt jwt() {
         Instant now = Instant.now();
         return Jwt.withTokenValue("user-token")
@@ -98,8 +116,8 @@ class CaseAssignmentControllerSecurityTest {
     static class TestSecurityConfiguration {
 
         @Bean
-        ServiceAuthFilter serviceAuthFilter() {
-            return new ServiceAuthFilter(authTokenValidator(), List.of("xui_webapp"));
+        ServiceAuthFilter serviceAuthFilter(AuthTokenValidator authTokenValidator) {
+            return new ServiceAuthFilter(authTokenValidator, List.of("xui_webapp"));
         }
 
         @Bean
@@ -107,17 +125,23 @@ class CaseAssignmentControllerSecurityTest {
             return new AuthTokenValidator() {
                 @Override
                 public void validate(String token) {
-                    // Accept the test service token so the controller security chain is exercised.
+                    rejectInvalidToken(token);
                 }
 
                 @Override
                 public void validate(String token, List<String> roles) {
-                    // Accept the test service token so the controller security chain is exercised.
+                    rejectInvalidToken(token);
                 }
 
                 @Override
                 public String getServiceName(String token) {
-                    return "xui_webapp";
+                    return token.contains("rejected-s2s-token") ? "invalid-service" : "xui_webapp";
+                }
+
+                private void rejectInvalidToken(String token) {
+                    if (token.contains("rejected-s2s-token")) {
+                        throw new InvalidTokenException("invalid service token");
+                    }
                 }
             };
         }

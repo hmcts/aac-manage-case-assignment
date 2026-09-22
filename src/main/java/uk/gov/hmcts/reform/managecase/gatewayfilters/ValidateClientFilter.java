@@ -13,6 +13,7 @@ import org.springframework.web.servlet.function.ServerResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
@@ -43,8 +44,8 @@ public interface ValidateClientFilter {
             } catch (JWTDecodeException exception) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid service authorization token");
             }
-            if (!applicationParams.getCcdDataStoreAllowedService().equals(service)
-                    || !applicationParams.getCcdDefinitionStoreAllowedService().equals(service)) {
+            String allowedService = allowedServiceForRoute(request, applicationParams);
+            if (allowedService == null || !allowedService.equals(service)) {
                 String errorMessage = String.format("forbidden client id %s for the /ccd endpoint", service);
                 log.debug(errorMessage);
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
@@ -64,10 +65,34 @@ public interface ValidateClientFilter {
         };
     }
 
+    static String allowedServiceForRoute(ServerRequest request, ApplicationParams applicationParams) {
+        String requestUri = request.uri().getPath()
+            + (request.uri().getQuery() == null ? "" : "?" + request.uri().getQuery());
+        boolean dataStoreRoute = matchesConfiguredRoute(requestUri,
+            applicationParams.getCcdDataStoreAllowedUrls());
+        boolean definitionStoreRoute = matchesConfiguredRoute(requestUri,
+            applicationParams.getCcdDefinitionStoreAllowedUrls());
+
+        if (dataStoreRoute == definitionStoreRoute) {
+            return null;
+        }
+        return dataStoreRoute
+            ? applicationParams.getCcdDataStoreAllowedService()
+            : applicationParams.getCcdDefinitionStoreAllowedService();
+    }
+
+    static boolean matchesConfiguredRoute(String requestUri, List<String> allowedUrls) {
+        return allowedUrls.stream()
+            .map("/ccd"::concat)
+            .anyMatch(requestUri::matches);
+    }
+
     class FilterSupplier implements org.springframework.cloud.gateway.server.mvc.filter.FilterSupplier {
         @Override
         public Collection<Method> get() {
-            return Arrays.asList(ValidateClientFilter.class.getMethods());
+            return Arrays.stream(ValidateClientFilter.class.getMethods())
+                .filter(method -> method.isAnnotationPresent(Shortcut.class))
+                .toList();
         }
     }
 

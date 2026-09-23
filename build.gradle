@@ -188,6 +188,7 @@ jacocoTestReport {
 }
 
 tasks.named('jacocoTestCoverageVerification') {
+  dependsOn test
   executionData(test)
   sourceSets(sourceSets.main)
   violationRules {

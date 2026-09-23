@@ -26,18 +26,18 @@ spring:
     gateway:
       mvc:
         routes:
-          - id: data-store
+          - id: definition-store
             predicates:
-              - Path=/ccd/**
-            uri: http://localhost:${wiremock.server.port:4452}
+              - Path=/ccd/api/display/**
+            uri: http://localhost:${wiremock.server.port:4451}
             filters:
               - AllowedRoutesFilter
               - ValidateClientFilter
               - StripPrefix=1
-          - id: definition-store
+          - id: data-store
             predicates:
               - Path=/ccd/**
-            uri: http://localhost:${wiremock.server.port:4451}
+            uri: http://localhost:${wiremock.server.port:4452}
             filters:
               - AllowedRoutesFilter
               - ValidateClientFilter

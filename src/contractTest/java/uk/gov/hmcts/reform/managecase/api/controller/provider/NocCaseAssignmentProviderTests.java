@@ -17,14 +17,18 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.managecase.api.payload.IdamUser;
 import uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController;
 import uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableEvent;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
+import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestion;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
+import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
 import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.data.user.UserRepository;
@@ -198,7 +202,16 @@ public class NocCaseAssignmentProviderTests {
 
     @State("A valid submit NoC event is requested")
     public void toSubmitValidNoCEvent() {
-        // The interaction does not require additional repository setup.
+        toVerifyValidNoCAnswers();
+
+        CaseDetails caseDetails = TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE);
+        given(dataStoreRepository.findCaseByCaseIdAsSystemUserUsingExternalApi(anyString()))
+            .willReturn(caseDetails);
+        given(definitionStoreRepository.caseRoles(anyString(), anyString(), anyString()))
+            .willReturn(List.of(CaseRole.builder().id(ORG_POLICY_ROLE).name(ORG_POLICY_ROLE).build()));
+        IdamUser user = new IdamUser();
+        user.setEmail("test@example.com");
+        given(userRepository.getUser()).willReturn(user);
     }
 
     @State("A NoC answer request with invalid case ID")
@@ -208,16 +221,24 @@ public class NocCaseAssignmentProviderTests {
 
     @State("A valid NoC answers verification request")
     public void toVerifyValidNoCAnswers() {
-        CaseDetails caseDetails = TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE);
+        CaseViewType caseViewType = new CaseViewType();
+        caseViewType.setId(TestFixtures.CASE_TYPE_ID);
+        CaseViewActionableEvent actionableEvent = new CaseViewActionableEvent();
+        actionableEvent.setId("NoCRequest");
+        CaseViewResource caseViewResource = new CaseViewResource();
+        caseViewResource.setReference(TestFixtures.CASE_ID);
+        caseViewResource.setCaseType(caseViewType);
+        caseViewResource.setCaseViewActionableEvents(new CaseViewActionableEvent[]{actionableEvent});
         ChallengeQuestion challengeQuestion = ChallengeQuestion.builder()
             .challengeQuestionId("NoC")
             .answers(List.of(new ChallengeAnswer("[field]:" + ORG_POLICY_ROLE)))
             .build();
         ChallengeQuestionsResult challengeQuestions = new ChallengeQuestionsResult(List.of(challengeQuestion));
+        CaseDetails caseDetails = TestFixtures.CaseDetailsFixture.caseDetails(ORGANIZATION_ID, ORG_POLICY_ROLE);
 
         given(noticeOfChangeQuestions.challengeQuestions(anyString()))
             .willReturn(NoCRequestDetails.builder()
-                .caseViewResource(new CaseViewResource())
+                .caseViewResource(caseViewResource)
                 .caseDetails(caseDetails)
                 .challengeQuestionsResult(challengeQuestions)
                 .build());

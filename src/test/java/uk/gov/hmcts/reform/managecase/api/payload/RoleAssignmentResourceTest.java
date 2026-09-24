@@ -41,27 +41,27 @@ class RoleAssignmentResourceTest {
     }
 
     @Test
-    @DisplayName("shouldPassForIsGrantType")
-    void shouldPassForIsGrantType() {
+    @DisplayName("shouldPassForHasGrantType")
+    void shouldPassForHasGrantType() {
         RoleAssignment roleAssignment = RoleAssignment.builder().grantType(SPECIFIC.name()).build();
 
-        assertThat(roleAssignment.isGrantType(SPECIFIC), is(true));
+        assertThat(roleAssignment.hasGrantType(SPECIFIC), is(true));
     }
 
     @Test
-    @DisplayName("shouldNotPassForIsGrantType")
-    void shouldNotPassForIsGrantType() {
+    @DisplayName("shouldNotPassForHasGrantType")
+    void shouldNotPassForHasGrantType() {
         RoleAssignment roleAssignment = RoleAssignment.builder().grantType(null).build();
 
-        assertThat(roleAssignment.isGrantType(SPECIFIC), is(false));
+        assertThat(roleAssignment.hasGrantType(SPECIFIC), is(false));
     }
 
     @Test
-    @DisplayName("shouldNotPassForIsGrantTypeWhenGrantTypeDoesNotMatch")
-    void shouldNotPassForIsGrantTypeWhenGrantTypeDoesNotMatch() {
+    @DisplayName("shouldNotPassForHasGrantTypeWhenGrantTypeDoesNotMatch")
+    void shouldNotPassForHasGrantTypeWhenGrantTypeDoesNotMatch() {
         RoleAssignment roleAssignment = RoleAssignment.builder().grantType(STANDARD.name()).build();
 
-        assertThat(roleAssignment.isGrantType(SPECIFIC), is(false));
+        assertThat(roleAssignment.hasGrantType(SPECIFIC), is(false));
     }
 
     private RoleAssignments getRoleAssignments(final long oneHour) {

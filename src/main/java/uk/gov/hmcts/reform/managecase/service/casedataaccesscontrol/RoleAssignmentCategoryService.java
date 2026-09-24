@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -14,8 +13,6 @@ import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCate
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.LEGAL_OPERATIONS;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.PROFESSIONAL;
 
-import uk.gov.hmcts.reform.managecase.api.errorhandling.ResourceNotFoundException;
-import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentServiceHelper;
@@ -30,7 +27,6 @@ public class RoleAssignmentCategoryService {
         Pattern.compile("^citizen(-.*)?$|^letter-holder$", Pattern.CASE_INSENSITIVE);
     private static final Pattern JUDICIAL_ROLE = Pattern.compile(".+-panelmember$",
         Pattern.CASE_INSENSITIVE);
-    private static final List<String> ENFORCEMENT_ROLES = List.of("bailiff-manager", "bailiff");
 
     private final CaseAssignmentService  caseAssignmentService;
     private final RoleAssignmentServiceHelper roleAssignmentServiceHelper;
@@ -72,20 +68,22 @@ public class RoleAssignmentCategoryService {
     }
 
     private boolean hasEnforcementRole(String userId) {
-        RoleAssignments roleAssignments;
-        try {
-            roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentServiceHelper
-                                                                          .getRoleAssignments(userId));
-        } catch (ResourceNotFoundException ex) {
+        RoleAssignments roleAssignments = roleAssignmentsMapper.toRoleAssignments(
+            roleAssignmentServiceHelper.getRoleAssignments(userId));
+
+        if (roleAssignments == null || roleAssignments.getRoleAssignmentsList() == null) {
             return false;
         }
-        List<RoleAssignment> assignments = roleAssignments == null || roleAssignments.getRoleAssignmentsList() == null
-            ? Collections.emptyList()
-            : roleAssignments.getRoleAssignmentsList();
 
-        return assignments.stream()
-            .filter(roleAssignment -> roleAssignment.isGrantType(GrantType.STANDARD))
-            .map(RoleAssignment::getRoleName)
-            .anyMatch(ENFORCEMENT_ROLES::contains);
+        /*
+         * Filter for ENFORCEMENT roles with GrantType.STANDARD.
+         * The global hmcts-enforcement role has GrantType.BASIC and is therefore not included.
+         */
+        return roleAssignments.getRoleAssignmentsList().stream()
+            .filter(roleAssignment -> roleAssignment.hasGrantType(GrantType.STANDARD))
+            .anyMatch(roleAssignment ->
+                          ENFORCEMENT.name().equalsIgnoreCase(roleAssignment.getRoleCategory()));
     }
+
+
 }

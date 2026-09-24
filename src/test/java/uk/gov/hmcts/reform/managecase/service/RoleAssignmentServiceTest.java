@@ -95,7 +95,7 @@ class RoleAssignmentServiceTest {
         given(roleAssignmentServiceHelper.getRoleAssignments(USER_ID))
             .willReturn(mockedRoleAssignmentResponse);
 
-        RoleAssignmentResponse response = roleAssignmentService.getRoleAssignments(USER_ID);
+        RoleAssignmentResponse response = roleAssignmentServiceHelper.getRoleAssignments(USER_ID);
 
         verify(roleAssignmentServiceHelper).getRoleAssignments(USER_ID);
         assertThat(response, is(mockedRoleAssignmentResponse));

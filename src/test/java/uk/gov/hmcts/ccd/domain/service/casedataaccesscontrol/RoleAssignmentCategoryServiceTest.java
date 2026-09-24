@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.ResourceNotFoundException;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
@@ -23,8 +22,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.BASIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.SPECIFIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.CITIZEN;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.ENFORCEMENT;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.JUDICIAL;
@@ -127,6 +126,7 @@ class RoleAssignmentCategoryServiceTest {
 
             RoleAssignment enforcementRole = RoleAssignment.builder()
                 .roleName("bailiff-manager")
+                .roleCategory(ENFORCEMENT.name())
                 .grantType(STANDARD.name())
                 .build();
 
@@ -140,19 +140,6 @@ class RoleAssignmentCategoryServiceTest {
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
             assertThat(roleCategory, is(ENFORCEMENT));
-        }
-
-        @Test
-        void shouldFallbackToLegalOperationsWhenRoleAssignmentsAreUnavailable() {
-
-            given(caseAssignmentService.getAssigneeRoles(USER_ID))
-                .willReturn(singletonList("invalidUser"));
-            given(roleAssignmentServiceHelper.getRoleAssignments(USER_ID))
-                .willThrow(new ResourceNotFoundException("not found"));
-
-            RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
-
-            assertThat(roleCategory, is(LEGAL_OPERATIONS));
         }
 
         @Test
@@ -186,26 +173,28 @@ class RoleAssignmentCategoryServiceTest {
         }
 
         @Test
-        void shouldFallbackToLegalOperationsWhenOnlySpecificGrantTypeEnforcementRoleExists() {
+        void shouldFallbackToLegalOperationsWhenOnlyBasicGrantTypeEnforcementRoleExists() {
 
             given(caseAssignmentService.getAssigneeRoles(USER_ID))
                 .willReturn(singletonList("some-user"));
 
-            RoleAssignment enforcementRoleWithSpecificGrant = RoleAssignment.builder()
-                .roleName("bailiff-manager")
-                .grantType(SPECIFIC.name())
+            RoleAssignment enforcementRoleWithBasicGrant = RoleAssignment.builder()
+                .roleName("hmcts-enforcement")
+                .grantType(BASIC.name())
+                .roleCategory(ENFORCEMENT.name())
                 .build();
 
             given(roleAssignmentServiceHelper.getRoleAssignments(USER_ID))
                 .willReturn(new RoleAssignmentResponse());
             given(roleAssignmentsMapper.toRoleAssignments(any(RoleAssignmentResponse.class)))
                 .willReturn(RoleAssignments.builder()
-                                .roleAssignmentsList(singletonList(enforcementRoleWithSpecificGrant))
+                                .roleAssignmentsList(singletonList(enforcementRoleWithBasicGrant))
                                 .build());
 
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
             assertThat(roleCategory, is(LEGAL_OPERATIONS));
+
         }
 
         @Test
@@ -239,12 +228,14 @@ class RoleAssignmentCategoryServiceTest {
 
             RoleAssignment nonMatchingRole = RoleAssignment.builder()
                 .roleName("caseworker")
+                .roleCategory(JUDICIAL.name())
                 .grantType(STANDARD.name())
                 .build();
 
             RoleAssignment matchingEnforcementRole = RoleAssignment.builder()
                 .roleName("bailiff")
                 .grantType(STANDARD.name())
+                .roleCategory(ENFORCEMENT.name())
                 .build();
 
             given(roleAssignmentServiceHelper.getRoleAssignments(USER_ID))

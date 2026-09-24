@@ -31,7 +31,7 @@ public class RoleAssignment {
             && (endTime == null || machineTimestamp.isBefore(endTime));
     }
 
-    public boolean isGrantType(GrantType grantType) {
-        return grantType != null && grantType.name().equals(getGrantType());
+    public boolean hasGrantType(GrantType grantType) {
+        return grantType != null && grantType.name().equals(this.grantType);
     }
 }

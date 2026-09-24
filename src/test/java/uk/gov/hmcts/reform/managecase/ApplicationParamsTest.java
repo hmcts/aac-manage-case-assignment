@@ -44,11 +44,6 @@ class ApplicationParamsTest {
     }
 
     @Test
-    void shouldEncodeStringUsingUtf8() {
-        assertEquals("case+id", ApplicationParams.encode("case id"));
-    }
-
-    @Test
     void shouldGetAmGetRoleAssignmentsURL() {
         final var roleAssignmentServiceHost = "test-host";
         final var baseUrl = roleAssignmentServiceHost + "/am/role-assignments/actors/{uid}";

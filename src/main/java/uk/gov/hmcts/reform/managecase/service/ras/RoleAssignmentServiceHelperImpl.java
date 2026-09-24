@@ -188,11 +188,14 @@ public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHel
 
     private ResponseEntity<RoleAssignmentResponse> exchangeGet(String userId, HttpEntity<Object> requestEntity)
         throws URISyntaxException {
-        final Map<String, String> queryParams = new HashMap<>();
-        queryParams.put("uid", ApplicationParams.encode(userId.toLowerCase()));
+        final Map<String, String> uriVariables = new HashMap<>();
+        uriVariables.put("uid", userId.toLowerCase());
 
-        final String encodedUrl = UriComponentsBuilder.fromHttpUrl(applicationParams.amGetRoleAssignmentsURL())
-            .buildAndExpand(queryParams).toUriString();
+        final String encodedUrl = UriComponentsBuilder
+            .fromHttpUrl(applicationParams.amGetRoleAssignmentsURL())
+            .encode()
+            .buildAndExpand(uriVariables)
+            .toUriString();
 
         return restTemplate.exchange(new URI(encodedUrl),
                                      HttpMethod.GET, requestEntity,

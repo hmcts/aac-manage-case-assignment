@@ -4,8 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +19,11 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.LABEL;
 
 @ToString
+@Getter
+@Setter
+@SuppressWarnings("unused")
 public class CaseTypeDefinition implements Serializable {
+    @Serial
     private static final long serialVersionUID = 5688786015302840008L;
     private String id;
     private String description;
@@ -36,97 +43,9 @@ public class CaseTypeDefinition implements Serializable {
     private List<AccessControlList> accessControlLists;
     private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Version getVersion() {
-        return version;
-    }
-
-    public void setVersion(Version version) {
-        this.version = version;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     @JsonIgnore
     public String getJurisdictionId() {
         return jurisdictionDefinition.getId();
-    }
-
-    public JurisdictionDefinition getJurisdictionDefinition() {
-        return jurisdictionDefinition;
-    }
-
-    public void setJurisdictionDefinition(JurisdictionDefinition jurisdictionDefinition) {
-        this.jurisdictionDefinition = jurisdictionDefinition;
-    }
-
-    public SecurityClassification getSecurityClassification() {
-        return securityClassification;
-    }
-
-    public void setSecurityClassification(SecurityClassification securityClassification) {
-        this.securityClassification = securityClassification;
-    }
-
-    public List<CaseEventDefinition> getEvents() {
-        return events;
-    }
-
-    public void setEvents(List<CaseEventDefinition> events) {
-        this.events = events;
-    }
-
-    public List<CaseStateDefinition> getStates() {
-        return states;
-    }
-
-    public void setStates(List<CaseStateDefinition> states) {
-        this.states = states;
-    }
-
-    public List<CaseFieldDefinition> getCaseFieldDefinitions() {
-        return caseFieldDefinitions;
-    }
-
-    public void setCaseFieldDefinitions(List<CaseFieldDefinition> caseFieldDefinitions) {
-        this.caseFieldDefinitions = caseFieldDefinitions;
-    }
-
-    public String getPrintableDocumentsUrl() {
-        return printableDocumentsUrl;
-    }
-
-    public void setPrintableDocumentsUrl(String printableDocumentsUrl) {
-        this.printableDocumentsUrl = printableDocumentsUrl;
-    }
-
-    public List<AccessControlList> getAccessControlLists() {
-        return accessControlLists;
-    }
-
-    public void setAccessControlLists(List<AccessControlList> accessControlLists) {
-        this.accessControlLists = accessControlLists;
     }
 
     public SecurityClassification getClassificationForField(String fieldId) {
@@ -155,10 +74,6 @@ public class CaseTypeDefinition implements Serializable {
             .findFirst();
     }
 
-    public List<SearchAliasField> getSearchAliasFields() {
-        return searchAliasFields;
-    }
-
     public void setSearchAliasFields(List<SearchAliasField> searchAliasFields) {
         if (searchAliasFields != null) {
             this.searchAliasFields.addAll(searchAliasFields);
@@ -177,7 +92,7 @@ public class CaseTypeDefinition implements Serializable {
     }
 
     @JsonIgnore
-    public <T extends CommonField> Optional<T> getComplexSubfieldDefinitionByPath(String path) {
+    public Optional<CaseFieldDefinition> getComplexSubfieldDefinitionByPath(String path) {
         return CaseFieldPathUtils.getFieldDefinitionByPath(this, path);
     }
 

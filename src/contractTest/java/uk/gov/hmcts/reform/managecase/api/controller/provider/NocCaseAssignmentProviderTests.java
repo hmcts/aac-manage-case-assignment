@@ -6,7 +6,8 @@ import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
-import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
+import au.com.dius.pact.provider.junitsupport.loader.PactBrokerConsumerVersionSelectors;
+import au.com.dius.pact.provider.junitsupport.loader.SelectorBuilder;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +29,6 @@ import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
-import java.io.IOException;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
@@ -44,10 +44,7 @@ import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixtur
 
 @ExtendWith(SpringExtension.class)
 @Provider("acc_manageCaseAssignment")
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-    host = "${PACT_BROKER_URL:localhost}",
-    port = "${PACT_BROKER_PORT:80}",
-    consumerVersionSelectors = {@VersionSelector(tag = "master")})
+@PactBroker(url = "${PACT_BROKER_SCHEME:http}://${PACT_BROKER_URL:localhost}:${PACT_BROKER_PORT:80}")
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
 @IgnoreNoPactsToVerify
 public class NocCaseAssignmentProviderTests {
@@ -87,6 +84,12 @@ public class NocCaseAssignmentProviderTests {
     @Autowired
     NoticeOfChangeController noticeOfChangeController;
 
+    @PactBrokerConsumerVersionSelectors
+    @SuppressWarnings("unused")
+    public SelectorBuilder consumerVersionSelectors() {
+        return new SelectorBuilder().latestTag("master");
+    }
+
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
@@ -107,7 +110,8 @@ public class NocCaseAssignmentProviderTests {
     }
 
     @State({"Assign a user to a case"})
-    public void toAssignUserToCase() throws IOException {
+    @SuppressWarnings("unused")
+    public void toAssignUserToCase() {
 
         given(prdRepository.findUsersByOrganisation())
             .willReturn(usersByOrganisation(user(ASSIGNEE_ID), user(ASSIGNEE_ID2), user(ASSIGNEE_ID3)));
@@ -137,7 +141,8 @@ public class NocCaseAssignmentProviderTests {
     }
 
     @State({"Case assignments exist for case Ids"})
-    public void toGetExistingCaseAssignments() throws IOException {
+    @SuppressWarnings("unused")
+    public void toGetExistingCaseAssignments() {
         given(prdRepository.findUsersByOrganisation())
             .willReturn(usersByOrganisation(user(ASSIGNEE_ID), user(ASSIGNEE_ID2)));
         given(dataStoreRepository.getCaseAssignments(eq(List.of(CASE_ID, CASE_ID2)),
@@ -150,7 +155,8 @@ public class NocCaseAssignmentProviderTests {
     }
 
     @State({"A notice of change against case"})
-    public void toApplyNoticeOfChange() throws IOException {
+    @SuppressWarnings("unused")
+    public void toApplyNoticeOfChange() {
         given(dataStoreRepository.getCaseAssignments(any(), any()))
             .willReturn(List.of(
                 new CaseUserRole(CASE_ID, ASSIGNEE_ID, CASE_ROLE),

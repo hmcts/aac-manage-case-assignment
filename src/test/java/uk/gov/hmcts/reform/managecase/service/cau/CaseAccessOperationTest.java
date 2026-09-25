@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -53,7 +53,7 @@ public class CaseAccessOperationTest {
     @InjectMocks
     private CaseAccessOperation caseAccessOperation;
 
-    @Mock(lenient = true)
+    @Mock
     private DataStoreRepository dataStoreRepository;
 
     private static final Long CASE_REFERENCE = 1234123412341236L;
@@ -95,11 +95,11 @@ public class CaseAccessOperationTest {
                 .id(CASE_REFERENCE_OTHER.toString())
                 .build();
 
-            doReturn(caseDetailsOther).when(dataStoreRepository)
+            lenient().doReturn(caseDetailsOther).when(dataStoreRepository)
                 .findCaseByCaseIdUsingExternalApi(String.valueOf(CASE_REFERENCE_OTHER));
-            doReturn(caseDetails).when(dataStoreRepository)
+            lenient().doReturn(caseDetails).when(dataStoreRepository)
                 .findCaseByCaseIdUsingExternalApi(String.valueOf(CASE_REFERENCE));
-            doReturn(null).when(dataStoreRepository)
+            lenient().doReturn(null).when(dataStoreRepository)
                 .findCaseByCaseIdUsingExternalApi(String.valueOf(CASE_NOT_FOUND_REFERENCE));
 
             Map<String, Long> orgIdToCountMap = new HashMap<>();
@@ -746,4 +746,3 @@ public class CaseAccessOperationTest {
             .thenReturn(secondCallCaseUserRoles);
     }
 }
-

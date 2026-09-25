@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.managecase.api.controller;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import uk.gov.hmcts.reform.managecase.BaseIT;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
@@ -10,6 +11,8 @@ import uk.gov.hmcts.reform.managecase.TestFixtures;
 import java.util.Date;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
@@ -57,7 +60,11 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
         verify(postRequestedFor(urlEqualTo("/searchCases?ctid=CT_MasterCase"))
                    .withHeader("Authorization",
                                containing("Bearer eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODM0NDUyOTd9aa")
-                   ));
+                   )
+                   .withHeader("X-Forwarded-Prefix", equalTo("/ccd"))
+                   .withHeader(HttpHeaders.CONTENT_LENGTH, matching("\\d+"))
+                   .withoutHeader("Forwarded")
+                   .withoutHeader(HttpHeaders.TRANSFER_ENCODING));
     }
 
     @DisplayName("SpringCloudGateway successfully forwards /ccd/internal/searchCases request to the data store with"
@@ -130,4 +137,3 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
                 .compact();
     }
 }
-

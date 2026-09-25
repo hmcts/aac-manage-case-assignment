@@ -26,7 +26,8 @@ import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTH
 class GatewayFiltersTest {
 
     private static final String DATA_STORE_PATH = "/ccd/searchCases?ctid=CT_MasterCase";
-    private static final String DEFINITION_STORE_PATH = "/ccd/case-types/CT_MasterCase";
+    private static final String DEFINITION_STORE_PATH = "/ccd/api/display/challenge-questions/case-type/"
+        + "CT_MasterCase/question-groups/NoCChallenge";
     private static final String SERVICE_NAME = "xui_webapp";
     private static final String DEFINITION_STORE_SERVICE_NAME = "xui_manage_org";
 
@@ -119,7 +120,7 @@ class GatewayFiltersTest {
     @Test
     void allowsTheServiceConfiguredForTheDefinitionStoreRoute() throws Exception {
         ApplicationParams applicationParams = applicationParams(List.of("/searchCases.*"),
-            List.of("/case-types.*"), SERVICE_NAME, DEFINITION_STORE_SERVICE_NAME);
+            List.of("/api/display/challenge-questions.*"), SERVICE_NAME, DEFINITION_STORE_SERVICE_NAME);
         SecurityUtils securityUtils = mock(SecurityUtils.class);
         when(securityUtils.getServiceNameFromS2SToken("definition-store-token"))
             .thenReturn(DEFINITION_STORE_SERVICE_NAME);
@@ -148,7 +149,7 @@ class GatewayFiltersTest {
     @Test
     void rejectsDefinitionStoreServiceOnDataStoreRoute() {
         ApplicationParams applicationParams = applicationParams(List.of("/searchCases.*"),
-            List.of("/case-types.*"), SERVICE_NAME, DEFINITION_STORE_SERVICE_NAME);
+            List.of("/api/display/challenge-questions.*"), SERVICE_NAME, DEFINITION_STORE_SERVICE_NAME);
         SecurityUtils securityUtils = mock(SecurityUtils.class);
         when(securityUtils.getServiceNameFromS2SToken("definition-store-token"))
             .thenReturn(DEFINITION_STORE_SERVICE_NAME);

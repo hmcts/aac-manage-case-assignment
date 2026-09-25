@@ -1,21 +1,25 @@
 package uk.gov.hmcts.reform.managecase.api.controller;
 
 import io.jsonwebtoken.Jwts;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.http.MediaType;
 import uk.gov.hmcts.reform.managecase.BaseIT;
 import uk.gov.hmcts.reform.managecase.TestFixtures;
-import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 
 import java.util.Date;
-import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -24,11 +28,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.caseDetails;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCase;
 import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubSearchCaseWithPrefix;
-import static uk.gov.hmcts.reform.managecase.fixtures.WiremockFixtures.stubGetChallengeQuestions;
 import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.MethodNamingConventions", "PMD.AvoidDuplicateLiterals"})
 public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
+
+    private static final WireMockServer DEFINITION_STORE = new WireMockServer(0);
+
+    static {
+        DEFINITION_STORE.start();
+    }
+
+    @AfterAll
+    static void stopDefinitionStore() {
+        DEFINITION_STORE.stop();
+    }
+
+    @DynamicPropertySource
+    static void definitionStoreProperties(DynamicPropertyRegistry registry) {
+        registry.add("definition.store.wiremock.port", DEFINITION_STORE::port);
+    }
 
     private static final String CASE_TYPE_ID = "CT_MasterCase";
     private static final String PATH = "/ccd/searchCases?ctid=CT_MasterCase";
@@ -70,15 +89,19 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
     @DisplayName("SpringCloudGateway forwards definition-store requests to the definition store")
     @Test
     void shouldForwardDefinitionStoreRequestToDefinitionStore() throws Exception {
-        stubGetChallengeQuestions(CASE_TYPE_ID, "NoCChallenge", new ChallengeQuestionsResult(List.of()));
+        String definitionStorePath = "/api/display/challenge-questions/case-type/"
+            + CASE_TYPE_ID + "/question-groups/NoCChallenge";
+        DEFINITION_STORE.stubFor(WireMock.get(WireMock.urlPathEqualTo(definitionStorePath))
+            .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json")
+                .withBody("{\"questions\":[]}")));
 
         String s2SToken = generateDummyS2SToken(SERVICE_NAME);
         this.mockMvc.perform(get(DEFINITION_STORE_PATH)
             .header(SERVICE_AUTHORIZATION, BEARER + s2SToken))
             .andExpect(status().isOk());
 
-        verify(getRequestedFor(urlEqualTo(
-            "/api/display/challenge-questions/case-type/" + CASE_TYPE_ID + "/question-groups/NoCChallenge")));
+        DEFINITION_STORE.verify(getRequestedFor(urlEqualTo(definitionStorePath)));
+        verify(0, getRequestedFor(urlEqualTo(definitionStorePath)));
     }
 
     @DisplayName("SpringCloudGateway successfully forwards /ccd/internal/searchCases request to the data store with"

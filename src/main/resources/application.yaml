@@ -56,16 +56,6 @@ spring:
         http-client:
           type: AUTODETECT
         routes:
-          - id: definition-store
-            uri: ${CCD_DEFINITION_STORE_API_BASE_URL:http://localhost:4451}
-            predicates:
-              - Path=/ccd/api/display/**
-            filters:
-              - AllowedRoutesFilter
-              - ValidateClientFilter
-              - RemoveResponseHeader=Cookie
-              - RemoveResponseHeader=Set-Cookie
-              - StripPrefix=1
           - id: data-store
             uri: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
             predicates:

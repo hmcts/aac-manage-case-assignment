@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.managecase.gatewayfilters;
 
-import com.auth0.jwt.exceptions.JWTDecodeException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.server.mvc.common.Shortcut;
@@ -9,12 +11,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.function.HandlerFilterFunction;
 import org.springframework.web.servlet.function.ServerRequest;
 import org.springframework.web.servlet.function.ServerResponse;
-
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
 
 import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
@@ -34,19 +30,11 @@ public interface ValidateClientFilter {
             SecurityUtils securityUtils = getApplicationContext(request).getBean(SecurityUtils.class);
             ApplicationParams applicationParams = getApplicationContext(request).getBean(ApplicationParams.class);
 
-            String serviceAuthorization = request.headers().firstHeader(SERVICE_AUTHORIZATION);
-            if (serviceAuthorization == null) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Missing service authorization token");
-            }
-
-            String service;
-            try {
-                service = securityUtils.getServiceNameFromS2SToken(serviceAuthorization);
-            } catch (JWTDecodeException exception) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid service authorization token");
-            }
-            String allowedService = allowedServiceForRoute(request, applicationParams);
-            if (allowedService == null || !allowedService.equals(service)) {
+            String service = securityUtils.getServiceNameFromS2SToken(
+                request.headers().firstHeader(SERVICE_AUTHORIZATION)
+            );
+            if (!applicationParams.getCcdDataStoreAllowedService().equals(service)
+                    || !applicationParams.getCcdDefinitionStoreAllowedService().equals(service)) {
                 String errorMessage = String.format("forbidden client id %s for the /ccd endpoint", service);
                 log.debug(errorMessage);
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
@@ -66,39 +54,10 @@ public interface ValidateClientFilter {
         };
     }
 
-    static String allowedServiceForRoute(ServerRequest request, ApplicationParams applicationParams) {
-        String requestUri = request.uri().getPath()
-            + (request.uri().getQuery() == null ? "" : "?" + request.uri().getQuery());
-        boolean dataStoreRoute = matchesConfiguredRoute(requestUri,
-            applicationParams.getCcdDataStoreAllowedUrls());
-        boolean definitionStoreRoute = matchesConfiguredRoute(requestUri,
-            applicationParams.getCcdDefinitionStoreAllowedUrls());
-
-        if (dataStoreRoute && definitionStoreRoute) {
-            String dataStoreService = applicationParams.getCcdDataStoreAllowedService();
-            String definitionStoreService = applicationParams.getCcdDefinitionStoreAllowedService();
-            return Objects.equals(dataStoreService, definitionStoreService) ? dataStoreService : null;
-        }
-        if (!dataStoreRoute && !definitionStoreRoute) {
-            return null;
-        }
-        return dataStoreRoute
-            ? applicationParams.getCcdDataStoreAllowedService()
-            : applicationParams.getCcdDefinitionStoreAllowedService();
-    }
-
-    static boolean matchesConfiguredRoute(String requestUri, List<String> allowedUrls) {
-        return allowedUrls.stream()
-            .map("/ccd"::concat)
-            .anyMatch(requestUri::matches);
-    }
-
     class FilterSupplier implements org.springframework.cloud.gateway.server.mvc.filter.FilterSupplier {
         @Override
         public Collection<Method> get() {
-            return Arrays.stream(ValidateClientFilter.class.getMethods())
-                .filter(method -> method.isAnnotationPresent(Shortcut.class))
-                .toList();
+            return Arrays.asList(ValidateClientFilter.class.getMethods());
         }
     }
 

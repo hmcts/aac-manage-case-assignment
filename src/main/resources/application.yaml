@@ -66,6 +66,11 @@ spring:
               - RemoveResponseHeader=Cookie
               - RemoveResponseHeader=Set-Cookie
               - StripPrefix=1
+      server:
+        webmvc:
+          trusted-proxies: ${MCA_GATEWAY_TRUSTED_PROXIES:127\.0\.0\.1|0:0:0:0:0:0:0:1}
+          x-forwarded-request-headers-filter:
+            prefix-append: false
     discovery:
       client:
         composite-indicator:

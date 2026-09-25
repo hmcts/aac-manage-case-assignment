@@ -1,0 +1,31 @@
+{
+  "_guid_": "F-207_Fetch_ApplyNoCDecision_Event_Trigger",
+  "_extends_": "Event_Creation_Token_Creation",
+
+  "specs": [
+    "to fetch the CCD ApplyNoCDecision event trigger and invoke the ACA callback"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "ACA_Users_NOC_Approver"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][S-207.6-CaseCreation_NoCRequest_Rejected][testData][actualResponse][body][id]}",
+      "etid": "ApplyNoCDecision"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "event_id": "ApplyNoCDecision",
+      "case_details": {
+        "id": "${[scenarioContext][parentContext][childContexts][S-207.6-CaseCreation_NoCRequest_Rejected][testData][actualResponse][body][id]}",
+        "case_type_id": "FT_NoCAutoApprovalCaseType"
+      }
+    }
+  }
+}

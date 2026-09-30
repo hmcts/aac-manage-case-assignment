@@ -9,7 +9,7 @@ import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootApplication(scanBasePackages = {
-    "uk.gov.hmcts.reform.managecase", 
+    "uk.gov.hmcts.reform.managecase",
     "uk.gov.hmcts.reform.idam.client",
     "uk.gov.hmcts.reform.authorisation"
 })
@@ -23,8 +23,11 @@ public class Application {
     }
 
     public static void main(final String[] args) {
+
         new SpringApplicationBuilder(Application.class)
             .web(WebApplicationType.SERVLET)
             .run(args);
+
     }
+
 }

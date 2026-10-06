@@ -257,6 +257,16 @@ sonarqube {
     property "sonar.projectName", "Reform::manage-case-assignment"
     property "sonar.projectKey", "uk.gov.hmcts.reform:manage-case-assignment"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation}"
+
+    // Jenkins exposes these variables for multibranch pull-request builds.
+    // Supplying them explicitly ensures SonarQube analyses the PR rather than
+    // treating the Jenkins PR branch as a normal long-lived branch.
+    def pullRequestKey = System.getenv('CHANGE_ID')
+    if (pullRequestKey) {
+      property "sonar.pullrequest.key", pullRequestKey
+      property "sonar.pullrequest.branch", System.getenv('CHANGE_BRANCH') ?: System.getenv('BRANCH_NAME')
+      property "sonar.pullrequest.base", System.getenv('CHANGE_TARGET') ?: 'master'
+    }
   }
 }
 

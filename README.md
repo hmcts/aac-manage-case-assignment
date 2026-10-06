@@ -95,6 +95,15 @@ To run all checks execute the following command:
 ./gradlew clean checkstyleMain checkstyleTest checkstyleIntegrationTest pmdMain pmdTest pmdIntegrationTest
 ```
 
+SonarQube analysis is run by the shared Jenkins pipeline. Pull-request builds
+pass the Jenkins change metadata to SonarQube so the analysis is associated with
+the GitHub pull request and its findings can be shown there.
+
+For the findings to appear on GitHub, the SonarQube project
+`uk.gov.hmcts.reform:manage-case-assignment` must be bound to
+`hmcts/aac-manage-case-assignment` in SonarQube's GitHub integration. This is an
+instance/project administration setting and cannot be stored in this repository.
+
 ### Docker
 Create docker image:
 

@@ -2,7 +2,7 @@ plugins {
   id 'application'
   id 'jacoco'
   id 'au.com.dius.pact' version '4.7.5'
-  id 'com.github.ben-manes.versions' version '0.61.0'
+  id 'io.github.ben-manes.versions' version '0.61.0'
   id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.25'
   id 'io.spring.dependency-management' version '1.1.7'
   id 'org.owasp.dependencycheck' version '13.0.0'
@@ -179,13 +179,35 @@ tasks.register('functional', Test) {
 }
 
 jacocoTestReport {
-  executionData(test, integration)
+  executionData(test)
   reports {
     xml.required = true
     csv.required = false
     xml.outputLocation = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
   }
 }
+
+tasks.named('jacocoTestCoverageVerification') {
+  dependsOn test
+  executionData(test)
+  sourceSets(sourceSets.main)
+  violationRules {
+    rule {
+      limit {
+        counter = 'LINE'
+        value = 'COVEREDRATIO'
+        minimum = 0.60
+      }
+      limit {
+        counter = 'BRANCH'
+        value = 'COVEREDRATIO'
+        minimum = 0.50
+      }
+    }
+  }
+}
+
+check.dependsOn jacocoTestReport, jacocoTestCoverageVerification
 
 project.ext {
   pactVersion = getCheckedOutGitCommitHash()
@@ -199,18 +221,18 @@ tasks.register('contract', Test) {
   include "uk/gov/hmcts/reform/managecase/api/controller/provider/**"
 }
 
-//tasks.register('runProviderPactVerification', Test) {
-//  testClassesDirs = sourceSets.contractTest.output.classesDirs
-//  classpath = sourceSets.contractTest.runtimeClasspath
-//  if (project.hasProperty('pact.verifier.publishResults')) {
-//    systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
-//  }
-//  systemProperty 'pact.provider.version', project.pactVersion
-//}
-//
-//tasks.named('runProviderPactVerification').configure {
-//  finalizedBy 'pactVerify'
-//}
+tasks.register('runProviderPactVerification', Test) {
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  if (project.hasProperty('pact.verifier.publishResults')) {
+    systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+  }
+  systemProperty 'pact.provider.version', project.pactVersion
+}
+
+tasks.named('runProviderPactVerification').configure {
+  finalizedBy 'pactVerify'
+}
 
 def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --short HEAD'.execute().text.trim()

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController;
@@ -21,11 +22,16 @@ import uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseUserRole;
 import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
+import uk.gov.hmcts.reform.managecase.data.user.UserRepository;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
+import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
 import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 import uk.gov.hmcts.reform.managecase.repository.PrdRepository;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
+import uk.gov.hmcts.reform.managecase.service.NotifyService;
+import uk.gov.hmcts.reform.managecase.service.noc.ChallengeAnswerValidator;
+import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.io.IOException;
@@ -70,16 +76,26 @@ public class NocCaseAssignmentProviderTests {
     private static final String TEST_APP_ORG_ID = "appOrgId";
     private static final String TEST_APP_ORG_NAME = "appOrgName";
 
-    @Autowired
+    @MockitoBean
     DataStoreRepository dataStoreRepository;
-    @Autowired
+    @MockitoBean
     PrdRepository prdRepository;
-    @Autowired
+    @MockitoBean
     IdamRepository idamRepository;
-    @Autowired
+    @MockitoBean
     JacksonUtils jacksonUtils;
-    @Autowired
+    @MockitoBean
     SecurityUtils securityUtils;
+    @MockitoBean
+    NoticeOfChangeQuestions noticeOfChangeQuestions;
+    @MockitoBean
+    ChallengeAnswerValidator challengeAnswerValidator;
+    @MockitoBean
+    DefinitionStoreRepository definitionStoreRepository;
+    @MockitoBean
+    UserRepository userRepository;
+    @MockitoBean
+    NotifyService notifyService;
 
     @Autowired
     CaseAssignmentController caseAssignmentController;

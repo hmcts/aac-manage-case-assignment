@@ -142,7 +142,7 @@ withPipeline("java", product, component) {
 
   onMaster {
     enableSlackNotifications('#ccd-master-builds')
-    //enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
+    enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
   }
 
   onDemo {
@@ -150,7 +150,7 @@ withPipeline("java", product, component) {
   }
   onPR {
     enableSlackNotifications('#ccd-pr-builds')
-    // enablePactAs([AppPipelineDsl.PactRoles.PROVIDER]) TODO - enable this before merging
+    enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
   }
 
   // Check if the build should be wired to an environment higher than 'preview'.

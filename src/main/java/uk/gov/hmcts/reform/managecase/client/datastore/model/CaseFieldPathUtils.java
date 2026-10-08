@@ -10,7 +10,6 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
-@SuppressWarnings({"PMD.AvoidLiteralsInIfCondition", "PMD.TooManyFields"})
 public final class CaseFieldPathUtils {
 
     private static final String SEPARATOR = ".";

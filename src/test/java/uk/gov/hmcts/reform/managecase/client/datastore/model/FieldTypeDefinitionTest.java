@@ -5,15 +5,12 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.TEXT;
 
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
 class FieldTypeDefinitionTest {
 
     @Test
@@ -24,7 +21,7 @@ class FieldTypeDefinitionTest {
 
         List<CaseFieldDefinition> result = fieldTypeDefinition.getChildren();
 
-        assertThat(result, is(List.of(firstNestedField, secondNestedField)));
+        assertThat(result).containsExactly(firstNestedField, secondNestedField);
     }
 
     @Test
@@ -34,7 +31,7 @@ class FieldTypeDefinitionTest {
 
         List<CaseFieldDefinition> result = fieldTypeDefinition.getChildren();
 
-        assertThat(result, is(List.of(nestedField)));
+        assertThat(result).containsExactly(nestedField);
     }
 
     @Test
@@ -43,7 +40,7 @@ class FieldTypeDefinitionTest {
 
         List<CaseFieldDefinition> result = fieldTypeDefinition.getChildren();
 
-        assertThat(result.isEmpty(), is(true));
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -52,7 +49,7 @@ class FieldTypeDefinitionTest {
 
         List<CaseFieldDefinition> result = fieldTypeDefinition.getChildren();
 
-        assertThat(result.isEmpty(), is(true));
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -62,7 +59,7 @@ class FieldTypeDefinitionTest {
 
         fieldTypeDefinition.setChildren(List.of(nestedField));
 
-        assertThat(fieldTypeDefinition.getComplexFields(), is(List.of(nestedField)));
+        assertThat(fieldTypeDefinition.getComplexFields()).containsExactly(nestedField);
     }
 
     @Test
@@ -73,7 +70,7 @@ class FieldTypeDefinitionTest {
 
         collectionFieldTypeDefinition.setChildren(List.of(nestedField));
 
-        assertThat(collectionFieldTypeDefinition.getChildren(), is(List.of(nestedField)));
+        assertThat(collectionFieldTypeDefinition.getChildren()).containsExactly(nestedField);
     }
 
     @Test
@@ -83,7 +80,7 @@ class FieldTypeDefinitionTest {
 
         fieldTypeDefinition.setChildren(List.of(nestedField));
 
-        assertThat(fieldTypeDefinition.getChildren().isEmpty(), is(true));
+        assertThat(fieldTypeDefinition.getChildren()).isEmpty();
     }
 
     @Test
@@ -93,7 +90,7 @@ class FieldTypeDefinitionTest {
 
         fieldTypeDefinition.setChildren(List.of(nestedField));
 
-        assertThat(fieldTypeDefinition.getChildren().isEmpty(), is(true));
+        assertThat(fieldTypeDefinition.getChildren()).isEmpty();
     }
 
     @Test
@@ -101,8 +98,8 @@ class FieldTypeDefinitionTest {
         FieldTypeDefinition fieldTypeDefinition = fieldTypeDefinition("collection");
 
         assertAll(
-            () -> assertThat(fieldTypeDefinition.isCollectionFieldType(), is(true)),
-            () -> assertThat(fieldTypeDefinition.isComplexFieldType(), is(false))
+            () -> assertThat(fieldTypeDefinition.isCollectionFieldType()).isTrue(),
+            () -> assertThat(fieldTypeDefinition.isComplexFieldType()).isFalse()
         );
     }
 
@@ -111,8 +108,8 @@ class FieldTypeDefinitionTest {
         FieldTypeDefinition fieldTypeDefinition = fieldTypeDefinition("complex");
 
         assertAll(
-            () -> assertThat(fieldTypeDefinition.isCollectionFieldType(), is(false)),
-            () -> assertThat(fieldTypeDefinition.isComplexFieldType(), is(true))
+            () -> assertThat(fieldTypeDefinition.isCollectionFieldType()).isFalse(),
+            () -> assertThat(fieldTypeDefinition.isComplexFieldType()).isTrue()
         );
     }
 
@@ -121,8 +118,8 @@ class FieldTypeDefinitionTest {
         FieldTypeDefinition fieldTypeDefinition = fieldTypeDefinition(TEXT);
 
         assertAll(
-            () -> assertThat(fieldTypeDefinition.isCollectionFieldType(), is(false)),
-            () -> assertThat(fieldTypeDefinition.isComplexFieldType(), is(false))
+            () -> assertThat(fieldTypeDefinition.isCollectionFieldType()).isFalse(),
+            () -> assertThat(fieldTypeDefinition.isComplexFieldType()).isFalse()
         );
     }
 
@@ -133,7 +130,7 @@ class FieldTypeDefinitionTest {
 
         Optional<CommonField> result = fieldTypeDefinition.getNestedField("NestedTextField", false);
 
-        assertThat(result, is(Optional.of(nestedField)));
+        assertThat(result).contains(nestedField);
     }
 
     @Test
@@ -145,7 +142,7 @@ class FieldTypeDefinitionTest {
         Optional<CommonField> result = fieldTypeDefinition.getNestedField(
             "NestedComplexField.DeeplyNestedField", false);
 
-        assertThat(result, is(Optional.of(deeplyNestedField)));
+        assertThat(result).contains(deeplyNestedField);
     }
 
     @Test
@@ -155,7 +152,7 @@ class FieldTypeDefinitionTest {
 
         Optional<CommonField> result = fieldTypeDefinition.getNestedField("ComplexField.NestedTextField", true);
 
-        assertThat(result, is(Optional.of(nestedField)));
+        assertThat(result).contains(nestedField);
     }
 
     @Test
@@ -165,7 +162,7 @@ class FieldTypeDefinitionTest {
 
         Optional<CommonField> result = fieldTypeDefinition.getNestedField("MissingField", false);
 
-        assertThat(result.isEmpty(), is(true));
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -175,7 +172,7 @@ class FieldTypeDefinitionTest {
 
         Optional<CommonField> result = fieldTypeDefinition.getNestedField(" ", false);
 
-        assertThat(result.isEmpty(), is(true));
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -185,10 +182,7 @@ class FieldTypeDefinitionTest {
 
         String result = fieldTypeDefinition.toString();
 
-        assertAll(
-            () -> assertThat(result, containsString("TextFieldType")),
-            () -> assertThat(result, containsString(TEXT))
-        );
+        assertThat(result).contains("TextFieldType", TEXT);
     }
 
     private CaseFieldDefinition complexCaseFieldDefinition(String id, CaseFieldDefinition... nestedFields) {
@@ -228,4 +222,3 @@ class FieldTypeDefinitionTest {
         return fieldTypeDefinition;
     }
 }
-

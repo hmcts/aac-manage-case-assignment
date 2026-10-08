@@ -6,14 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("RoleAssignmentAttributesResourceTest")
-@SuppressWarnings("PMD.TooManyMethods")
 class RoleAssignmentAttributesResourceTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -31,40 +27,70 @@ class RoleAssignmentAttributesResourceTest {
             .build();
 
         assertAll(
-            () -> assertThat(result.getJurisdiction(), is("DIVORCE")),
-            () -> assertThat(result.getCaseType(), is("FinancialRemedy")),
-            () -> assertThat(result.getCaseId(), is("111111")),
-            () -> assertThat(result.getRegion(), is("Hampshire")),
-            () -> assertThat(result.getLocation(), is("Southampton")),
-            () -> assertThat(result.getContractType(), is("SALARIED")),
-            () -> assertThat(result.isJurisdictionDefined(), is(true)),
-            () -> assertThat(result.isCaseTypeDefined(), is(true)),
-            () -> assertThat(result.isCaseIdDefined(), is(true)),
-            () -> assertThat(result.isRegionDefined(), is(true)),
-            () -> assertThat(result.isLocationDefined(), is(true)),
-            () -> assertThat(result.isContractTypeDefined(), is(true))
+            () -> assertThat(result.getJurisdiction()).isEqualTo("DIVORCE"),
+            () -> assertThat(result.getCaseType()).isEqualTo("FinancialRemedy"),
+            () -> assertThat(result.getCaseId()).isEqualTo("111111"),
+            () -> assertThat(result.getRegion()).isEqualTo("Hampshire"),
+            () -> assertThat(result.getLocation()).isEqualTo("Southampton"),
+            () -> assertThat(result.getContractType()).isEqualTo("SALARIED"),
+            () -> assertThat(result.isJurisdictionDefined()).isTrue(),
+            () -> assertThat(result.isCaseTypeDefined()).isTrue(),
+            () -> assertThat(result.isCaseIdDefined()).isTrue(),
+            () -> assertThat(result.isRegionDefined()).isTrue(),
+            () -> assertThat(result.isLocationDefined()).isTrue(),
+            () -> assertThat(result.isContractTypeDefined()).isTrue()
+        );
+    }
+
+    @Test
+    @DisplayName("should track null builder values as defined")
+    void shouldTrackNullBuilderValuesAsDefined() {
+        RoleAssignmentAttributesResource result = RoleAssignmentAttributesResource.builder()
+            .jurisdiction(null)
+            .caseType(null)
+            .caseId(null)
+            .region(null)
+            .location(null)
+            .contractType(null)
+            .build();
+
+        assertAll(
+            () -> assertThat(result.getJurisdiction()).isNull(),
+            () -> assertThat(result.getCaseType()).isNull(),
+            () -> assertThat(result.getCaseId()).isNull(),
+            () -> assertThat(result.getRegion()).isNull(),
+            () -> assertThat(result.getLocation()).isNull(),
+            () -> assertThat(result.getContractType()).isNull(),
+            () -> assertThat(result.isJurisdictionDefined()).isTrue(),
+            () -> assertThat(result.isCaseTypeDefined()).isTrue(),
+            () -> assertThat(result.isCaseIdDefined()).isTrue(),
+            () -> assertThat(result.isRegionDefined()).isTrue(),
+            () -> assertThat(result.isLocationDefined()).isTrue(),
+            () -> assertThat(result.isContractTypeDefined()).isTrue()
         );
     }
 
     @Test
     @DisplayName("should leave fields undefined when JSON properties are absent")
     void shouldLeaveFieldsUndefinedWhenJsonPropertiesAreAbsent() throws JsonProcessingException {
-        RoleAssignmentAttributesResource result = OBJECT_MAPPER.readValue("{}",
-            RoleAssignmentAttributesResource.class);
+        RoleAssignmentAttributesResource result = OBJECT_MAPPER.readValue(
+            "{}",
+            RoleAssignmentAttributesResource.class
+        );
 
         assertAll(
-            () -> assertThat(result.getJurisdiction(), is(nullValue())),
-            () -> assertThat(result.getCaseType(), is(nullValue())),
-            () -> assertThat(result.getCaseId(), is(nullValue())),
-            () -> assertThat(result.getRegion(), is(nullValue())),
-            () -> assertThat(result.getLocation(), is(nullValue())),
-            () -> assertThat(result.getContractType(), is(nullValue())),
-            () -> assertThat(result.isJurisdictionDefined(), is(false)),
-            () -> assertThat(result.isCaseTypeDefined(), is(false)),
-            () -> assertThat(result.isCaseIdDefined(), is(false)),
-            () -> assertThat(result.isRegionDefined(), is(false)),
-            () -> assertThat(result.isLocationDefined(), is(false)),
-            () -> assertThat(result.isContractTypeDefined(), is(false))
+            () -> assertThat(result.getJurisdiction()).isNull(),
+            () -> assertThat(result.getCaseType()).isNull(),
+            () -> assertThat(result.getCaseId()).isNull(),
+            () -> assertThat(result.getRegion()).isNull(),
+            () -> assertThat(result.getLocation()).isNull(),
+            () -> assertThat(result.getContractType()).isNull(),
+            () -> assertThat(result.isJurisdictionDefined()).isFalse(),
+            () -> assertThat(result.isCaseTypeDefined()).isFalse(),
+            () -> assertThat(result.isCaseIdDefined()).isFalse(),
+            () -> assertThat(result.isRegionDefined()).isFalse(),
+            () -> assertThat(result.isLocationDefined()).isFalse(),
+            () -> assertThat(result.isContractTypeDefined()).isFalse()
         );
     }
 
@@ -72,30 +98,32 @@ class RoleAssignmentAttributesResourceTest {
     @DisplayName("should track explicit null JSON properties as defined")
     void shouldTrackExplicitNullJsonPropertiesAsDefined() throws JsonProcessingException {
         RoleAssignmentAttributesResource result = OBJECT_MAPPER.readValue(
-            "{"
-                + "\"jurisdiction\":null,"
-                + "\"caseType\":null,"
-                + "\"caseId\":null,"
-                + "\"region\":null,"
-                + "\"location\":null,"
-                + "\"contractType\":null"
-                + "}",
+            """
+                {
+                    "jurisdiction":null,
+                    "caseType":null,
+                    "caseId":null,
+                    "region":null,
+                    "location":null,
+                    "contractType":null
+                }
+                """,
             RoleAssignmentAttributesResource.class
         );
 
         assertAll(
-            () -> assertThat(result.getJurisdiction(), is(nullValue())),
-            () -> assertThat(result.getCaseType(), is(nullValue())),
-            () -> assertThat(result.getCaseId(), is(nullValue())),
-            () -> assertThat(result.getRegion(), is(nullValue())),
-            () -> assertThat(result.getLocation(), is(nullValue())),
-            () -> assertThat(result.getContractType(), is(nullValue())),
-            () -> assertThat(result.isJurisdictionDefined(), is(true)),
-            () -> assertThat(result.isCaseTypeDefined(), is(true)),
-            () -> assertThat(result.isCaseIdDefined(), is(true)),
-            () -> assertThat(result.isRegionDefined(), is(true)),
-            () -> assertThat(result.isLocationDefined(), is(true)),
-            () -> assertThat(result.isContractTypeDefined(), is(true))
+            () -> assertThat(result.getJurisdiction()).isNull(),
+            () -> assertThat(result.getCaseType()).isNull(),
+            () -> assertThat(result.getCaseId()).isNull(),
+            () -> assertThat(result.getRegion()).isNull(),
+            () -> assertThat(result.getLocation()).isNull(),
+            () -> assertThat(result.getContractType()).isNull(),
+            () -> assertThat(result.isJurisdictionDefined()).isTrue(),
+            () -> assertThat(result.isCaseTypeDefined()).isTrue(),
+            () -> assertThat(result.isCaseIdDefined()).isTrue(),
+            () -> assertThat(result.isRegionDefined()).isTrue(),
+            () -> assertThat(result.isLocationDefined()).isTrue(),
+            () -> assertThat(result.isContractTypeDefined()).isTrue()
         );
     }
 
@@ -103,30 +131,32 @@ class RoleAssignmentAttributesResourceTest {
     @DisplayName("should deserialise JSON properties with values as defined")
     void shouldDeserialiseJsonPropertiesWithValuesAsDefined() throws JsonProcessingException {
         RoleAssignmentAttributesResource result = OBJECT_MAPPER.readValue(
-            "{"
-                + "\"jurisdiction\":\"DIVORCE\","
-                + "\"caseType\":\"FinancialRemedy\","
-                + "\"caseId\":\"111111\","
-                + "\"region\":\"Hampshire\","
-                + "\"location\":\"Southampton\","
-                + "\"contractType\":\"SALARIED\""
-                + "}",
+            """
+                {
+                    "jurisdiction":"DIVORCE",
+                    "caseType":"FinancialRemedy",
+                    "caseId":"111111",
+                    "region":"Hampshire",
+                    "location":"Southampton",
+                    "contractType":"SALARIED"
+                }
+                """,
             RoleAssignmentAttributesResource.class
         );
 
         assertAll(
-            () -> assertThat(result.getJurisdiction(), is("DIVORCE")),
-            () -> assertThat(result.getCaseType(), is("FinancialRemedy")),
-            () -> assertThat(result.getCaseId(), is("111111")),
-            () -> assertThat(result.getRegion(), is("Hampshire")),
-            () -> assertThat(result.getLocation(), is("Southampton")),
-            () -> assertThat(result.getContractType(), is("SALARIED")),
-            () -> assertThat(result.isJurisdictionDefined(), is(true)),
-            () -> assertThat(result.isCaseTypeDefined(), is(true)),
-            () -> assertThat(result.isCaseIdDefined(), is(true)),
-            () -> assertThat(result.isRegionDefined(), is(true)),
-            () -> assertThat(result.isLocationDefined(), is(true)),
-            () -> assertThat(result.isContractTypeDefined(), is(true))
+            () -> assertThat(result.getJurisdiction()).isEqualTo("DIVORCE"),
+            () -> assertThat(result.getCaseType()).isEqualTo("FinancialRemedy"),
+            () -> assertThat(result.getCaseId()).isEqualTo("111111"),
+            () -> assertThat(result.getRegion()).isEqualTo("Hampshire"),
+            () -> assertThat(result.getLocation()).isEqualTo("Southampton"),
+            () -> assertThat(result.getContractType()).isEqualTo("SALARIED"),
+            () -> assertThat(result.isJurisdictionDefined()).isTrue(),
+            () -> assertThat(result.isCaseTypeDefined()).isTrue(),
+            () -> assertThat(result.isCaseIdDefined()).isTrue(),
+            () -> assertThat(result.isRegionDefined()).isTrue(),
+            () -> assertThat(result.isLocationDefined()).isTrue(),
+            () -> assertThat(result.isContractTypeDefined()).isTrue()
         );
     }
 
@@ -139,8 +169,8 @@ class RoleAssignmentAttributesResourceTest {
         );
 
         assertAll(
-            () -> assertThat(result.getJurisdiction(), is("DIVORCE")),
-            () -> assertThat(result.isJurisdictionDefined(), is(true))
+            () -> assertThat(result.getJurisdiction()).isEqualTo("DIVORCE"),
+            () -> assertThat(result.isJurisdictionDefined()).isTrue()
         );
     }
 
@@ -156,11 +186,11 @@ class RoleAssignmentAttributesResourceTest {
         JsonNode result = OBJECT_MAPPER.readTree(OBJECT_MAPPER.writeValueAsString(attributes));
 
         assertAll(
-            () -> assertThat(result.get("jurisdiction").asText(), is("DIVORCE")),
-            () -> assertThat(result.get("caseId").asText(), is("111111")),
-            () -> assertThat(result.has("contractType"), is(false)),
-            () -> assertThat(result.has("jurisdictionDefined"), is(false)),
-            () -> assertThat(result.has("caseIdDefined"), is(false))
+            () -> assertThat(result.get("jurisdiction").asText()).isEqualTo("DIVORCE"),
+            () -> assertThat(result.get("caseId").asText()).isEqualTo("111111"),
+            () -> assertThat(result.has("contractType")).isFalse(),
+            () -> assertThat(result.has("jurisdictionDefined")).isFalse(),
+            () -> assertThat(result.has("caseIdDefined")).isFalse()
         );
     }
 
@@ -171,8 +201,8 @@ class RoleAssignmentAttributesResourceTest {
         RoleAssignmentAttributesResource second = populatedAttributes();
 
         assertAll(
-            () -> assertThat(first, is(second)),
-            () -> assertThat(first.hashCode(), is(second.hashCode()))
+            () -> assertThat(first).isEqualTo(second),
+            () -> assertThat(first.hashCode()).isEqualTo(second.hashCode())
         );
     }
 
@@ -184,7 +214,7 @@ class RoleAssignmentAttributesResourceTest {
             .jurisdiction(null)
             .build();
 
-        assertThat(undefinedJurisdiction, is(not(definedNullJurisdiction)));
+        assertThat(undefinedJurisdiction).isNotEqualTo(definedNullJurisdiction);
     }
 
     @Test
@@ -200,7 +230,7 @@ class RoleAssignmentAttributesResourceTest {
             .contractType("SALARIED")
             .build();
 
-        assertThat(first, is(not(second)));
+        assertThat(first).isNotEqualTo(second);
     }
 
     @Test
@@ -210,9 +240,9 @@ class RoleAssignmentAttributesResourceTest {
 
         String result = attributes.toString();
 
-        assertThat(result, is("RoleAssignmentAttributesResource("
+        assertThat(result).isEqualTo("RoleAssignmentAttributesResource("
             + "jurisdiction=DIVORCE, caseType=FinancialRemedy, caseId=111111, "
-            + "region=Hampshire, location=Southampton, contractType=SALARIED)"));
+                                         + "region=Hampshire, location=Southampton, contractType=SALARIED)");
     }
 
     private RoleAssignmentAttributesResource populatedAttributes() {
@@ -226,6 +256,3 @@ class RoleAssignmentAttributesResourceTest {
             .build();
     }
 }
-
-
-

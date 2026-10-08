@@ -14,7 +14,7 @@ import java.util.Objects;
 /*
   This class tracks whether a field was present in JSON to support three states during deserialisation:
 
-  When JSON does not have the jurisdiction field, isJurisdictionDefined() returns false.
+  For example, when JSON does not have the jurisdiction field, isJurisdictionDefined() returns false.
 
   When JSON have the jurisdiction field, and the value of that field is null,
   isJurisdictionDefined() returns true and getJurisdiction() returns null.

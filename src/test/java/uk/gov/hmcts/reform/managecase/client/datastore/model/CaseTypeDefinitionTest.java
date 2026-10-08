@@ -7,16 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.LABEL;
 import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDefinition.TEXT;
 
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods"})
 class CaseTypeDefinitionTest {
 
     @Test
@@ -26,7 +24,7 @@ class CaseTypeDefinitionTest {
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
 
-        assertThat(caseTypeDefinition.getJurisdictionId(), is("BEFTA_MASTER"));
+        assertThat(caseTypeDefinition.getJurisdictionId()).isEqualTo("BEFTA_MASTER");
     }
 
     @Test
@@ -37,7 +35,7 @@ class CaseTypeDefinitionTest {
 
         SecurityClassification result = caseTypeDefinition.getClassificationForField("TextField");
 
-        assertThat(result, is(SecurityClassification.PRIVATE));
+        assertThat(result).isEqualTo(SecurityClassification.PRIVATE);
     }
 
     @Test
@@ -45,10 +43,9 @@ class CaseTypeDefinitionTest {
         CaseTypeDefinition caseTypeDefinition = caseTypeDefinition(caseFieldDefinition("TextField", TEXT));
         caseTypeDefinition.setName("CaseType");
 
-        RuntimeException result = assertThrows(RuntimeException.class,
-            () -> caseTypeDefinition.getClassificationForField("MissingField"));
-
-        assertThat(result.getMessage(), is("CaseFieldId MissingField not found in CaseType CaseType"));
+        assertThatThrownBy(() -> caseTypeDefinition.getClassificationForField("MissingField"))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("CaseFieldId MissingField not found in CaseType CaseType");
     }
 
     @Test
@@ -60,7 +57,7 @@ class CaseTypeDefinitionTest {
             caseEventDefinition("Review", true)
         ));
 
-        assertThat(caseTypeDefinition.hasDraftEnabledEvent(), is(true));
+        assertThat(caseTypeDefinition.hasDraftEnabledEvent()).isTrue();
     }
 
     @Test
@@ -71,7 +68,7 @@ class CaseTypeDefinitionTest {
             caseEventDefinition("Update", false)
         ));
 
-        assertThat(caseTypeDefinition.hasDraftEnabledEvent(), is(false));
+        assertThat(caseTypeDefinition.hasDraftEnabledEvent()).isFalse();
     }
 
     @Test
@@ -79,7 +76,7 @@ class CaseTypeDefinitionTest {
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setEvents(List.of(caseEventDefinition("submitCase", false)));
 
-        assertThat(caseTypeDefinition.hasEventId("submitCase"), is(true));
+        assertThat(caseTypeDefinition.hasEventId("submitCase")).isTrue();
     }
 
     @Test
@@ -87,7 +84,7 @@ class CaseTypeDefinitionTest {
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setEvents(List.of(caseEventDefinition("submitCase", false)));
 
-        assertThat(caseTypeDefinition.hasEventId("missingEvent"), is(false));
+        assertThat(caseTypeDefinition.hasEventId("missingEvent")).isFalse();
     }
 
     @Test
@@ -98,7 +95,7 @@ class CaseTypeDefinitionTest {
 
         Optional<CaseEventDefinition> result = caseTypeDefinition.findCaseEvent("SUBMITCASE");
 
-        assertThat(result, is(Optional.of(caseEventDefinition)));
+        assertThat(result).contains(caseEventDefinition);
     }
 
     @Test
@@ -108,7 +105,7 @@ class CaseTypeDefinitionTest {
 
         Optional<CaseEventDefinition> result = caseTypeDefinition.findCaseEvent("missingEvent");
 
-        assertThat(result.isEmpty(), is(true));
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -120,8 +117,8 @@ class CaseTypeDefinitionTest {
 
         caseTypeDefinition.setSearchAliasFields(List.of(secondSearchAliasField));
 
-        assertThat(caseTypeDefinition.getSearchAliasFields(),
-            is(List.of(firstSearchAliasField, secondSearchAliasField)));
+        assertThat(caseTypeDefinition.getSearchAliasFields())
+            .containsExactly(firstSearchAliasField, secondSearchAliasField);
     }
 
     @Test
@@ -132,7 +129,7 @@ class CaseTypeDefinitionTest {
 
         caseTypeDefinition.setSearchAliasFields(null);
 
-        assertThat(caseTypeDefinition.getSearchAliasFields(), is(List.of(searchAliasField)));
+        assertThat(caseTypeDefinition.getSearchAliasFields()).containsExactly(searchAliasField);
     }
 
     @Test
@@ -140,21 +137,21 @@ class CaseTypeDefinitionTest {
         CaseFieldDefinition collectionField = caseFieldDefinition("CollectionField", COLLECTION);
         CaseTypeDefinition caseTypeDefinition = caseTypeDefinition(collectionField);
 
-        assertThat(caseTypeDefinition.isCaseFieldACollection("CollectionField"), is(true));
+        assertThat(caseTypeDefinition.isCaseFieldACollection("CollectionField")).isTrue();
     }
 
     @Test
     void shouldReturnFalseWhenCaseFieldIsNotACollection() {
         CaseTypeDefinition caseTypeDefinition = caseTypeDefinition(caseFieldDefinition("TextField", TEXT));
 
-        assertThat(caseTypeDefinition.isCaseFieldACollection("TextField"), is(false));
+        assertThat(caseTypeDefinition.isCaseFieldACollection("TextField")).isFalse();
     }
 
     @Test
     void shouldReturnFalseWhenCollectionCaseFieldDoesNotExist() {
         CaseTypeDefinition caseTypeDefinition = caseTypeDefinition(caseFieldDefinition("TextField", TEXT));
 
-        assertThat(caseTypeDefinition.isCaseFieldACollection("MissingField"), is(false));
+        assertThat(caseTypeDefinition.isCaseFieldACollection("MissingField")).isFalse();
     }
 
     @Test
@@ -164,7 +161,7 @@ class CaseTypeDefinitionTest {
 
         Optional<CaseFieldDefinition> result = caseTypeDefinition.getCaseField("textfield");
 
-        assertThat(result, is(Optional.of(caseFieldDefinition)));
+        assertThat(result).contains(caseFieldDefinition);
     }
 
     @Test
@@ -173,7 +170,7 @@ class CaseTypeDefinitionTest {
 
         Optional<CaseFieldDefinition> result = caseTypeDefinition.getCaseField("MissingField");
 
-        assertThat(result.isEmpty(), is(true));
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -185,7 +182,7 @@ class CaseTypeDefinitionTest {
         Optional<CaseFieldDefinition> result = caseTypeDefinition.getComplexSubfieldDefinitionByPath(
             "ComplexField.NestedTextField");
 
-        assertThat(result, is(Optional.of(nestedField)));
+        assertThat(result).contains(nestedField);
     }
 
     @Test
@@ -197,7 +194,7 @@ class CaseTypeDefinitionTest {
         Optional<CaseFieldDefinition> result = caseTypeDefinition.getComplexSubfieldDefinitionByPath(
             "ComplexField.MissingField");
 
-        assertThat(result.isEmpty(), is(true));
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -211,8 +208,8 @@ class CaseTypeDefinitionTest {
         Map<String, TextNode> result = caseTypeDefinition.getLabelsFromCaseFields();
 
         assertAll(
-            () -> assertThat(result.size(), is(1)),
-            () -> assertThat(result.get("LabelField").asText(), is("The label text"))
+            () -> assertThat(result).hasSize(1),
+            () -> assertThat(result.get("LabelField").asText()).isEqualTo("The label text")
         );
     }
 
@@ -222,7 +219,7 @@ class CaseTypeDefinitionTest {
 
         Map<String, TextNode> result = caseTypeDefinition.getLabelsFromCaseFields();
 
-        assertThat(result.isEmpty(), is(true));
+        assertThat(result).isEmpty();
     }
 
     private CaseTypeDefinition caseTypeDefinition(CaseFieldDefinition... caseFieldDefinitions) {
@@ -273,4 +270,3 @@ class CaseTypeDefinitionTest {
         return fieldTypeDefinition;
     }
 }
-

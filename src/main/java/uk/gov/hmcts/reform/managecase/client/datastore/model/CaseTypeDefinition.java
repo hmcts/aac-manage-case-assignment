@@ -21,7 +21,6 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDef
 @ToString
 @Getter
 @Setter
-@SuppressWarnings("unused")
 public class CaseTypeDefinition implements Serializable {
     @Serial
     private static final long serialVersionUID = 5688786015302840008L;

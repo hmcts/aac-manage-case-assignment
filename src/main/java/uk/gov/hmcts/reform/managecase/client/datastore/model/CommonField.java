@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import java.util.Optional;
 
-@SuppressWarnings("unused")
 public interface CommonField extends CommonDCPModel {
 
     FieldTypeDefinition getFieldTypeDefinition();

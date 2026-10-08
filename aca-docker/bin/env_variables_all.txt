@@ -11,6 +11,8 @@ export CALLBACK_FTA_ENABLED=true
 export CCD_BEFTA_MASTER_SOLICITOR_4_PWD=Pa55word11
 export CCD_BEFTA_PUI_CAA_1_PWD=Pa55word11
 export CCD_BEFTA_SOLICITOR_4_PWD=Pa55word11
+export OAUTH2_ACCESS_TOKEN_TYPE=OIDC
+export OAUTH2_SCOPE_VARIABLES="profile openid roles"
 export TEST_URL=http://localhost:4454
 export MCA_API_BASE_URL=http://host.docker.internal:4454
 

@@ -41,8 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     SecurityConfigurationTest.TestSecurityConfiguration.class
 })
 @TestPropertySource(properties = {
-    "spring.security.oauth2.client.provider.oidc.issuer-uri=http://idam.example/o",
-    "oidc.issuer=http://idam.example/o"
+    "spring.security.oauth2.client.provider.oidc.issuer-uri=http://idam.example/o"
 })
 class SecurityConfigurationTest {
 

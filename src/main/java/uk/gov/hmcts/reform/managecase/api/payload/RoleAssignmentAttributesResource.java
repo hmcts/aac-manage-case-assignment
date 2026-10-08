@@ -1,20 +1,19 @@
 package uk.gov.hmcts.reform.managecase.api.payload;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Optional;
 
 @Builder
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 /**
  * Used Optional<Striing> in this class, this will help to have three different values for the object when
@@ -34,10 +33,16 @@ public class  RoleAssignmentAttributesResource implements Serializable {
 
     private static final long serialVersionUID = -490395457914850791L;
 
+    @JsonProperty("jurisdiction")
     private Optional<String> jurisdiction;
+    @JsonProperty("caseType")
     private Optional<String> caseType;
+    @JsonProperty("caseId")
     private Optional<String> caseId;
+    @JsonProperty("region")
     private Optional<String> region;
+    @JsonProperty("location")
     private Optional<String> location;
+    @JsonProperty("contractType")
     private Optional<String> contractType;
 }

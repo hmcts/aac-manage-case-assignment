@@ -34,6 +34,9 @@ spring:
   main:
     allow-bean-definition-overriding: true
     web-application-type: SERVLET
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
   cache:
     cache-names: userInfoCache,usersByOrganisationExternal,usersByOrganisationInternal,organisationAddressById,systemUserAccessTokenCache,caaAccessTokenCache,nocApproverAccessTokenCache,caseRoles,challengeQuestions
     caffeine:

@@ -3,12 +3,13 @@ version: '2.4'
 
 services:
   manage-case-assignment:
-    image: "hmctsprod.azurecr.io/aac/manage-case-assignment:${MANAGE_CASE_ASSIGNMENT_TAG:-latest}"
+    #image: "hmctsprod.azurecr.io/aac/manage-case-assignment:${MANAGE_CASE_ASSIGNMENT_TAG:-latest}"
+    image: "hmcts/manage-case-assignment:local"
     container_name: manage-case-assignment
     environment:
       SERVER_PORT: 4454
-      IDAM_API_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam-api:5000}"
-      IDAM_OIDC_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam-api:5000}"
+      IDAM_API_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam:5000}"
+      IDAM_OIDC_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam:5000}"
       S2S_URL: http://service-auth-provider-api:8080
       MANAGE_CASE_S2S_KEY: "AAAAAAAAAAAAAAAA"
       MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp,ccd_data

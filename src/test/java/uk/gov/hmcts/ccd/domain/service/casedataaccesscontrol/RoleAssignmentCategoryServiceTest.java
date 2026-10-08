@@ -8,15 +8,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignment;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignmentResponse;
+import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments;
 import uk.gov.hmcts.reform.managecase.service.CaseAssignmentService;
 import uk.gov.hmcts.reform.managecase.service.casedataaccesscontrol.RoleAssignmentCategoryService;
+import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentServiceHelper;
+import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentsMapper;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.BASIC;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.CITIZEN;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.ENFORCEMENT;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.JUDICIAL;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.LEGAL_OPERATIONS;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.PROFESSIONAL;
@@ -29,6 +38,12 @@ class RoleAssignmentCategoryServiceTest {
 
     @Mock
     private CaseAssignmentService caseAssignmentService;
+
+    @Mock
+    private RoleAssignmentServiceHelper roleAssignmentServiceHelper;
+
+    @Mock
+    private RoleAssignmentsMapper roleAssignmentsMapper;
 
     @InjectMocks
     private RoleAssignmentCategoryService roleAssignmentCategoryService;
@@ -101,6 +116,138 @@ class RoleAssignmentCategoryServiceTest {
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
             assertThat(roleCategory, is(LEGAL_OPERATIONS));
+        }
+
+        @Test
+        void shouldGetRoleCategoryForEnforcementUser() {
+
+            given(caseAssignmentService.getAssigneeRoles(USER_ID))
+                .willReturn(singletonList("bailiff-manager-user"));
+
+            RoleAssignment enforcementRole = RoleAssignment.builder()
+                .roleName("bailiff-manager")
+                .roleCategory(ENFORCEMENT.name())
+                .grantType(STANDARD.name())
+                .build();
+
+            given(roleAssignmentServiceHelper.getRoleAssignments(USER_ID))
+                .willReturn(new RoleAssignmentResponse());
+            given(roleAssignmentsMapper.toRoleAssignments(any(RoleAssignmentResponse.class)))
+                .willReturn(RoleAssignments.builder()
+                                .roleAssignmentsList(singletonList(enforcementRole))
+                                .build());
+
+            RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
+
+            assertThat(roleCategory, is(ENFORCEMENT));
+        }
+
+        @Test
+        void shouldFallbackToLegalOperationsWhenRoleAssignmentsMapperReturnsNull() {
+
+            given(caseAssignmentService.getAssigneeRoles(USER_ID))
+                .willReturn(singletonList("some-user"));
+            given(roleAssignmentServiceHelper.getRoleAssignments(USER_ID))
+                .willReturn(new RoleAssignmentResponse());
+            given(roleAssignmentsMapper.toRoleAssignments(any(RoleAssignmentResponse.class)))
+                .willReturn(null);
+
+            RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
+
+            assertThat(roleCategory, is(LEGAL_OPERATIONS));
+        }
+
+        @Test
+        void shouldFallbackToLegalOperationsWhenRoleAssignmentsListIsNull() {
+
+            given(caseAssignmentService.getAssigneeRoles(USER_ID))
+                .willReturn(singletonList("some-user"));
+            given(roleAssignmentServiceHelper.getRoleAssignments(USER_ID))
+                .willReturn(new RoleAssignmentResponse());
+            given(roleAssignmentsMapper.toRoleAssignments(any(RoleAssignmentResponse.class)))
+                .willReturn(RoleAssignments.builder().roleAssignmentsList(null).build());
+
+            RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
+
+            assertThat(roleCategory, is(LEGAL_OPERATIONS));
+        }
+
+        @Test
+        void shouldFallbackToLegalOperationsWhenOnlyBasicGrantTypeEnforcementRoleExists() {
+
+            given(caseAssignmentService.getAssigneeRoles(USER_ID))
+                .willReturn(singletonList("some-user"));
+
+            RoleAssignment enforcementRoleWithBasicGrant = RoleAssignment.builder()
+                .roleName("hmcts-enforcement")
+                .grantType(BASIC.name())
+                .roleCategory(ENFORCEMENT.name())
+                .build();
+
+            given(roleAssignmentServiceHelper.getRoleAssignments(USER_ID))
+                .willReturn(new RoleAssignmentResponse());
+            given(roleAssignmentsMapper.toRoleAssignments(any(RoleAssignmentResponse.class)))
+                .willReturn(RoleAssignments.builder()
+                                .roleAssignmentsList(singletonList(enforcementRoleWithBasicGrant))
+                                .build());
+
+            RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
+
+            assertThat(roleCategory, is(LEGAL_OPERATIONS));
+
+        }
+
+        @Test
+        void shouldFallbackToLegalOperationsWhenStandardGrantTypeRoleIsNotEnforcementRole() {
+
+            given(caseAssignmentService.getAssigneeRoles(USER_ID))
+                .willReturn(singletonList("caseworker-user"));
+
+            RoleAssignment nonEnforcementStandardRole = RoleAssignment.builder()
+                .roleName("caseworker")
+                .grantType(STANDARD.name())
+                .build();
+
+            given(roleAssignmentServiceHelper.getRoleAssignments(USER_ID))
+                .willReturn(new RoleAssignmentResponse());
+            given(roleAssignmentsMapper.toRoleAssignments(any(RoleAssignmentResponse.class)))
+                .willReturn(RoleAssignments.builder()
+                                .roleAssignmentsList(singletonList(nonEnforcementStandardRole))
+                                .build());
+
+            RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
+
+            assertThat(roleCategory, is(LEGAL_OPERATIONS));
+        }
+
+        @Test
+        void shouldGetEnforcementWhenAtLeastOneStandardEnforcementRoleExists() {
+
+            given(caseAssignmentService.getAssigneeRoles(USER_ID))
+                .willReturn(singletonList("bailiff-user"));
+
+            RoleAssignment nonMatchingRole = RoleAssignment.builder()
+                .roleName("caseworker")
+                .roleCategory(JUDICIAL.name())
+                .grantType(STANDARD.name())
+                .build();
+
+            RoleAssignment matchingEnforcementRole = RoleAssignment.builder()
+                .roleName("bailiff")
+                .grantType(STANDARD.name())
+                .roleCategory(ENFORCEMENT.name())
+                .build();
+
+            given(roleAssignmentServiceHelper.getRoleAssignments(USER_ID))
+                .willReturn(new RoleAssignmentResponse());
+            given(roleAssignmentsMapper.toRoleAssignments(any(RoleAssignmentResponse.class)))
+                .willReturn(RoleAssignments.builder()
+                                .roleAssignmentsList(asList(nonMatchingRole, matchingEnforcementRole))
+                                .build());
+
+            RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
+
+            assertThat(roleCategory, is(ENFORCEMENT));
         }
 
     }

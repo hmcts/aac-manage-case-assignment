@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+
 import java.util.List;
 
 @Named
@@ -102,4 +103,9 @@ public class ApplicationParams {
     public List<String> getAuthorisedServicesForCaseUserRoles() {
         return authorisedServicesForCaseUserRoles;
     }
+
+    public String amGetRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/actors/{uid}";
+    }
+
 }

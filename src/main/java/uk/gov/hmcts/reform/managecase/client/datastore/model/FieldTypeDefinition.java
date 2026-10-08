@@ -2,8 +2,11 @@ package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -12,8 +15,12 @@ import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 
+@Getter
+@Setter
+@SuppressWarnings("unused")
 public class FieldTypeDefinition implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -4257574164546267919L;
 
     public static final String COLLECTION = "Collection";
@@ -48,54 +55,6 @@ public class FieldTypeDefinition implements Serializable {
     @JsonProperty("collection_field_type")
     private FieldTypeDefinition collectionFieldTypeDefinition;
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public BigDecimal getMin() {
-        return min;
-    }
-
-    public void setMin(BigDecimal min) {
-        this.min = min;
-    }
-
-    public BigDecimal getMax() {
-        return max;
-    }
-
-    public void setMax(BigDecimal max) {
-        this.max = max;
-    }
-
-    public String getRegularExpression() {
-        return regularExpression;
-    }
-
-    public void setRegularExpression(String regularExpression) {
-        this.regularExpression = regularExpression;
-    }
-
-    public List<FixedListItemDefinition> getFixedListItemDefinitions() {
-        return fixedListItemDefinitions;
-    }
-
-    public void setFixedListItemDefinitions(List<FixedListItemDefinition> fixedListItemDefinitions) {
-        this.fixedListItemDefinitions = fixedListItemDefinitions;
-    }
-
-    public List<CaseFieldDefinition> getComplexFields() {
-        return complexFields;
-    }
-
-    public void setComplexFields(List<CaseFieldDefinition> complexFields) {
-        this.complexFields = complexFields;
-    }
-
     @JsonIgnore
     public List<CaseFieldDefinition> getChildren() {
         if (isComplexFieldType()) {
@@ -129,24 +88,9 @@ public class FieldTypeDefinition implements Serializable {
         return type.equalsIgnoreCase(COMPLEX);
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public FieldTypeDefinition getCollectionFieldTypeDefinition() {
-        return collectionFieldTypeDefinition;
-    }
-
-    public void setCollectionFieldTypeDefinition(FieldTypeDefinition collectionFieldTypeDefinition) {
-        this.collectionFieldTypeDefinition = collectionFieldTypeDefinition;
-    }
-
     public Optional<CommonField> getNestedField(String path, boolean pathIncludesParent) {
-        return CaseFieldPathUtils.getFieldDefinitionByPath(this, path, pathIncludesParent);
+        return CaseFieldPathUtils.getFieldDefinitionByPath(this, path, pathIncludesParent)
+            .map(CommonField.class::cast);
     }
 
     @Override

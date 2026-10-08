@@ -108,6 +108,8 @@ ccd:
   s2s-authorised:
     services:
       case_user_roles: aac_manage_case_assignment,xui_webapp
+  challengeAnswerStripCharacters: "${CHALLENGE_ANSWER_STRIP_CHARACTERS:-'’}"
+
 
 prd:
   host: ${PRD_HOST:http://localhost:5544}

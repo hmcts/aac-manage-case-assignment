@@ -202,7 +202,7 @@ class RoleAssignmentAttributesResourceTest {
 
         assertAll(
             () -> assertThat(first).isEqualTo(second),
-            () -> assertThat(first.hashCode()).isEqualTo(second.hashCode())
+            () -> assertThat(first).hasSameHashCodeAs(second)
         );
     }
 

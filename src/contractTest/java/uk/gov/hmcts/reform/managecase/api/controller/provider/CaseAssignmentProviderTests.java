@@ -70,7 +70,6 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidation
 @Provider("acc_manageCaseAssignment")
 @PactBroker(url = "${PACT_BROKER_URL:http://localhost:80}")
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
-@IgnoreNoPactsToVerify
 public class CaseAssignmentProviderTests {
 
     private static final String ORG_POLICY_ROLE = "caseworker-probate";

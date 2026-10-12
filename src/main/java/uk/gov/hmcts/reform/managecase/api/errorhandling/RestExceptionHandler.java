@@ -7,6 +7,7 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -126,7 +127,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 String code = NoCValidationError.getCodeFromMessage(message);
                 String[] errors = convertNoCErrors(errorsToConvert);
                 NoCApiError apiError = new NoCApiError(status, message, code, List.of(errors));
-                return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+                return new ResponseEntity<>(apiError, jsonHeaders(), apiError.getStatus());
             }
         }
         return null;
@@ -138,7 +139,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             return handleConstraintErrors(errors, status);
         }
         ApiError apiError = new ApiError(status, message, errors == null ? null : List.of(errors));
-        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+        return new ResponseEntity<>(apiError, jsonHeaders(), apiError.getStatus());
 
     }
 
@@ -146,7 +147,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                                                        String... errors) {
         NoCApiError apiError = new NoCApiError(HttpStatus.BAD_REQUEST, message, code,
                                                errors == null ? null : List.of(errors));
-        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+        return new ResponseEntity<>(apiError, jsonHeaders(), apiError.getStatus());
+    }
+
+    private HttpHeaders jsonHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return headers;
     }
 
     private HttpStatus getHttpStatus(ResponseStatus responseStatus) {

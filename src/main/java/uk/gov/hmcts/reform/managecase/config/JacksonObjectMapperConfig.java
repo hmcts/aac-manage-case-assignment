@@ -13,10 +13,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.List;
+import java.lang.reflect.Constructor;
 
 @Configuration
 public class JacksonObjectMapperConfig implements WebMvcConfigurer {
@@ -44,16 +44,39 @@ public class JacksonObjectMapperConfig implements WebMvcConfigurer {
         return mapper;
     }
 
+    @Override
+    public void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
+        builder.configureMessageConvertersList(converters -> {
+            converters.removeIf(JacksonJsonHttpMessageConverter.class::isInstance);
+            if (converters.stream().noneMatch(this::isJackson2Converter)) {
+                converters.add(createJackson2Converter());
+            }
+        });
+    }
+
     /**
      * Keep the Jackson 2 converter until the application DTOs and HMCTS clients are migrated to Jackson 3.
-     * The deprecated APIs are intentional here because this is the Boot 4 Jackson 2 compatibility bridge.
+     * Reflection isolates this temporary bridge from the deprecated Spring converter API.
      */
-    @Override
-    @SuppressWarnings("java:S1874")
-    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.removeIf(converter -> converter instanceof JacksonJsonHttpMessageConverter);
-        if (converters.stream().noneMatch(MappingJackson2HttpMessageConverter.class::isInstance)) {
-            converters.add(new MappingJackson2HttpMessageConverter(defaultObjectMapper()));
+    private HttpMessageConverter<?> createJackson2Converter() {
+        try {
+            Class<?> converterClass = jackson2ConverterClass();
+            Constructor<?> constructor = converterClass.getConstructor(ObjectMapper.class);
+            return (HttpMessageConverter<?>) constructor.newInstance(defaultObjectMapper());
+        } catch (ReflectiveOperationException | ClassCastException exception) {
+            throw new IllegalStateException("Jackson 2 HTTP converter is unavailable", exception);
+        }
+    }
+
+    private boolean isJackson2Converter(HttpMessageConverter<?> converter) {
+        return jackson2ConverterClass().isInstance(converter);
+    }
+
+    private Class<?> jackson2ConverterClass() {
+        try {
+            return Class.forName("org.springframework.http.converter.json.MappingJackson2HttpMessageConverter");
+        } catch (ClassNotFoundException exception) {
+            throw new IllegalStateException("Jackson 2 HTTP converter is unavailable", exception);
         }
     }
 

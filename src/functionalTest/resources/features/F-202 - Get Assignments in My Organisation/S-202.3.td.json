@@ -17,7 +17,7 @@
 			"title": "Bad Request",
 			"detail": "Required parameter 'case_ids' is not present.",
 			"instance": "[[ANY_NULLABLE]]",
-			"properties": {}
+			"properties": "[[ANY_NULLABLE]]"
 		}
 	}
 }

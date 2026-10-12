@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -43,12 +44,17 @@ public class JacksonObjectMapperConfig implements WebMvcConfigurer {
         return mapper;
     }
 
+    /**
+     * Keep the Jackson 2 converter until the application DTOs and HMCTS clients are migrated to Jackson 3.
+     * The deprecated APIs are intentional here because this is the Boot 4 Jackson 2 compatibility bridge.
+     */
     @Override
+    @SuppressWarnings("java:S1874")
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.removeIf(converter -> converter.getClass().getName()
-            .equals("org.springframework.http.converter.json.JacksonJsonHttpMessageConverter"));
+        converters.removeIf(converter -> converter instanceof JacksonJsonHttpMessageConverter);
         if (converters.stream().noneMatch(MappingJackson2HttpMessageConverter.class::isInstance)) {
             converters.add(new MappingJackson2HttpMessageConverter(defaultObjectMapper()));
         }
     }
+
 }

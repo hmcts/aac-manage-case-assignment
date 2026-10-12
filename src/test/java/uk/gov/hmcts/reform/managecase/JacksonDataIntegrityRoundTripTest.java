@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.managecase.domain.Organisation;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 
@@ -192,7 +193,7 @@ class JacksonDataIntegrityRoundTripTest {
                 .organisationName("Organisation One")
                 .build())
             .caseRoleId(DynamicList.builder().value(role).listItems(List.of(role)).build())
-            .requestTimestamp(LocalDateTime.of(2025, 1, 2, 3, 4, 5))
+            .requestTimestamp(LocalDateTime.of(2025, Month.JANUARY, 2, 3, 4, 5))
             .approvalStatus("APPROVED")
             .createdBy("user-id")
             .build();
@@ -219,7 +220,7 @@ class JacksonDataIntegrityRoundTripTest {
         ChangeOrganisationRequest decoded = objectMapper.treeToValue(actual, ChangeOrganisationRequest.class);
         assertThat(decoded.getOrganisationToAdd().getOrganisationID()).isEqualTo("ORG1");
         assertThat(decoded.getCaseRoleId().getValue().getCode()).isEqualTo("[Defendant]");
-        assertThat(decoded.getRequestTimestamp()).isEqualTo(LocalDateTime.of(2025, 1, 2, 3, 4, 5));
+        assertThat(decoded.getRequestTimestamp()).isEqualTo(LocalDateTime.of(2025, Month.JANUARY, 2, 3, 4, 5));
         assertThat(decoded.getOrganisationToRemove()).isNull();
     }
 }

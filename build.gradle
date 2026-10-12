@@ -215,6 +215,7 @@ tasks.register('runProviderPactVerification', Test) {
     throw new GradleException('Could not determine the provider Git branch for Pact verification.')
   }
   systemProperty 'pact.provider.branch', providerBranch
+  systemProperty 'pactbroker.providerBranch', providerBranch
   finalizedBy pactVerify
 }
 

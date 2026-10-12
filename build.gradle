@@ -26,6 +26,7 @@ ext {
   restAssured         = '5.5.7'
   beftaFwVersion      = '9.2.10'
   ccdTestDefinitionVersion = '7.26.12'
+  beftaJacksonVersion = '2.19.2'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -68,6 +69,20 @@ sourceSets {
     resources.srcDir file('src/contractTest/resources')
   }
 
+}
+
+// BEFTA 9.2.x contains Jackson 2 annotations referencing
+// PropertyNamingStrategy$SnakeCaseStrategy, which was removed in Jackson 2.20.
+// Keep this compatibility version scoped to the test classpath; the application
+// continues to use the Jackson versions managed by Spring Boot 4.
+configurations.matching { it.name in ['testRuntimeClasspath', 'functionalTestRuntimeClasspath'] }.configureEach {
+  resolutionStrategy.eachDependency { details ->
+    if (details.requested.group == 'com.fasterxml.jackson.core'
+        && details.requested.name == 'jackson-databind') {
+      details.useVersion beftaJacksonVersion
+      details.because 'BEFTA 9.2.x requires the Jackson 2.19 naming-strategy compatibility class'
+    }
+  }
 }
 
 tasks.withType(JavaCompile) {

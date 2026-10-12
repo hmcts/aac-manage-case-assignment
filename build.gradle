@@ -210,18 +210,27 @@ tasks.register('runProviderPactVerification', Test) {
   }
   systemProperty 'pact_do_not_track', 'true'
   systemProperty 'pact.provider.version', project.pactVersion
+  def providerBranch = System.getenv('CHANGE_BRANCH') ?: System.getenv('BRANCH_NAME') ?: getCheckedOutGitBranchName()
+  if (!providerBranch || providerBranch == 'HEAD') {
+    throw new GradleException('Could not determine the provider Git branch for Pact verification.')
+  }
+  systemProperty 'pact.provider.branch', providerBranch
   finalizedBy pactVerify
 }
 
 def getCheckedOutGitCommitHash() {
-  'git rev-parse --verify --short HEAD'.execute().text.trim()
+  'git rev-parse --verify HEAD'.execute().text.trim()
+}
+
+def getCheckedOutGitBranchName() {
+  'git branch --show-current'.execute().text.trim()
 }
 
 pact {
   publish {
     pactDirectory = 'pacts'
     pactBrokerUrl = System.getenv("PACT_BROKER_URL") ?: 'http://localhost:80'
-    tags = [System.getenv("PACT_BRANCH_NAME") ?:'Dev']
+    consumerBranch = System.getenv('CHANGE_BRANCH') ?: System.getenv('BRANCH_NAME') ?: getCheckedOutGitBranchName()
     version = project.pactVersion
   }
 }

@@ -75,7 +75,9 @@ sourceSets {
 // PropertyNamingStrategy$SnakeCaseStrategy, which was removed in Jackson 2.20.
 // Keep this compatibility version scoped to the test classpath; the application
 // continues to use the Jackson versions managed by Spring Boot 4.
-configurations.matching { it.name in ['testRuntimeClasspath', 'functionalTestRuntimeClasspath'] }.configureEach {
+configurations.matching {
+  it.name in ['testRuntimeClasspath', 'functionalTestRuntimeClasspath']
+}.configureEach {
   resolutionStrategy.eachDependency { details ->
     if (details.requested.group == 'com.fasterxml.jackson.core'
         && details.requested.name == 'jackson-databind') {
@@ -137,7 +139,8 @@ tasks.register('smoke', Test) {
 
     javaexec {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
-      classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+      classpath = sourceSets.functionalTest.output + configurations.testRuntimeClasspath
+          + sourceSets.main.output + sourceSets.test.output
       args = [
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
               '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
@@ -171,7 +174,8 @@ tasks.register('functional', Test) {
 
     javaexec {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
-      classpath += sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+      classpath = sourceSets.functionalTest.output + configurations.testRuntimeClasspath
+          + sourceSets.main.output + sourceSets.test.output
       args = [
               '--threads', '1',
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",

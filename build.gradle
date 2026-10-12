@@ -139,8 +139,12 @@ tasks.register('smoke', Test) {
 
     javaexec {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
-      classpath = sourceSets.functionalTest.output + configurations.testRuntimeClasspath
-          + sourceSets.main.output + sourceSets.test.output
+      classpath = files(
+          sourceSets.functionalTest.output,
+          configurations.testRuntimeClasspath,
+          sourceSets.main.output,
+          sourceSets.test.output
+      )
       args = [
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",
               '--plugin', "junit:${buildDir}/test-results/smoke/cucumber.xml",
@@ -174,8 +178,12 @@ tasks.register('functional', Test) {
 
     javaexec {
       main = "uk.gov.hmcts.reform.managecase.befta.ManageCaseAssignmentBeftaMain"
-      classpath = sourceSets.functionalTest.output + configurations.testRuntimeClasspath
-          + sourceSets.main.output + sourceSets.test.output
+      classpath = files(
+          sourceSets.functionalTest.output,
+          configurations.testRuntimeClasspath,
+          sourceSets.main.output,
+          sourceSets.test.output
+      )
       args = [
               '--threads', '1',
               '--plugin', "json:${cucumberReports.outputDir}/cucumber.json",

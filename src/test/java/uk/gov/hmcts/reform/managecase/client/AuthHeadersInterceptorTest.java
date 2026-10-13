@@ -1,59 +1,40 @@
 package uk.gov.hmcts.reform.managecase.client;
 
 import feign.RequestTemplate;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.managecase.security.SecurityUtils.SERVICE_AUTHORIZATION;
 
 class AuthHeadersInterceptorTest {
 
-    public static final String USER_TOKEN = "fdsf";
-    public static final String S2S_TOKEN = "dcdsfda";
-    @InjectMocks
-    private AuthHeadersInterceptor interceptor;
+    @Test
+    void shouldAddMissingUserAndServiceHeaders() {
+        SecurityUtils securityUtils = mock(SecurityUtils.class);
+        when(securityUtils.getUserBearerToken()).thenReturn("user-token");
+        when(securityUtils.getS2SToken()).thenReturn("s2s-token");
+        RequestTemplate template = new RequestTemplate();
 
-    @Mock
-    private SecurityUtils securityUtils;
-    private RequestTemplate template;
+        new AuthHeadersInterceptor(securityUtils).apply(template);
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        template = new RequestTemplate();
+        assertThat(template.headers().get(AUTHORIZATION)).containsExactly("user-token");
+        assertThat(template.headers().get(SERVICE_AUTHORIZATION)).containsExactly("s2s-token");
     }
 
     @Test
-    @DisplayName("Auth headers applied if not exist")
-    void shouldApplyAuthHeaders() {
-        given(securityUtils.getUserBearerToken()).willReturn(USER_TOKEN);
-        given(securityUtils.getS2SToken()).willReturn(S2S_TOKEN);
+    void shouldPreserveExistingHeaders() {
+        SecurityUtils securityUtils = mock(SecurityUtils.class);
+        RequestTemplate template = new RequestTemplate();
+        template.header(AUTHORIZATION, "existing-user");
+        template.header(SERVICE_AUTHORIZATION, "existing-s2s");
 
-        interceptor.apply(template);
+        new AuthHeadersInterceptor(securityUtils).apply(template);
 
-        assertThat(template.headers().get(AUTHORIZATION)).containsOnly(USER_TOKEN);
-        assertThat(template.headers().get(SERVICE_AUTHORIZATION)).containsOnly(S2S_TOKEN);
-    }
-
-    @Test
-    @DisplayName("Auth headers shouldn't override if exit")
-    void shouldNotOverrideAuthHeaders() {
-        template.header(AUTHORIZATION, USER_TOKEN);
-        template.header(SERVICE_AUTHORIZATION, S2S_TOKEN);
-
-        interceptor.apply(template);
-
-        verify(securityUtils, times(0)).getUserBearerToken();
-        verify(securityUtils, times(0)).getS2SToken();
+        assertThat(template.headers().get(AUTHORIZATION)).containsExactly("existing-user");
+        assertThat(template.headers().get(SERVICE_AUTHORIZATION)).containsExactly("existing-s2s");
     }
 }

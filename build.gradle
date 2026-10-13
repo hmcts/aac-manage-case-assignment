@@ -192,11 +192,25 @@ project.ext {
 }
 
 tasks.register('contract', Test) {
-  description = 'Runs the consumer Pact tests'
+  description = 'Runs the provider Pact tests'
   useJUnitPlatform()
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
   include "uk/gov/hmcts/reform/managecase/api/controller/provider/**"
+}
+
+tasks.register('contractTest', Test) {
+  description = 'Runs the consumer Pact tests and generates contracts in pacts'
+  group = 'Verification'
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  include "uk/gov/hmcts/reform/managecase/client/**"
+  systemProperty 'pact.rootDir', file('pacts').absolutePath
+  outputs.dir file('pacts')
+}
+
+tasks.named('check') {
+  dependsOn tasks.named('contractTest')
 }
 
 //tasks.register('runProviderPactVerification', Test) {

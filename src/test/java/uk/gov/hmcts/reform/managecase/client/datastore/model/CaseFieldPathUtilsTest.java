@@ -18,7 +18,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis", "PMD.TooManyMethods"})
 class CaseFieldPathUtilsTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();

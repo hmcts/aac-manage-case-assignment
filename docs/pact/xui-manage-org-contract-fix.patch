@@ -1,0 +1,42 @@
+--- a/api/test/pact/pact-tests/aacCaseAssignment/getCases.spec.ts
++++ b/api/test/pact/pact-tests/aacCaseAssignment/getCases.spec.ts
+@@ -17,7 +17,7 @@
+         withRequest: {
+           method: 'GET',
+           path: '/case-assignments',
+-          query: 'case_ids=[123456789]',
++          query: 'case_ids=1588234985453946',
+           headers: {
+             'Content-Type': 'application/json',
+             'Authorization': 'Bearer some-access-token',
+@@ -43,7 +43,7 @@
+     });
+ 
+     it('returns the correct response', async () => {
+-      const caseUrl: string = `${pactSetUp.provider.mockService.baseUrl}/case-assignments?case_ids=[123456789]`;
++      const caseUrl: string = `${pactSetUp.provider.mockService.baseUrl}/case-assignments?case_ids=1588234985453946`;
+ 
+       const response = await getCases(caseUrl);
+       const responseDto: CCDRawCaseUserModel[] = <CCDRawCaseUserModel[]>response.data.case_assignments;
+@@ -53,17 +53,15 @@
+ 
+     function assertResponse(dto: CCDRawCaseUserModel[]): void {
+       expect(dto).to.be.not.null;
+-      expect(dto[0].case_id).to.equal('123456789');
+-      expect(dto[0].case_title).to.equal('Case 1');
+-      expect(dto[0].shared_with[0].case_roles).to.deep.equal([]);
++      expect(dto[0].case_id).to.equal('1588234985453946');
++      expect(dto[0].shared_with[0].case_roles).to.deep.equal(['[CR1]']);
+       expect(dto[0].shared_with[0].first_name).to.equal('Joe');
+     }
+ 
+     const caseResponse = { case_assignments: [{
+-      case_id: somethingLike('123456789'),
+-      case_title: somethingLike('Case 1'),
++      case_id: somethingLike('1588234985453946'),
+       shared_with: [{
+-        case_roles: [],
++        case_roles: [somethingLike('[CR1]')],
+         email: somethingLike('test@email.com'),
+         first_name: somethingLike('Joe'),
+         idam_id: somethingLike('a123456789'),

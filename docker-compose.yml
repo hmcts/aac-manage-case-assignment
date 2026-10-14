@@ -12,12 +12,17 @@ services:
     environment:
       IDAM_URL: https://idam-web-public.aat.platform.hmcts.net
       S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-      MANAGE_CASE_S2S_KEY: "AAAAAAAAAAAAAAAA" # use aat key from vault
+      MANAGE_CASE_S2S_KEY: "${MANAGE_CASE_S2S_KEY:?Set MANAGE_CASE_S2S_KEY from the service secret store}"
+      IDAM_CLIENT_SECRET: "${IDAM_CLIENT_SECRET:?Set IDAM_CLIENT_SECRET from the service secret store}"
+      IDAM_CAA_USERNAME: "${IDAM_CAA_USERNAME:?Set IDAM_CAA_USERNAME from the service secret store}"
+      IDAM_CAA_PASSWORD: "${IDAM_CAA_PASSWORD:?Set IDAM_CAA_PASSWORD from the service secret store}"
+      IDAM_NOC_APPROVER_USERNAME: "${IDAM_NOC_APPROVER_USERNAME:?Set IDAM_NOC_APPROVER_USERNAME from the service secret store}"
+      IDAM_NOC_APPROVER_PASSWORD: "${IDAM_NOC_APPROVER_PASSWORD:?Set IDAM_NOC_APPROVER_PASSWORD from the service secret store}"
+      NOTIFY_MCA_API_KEY: "${NOTIFY_MCA_API_KEY:?Set NOTIFY_MCA_API_KEY from the service secret store}"
       MANAGE_CASE_S2S_AUTHORISED_SERVICES: ccd_gw,xui_webapp,ccd_data
       CCD_DATA_STORE_API_BASE_URL: http://ccd-data-store-api-aat.service.core-compute-aat.internal
       CCD_DEFINITION_STORE_API_BASE_URL: http://ccd-definition-store-api-aat.service.core-compute-aat.internal
       PRD_HOST: http://rd-professional-api-aat.service.core-compute-aat.internal
-      NOTIFY_MCA_API_KEY: "notify-test-api-key"
       ROLE_ASSIGNMENT_URL: "${ROLE_ASSIGNMENT_URL:-http://am-role-assignment-service:4096}"
       # for debug JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     ports:

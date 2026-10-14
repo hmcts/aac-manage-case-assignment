@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.managecase.client.prd;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +10,6 @@ import static com.fasterxml.jackson.annotation.Nulls.AS_EMPTY;
 
 @Getter
 @AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class FindUsersByOrganisationResponse {
 
     @JsonSetter(nulls = AS_EMPTY)

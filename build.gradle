@@ -199,6 +199,7 @@ tasks.register('contract', Test) {
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
   include "uk/gov/hmcts/reform/managecase/api/controller/provider/**"
+  systemProperty 'pact_do_not_track', 'true'
 }
 
 tasks.register('verifyFunctionalTestJwtIssuer', JavaExec) {
@@ -291,14 +292,18 @@ tasks.named('check').configure {
 //}
 
 def getCheckedOutGitCommitHash() {
-  'git rev-parse --verify --short HEAD'.execute().text.trim()
+  'git rev-parse --verify HEAD'.execute().text.trim()
+}
+
+def getCheckedOutGitBranchName() {
+  'git branch --show-current'.execute().text.trim()
 }
 
 pact {
   publish {
     pactDirectory = 'pacts'
     pactBrokerUrl = System.getenv("PACT_BROKER_URL") ?: 'http://localhost:80'
-    tags = [System.getenv("PACT_BRANCH_NAME") ?:'Dev']
+    consumerBranch = System.getenv('CHANGE_BRANCH') ?: System.getenv('BRANCH_NAME') ?: getCheckedOutGitBranchName()
     version = project.pactVersion
   }
 }
@@ -505,6 +510,20 @@ tasks.register('runRemoteDemo', JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   doFirst() {
     configRemoteRunTask(it, 'demo')
+  }
+}
+
+[
+  tasks.named('contract'),
+  tasks.named('runProviderPactVerification')
+].each { contractTestTask ->
+  contractTestTask.configure {
+    doFirst {
+      def mockitoCore = classpath.find { it.name.startsWith('mockito-core-') }
+      if (mockitoCore != null) {
+        jvmArgs("-javaagent:${mockitoCore.absolutePath}")
+      }
+    }
   }
 }
 

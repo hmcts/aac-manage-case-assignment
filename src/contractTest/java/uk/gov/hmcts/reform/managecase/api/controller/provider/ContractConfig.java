@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.managecase.api.controller.provider;
 
+import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.RestExceptionHandler;
 import uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController;
 import uk.gov.hmcts.reform.managecase.data.user.UserRepository;
 import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
@@ -22,11 +24,29 @@ import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.mockito.Mockito;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.ServletWebServerFactoryAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
+import org.springframework.cloud.gateway.server.mvc.GatewayServerMvcAutoConfiguration;
+import org.springframework.cloud.gateway.server.mvc.config.DefaultFunctionConfiguration;
+import org.springframework.cloud.gateway.server.mvc.filter.FilterAutoConfiguration;
+import org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctionAutoConfiguration;
+import org.springframework.cloud.gateway.server.mvc.predicate.PredicateAutoConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 @Configuration
+@Import({ApplicationParams.class, RestExceptionHandler.class})
+@ImportAutoConfiguration({ServletWebServerFactoryAutoConfiguration.class, DispatcherServletAutoConfiguration.class,
+    WebMvcAutoConfiguration.class, JacksonAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class,
+    RestClientAutoConfiguration.class, GatewayServerMvcAutoConfiguration.class, FilterAutoConfiguration.class,
+    HandlerFunctionAutoConfiguration.class, PredicateAutoConfiguration.class, DefaultFunctionConfiguration.class})
 public class ContractConfig {
 
     @Bean

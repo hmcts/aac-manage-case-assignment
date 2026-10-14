@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.managecase.api.controller.provider;
 
+import au.com.dius.pact.provider.junit5.HttpTestTarget;
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
 import au.com.dius.pact.provider.junitsupport.Provider;
@@ -7,20 +8,19 @@ import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.PactBrokerConsumerVersionSelectors;
 import au.com.dius.pact.provider.junitsupport.loader.SelectorBuilder;
-import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.hc.core5.http.HttpRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController;
-import uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.RestExceptionHandler;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.payload.IdamUser;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -53,6 +53,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static java.util.Collections.emptyList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -68,7 +72,10 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidation
 @ExtendWith(SpringExtension.class)
 @Provider("acc_manageCaseAssignment")
 @PactBroker(url = "${PACT_BROKER_URL:http://localhost:80}")
-@ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
+@SpringBootTest(classes = {ContractConfig.class, MapperConfig.class},
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = "CCD_DATA_STORE_API_BASE_URL=http://localhost:${wiremock.server.port}")
+@AutoConfigureWireMock(port = 0)
 public class CaseAssignmentProviderTests {
 
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
@@ -113,11 +120,8 @@ public class CaseAssignmentProviderTests {
     @Autowired
     UserRepository userRepository;
 
-    @Autowired
-    CaseAssignmentController caseAssignmentController;
-
-    @Autowired
-    NoticeOfChangeController noticeOfChangeController;
+    @LocalServerPort
+    private int port;
 
     @PactBrokerConsumerVersionSelectors
     public static SelectorBuilder consumerVersionSelectors() {
@@ -141,21 +145,43 @@ public class CaseAssignmentProviderTests {
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
-    void pactVerificationTestTemplate(PactVerificationContext context) {
+    void pactVerificationTestTemplate(PactVerificationContext context, HttpRequest request) {
         if (context != null) {
+            // Connection management belongs to the HTTP transport, which MockMvc does not exercise.
+            request.setHeader("Connection", "close");
             context.verifyInteraction();
         }
     }
 
     @BeforeEach
     void before(PactVerificationContext context) {
-        MockMvcTestTarget testTarget = new MockMvcTestTarget();
-        //System.getProperties().setProperty("pact.verifier.publishResults", "true");
-        testTarget.setControllers(caseAssignmentController, noticeOfChangeController);
-        testTarget.setControllerAdvices(new RestExceptionHandler());
         if (context != null) {
-            context.setTarget(testTarget);
+            // Use a real servlet container for gateway routes and transport headers such as Connection.
+            context.setTarget(new HttpTestTarget("localhost", port));
         }
+    }
+
+    @State("Get list of cases")
+    public void toGetListOfCases() {
+        given(prdRepository.findUsersByOrganisation()).willReturn(usersByOrganisation(user(ASSIGNEE_ID)));
+        given(dataStoreRepository.getCaseAssignments(eq(List.of(CASE_ID)), eq(List.of(ASSIGNEE_ID))))
+            .willReturn(List.of(new CaseUserRole(CASE_ID, ASSIGNEE_ID, CASE_ROLE)));
+    }
+
+    @State("Handle caa case types")
+    public void toHandleCaaCaseTypes() {
+        given(securityUtils.getServiceNameFromS2SToken("serviceAuthToken")).willReturn("xui_webapp");
+        given(securityUtils.getCaaSystemUserToken()).willReturn(BEAR_TOKEN);
+        given(securityUtils.getS2SToken()).willReturn("systemServiceAuthToken");
+        stubFor(post(urlPathEqualTo("/searchCases"))
+            .willReturn(aResponse().withHeader("Content-Type", "application/json")
+                .withBody("""
+                    {
+                      "total": 2,
+                      "cases": [{"case_id": "case 1"}, {"case_id": "case_2"}],
+                      "case_types_results": []
+                    }
+                    """)));
     }
 
     @State("NoC questions exist for case with given id")

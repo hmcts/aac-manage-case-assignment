@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ApplicationParamsTest {
 
-    private ApplicationParams applicationParams = new ApplicationParams();
+    private final ApplicationParams applicationParams = new ApplicationParams();
 
     @Test
     void shouldGetRoleAssignmentServiceHost() {
@@ -40,6 +40,17 @@ class ApplicationParamsTest {
         ReflectionTestUtils.setField(applicationParams, "roleAssignmentServiceHost", roleAssignmentServiceHost);
 
         assertEquals(baseUrl, applicationParams.amDeleteByQueryRoleAssignmentsURL());
+
+    }
+
+    @Test
+    void shouldGetAmGetRoleAssignmentsURL() {
+        final var roleAssignmentServiceHost = "test-host";
+        final var baseUrl = roleAssignmentServiceHost + "/am/role-assignments/actors/{uid}";
+
+        ReflectionTestUtils.setField(applicationParams, "roleAssignmentServiceHost", roleAssignmentServiceHost);
+
+        assertEquals(baseUrl, applicationParams.amGetRoleAssignmentsURL());
 
     }
 

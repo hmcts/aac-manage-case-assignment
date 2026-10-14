@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.wiremock.spring.EnableWireMock;
+import org.wiremock.spring.ConfigureWireMock;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -21,15 +23,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 @ActiveProfiles("integration")
 @SpringBootTest(classes = {
     Application.class
 })
 @AutoConfigureMockMvc(addFilters = false)
-@AutoConfigureWireMock(port = 0, stubs = "classpath:/wiremock-stubs")
+@EnableWireMock(@ConfigureWireMock(filesUnderClasspath = "wiremock-stubs"))
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class BaseIT {
 
@@ -37,6 +40,7 @@ public class BaseIT {
     protected MockMvc mockMvc;
     @Autowired
     protected ObjectMapper objectMapper;
+
     @Value("${wiremock.server.port}")
     protected Integer wiremockPort;
 
@@ -50,7 +54,7 @@ public class BaseIT {
     void setupDecoder() {
         Jwt dummyJwt = dummyJwt();
         when(dummyDecoder.decode(anyString())).thenReturn(dummyJwt);
-        when(authentication.getPrincipal()).thenReturn(dummyJwt);
+        lenient().when(authentication.getPrincipal()).thenReturn(dummyJwt);
         SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
     }
     

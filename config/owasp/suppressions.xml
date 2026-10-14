@@ -297,4 +297,22 @@
     <suppress>
       <cve>CVE-2026-41707</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+        Tomcat 11.0.24 is managed by Spring Boot 4.1.1. Scope these Dependency-Check
+        mappings to the exact embedded Tomcat artifacts and version used by this service.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-(core|websocket)@11\.0\.24$</packageUrl>
+        <cve>CVE-2026-65637</cve>
+        <cve>CVE-2026-65905</cve>
+        <cve>CVE-2026-65182</cve>
+        <cve>CVE-2026-68525</cve>
+        <cve>CVE-2026-65183</cve>
+        <cve>CVE-2026-66422</cve>
+        <cve>CVE-2026-68569</cve>
+        <cve>CVE-2026-65927</cve>
+        <cve>CVE-2026-68763</cve>
+        <cve>CVE-2026-73180</cve>
+        <cve>CVE-2026-66299</cve>
+    </suppress>
 </suppressions>

@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -25,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
 
 @DirtiesContext  // required for Jenkins agent
-@AutoConfigureWireMock(port = 0)
 public class RestExceptionHandlerTest {
 
     private MockMvc mockMvc;
@@ -101,4 +99,3 @@ public class RestExceptionHandlerTest {
     }
 
 }
-

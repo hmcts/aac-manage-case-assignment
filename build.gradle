@@ -216,8 +216,6 @@ tasks.register('runProviderPactVerification', Test) {
   }
   systemProperty 'pact.provider.branch', providerBranch
   systemProperty 'pactbroker.providerBranch', providerBranch
-  systemProperty 'pactbroker.enablePending',
-      providers.gradleProperty('pactbroker.enablePending').getOrElse('true')
   finalizedBy pactVerify
 }
 

@@ -129,17 +129,10 @@ public class CaseAssignmentProviderTests {
             return new SelectorBuilder().branch(consumerBranch);
         }
 
-        String providerBranch = System.getenv("CHANGE_BRANCH");
-        if (providerBranch == null || providerBranch.isBlank()) {
-            providerBranch = System.getenv("BRANCH_NAME");
-        }
-
-        SelectorBuilder selectors = new SelectorBuilder().deployedOrReleased();
-        if ("master".equals(providerBranch)) {
-            return selectors.branch("master");
-        }
-
-        return selectors.matchingBranch();
+        return new SelectorBuilder()
+            .branch("master")
+            .deployedOrReleased()
+            .matchingBranch();
     }
 
     @TestTemplate

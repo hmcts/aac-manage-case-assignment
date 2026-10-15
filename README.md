@@ -52,54 +52,12 @@ To run all integration tests execute the following command:
 ```
 
 ### Consumer contract tests
-
-Run the Pact consumer tests against a local mock provider:
-
+Run the Pact consumer tests:
 ```bash
 ./gradlew contractTest
 ```
 
-These tests also run as part of `check` and `build`. They exercise `PrdApiClient` with
-the production authentication interceptor and JSON mapper, covering:
-
-| Consumer | Provider | Request |
-| --- | --- | --- |
-| `aac_manageCaseAssignment` | `referenceData_organisationalExternalUsers` | `GET /refdata/external/v1/organisations/users?status=Active&returnRoles=false` |
-
-The successful response requires an organisation identifier and a list of users
-with the identifiers, names and email addresses used by case assignment. Pact
-type matchers allow different user details and additional response fields; the
-list may contain more than one user.
-
-The generated contract is
-`pacts/aac_manageCaseAssignment-referenceData_organisationalExternalUsers.json`.
-Publish it to the configured broker after running the tests:
-
-```bash
-PACT_BROKER_URL=https://pact-broker.platform.hmcts.net PACT_BRANCH_NAME=<branch> ./gradlew pactPublish
-```
-
-For a local broker running on port 9292, run the tests and publish with a local tag:
-
-```bash
-PACT_BROKER_URL=http://localhost:9292 PACT_BRANCH_NAME=local ./gradlew contractTest pactPublish
-```
-
-View the published contract in the [local Pact Broker](http://localhost:9292).
-The broker stores contracts and verification results; consumer tests use the Pact
-mock server, and provider verification runs separately against Ref Data.
-
-Provider verification uses the state `Professional users exist for an Active organisation`
-under `referenceData_organisationalExternalUsers`. The local Ref Data checkout now
-includes `CaseAssignmentExternalUsersProviderTest`, which reuses its existing
-professional external-users controller test configuration for this participant.
-It verifies the real controller with fixture service responses and publishes the
-result when `-Ppact.verifier.publishResults=true` is supplied. A published provider
-result populates the broker's **Last verified** column.
-
-The internal organisation endpoints listed in the gap analysis use
-`referenceData_organisationalInternal` and need separate contracts. The existing
-`contract` task runs this service's provider verification tests.
+Contracts are generated in `pacts/`. These tests also run as part of `check` and `build`.
 
 ### Functional tests
 These are the tests run against an environment. For example if you would like to test your local

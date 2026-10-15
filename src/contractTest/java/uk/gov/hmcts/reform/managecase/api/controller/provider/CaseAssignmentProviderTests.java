@@ -127,8 +127,14 @@ public class CaseAssignmentProviderTests {
         }
 
         String providerBranch = System.getenv("CHANGE_BRANCH");
+        boolean runningInCi = providerBranch != null && !providerBranch.isBlank();
         if (providerBranch == null || providerBranch.isBlank()) {
             providerBranch = System.getenv("BRANCH_NAME");
+            runningInCi = providerBranch != null && !providerBranch.isBlank();
+        }
+
+        if (!runningInCi) {
+            return new SelectorBuilder().branch("master");
         }
 
         SelectorBuilder selectors = new SelectorBuilder().deployedOrReleased();

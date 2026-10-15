@@ -63,7 +63,7 @@ docker compose up -d postgres pact-broker
 
 Second, from the consumer repository, publish the consumer Pact to the local broker with its full Git commit SHA as the consumer version and its Git branch as branch metadata. Do not publish or select Pact tags.
 
-Finally, from this repository, run provider verification and publish verification results to the local Pact Broker. `PACT_CONSUMER_BRANCH` overrides branch selection for local runs. If it is unset, deployed or released Pacts are always selected. A provider build on `master` also selects the consumer `master` branch; a provider PR build selects the consumer Pact from the matching branch. CI determines the provider branch from `CHANGE_BRANCH`, falling back to `BRANCH_NAME`. The verification result is published with the provider full Git commit SHA and branch metadata.
+Finally, from this repository, run provider verification and publish verification results to the local Pact Broker. `PACT_CONSUMER_BRANCH` overrides branch selection for local runs; when it is unset, the consumer `master` branch is selected. A provider build on `master` also selects the consumer `master` branch; a provider PR build selects deployed or released Pacts plus the consumer Pact from the matching branch. CI determines the provider branch from `CHANGE_BRANCH`, falling back to `BRANCH_NAME`. The verification result is published with the provider full Git commit SHA and branch metadata.
 
 ```bash
 PACT_BROKER_URL=http://localhost:9292 \

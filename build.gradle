@@ -15,6 +15,7 @@ ext {
   set('springCloudVersion', '2025.0.3')
   set('spring-framework.version', '6.2.19')
   set('spring-security.version', '6.5.11')
+  set('tomcat.version', '10.1.61')
   set('netty.version', '4.1.136.Final')
   set('log4j2.version', '2.26.1')
   // BEFTA 9.2.10 references PropertyNamingStrategy.SnakeCaseStrategy, removed in Jackson 2.19.

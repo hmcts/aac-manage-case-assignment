@@ -51,6 +51,14 @@ To run all integration tests execute the following command:
 ./gradlew integration
 ```
 
+### Consumer contract tests
+Run the Pact consumer tests:
+```bash
+./gradlew contractTest
+```
+
+Contracts are generated in `pacts/`. These tests also run as part of `check` and `build`.
+
 ### Provider Pact tests
 
 In order to run the provider Pact tests locally, first start the Postgres database and Pact Broker services from the [Pact Broker Docker repository](https://github.com/pact-foundation/pact-broker-docker):

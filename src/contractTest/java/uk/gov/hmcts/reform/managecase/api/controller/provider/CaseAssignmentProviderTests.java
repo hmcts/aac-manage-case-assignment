@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.managecase.api.controller.provider;
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
 import au.com.dius.pact.provider.junitsupport.Provider;
-import au.com.dius.pact.provider.junitsupport.AllowOverridePactUrl;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
@@ -85,7 +84,9 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidation
     url = "${PACT_BROKER_URL:http://localhost:9292}",
     enablePendingPacts = "${pactbroker.enablePending:true}"
 )
-@ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
+@SpringBootTest(classes = {ContractConfig.class, MapperConfig.class, GatewayContractConfig.class})
+@AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("pact")
 public class CaseAssignmentProviderTests {
 
     @Autowired

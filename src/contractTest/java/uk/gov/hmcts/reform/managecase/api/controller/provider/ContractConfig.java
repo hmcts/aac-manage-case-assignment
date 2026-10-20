@@ -25,9 +25,36 @@ import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
+import uk.gov.hmcts.reform.idam.client.IdamApi;
+import uk.gov.hmcts.reform.managecase.ApplicationParams;
+
+import java.util.Arrays;
+
+import static org.mockito.Mockito.when;
 
 @Configuration
 public class ContractConfig {
+
+    @Bean
+    public IdamApi idamApi() {
+        return Mockito.mock(IdamApi.class);
+    }
+
+
+    @Bean
+    public ApplicationParams applicationParams(Environment environment) {
+        ApplicationParams params = Mockito.mock(ApplicationParams.class);
+        when(params.getCcdDataStoreAllowedUrls()).thenReturn(Arrays.asList(
+            environment.getRequiredProperty("ccd.data-store.allowed-urls").split(",")));
+        when(params.getCcdDefinitionStoreAllowedUrls()).thenReturn(Arrays.asList(
+            environment.getRequiredProperty("ccd.definition-store.allowed-urls").split(",")));
+        when(params.getCcdDataStoreAllowedService())
+            .thenReturn(environment.getRequiredProperty("ccd.data-store.allowed-service"));
+        when(params.getCcdDefinitionStoreAllowedService())
+            .thenReturn(environment.getRequiredProperty("ccd.definition-store.allowed-service"));
+        return params;
+    }
 
     @Bean
     public PrdRepository prdRepository() {

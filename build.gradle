@@ -230,7 +230,7 @@ def getCheckedOutGitBranchName() {
 pact {
   publish {
     pactDirectory = 'pacts'
-    pactBrokerUrl = System.getenv("PACT_BROKER_URL") ?: 'http://localhost:80'
+    pactBrokerUrl = System.getenv("PACT_BROKER_URL") ?: 'http://localhost:9292'
     consumerBranch = System.getenv('CHANGE_BRANCH') ?: System.getenv('BRANCH_NAME') ?: getCheckedOutGitBranchName()
     version = project.pactVersion
   }

@@ -59,6 +59,31 @@ Run the Pact consumer tests:
 
 Contracts are generated in `pacts/`. These tests also run as part of `check` and `build`.
 
+### Provider Pact tests
+
+In order to run the provider Pact tests locally, first start the Postgres database and Pact Broker services from the [Pact Broker Docker repository](https://github.com/pact-foundation/pact-broker-docker):
+
+```bash
+git clone https://github.com/pact-foundation/pact-broker-docker.git
+cd pact-broker-docker
+docker compose up -d postgres pact-broker
+```
+
+Second, from the consumer repository, publish the consumer Pact to the local broker with its full Git commit SHA as the consumer version and its Git branch as branch metadata. Do not publish or select Pact tags.
+
+Finally, from this repository, run provider verification and publish verification results to the local Pact Broker. `PACT_CONSUMER_BRANCH` overrides branch selection for local runs. If it is unset, deployed or released Pacts are always selected. A provider build on `master` also selects the consumer `master` branch; a provider PR build selects the consumer Pact from the matching branch. CI determines the provider branch from `CHANGE_BRANCH`, falling back to `BRANCH_NAME`. The verification result is published with the provider full Git commit SHA and branch metadata.
+
+```bash
+PACT_BROKER_URL=http://localhost:9292 \
+PACT_CONSUMER_BRANCH=<consumer-branch> \
+./gradlew runProviderPactVerification \
+  -Ppact.verifier.publishResults=true \
+  --rerun-tasks
+```
+
+
+When finished, stop the broker with `docker compose down` from the `pact-broker-docker` directory.
+
 ### Functional tests
 These are the tests run against an environment. For example if you would like to test your local
  environment you'll need to export variables on your `.bash_profile` script.

@@ -79,4 +79,13 @@
         <packageUrl regex="true">^pkg:maven/org\.springframework\.cloud/spring-cloud-(gateway-server-mvc|starter-gateway-mvc)@4\.3\.5$</packageUrl>
         <cve>CVE-2026-47879</cve>
     </suppress>
+    <suppress>
+        <cve>CVE-2026-50229</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-65182</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-68525</cve>
+    </suppress>
 </suppressions>

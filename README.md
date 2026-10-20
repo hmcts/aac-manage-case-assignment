@@ -37,6 +37,12 @@ API documentation is provided with Swagger.
 You can view the json spec here: [http://localhost:4454/v2/api-docs](http://localhost:4454/v2/api-docs)
 Swagger UI is available here: [http://localhost:4454/swagger-ui.html](http://localhost:4454/swagger-ui.html)
 
+## JSON deserialisation security
+
+Jackson is configured to reject unknown JSON properties. See
+[JSON deserialisation security](docs/security/json-deserialisation-security.md)
+for the rules, guardrails, review checklist, and Jira risk wording.
+
 ## Developing
 
 ### Unit tests

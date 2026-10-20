@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.managecase.api.controller.provider;
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
 import au.com.dius.pact.provider.junitsupport.Provider;
+import au.com.dius.pact.provider.junitsupport.AllowOverridePactUrl;
+import com.github.tomakehurst.wiremock.WireMockServer;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.PactBrokerConsumerVersionSelectors;
@@ -14,13 +16,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.api.controller.CaseAssignmentController;
 import uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController;
-import uk.gov.hmcts.reform.managecase.api.errorhandling.RestExceptionHandler;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.api.payload.IdamUser;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
@@ -33,6 +39,7 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQues
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
+import uk.gov.hmcts.reform.managecase.client.prd.ProfessionalUser;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.data.user.UserRepository;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
@@ -60,6 +67,13 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.reset;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.usersByOrganisation;
@@ -67,9 +81,27 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidation
 
 @ExtendWith(SpringExtension.class)
 @Provider("acc_manageCaseAssignment")
-@PactBroker(url = "${PACT_BROKER_URL:http://localhost:80}")
-@ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
+@PactBroker(
+    url = "${PACT_BROKER_URL:http://localhost:9292}",
+    enablePendingPacts = "true"
+)
+@SpringBootTest(classes = {ContractConfig.class, MapperConfig.class, GatewayContractConfig.class})
+@AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("pact")
+@AllowOverridePactUrl
 public class CaseAssignmentProviderTests {
+
+    @Autowired
+    MockMvc mockMvc;
+
+    @Autowired
+    WireMockServer gatewayDownstream;
+
+    @DynamicPropertySource
+    static void gatewayProperties(DynamicPropertyRegistry properties) {
+        properties.add("CCD_DATA_STORE_API_BASE_URL", GatewayContractConfig::downstreamUrl);
+        properties.add("CCD_DEFINITION_STORE_API_BASE_URL", GatewayContractConfig::downstreamUrl);
+    }
 
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
     private static final String ORG_POLICY_ROLE2 = "caseworker-probate2";
@@ -144,18 +176,47 @@ public class CaseAssignmentProviderTests {
     void pactVerificationTestTemplate(PactVerificationContext context) {
         if (context != null) {
             context.verifyInteraction();
+            if (context.getInteraction().getDescription().equals("A list of case types (from config)")) {
+                gatewayDownstream.verify(1, postRequestedFor(urlPathEqualTo("/searchCases")));
+            }
         }
     }
 
     @BeforeEach
     void before(PactVerificationContext context) {
+        reset(dataStoreRepository, prdRepository, idamRepository, jacksonUtils, securityUtils,
+              noticeOfChangeQuestions, challengeAnswerValidator, definitionStoreRepository, userRepository);
+        gatewayDownstream.resetAll();
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
-        //System.getProperties().setProperty("pact.verifier.publishResults", "true");
-        testTarget.setControllers(caseAssignmentController, noticeOfChangeController);
-        testTarget.setControllerAdvices(new RestExceptionHandler());
+        testTarget.setMockMvc(mockMvc);
         if (context != null) {
             context.setTarget(testTarget);
         }
+    }
+
+    @State("Get list of cases")
+    public void manageOrgAssignments() {
+        ProfessionalUser user = ProfessionalUser.builder()
+            .userIdentifier("a123456789").firstName("Joe").lastName("Smith")
+            .email("test@email.com").build();
+        given(prdRepository.findUsersByOrganisation()).willReturn(usersByOrganisation(user));
+        given(dataStoreRepository.getCaseAssignments(eq(List.of("123456789")), eq(List.of("a123456789"))))
+            .willReturn(List.of(new CaseUserRole("123456789", "a123456789", CASE_ROLE)));
+    }
+
+    @State("Handle caa case types")
+    public void manageOrgSearch() {
+        given(securityUtils.getServiceNameFromS2SToken(anyString())).willReturn("xui_webapp");
+        given(securityUtils.getCaaSystemUserToken()).willReturn("contract-system-token");
+        given(securityUtils.getS2SToken()).willReturn("contract-service-token");
+        gatewayDownstream.stubFor(post(urlPathEqualTo("/searchCases"))
+            .withRequestBody(matchingJsonPath("$.query.bool.filter"))
+            .withRequestBody(matchingJsonPath("$.size", equalTo("100")))
+            .withHeader("Authorization", equalTo("contract-system-token"))
+            .withHeader("ServiceAuthorization", equalTo("contract-service-token"))
+            .willReturn(aResponse().withHeader("Content-Type", "application/json").withBody("""
+                {"total":2,"cases":[{"case_id":"case 1"},{"case_id":"case_2"}],"case_types_results":[]}
+                """)));
     }
 
     @State("NoC questions exist for case with given id")

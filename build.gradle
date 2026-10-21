@@ -22,8 +22,8 @@ ext {
   set('jackson.version', '2.18.11')
   set('snakeyaml.version', '2.7')
   set('commons-lang3.version', '3.20.0')
-  set('httpclient5.version', '5.6.4')
-  set('httpcore5.version', '5.4.4')
+  //set('httpclient5.version', '5.6.4')
+  //set('httpcore5.version', '5.4.4')
 
   junit               = '6.1.3'
   junitPlatform       = '6.1.3'

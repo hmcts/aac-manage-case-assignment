@@ -348,7 +348,7 @@ dependencies {
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLogging
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '6.2.0-RELEASE'
 
-  implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.0'
+  implementation group: 'com.auth0', name: 'java-jwt', version: '4.6.1'
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
   implementation group: 'com.vladmihalcea', name: 'hibernate-types-60', version: '2.21.1'
   implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: jjwt
@@ -383,7 +383,7 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-subclass', version: '5.23.0'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner'
-  testImplementation group: 'com.google.guava', name: 'guava', version: '33.6.0-jre' // For BEFTA
+  testImplementation group: 'com.google.guava', name: 'guava', version: '33.7.2-jre' // For BEFTA
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath

@@ -34,3 +34,6 @@ definition_files/
 
 ### Remote run configs
 .*-remote-env
+
+### ASDF config
+.tool-versions

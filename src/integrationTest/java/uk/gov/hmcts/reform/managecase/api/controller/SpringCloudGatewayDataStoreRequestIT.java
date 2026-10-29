@@ -48,6 +48,7 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
         this.mockMvc.perform(post(PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .header(SERVICE_AUTHORIZATION, BEARER + s2SToken)
+            .header("X-Forwarded-Prefix", "/incoming")
             .content(ES_QUERY))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.cases.length()", is(1)))

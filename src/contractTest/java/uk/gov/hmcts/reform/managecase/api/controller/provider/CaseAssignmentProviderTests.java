@@ -67,7 +67,10 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidation
 
 @ExtendWith(SpringExtension.class)
 @Provider("acc_manageCaseAssignment")
-@PactBroker(url = "${PACT_BROKER_URL:http://localhost:80}")
+@PactBroker(
+    url = "${PACT_BROKER_URL:http://localhost:9292}",
+    enablePendingPacts = "${pactbroker.enablePending:true}"
+)
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
 public class CaseAssignmentProviderTests {
 
@@ -126,17 +129,10 @@ public class CaseAssignmentProviderTests {
             return new SelectorBuilder().branch(consumerBranch);
         }
 
-        String providerBranch = System.getenv("CHANGE_BRANCH");
-        if (providerBranch == null || providerBranch.isBlank()) {
-            providerBranch = System.getenv("BRANCH_NAME");
-        }
-
-        SelectorBuilder selectors = new SelectorBuilder().deployedOrReleased();
-        if ("master".equals(providerBranch)) {
-            return selectors.branch("master");
-        }
-
-        return selectors.matchingBranch();
+        return new SelectorBuilder()
+            .branch("master")
+            .deployedOrReleased()
+            .matchingBranch();
     }
 
     @TestTemplate

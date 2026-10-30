@@ -11,6 +11,7 @@ Feature: F-210: Gateway response integrity
 
     Given a user [S1 - a solicitor creating a case used to verify gateway response integrity],
       And a case [C1 producing a complete search response] created as in [F-210_Prerequisite_Case_Creation],
+      And a wait time of [5] seconds [to allow for Logstash to index the case just created],
 
     When a request is prepared with appropriate values,
       And the request [searches for C1 through the MCA Data Store gateway],

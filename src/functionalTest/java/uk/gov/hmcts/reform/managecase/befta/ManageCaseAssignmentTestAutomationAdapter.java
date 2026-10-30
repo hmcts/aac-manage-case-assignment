@@ -45,7 +45,7 @@ public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutoma
         if (key.toString().startsWith("caseIdAsIntegerFrom")) {
             String childContext = key.toString().replace("caseIdAsIntegerFrom_","");
             try {
-                return (long) ReflectionUtils.deepGetFieldInObject(scenarioContext, "ParentContext.childContexts."
+                return ReflectionUtils.deepGetFieldInObject(scenarioContext, "ParentContext.childContexts."
                     + childContext
                     + ".testData.actualResponse.body.id");
             } catch (Exception e) {

@@ -68,8 +68,7 @@ ccd:
   ccd-definition-store-api:
     java:
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
-      image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
-      #image: hmctsprod.azurecr.io/ccd/definition-store-api:pr-1756-820fedd-20260526090548
+      image: hmctsprod.azurecr.io/ccd/definition-store-api@sha256:9ddd709903093bdb18d62fd12e62da4d54d914221410fa275ee79028dc48b144
       imagePullPolicy: Always
       devmemoryRequests: 2048Mi
       devcpuRequests: 2000m
@@ -94,8 +93,7 @@ ccd:
   ccd-data-store-api:
     java:
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
-      image: hmctsprod.azurecr.io/ccd/data-store-api:latest
-      #image: hmctsprod.azurecr.io/ccd/data-store-api:pr-2844-c363f29-20260526115255
+      image: hmctsprod.azurecr.io/ccd/data-store-api@sha256:370706056c70d814cea4cb361abd62a4a31a345484d5ef4a7ec083e8f8b7400f
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'
       devmemoryLimits: '2048Mi'
@@ -119,6 +117,7 @@ ccd:
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
         IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
+        OIDC_ALLOWED_ISSUERS: "https://idam-web-public.aat.platform.hmcts.net/o,https://hmcts-access.aat.platform.hmcts.net/o,https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/realms/root/realms/hmcts,https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts"
         DATA_STORE_CROSS_JURISDICTIONAL_ROLES: caseworker-caa,caseworker-approver
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
@@ -151,7 +150,7 @@ ccd:
   ccd-user-profile-api:
     java:
       ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
-      image: hmctsprod.azurecr.io/ccd/user-profile-api:latest
+      image: hmctsprod.azurecr.io/ccd/user-profile-api@sha256:498e446e1d4b52e2ffab15cb2197404fda7f5875169b0cdbf6a877571f30865b
       imagePullPolicy: Always
       environment:
         USER_PROFILE_DB_HOST: "{{ .Release.Name }}-postgresql"
@@ -167,6 +166,7 @@ ccd:
   am-role-assignment-service:
     java:
       ingressHost: am-role-assignment-service-${SERVICE_FQDN}
+      image: hmctsprod.azurecr.io/am/role-assignment-service@sha256:1f408148689954bc7209ddd8bb27a591f3a601ac6a09628822c5155f3a509601
       secrets:
         ROLE_ASSIGNMENT_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"

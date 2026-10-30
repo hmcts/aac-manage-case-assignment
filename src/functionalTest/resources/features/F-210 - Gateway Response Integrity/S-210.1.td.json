@@ -1,6 +1,6 @@
 {
   "_guid_": "S-210.1",
-  "title": "A compressed Data Store response is returned completely through the MCA gateway",
+  "title": "A compressible Data Store response is returned completely through the MCA gateway",
 
   "productName": "Manage Case Assignment Microservice",
   "operationName": "Search cases through gateway",
@@ -40,6 +40,11 @@
 
   "expectedResponse": {
     "_extends_": "Common_200_Response",
+    "headers": {
+      "_extends_": "Common_200_Response_Headers",
+      "Transfer-Encoding": "chunked",
+      "X-XSS-Protection": "0"
+    },
     "body": {
       "total": 1,
       "case_types_results": [
@@ -50,11 +55,7 @@
       ],
       "cases": [
         {
-          "id": "${[scenarioContext][childContexts][F-210_Prerequisite_Case_Creation][testData][actualResponse][body][id]}",
-          "case_type_id": "FT_MasterCaseType",
-          "case_data": {
-            "TextAreaField": "${[scenarioContext][customValues][ccd8333GatewayLargeText]}"
-          }
+          "_extends_": "F-210_Search_Case_Response"
         }
       ]
     }

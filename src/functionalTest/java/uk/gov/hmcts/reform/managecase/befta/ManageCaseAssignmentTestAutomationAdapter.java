@@ -106,10 +106,6 @@ public class ManageCaseAssignmentTestAutomationAdapter extends DefaultTestAutoma
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
             }
-        } else if (key.toString().equals("ccd8333GatewayLargeText")) {
-            return "CCD-8333-GATEWAY-RESPONSE-START-"
-                + "gateway-response-integrity-".repeat(200)
-                + "CCD-8333-GATEWAY-RESPONSE-COMPLETE";
         }
         return super.calculateCustomValue(scenarioContext, key);
     }

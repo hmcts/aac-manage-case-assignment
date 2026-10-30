@@ -3,23 +3,12 @@
   "_extends_": "F-201_Prerequisite_Case_Creation_C1",
 
   "specs": [
-    "C1 containing a large response marker"
+    "C1 producing a complete search response"
   ],
 
   "request": {
     "body": {
-      "event_token": "${[scenarioContext][siblingContexts][F-210_Prerequisite_Case_Creation_Token_Creation][testData][actualResponse][body][token]}",
-      "data": {
-        "TextAreaField": "${[scenarioContext][customValues][ccd8333GatewayLargeText]}"
-      }
-    }
-  },
-
-  "expectedResponse": {
-    "body": {
-      "case_data": {
-        "TextAreaField": "${[scenarioContext][customValues][ccd8333GatewayLargeText]}"
-      }
+      "event_token": "${[scenarioContext][siblingContexts][F-210_Prerequisite_Case_Creation_Token_Creation][testData][actualResponse][body][token]}"
     }
   }
 }

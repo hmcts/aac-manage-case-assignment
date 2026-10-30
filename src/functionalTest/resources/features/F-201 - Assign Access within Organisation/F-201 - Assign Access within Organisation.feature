@@ -25,7 +25,7 @@ Feature: F-201: Assign Access within Organisation
       And a call [by S2 to access the case created by S1] will get the expected response as in [F-201_Case_Found].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-201.1b
+  @S-201.1b @Smoke @CCD-8333
   Scenario: Solicitor successfully sharing case access with another solicitor in their org (happy path) called with use_user_token to fetch case details
 
     Given a user [S1 - a solicitor, to create a case under their organisation and share it with a fellow solicitor in the same organisation],

@@ -1,0 +1,62 @@
+{
+  "_guid_": "S-210.1",
+  "title": "A compressed Data Store response is returned completely through the MCA gateway",
+
+  "productName": "Manage Case Assignment Microservice",
+  "operationName": "Search cases through gateway",
+  "method": "POST",
+  "uri": "/ccd/searchCases",
+
+  "s2sClientId": "xui_webapp",
+  "userTokenClientId": "xuiwebapp",
+
+  "specs": [
+    "S1 - a solicitor creating a case used to verify gateway response integrity",
+    "searches for C1 through the MCA Data Store gateway"
+  ],
+
+  "users": {
+    "S1": {
+      "username": "befta.master.solicitor.becky@gmail.com",
+      "password": "[[$CCD_BEFTA_MASTER_SOLICITOR_1_PWD]]"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ctid": "${[scenarioContext][childContexts][F-210_Prerequisite_Case_Creation][testData][actualResponse][body][case_type_id]}"
+    },
+    "body": {
+      "native_es_query": {
+        "query": {
+          "match": {
+            "reference": "${[scenarioContext][childContexts][F-210_Prerequisite_Case_Creation][testData][actualResponse][body][id]}"
+          }
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "total": 1,
+      "case_types_results": [
+        {
+          "total": 1,
+          "case_type_id": "FT_MasterCaseType"
+        }
+      ],
+      "cases": [
+        {
+          "id": "${[scenarioContext][childContexts][F-210_Prerequisite_Case_Creation][testData][actualResponse][body][id]}",
+          "case_type_id": "FT_MasterCaseType",
+          "case_data": {
+            "TextAreaField": "${[scenarioContext][customValues][ccd8333GatewayLargeText]}"
+          }
+        }
+      ]
+    }
+  }
+}

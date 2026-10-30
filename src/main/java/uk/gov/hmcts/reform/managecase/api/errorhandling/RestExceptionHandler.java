@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.managecase.api.errorhandling;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.google.common.collect.ImmutableList;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +29,7 @@ import jakarta.validation.ValidationException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @RestControllerAdvice
 @Slf4j
@@ -46,6 +50,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .toArray(String[]::new);
         return toResponseEntity(HttpStatus.valueOf(status.value()), null, errors);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+        HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+
+        log.error("HTTP message not readable: {}", ex.getLocalizedMessage());
+        UnrecognizedPropertyException unrecognizedPropertyException = findUnrecognizedPropertyException(ex);
+        if (unrecognizedPropertyException != null) {
+            return toResponseEntity(
+                HttpStatus.BAD_REQUEST,
+                String.format("Unknown JSON property '%s'.", getUnknownPropertyPath(unrecognizedPropertyException))
+            );
+        }
+
+        return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler({CaseAssignedUserRoleException.class})
@@ -157,5 +177,28 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         }
 
         return null;
+    }
+
+    private UnrecognizedPropertyException findUnrecognizedPropertyException(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (current instanceof UnrecognizedPropertyException unrecognizedPropertyException) {
+                return unrecognizedPropertyException;
+            }
+            current = current.getCause();
+        }
+        return null;
+    }
+
+    private String getUnknownPropertyPath(UnrecognizedPropertyException exception) {
+        List<String> path = exception.getPath().stream()
+            .map(JsonMappingException.Reference::getFieldName)
+            .filter(Objects::nonNull)
+            .toList();
+
+        if (path.isEmpty()) {
+            return exception.getPropertyName();
+        }
+        return String.join(".", path);
     }
 }

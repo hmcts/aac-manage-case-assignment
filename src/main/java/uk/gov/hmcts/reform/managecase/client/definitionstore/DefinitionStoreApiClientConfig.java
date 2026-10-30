@@ -1,7 +1,11 @@
 package uk.gov.hmcts.reform.managecase.client.definitionstore;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.codec.Decoder;
 import feign.Retryer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import uk.gov.hmcts.reform.managecase.client.DownstreamResponseDecoderFactory;
 import uk.gov.hmcts.reform.managecase.client.SystemUserAuthHeadersInterceptor;
 import uk.gov.hmcts.reform.managecase.security.SecurityUtils;
 
@@ -24,5 +28,10 @@ public class DefinitionStoreApiClientConfig {
     @Bean
     public Retryer retryer() {
         return Retryer.NEVER_RETRY;
+    }
+
+    @Bean
+    public Decoder definitionStoreResponseDecoder(@Qualifier("DefaultObjectMapper") ObjectMapper objectMapper) {
+        return DownstreamResponseDecoderFactory.tolerantJsonDecoder(objectMapper);
     }
 }

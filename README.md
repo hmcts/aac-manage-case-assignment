@@ -73,7 +73,6 @@ PACT_CONSUMER_BRANCH=<consumer-branch> \
   --rerun-tasks
 ```
 
-
 When finished, stop the broker with `docker compose down` from the `pact-broker-docker` directory.
 
 ### Functional tests

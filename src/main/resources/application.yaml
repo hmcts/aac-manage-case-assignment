@@ -63,6 +63,11 @@ spring:
             filters:
               - AllowedRoutesFilter
               - ValidateClientFilter
+              # HttpClient 5.6 decompresses response entities but retains the headers for the compressed entity.
+              # Remove stale entity headers before Tomcat writes the decompressed response to the caller.
+              - RemoveResponseHeader=Content-Length
+              - RemoveResponseHeader=Content-Encoding
+              - RemoveResponseHeader=Content-MD5
               - RemoveResponseHeader=Cookie
               - RemoveResponseHeader=Set-Cookie
               - StripPrefix=1

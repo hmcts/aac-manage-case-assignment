@@ -40,7 +40,6 @@ class RoleAssignmentsMapperTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
     }
 
     @Nested
@@ -48,7 +47,7 @@ class RoleAssignmentsMapperTest {
     class ToRoleAssignments {
 
         @Test
-        public void shouldMapToRoleAssignments() {
+        void shouldMapToRoleAssignments() {
             RoleAssignmentResource roleAssignment1 = createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID1);
             RoleAssignmentResource roleAssignment2 = createRoleAssignmentRecord(ASSIGNMENT_2, CASE_ID2);
             RoleAssignmentResponse response = createRoleAssignmentResponse(asList(
@@ -62,41 +61,41 @@ class RoleAssignmentsMapperTest {
             assertAll(
                 () -> assertThat(roleAssignments.size(), is(2)),
 
-                () -> assertThat(roleAssignments.get(0).getId(), is(ASSIGNMENT_1)),
-                () -> assertThat(roleAssignments.get(0).getActorIdType(), is(roleAssignment1.getActorIdType())),
-                () -> assertThat(roleAssignments.get(0).getActorId(), is(roleAssignment1.getActorId())),
-                () -> assertThat(roleAssignments.get(0).getRoleType(), is(roleAssignment1.getRoleType())),
-                () -> assertThat(roleAssignments.get(0).getRoleName(), is(roleAssignment1.getRoleName())),
+                () -> assertThat(roleAssignments.getFirst().getId(), is(ASSIGNMENT_1)),
+                () -> assertThat(roleAssignments.getFirst().getActorIdType(), is(roleAssignment1.getActorIdType())),
+                () -> assertThat(roleAssignments.getFirst().getActorId(), is(roleAssignment1.getActorId())),
+                () -> assertThat(roleAssignments.getFirst().getRoleType(), is(roleAssignment1.getRoleType())),
+                () -> assertThat(roleAssignments.getFirst().getRoleName(), is(roleAssignment1.getRoleName())),
                 () -> assertThat(
-                    roleAssignments.get(0).getClassification(),
+                    roleAssignments.getFirst().getClassification(),
                     is(roleAssignment1.getClassification())
                 ),
-                () -> assertThat(roleAssignments.get(0).getGrantType(), is(roleAssignment1.getGrantType())),
-                () -> assertThat(roleAssignments.get(0).getRoleCategory(), is(roleAssignment1.getRoleCategory())),
-                () -> assertThat(roleAssignments.get(0).getReadOnly(), is(roleAssignment1.getReadOnly())),
-                () -> assertThat(roleAssignments.get(0).getBeginTime(), is(roleAssignment1.getBeginTime())),
-                () -> assertThat(roleAssignments.get(0).getEndTime(), is(roleAssignment1.getEndTime())),
-                () -> assertThat(roleAssignments.get(0).getCreated(), is(roleAssignment1.getCreated())),
-                () -> assertThat(roleAssignments.get(0).getAuthorisations().size(), is(0)),
+                () -> assertThat(roleAssignments.getFirst().getGrantType(), is(roleAssignment1.getGrantType())),
+                () -> assertThat(roleAssignments.getFirst().getRoleCategory(), is(roleAssignment1.getRoleCategory())),
+                () -> assertThat(roleAssignments.getFirst().getReadOnly(), is(roleAssignment1.getReadOnly())),
+                () -> assertThat(roleAssignments.getFirst().getBeginTime(), is(roleAssignment1.getBeginTime())),
+                () -> assertThat(roleAssignments.getFirst().getEndTime(), is(roleAssignment1.getEndTime())),
+                () -> assertThat(roleAssignments.getFirst().getCreated(), is(roleAssignment1.getCreated())),
+                () -> assertThat(roleAssignments.getFirst().getAuthorisations().size(), is(0)),
 
                 () -> assertThat(
-                    roleAssignments.get(0).getAttributes().getJurisdiction(),
+                    roleAssignments.getFirst().getAttributes().getJurisdiction(),
                     is(roleAssignment1.getAttributes().getJurisdiction())
                 ),
                 () -> assertThat(
-                    roleAssignments.get(0).getAttributes().getCaseId(),
+                    roleAssignments.getFirst().getAttributes().getCaseId(),
                     is(roleAssignment1.getAttributes().getCaseId())
                 ),
                 () -> assertThat(
-                    roleAssignments.get(0).getAttributes().getRegion(),
+                    roleAssignments.getFirst().getAttributes().getRegion(),
                     is(roleAssignment1.getAttributes().getRegion())
                 ),
                 () -> assertThat(
-                    roleAssignments.get(0).getAttributes().getLocation(),
+                    roleAssignments.getFirst().getAttributes().getLocation(),
                     is(roleAssignment1.getAttributes().getLocation())
                 ),
                 () -> assertThat(
-                    roleAssignments.get(0).getAttributes().getContractType(),
+                    roleAssignments.getFirst().getAttributes().getContractType(),
                     is(roleAssignment1.getAttributes().getContractType())
                 ),
 
@@ -121,12 +120,12 @@ class RoleAssignmentsMapperTest {
         }
 
         @Test
-        public void shouldMapNullRoleAssignmentResponse() {
+        void shouldMapNullRoleAssignmentResponse() {
             assertNull(instance.toRoleAssignments(null));
         }
 
         @Test
-        public void shouldMapNullRoleAssignmentResourceList() {
+        void shouldMapNullRoleAssignmentResourceList() {
             RoleAssignmentResponse response = createRoleAssignmentResponse(null);
 
             RoleAssignments mapped = instance.toRoleAssignments(response);
@@ -136,7 +135,7 @@ class RoleAssignmentsMapperTest {
         }
 
         @Test
-        public void shouldMapNullRoleAssignmentResource() {
+        void shouldMapNullRoleAssignmentResource() {
             RoleAssignmentResource roleAssignment = null;
             RoleAssignmentResponse response = createRoleAssignmentResponse(singletonList(roleAssignment));
 
@@ -145,12 +144,12 @@ class RoleAssignmentsMapperTest {
             List<RoleAssignment> roleAssignments = mapped.getRoleAssignmentsList();
             assertAll(
                 () -> assertThat(roleAssignments.size(), is(1)),
-                () -> assertNull(roleAssignments.get(0))
+                () -> assertNull(roleAssignments.getFirst())
             );
         }
 
         @Test
-        public void shouldMapNullRoleAssignmentAttributes() {
+        void shouldMapNullRoleAssignmentAttributes() {
             RoleAssignmentResource roleAssignment = RoleAssignmentResource.builder()
                 .id(ASSIGNMENT_1)
                 .attributes(null)
@@ -162,8 +161,8 @@ class RoleAssignmentsMapperTest {
             List<RoleAssignment> roleAssignments = mapped.getRoleAssignmentsList();
             assertAll(
                 () -> assertThat(roleAssignments.size(), is(1)),
-                () -> assertThat(roleAssignments.get(0).getId(), is(ASSIGNMENT_1)),
-                () -> assertNull(roleAssignments.get(0).getAttributes())
+                () -> assertThat(roleAssignments.getFirst().getId(), is(ASSIGNMENT_1)),
+                () -> assertNull(roleAssignments.getFirst().getAttributes())
             );
         }
     }

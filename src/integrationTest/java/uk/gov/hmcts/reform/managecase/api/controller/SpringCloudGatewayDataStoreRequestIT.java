@@ -130,4 +130,3 @@ public class SpringCloudGatewayDataStoreRequestIT extends BaseIT {
                 .compact();
     }
 }
-

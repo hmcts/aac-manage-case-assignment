@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.managecase.security;
 
 import com.google.common.collect.Lists;
+import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.managecase.repository.IdamRepository;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,6 +29,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -92,6 +95,20 @@ class SecurityUtilsTest {
     @Test
     void hasSolicitorAndJurisdictionRolesReturnsFalseWhenRolesEmpty() {
         assertFalse(securityUtils.hasSolicitorAndJurisdictionRoles(roles, ""));
+    }
+
+    @Test
+    void getServiceNameFromS2STokenReturnsSubjectFromBearerToken() {
+        String token = generateServiceToken("xui_webapp");
+
+        assertEquals("xui_webapp", securityUtils.getServiceNameFromS2SToken("Bearer " + token));
+    }
+
+    @Test
+    void getServiceNameFromS2STokenReturnsSubjectFromUnprefixedToken() {
+        String token = generateServiceToken("ccd_data");
+
+        assertEquals("ccd_data", securityUtils.getServiceNameFromS2SToken(token));
     }
 
     @Test
@@ -161,5 +178,13 @@ class SecurityUtilsTest {
 
     private GrantedAuthority newAuthority(String authority) {
         return (GrantedAuthority) () -> authority;
+    }
+
+    private String generateServiceToken(String serviceName) {
+        return Jwts.builder()
+            .subject(serviceName)
+            .issuedAt(new Date())
+            .signWith(Jwts.SIG.HS256.key().build())
+            .compact();
     }
 }

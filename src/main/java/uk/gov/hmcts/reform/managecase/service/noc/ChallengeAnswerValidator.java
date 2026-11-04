@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.managecase.service.noc;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeAnswer;
@@ -27,6 +28,12 @@ import static uk.gov.hmcts.reform.managecase.client.datastore.model.FieldTypeDef
 @SuppressWarnings({"PMD.AvoidLiteralsInIfCondition", "PMD.UseConcurrentHashMap"})
 public class ChallengeAnswerValidator {
 
+    private final ApplicationParams applicationParams;
+
+    public ChallengeAnswerValidator(ApplicationParams applicationParams) {
+        this.applicationParams = applicationParams;
+    }
+
     public String getMatchingCaseRole(ChallengeQuestionsResult challengeQuestions,
                                       List<SubmittedChallengeAnswer> submittedAnswers,
                                       CaseDetails caseDetails) {
@@ -42,7 +49,7 @@ public class ChallengeAnswerValidator {
                                        ChallengeQuestionsResult challengeQuestions) {
         List<String> matchingCaseRoleIds = caseRoleCorrectAnswers.keySet().stream()
             .filter(caseRoleId -> caseRoleCorrectAnswers.get(caseRoleId) == challengeQuestions.getQuestions().size())
-            .collect(toList());
+            .toList();
 
         if (matchingCaseRoleIds.isEmpty()) {
             throw new NoCException(ANSWERS_NOT_MATCH_LITIGANT);
@@ -52,7 +59,7 @@ public class ChallengeAnswerValidator {
             throw new NoCException(ANSWERS_NOT_IDENTIFY_LITIGANT);
         }
 
-        return matchingCaseRoleIds.get(0);
+        return matchingCaseRoleIds.getFirst();
     }
 
     private Map<String, Integer> getCaseRoleCorrectAnswers(List<SubmittedChallengeAnswer> answers,
@@ -120,6 +127,6 @@ public class ChallengeAnswerValidator {
     }
 
     private String formattedString(String textValue) {
-        return whitespace().or(anyOf("-'")).removeFrom(textValue);
+        return whitespace().or(anyOf(applicationParams.getChallengeAnswerStripCharacters())).removeFrom(textValue);
     }
 }

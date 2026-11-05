@@ -1,104 +1,67 @@
 package uk.gov.hmcts.reform.managecase.api.errorhandling;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController;
-import uk.gov.hmcts.reform.managecase.service.noc.ApplyNoCDecisionService;
-import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeApprovalService;
-import uk.gov.hmcts.reform.managecase.service.noc.NoticeOfChangeQuestions;
-import uk.gov.hmcts.reform.managecase.service.noc.RequestNoticeOfChangeService;
-import uk.gov.hmcts.reform.managecase.service.noc.PrepareNoCService;
-import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCException;
 
-import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static uk.gov.hmcts.reform.managecase.api.controller.NoticeOfChangeController.GET_NOC_QUESTIONS;
+class RestExceptionHandlerTest {
 
-@DirtiesContext  // required for Jenkins agent
-@AutoConfigureWireMock(port = 0)
-public class RestExceptionHandlerTest {
+    private final RestExceptionHandler handler = new RestExceptionHandler();
 
-    private MockMvc mockMvc;
+    @Test
+    void shouldMapAccessDeniedToForbidden() {
+        var response = handler.handleAccessDeniedException(new AccessDeniedException("denied"));
 
-    @Mock
-    protected NoticeOfChangeQuestions service;
-
-    @Mock
-    protected NoticeOfChangeApprovalService approvalService;
-
-    @Mock
-    protected PrepareNoCService prepareNoCService;
-
-    @Mock
-    protected VerifyNoCAnswersService verifyNoCAnswersService;
-
-    @Mock
-    protected ApplyNoCDecisionService applyNoCDecisionService;
-
-    @Mock
-    protected RequestNoticeOfChangeService requestNoticeOfChangeService;
-
-    @Mock
-    protected JacksonUtils jacksonUtils;
-
-
-    private static final String CASE_ID = "1567934206391385";
-
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        NoticeOfChangeController controller = new NoticeOfChangeController(service,
-                                                                           approvalService,
-                                                                           verifyNoCAnswersService,
-                                                                           prepareNoCService,
-                                                                           requestNoticeOfChangeService,
-                                                                           applyNoCDecisionService,
-                                                                           jacksonUtils);
-
-        mockMvc = MockMvcBuilders.standaloneSetup(controller)
-            .setControllerAdvice(new RestExceptionHandler())
-            .build();
-
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(((ApiError) response.getBody()).getMessage()).isEqualTo("denied");
     }
 
     @Test
-    public void handleException_shouldReturnCaseCouldNotBeFoundResponse() throws Exception {
+    void shouldMapValidationToBadRequest() {
+        var response = handler.handleValidationException(new jakarta.validation.ValidationException("invalid"));
 
-        // ARRANGE
-        String myUniqueExceptionMessage = "Case could not be found";
-        // any runtime exception (that is not an CaseAssignedUserRoleException)
-        CaseCouldNotBeFoundException expectedException =
-            new CaseCouldNotBeFoundException(myUniqueExceptionMessage);
-
-        setupMockServiceToThrowException(expectedException);
-        ResultActions result =  this.mockMvc.perform(get("/noc" + GET_NOC_QUESTIONS)
-                                                         .queryParam("case_id", CASE_ID));
-
-        assertHttpErrorResponse(result, expectedException);
-
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(((ApiError) response.getBody()).getMessage()).isEqualTo("invalid");
     }
 
-    private void setupMockServiceToThrowException(Exception expectedException) {
-        // configure chosen mock service to throw exception when controller is run
-        when(service.getChallengeQuestions(CASE_ID)).thenThrow(expectedException);
+    @Test
+    void shouldMapMissingCaseToNotFound() {
+        var response = handler.handleCaseCouldNotBeFoundException(
+            new CaseCouldNotBeFoundException("missing"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(((ApiError) response.getBody()).getMessage()).isEqualTo("missing");
     }
 
-    private void assertHttpErrorResponse(ResultActions result, Exception expectedException) throws Exception {
+    @Test
+    void shouldMapCaseAssignmentErrorUsingResponseStatus() {
+        var response = handler.handleApiException(new CaseAssignedUserRoleException("invalid role"));
 
-        result.andExpect(jsonPath("$.message").value(expectedException.getMessage()));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+        assertThat(((ApiError) response.getBody()).getMessage()).isEqualTo("invalid role");
+        assertThat(CaseAssignedUserRoleException.class.getAnnotation(ResponseStatus.class).code())
+            .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
+    @Test
+    void shouldMapNoCErrorToStructuredBadRequest() {
+        var response = handler.handleNoCException(new NoCException("invalid answers", "answers-invalid"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        var body = (uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCApiError) response.getBody();
+        assertThat(body.getMessage()).isEqualTo("invalid answers");
+        assertThat(body.getCode()).isEqualTo("answers-invalid");
+    }
+
+    @Test
+    void shouldMapUnexpectedExceptionToInternalServerError() {
+        var response = handler.handleAll(new IllegalStateException("unexpected"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(((ApiError) response.getBody()).getMessage()).isEqualTo("unexpected");
+    }
 }
-

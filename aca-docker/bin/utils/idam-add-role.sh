@@ -27,6 +27,10 @@ if [ $STATUS -eq 201 ]; then
   echo "Role created sucessfully"
 elif [ $STATUS -eq 409 ]; then
   echo "Role already exists!"
+elif [ $STATUS -eq 404 ]; then
+  echo "IDAM /roles endpoint not found at ${IDAM_API_BASE_URL:-http://localhost:5000}/roles"
+  echo "This script requires full SIDAM/IDAM. If using idam-sim, do not run add-roles.sh."
+  exit 1
 else
   echo "ERROR: HTTPCODE = $STATUS"
   exit 1

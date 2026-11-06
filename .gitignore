@@ -1,5 +1,6 @@
 .gradle
 /build/
+/pacts/
 !gradle/wrapper/gradle-wrapper.jar
 *.class
 lib/applicationinsights-agent-*.jar

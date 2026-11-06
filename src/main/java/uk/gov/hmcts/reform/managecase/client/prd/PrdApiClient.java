@@ -18,6 +18,10 @@ public interface PrdApiClient {
     FindOrganisationResponse findRequestingUserOrganisation();
 
     @GetMapping(value = "/refdata/external/v1/organisations/users?status=Active&returnRoles=false",
+        consumes = APPLICATION_JSON_VALUE)
+    FindUsersByOrganisationResponse findActiveUserOrganisation(@RequestParam("userIdentifier") String userIdentifier);
+
+    @GetMapping(value = "/refdata/external/v1/organisations/users?status=Active&returnRoles=false",
             consumes = APPLICATION_JSON_VALUE)
     FindUsersByOrganisationResponse findActiveUsersByOrganisation();
 

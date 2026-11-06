@@ -728,6 +728,42 @@ public class NoticeOfChangeControllerIT {
         }
 
         @Test
+        void shouldSubmitNoCWhenPrdDoesNotHaveMetadataEndpoint() throws Exception {
+            var metadataStub = stubFor(WireMock.get(urlEqualTo("/refdata/external/v1/organisations/metadata"))
+                .willReturn(aResponse().withStatus(404)
+                    .withHeader("Content-Type", APPLICATION_JSON_VALUE)
+                    .withBody("{\"status\":404,\"error\":\"Not Found\","
+                        + "\"path\":\"/refdata/external/v1/organisations/metadata\"}")));
+            var userStub = stubFor(WireMock.get(WireMock.urlPathEqualTo("/refdata/external/v1/organisations/users"))
+                .withQueryParam("userIdentifier", WireMock.equalTo("445"))
+                .withQueryParam("status", WireMock.equalTo("Active"))
+                .withQueryParam("returnRoles", WireMock.equalTo("false"))
+                .willReturn(aResponse().withStatus(200)
+                    .withHeader("Content-Type", APPLICATION_JSON_VALUE)
+                    .withBody("{\"users\":[],\"organisationIdentifier\":\"InvokingUsersOrg\"}")));
+
+            try {
+                mockMvc.perform(post(ENDPOINT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(requestNoticeOfChangeRequest)))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.status_message", is(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)))
+                    .andExpect(jsonPath("$.approval_status", is(PENDING.name())));
+
+                WireMock.verify(WireMock.getRequestedFor(
+                        WireMock.urlPathEqualTo("/refdata/external/v1/organisations/users"))
+                    .withQueryParam("userIdentifier", WireMock.equalTo("445")));
+                WireMock.verify(0, WireMock.getRequestedFor(
+                        WireMock.urlPathEqualTo("/refdata/external/v1/organisations/users"))
+                    .withQueryParam("userIdentifier", WireMock.absent()));
+            } finally {
+                WireMock.removeStub(metadataStub);
+                WireMock.removeStub(userStub);
+                WireMock.resetAllRequests();
+            }
+        }
+
+        @Test
         void shouldSuccessfullyVerifyNoCRequestWithoutAutoApproval() throws Exception {
             this.mockMvc.perform(post(ENDPOINT_URL)
                     .contentType(MediaType.APPLICATION_JSON)

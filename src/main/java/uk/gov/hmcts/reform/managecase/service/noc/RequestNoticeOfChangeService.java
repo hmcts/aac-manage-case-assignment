@@ -76,7 +76,7 @@ public class RequestNoticeOfChangeService {
         Organisation incumbentOrganisation = noCRequestDetails.getOrganisationPolicy().getOrganisation();
         String caseRoleId = noCRequestDetails.getOrganisationPolicy().getOrgPolicyCaseAssignedRole();
 
-        String organisationIdentifier = prdRepository.findUsersByOrganisation().getOrganisationIdentifier();
+        String organisationIdentifier = prdRepository.findRequestingUserOrganisation().getOrganisationIdentifier();
 
         Organisation invokersOrganisation = Organisation.builder().organisationID(organisationIdentifier).build();
 

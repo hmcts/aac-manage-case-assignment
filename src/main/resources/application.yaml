@@ -35,7 +35,7 @@ spring:
     allow-bean-definition-overriding: true
     web-application-type: SERVLET
   cache:
-    cache-names: userInfoCache,usersByOrganisationExternal,usersByOrganisationInternal,organisationAddressById,systemUserAccessTokenCache,caaAccessTokenCache,nocApproverAccessTokenCache,caseRoles,challengeQuestions
+    cache-names: userInfoCache,usersByOrganisationExternal,usersByOrganisationInternal,requestingUserOrganisation,organisationAddressById,systemUserAccessTokenCache,caaAccessTokenCache,nocApproverAccessTokenCache,caseRoles,challengeQuestions
     caffeine:
       spec: expireAfterWrite=1800s
   security:

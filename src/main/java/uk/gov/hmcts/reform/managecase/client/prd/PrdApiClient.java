@@ -14,6 +14,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 )
 public interface PrdApiClient {
 
+    @GetMapping(value = "/refdata/external/v1/organisations/metadata", consumes = APPLICATION_JSON_VALUE)
+    FindOrganisationResponse findRequestingUserOrganisation();
+
     @GetMapping(value = "/refdata/external/v1/organisations/users?status=Active&returnRoles=false",
             consumes = APPLICATION_JSON_VALUE)
     FindUsersByOrganisationResponse findActiveUsersByOrganisation();

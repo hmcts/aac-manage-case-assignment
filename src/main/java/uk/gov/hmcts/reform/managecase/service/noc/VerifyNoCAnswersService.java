@@ -57,7 +57,7 @@ public class VerifyNoCAnswersService {
 
     private boolean organisationEqualsRequestingUsers(Organisation organisation) {
         return organisation != null
-            && prdRepository.findUsersByOrganisation()
+            && prdRepository.findRequestingUserOrganisation()
             .getOrganisationIdentifier().equals(organisation.getOrganisationID());
     }
 

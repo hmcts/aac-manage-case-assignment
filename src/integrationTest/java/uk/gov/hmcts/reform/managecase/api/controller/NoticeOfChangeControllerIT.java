@@ -736,6 +736,10 @@ public class NoticeOfChangeControllerIT {
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)))
                 .andExpect(jsonPath("$.approval_status", is(PENDING.name())));
+
+            WireMock.verify(WireMock.getRequestedFor(urlEqualTo("/refdata/external/v1/organisations/metadata")));
+            WireMock.verify(0, WireMock.getRequestedFor(WireMock.urlPathEqualTo(
+                "/refdata/external/v1/organisations/users")));
         }
 
         @Test
@@ -763,6 +767,10 @@ public class NoticeOfChangeControllerIT {
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status_message", is(REQUEST_NOTICE_OF_CHANGE_STATUS_MESSAGE)))
                 .andExpect(jsonPath("$.approval_status", is(APPROVED.name())));
+
+            WireMock.verify(WireMock.getRequestedFor(urlEqualTo("/refdata/external/v1/organisations/metadata")));
+            WireMock.verify(0, WireMock.getRequestedFor(WireMock.urlPathEqualTo(
+                "/refdata/external/v1/organisations/users")));
         }
     }
 

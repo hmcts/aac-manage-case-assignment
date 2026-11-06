@@ -18,6 +18,12 @@ public class DefaultPrdRepository implements PrdRepository {
     }
 
     @Override
+    @Cacheable(value = "requestingUserOrganisation", key = "@securityUtils.userToken")
+    public FindOrganisationResponse findRequestingUserOrganisation() {
+        return prdApi.findRequestingUserOrganisation();
+    }
+
+    @Override
     @Cacheable(value = "usersByOrganisationExternal", key = "@securityUtils.userToken")
     public FindUsersByOrganisationResponse findUsersByOrganisation() {
         return prdApi.findActiveUsersByOrganisation();

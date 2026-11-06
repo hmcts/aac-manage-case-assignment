@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse
 
 public interface PrdRepository {
 
+    FindOrganisationResponse findRequestingUserOrganisation();
+
     FindUsersByOrganisationResponse findUsersByOrganisation();
 
     FindUsersByOrganisationResponse findUsersByOrganisation(String organisationId);

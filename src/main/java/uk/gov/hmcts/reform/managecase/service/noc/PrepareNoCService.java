@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
-import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
 import uk.gov.hmcts.reform.managecase.repository.DefinitionStoreRepository;
@@ -151,8 +150,7 @@ public class PrepareNoCService {
     }
 
     private String findTheOrganisationIdOfTheInvokerUsingPrd() {
-        FindUsersByOrganisationResponse usersByOrganisation = prdRepository.findUsersByOrganisation();
-        return usersByOrganisation.getOrganisationIdentifier();
+        return prdRepository.findRequestingUserOrganisation().getOrganisationIdentifier();
     }
 
     private boolean hasCaseRoleId(Map<String, JsonNode> data, String corFieldName) {

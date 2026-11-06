@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewActionableE
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewType;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
-import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
+import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.data.user.UserRepository;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.DynamicList;
@@ -103,9 +103,9 @@ class RequestNoticeOfChangeServiceTest {
     @BeforeEach
     void setUp() {
         openMocks(this);
-        FindUsersByOrganisationResponse findUsersByOrganisationResponse = new FindUsersByOrganisationResponse(
-            emptyList(), INVOKERS_ORGANISATION_IDENTIFIER);
-        given(prdRepository.findUsersByOrganisation()).willReturn(findUsersByOrganisationResponse);
+        FindOrganisationResponse requestingUserOrganisation = new FindOrganisationResponse(
+            emptyList(), INVOKERS_ORGANISATION_IDENTIFIER, null);
+        given(prdRepository.findRequestingUserOrganisation()).willReturn(requestingUserOrganisation);
 
         CaseViewType caseViewType = new CaseViewType();
         caseViewType.setId("id");

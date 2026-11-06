@@ -125,6 +125,9 @@ mca:
 notify:
   api-key: ${NOTIFY_MCA_API_KEY:notify-test-api-key}
   email-template-id: ${NOTIFY_EMAIL_TEMPLATE_ID:a60215dd-08bb-475e-956c-e97fdb7e448c}
+  email:
+    pool-size: ${NOTIFY_EMAIL_POOL_SIZE:4}
+    queue-capacity: ${NOTIFY_EMAIL_QUEUE_CAPACITY:100}
 
 role:
   assignment:

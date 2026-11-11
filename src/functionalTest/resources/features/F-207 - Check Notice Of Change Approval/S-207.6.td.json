@@ -1,0 +1,15 @@
+{
+  "_guid_": "S-207.6",
+
+  "title": "CCD ApplyNoCDecision callback payload is accepted by ACA",
+
+  "specs": [
+    "Richard - with the ability to create a case for a particular jurisdiction within an organisation"
+  ],
+
+  "users": {
+    "Richard": {
+      "_extends_": "ACA_Users_Richard"
+    }
+  }
+}

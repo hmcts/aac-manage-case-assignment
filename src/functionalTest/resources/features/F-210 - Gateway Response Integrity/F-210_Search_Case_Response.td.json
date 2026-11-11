@@ -1,0 +1,118 @@
+{
+  "_guid_": "F-210_Search_Case_Response",
+
+  "id": "${[scenarioContext][childContexts][F-210_Prerequisite_Case_Creation][testData][actualResponse][body][id]}",
+  "jurisdiction": "BEFTA_MASTER",
+  "state": "CaseCreated",
+  "version": null,
+  "case_type_id": "FT_MasterCaseType",
+  "created_date": "[[ANYTHING_PRESENT]]",
+  "last_modified": "[[ANYTHING_PRESENT]]",
+  "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+  "security_classification": "PUBLIC",
+  "case_data": {
+    "OrganisationPolicyField2": {
+      "OrgPolicyCaseAssignedRole": "[Defendant]",
+      "Organisation": {
+        "OrganisationID": "QUK822N",
+        "OrganisationName": "ACA-2 Organisation"
+      },
+      "OrgPolicyReference": "DefendantPolicy"
+    },
+    "OrganisationPolicyField1": {
+      "OrgPolicyCaseAssignedRole": "[Claimant]",
+      "Organisation": {
+        "OrganisationID": "QUK822N",
+        "OrganisationName": "ACA-2 Organisation"
+      },
+      "OrgPolicyReference": "ClaimantPolicy"
+    }
+  },
+  "data_classification": {
+    "AddressField": {
+      "classification": "PUBLIC",
+      "value": {
+        "AddressLine3": "PUBLIC",
+        "AddressLine2": "PUBLIC",
+        "AddressLine1": "PUBLIC",
+        "Country": "PUBLIC"
+      }
+    },
+    "AddressUKField": {
+      "classification": "PUBLIC",
+      "value": {
+        "AddressLine3": "PUBLIC",
+        "AddressLine2": "PUBLIC",
+        "AddressLine1": "PUBLIC",
+        "Country": "PUBLIC",
+        "PostTown": "PUBLIC",
+        "PostCode": "PUBLIC",
+        "County": "PUBLIC"
+      }
+    },
+    "DocumentField": "PUBLIC",
+    "MoneyField": "PUBLIC",
+    "DynamicList": "PUBLIC",
+    "MarritalStatus": "PUBLIC",
+    "SearchCriteria": {
+      "classification": "PUBLIC",
+      "value": {}
+    },
+    "NumberField": "PUBLIC",
+    "MultiSelectField": "PUBLIC",
+    "EmailField": "PUBLIC",
+    "YesNoField": "PUBLIC",
+    "PhoneField": "PUBLIC",
+    "TextField": "PUBLIC",
+    "DateField": "PUBLIC",
+    "OrganisationPolicyField2": {
+      "classification": "PUBLIC",
+      "value": {
+        "OrgPolicyCaseAssignedRole": "PUBLIC",
+        "Organisation": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrganisationID": "PUBLIC",
+            "OrganisationName": "PUBLIC"
+          }
+        },
+        "OrgPolicyReference": "PUBLIC"
+      }
+    },
+    "OrganisationPolicyField1": {
+      "classification": "PUBLIC",
+      "value": {
+        "OrgPolicyCaseAssignedRole": "PUBLIC",
+        "Organisation": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrganisationID": "PUBLIC",
+            "OrganisationName": "PUBLIC"
+          }
+        },
+        "OrgPolicyReference": "PUBLIC"
+      }
+    },
+    "TextAreaField": "PUBLIC",
+    "CollectionField": {
+      "classification": "PUBLIC",
+      "value": [
+        {
+          "id": "[[ANY_STRING_NOT_NULLABLE]]",
+          "classification": "PUBLIC"
+        },
+        {
+          "id": "[[ANY_STRING_NOT_NULLABLE]]",
+          "classification": "PUBLIC"
+        }
+      ]
+    }
+  },
+  "supplementary_data": null,
+  "after_submit_callback_response": null,
+  "callback_response_status_code": null,
+  "callback_response_status": null,
+  "callback_error_message": null,
+  "delete_draft_response_status_code": null,
+  "delete_draft_response_status": null
+}

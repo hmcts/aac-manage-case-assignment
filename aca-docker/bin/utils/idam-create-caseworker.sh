@@ -5,7 +5,7 @@
 ######################
 
 get_user_roles() {
-  docker run -e PGPASSWORD='openidm' --rm --network ccd-network postgres:11-alpine psql --host shared-db --username openidm --tuples-only --command "SELECT data.roles FROM managedObjects mo, LATERAL (SELECT regexp_replace(string_agg((element::json -> '_ref')::text, ','), '( *\\w*\\/)|(\")', '', 'g') AS roles FROM json_array_elements_text(mo.fullobject->'effectiveRoles') as data(element)) data WHERE mo.fullobject ->> 'userName'='${1}';" openidm
+  docker run -e PGPASSWORD="${IDAM_DB_PASSWORD:?IDAM_DB_PASSWORD must be set}" --rm --network ccd-network postgres:11-alpine psql --host shared-db --username openidm --tuples-only --command "SELECT data.roles FROM managedObjects mo, LATERAL (SELECT regexp_replace(string_agg((element::json -> '_ref')::text, ','), '( *\\w*\\/)|(\")', '', 'g') AS roles FROM json_array_elements_text(mo.fullobject->'effectiveRoles') as data(element)) data WHERE mo.fullobject ->> 'userName'='${1}';" openidm
 }
 
 create_user_request() {
@@ -17,7 +17,7 @@ create_user_request() {
           "email":"'"${email}"'",
           "forename":"'"${firstName}"'",
           "surname":"'"${surname}"'",
-          "password":"Pa55word11",
+          "password":"'"${IDAM_TEST_USER_PASSWORD:?Set IDAM_TEST_USER_PASSWORD}"'",
           "levelOfAccess":1,
           "roles": [
             '"${rolesJson}"'
@@ -80,8 +80,7 @@ set -eu
 
 if [ "${ENVIRONMENT:-local}" != "local" ]; then
   exit 0;
-fi
-
+  fi
 email=${1}
 rolesStr=${2}
 surname=${3:-"Tester"}

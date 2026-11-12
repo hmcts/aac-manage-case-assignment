@@ -8,11 +8,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CaseFieldDefinitionTest {
 
@@ -27,7 +25,7 @@ class CaseFieldDefinitionTest {
         String json = objectMapper.writeValueAsString(caseFieldDefinition);
         CaseFieldDefinition result = objectMapper.readValue(json, CaseFieldDefinition.class);
 
-        assertThat(objectMapper.valueToTree(result.getFormattedValue()), is(formattedValue));
+        assertThat(objectMapper.<JsonNode>valueToTree(result.getFormattedValue())).isEqualTo(formattedValue);
     }
 
     @Test
@@ -35,9 +33,9 @@ class CaseFieldDefinitionTest {
         CaseFieldDefinition caseFieldDefinition = caseFieldDefinition("CollectionField", fieldType("Collection"));
 
         assertAll(
-            () -> assertThat(caseFieldDefinition.isCollectionFieldType(), is(true)),
-            () -> assertThat(caseFieldDefinition.isComplexFieldType(), is(false)),
-            () -> assertThat(caseFieldDefinition.isCompoundFieldType(), is(true))
+            () -> assertThat(caseFieldDefinition.isCollectionFieldType()).isTrue(),
+            () -> assertThat(caseFieldDefinition.isComplexFieldType()).isFalse(),
+            () -> assertThat(caseFieldDefinition.isCompoundFieldType()).isTrue()
         );
     }
 
@@ -46,9 +44,9 @@ class CaseFieldDefinitionTest {
         CaseFieldDefinition caseFieldDefinition = caseFieldDefinition("ComplexField", fieldType("Complex"));
 
         assertAll(
-            () -> assertThat(caseFieldDefinition.isCollectionFieldType(), is(false)),
-            () -> assertThat(caseFieldDefinition.isComplexFieldType(), is(true)),
-            () -> assertThat(caseFieldDefinition.isCompoundFieldType(), is(true))
+            () -> assertThat(caseFieldDefinition.isCollectionFieldType()).isFalse(),
+            () -> assertThat(caseFieldDefinition.isComplexFieldType()).isTrue(),
+            () -> assertThat(caseFieldDefinition.isCompoundFieldType()).isTrue()
         );
     }
 
@@ -57,9 +55,9 @@ class CaseFieldDefinitionTest {
         CaseFieldDefinition caseFieldDefinition = caseFieldDefinition("TextField", fieldType("Text"));
 
         assertAll(
-            () -> assertThat(caseFieldDefinition.isCollectionFieldType(), is(false)),
-            () -> assertThat(caseFieldDefinition.isComplexFieldType(), is(false)),
-            () -> assertThat(caseFieldDefinition.isCompoundFieldType(), is(false))
+            () -> assertThat(caseFieldDefinition.isCollectionFieldType()).isFalse(),
+            () -> assertThat(caseFieldDefinition.isComplexFieldType()).isFalse(),
+            () -> assertThat(caseFieldDefinition.isCompoundFieldType()).isFalse()
         );
     }
 
@@ -68,7 +66,7 @@ class CaseFieldDefinitionTest {
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
         caseFieldDefinition.setDisplayContext("MANDATORY");
 
-        assertThat(caseFieldDefinition.displayContextType(), is(DisplayContext.MANDATORY));
+        assertThat(caseFieldDefinition.displayContextType()).isEqualTo(DisplayContext.MANDATORY);
     }
 
     @Test
@@ -76,14 +74,14 @@ class CaseFieldDefinitionTest {
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
         caseFieldDefinition.setDisplayContext("HIDDEN");
 
-        assertThat(caseFieldDefinition.displayContextType(), is(nullValue()));
+        assertThat(caseFieldDefinition.displayContextType()).isNull();
     }
 
     @Test
     void shouldReturnNullDisplayContextTypeWhenDisplayContextIsMissing() {
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
 
-        assertThat(caseFieldDefinition.displayContextType(), is(nullValue()));
+        assertThat(caseFieldDefinition.displayContextType()).isNull();
     }
 
     @Test
@@ -91,7 +89,8 @@ class CaseFieldDefinitionTest {
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
         caseFieldDefinition.setDisplayContext("UNKNOWN");
 
-        assertThrows(IllegalArgumentException.class, caseFieldDefinition::displayContextType);
+        assertThatThrownBy(caseFieldDefinition::displayContextType)
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -100,7 +99,7 @@ class CaseFieldDefinitionTest {
 
         Optional<CommonField> result = caseFieldDefinition.getComplexFieldNestedField(" ");
 
-        assertThat(result, is(Optional.of(caseFieldDefinition)));
+        assertThat(result).contains(caseFieldDefinition);
     }
 
     @Test
@@ -110,7 +109,7 @@ class CaseFieldDefinitionTest {
 
         Optional<CommonField> result = caseFieldDefinition.getComplexFieldNestedField("NestedTextField");
 
-        assertThat(result, is(Optional.of(nestedField)));
+        assertThat(result).contains(nestedField);
     }
 
     @Test
@@ -122,7 +121,7 @@ class CaseFieldDefinitionTest {
         Optional<CommonField> result = caseFieldDefinition.getComplexFieldNestedField(
             "NestedComplexField.NestedNumberField");
 
-        assertThat(result, is(Optional.of(deeplyNestedField)));
+        assertThat(result).contains(deeplyNestedField);
     }
 
     @Test
@@ -132,7 +131,16 @@ class CaseFieldDefinitionTest {
 
         Optional<CommonField> result = caseFieldDefinition.getComplexFieldNestedField("MissingField");
 
-        assertThat(result.isEmpty(), is(true));
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldExposeComplexFieldChildren() {
+        CaseFieldDefinition child = caseFieldDefinition("AddressLine1", fieldType("Text"));
+        FieldTypeDefinition complexType = fieldType("Complex");
+        complexType.setComplexFields(List.of(child));
+
+        assertThat(complexType.getChildren()).containsExactly(child);
     }
 
     private CaseFieldDefinition complexCaseFieldDefinition(String id, CaseFieldDefinition... nestedFields) {

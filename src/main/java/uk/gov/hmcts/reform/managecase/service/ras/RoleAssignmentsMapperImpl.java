@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.RoleAssignments.RoleAssignment
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class RoleAssignmentsMapperImpl implements RoleAssignmentsMapper {
@@ -82,12 +83,28 @@ public class RoleAssignmentsMapperImpl implements RoleAssignmentsMapper {
 
         RoleAssignmentAttributesBuilder roleAssignmentAttributes = RoleAssignmentAttributes.builder();
 
-        roleAssignmentAttributes.jurisdiction(roleAssignmentAttributesResource.getJurisdiction());
-        roleAssignmentAttributes.caseType(roleAssignmentAttributesResource.getCaseType());
-        roleAssignmentAttributes.caseId(roleAssignmentAttributesResource.getCaseId());
-        roleAssignmentAttributes.region(roleAssignmentAttributesResource.getRegion());
-        roleAssignmentAttributes.location(roleAssignmentAttributesResource.getLocation());
-        roleAssignmentAttributes.contractType(roleAssignmentAttributesResource.getContractType());
+        if (roleAssignmentAttributesResource.isJurisdictionDefined()) {
+            roleAssignmentAttributes.jurisdiction(
+                Optional.ofNullable(roleAssignmentAttributesResource.getJurisdiction())
+            );
+        }
+        if (roleAssignmentAttributesResource.isCaseTypeDefined()) {
+            roleAssignmentAttributes.caseType(Optional.ofNullable(roleAssignmentAttributesResource.getCaseType()));
+        }
+        if (roleAssignmentAttributesResource.isCaseIdDefined()) {
+            roleAssignmentAttributes.caseId(Optional.ofNullable(roleAssignmentAttributesResource.getCaseId()));
+        }
+        if (roleAssignmentAttributesResource.isRegionDefined()) {
+            roleAssignmentAttributes.region(Optional.ofNullable(roleAssignmentAttributesResource.getRegion()));
+        }
+        if (roleAssignmentAttributesResource.isLocationDefined()) {
+            roleAssignmentAttributes.location(Optional.ofNullable(roleAssignmentAttributesResource.getLocation()));
+        }
+        if (roleAssignmentAttributesResource.isContractTypeDefined()) {
+            roleAssignmentAttributes.contractType(
+                Optional.ofNullable(roleAssignmentAttributesResource.getContractType())
+            );
+        }
 
         return roleAssignmentAttributes.build();
     }

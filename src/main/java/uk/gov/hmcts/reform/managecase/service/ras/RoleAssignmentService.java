@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.managecase.service.casedataaccesscontrol.RoleAssignme
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -67,7 +66,7 @@ public class RoleAssignmentService {
                     request.getRoleNames(),
                     false
                      )
-                ).forEach(assignmentRequest -> roleAssignmentServiceHelper.createRoleAssignment(assignmentRequest));
+                ).forEach(roleAssignmentServiceHelper::createRoleAssignment);
         }
     }
 
@@ -99,9 +98,9 @@ public class RoleAssignmentService {
                 .readOnly(false)
                 .beginTime(Instant.now())
                 .attributes(RoleAssignmentAttributesResource.builder()
-                                .jurisdiction(Optional.of(caseDetails.getJurisdiction()))
-                                .caseType(Optional.of(caseDetails.getCaseTypeId()))
-                                .caseId(Optional.of(caseDetails.getReferenceAsString()))
+                                .jurisdiction(caseDetails.getJurisdiction())
+                                .caseType(caseDetails.getCaseTypeId())
+                                .caseId(caseDetails.getReferenceAsString())
                                 .build())
                 .build())
             .collect(Collectors.toList());
@@ -123,7 +122,7 @@ public class RoleAssignmentService {
         final var roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
         var caseIdError = new RuntimeException(RoleAssignmentAttributes.ATTRIBUTE_NOT_DEFINED);
         return roleAssignments.getRoleAssignmentsList().stream()
-            .filter(roleAssignment -> isValidRoleAssignment(roleAssignment))
+            .filter(this::isValidRoleAssignment)
             .map(roleAssignment ->
                      new CaseAssignedUserRole(
                          roleAssignment.getAttributes().getCaseId().orElseThrow(() -> caseIdError),

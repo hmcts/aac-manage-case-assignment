@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.managecase.repository.DataStoreRepository;
 import uk.gov.hmcts.reform.managecase.service.ras.RoleAssignmentService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +79,6 @@ public class CaseAccessOperationTest {
         private  ArgumentCaptor<List<RoleAssignmentsAddRequest>> caseUserRolesCaptor;
 
         private Map<String, Map<String, Long>> caseReferenceToOrgIdCountMap;
-        private Map<String, Map<String, Long>> caseReferenceToOrgIdCountMapOther;
 
         @BeforeEach
         void setup() {
@@ -107,11 +105,6 @@ public class CaseAccessOperationTest {
             caseReferenceToOrgIdCountMap = new HashMap<>();
             caseReferenceToOrgIdCountMap.put(CASE_REFERENCE.toString(), orgIdToCountMap);
 
-            Map<String, Long> orgIdToCountMapOther = new HashMap<>();
-            orgIdToCountMapOther.put(ORGANISATION, 1L);
-            orgIdToCountMapOther.put(ORGANISATION_OTHER, 1L);
-            caseReferenceToOrgIdCountMapOther = new HashMap<>();
-            caseReferenceToOrgIdCountMapOther.put(CASE_REFERENCE_OTHER.toString(), orgIdToCountMapOther);
         }
 
 
@@ -202,7 +195,7 @@ public class CaseAccessOperationTest {
                 () -> assertEquals(1, deleteRequests.size()),
                 () -> assertCorrectlyPopulatedRoleAssignmentsDeleteRequest(
                     CASE_REFERENCE.toString(), USER_ID, List.of(CASE_ROLE),
-                    deleteRequests.get(0)
+                    deleteRequests.getFirst()
                 )
             );
             verify(dataStoreRepository, times(1))
@@ -237,7 +230,7 @@ public class CaseAccessOperationTest {
                 () -> assertEquals(1, deleteRequests.size()),
                 () -> assertCorrectlyPopulatedRoleAssignmentsDeleteRequest(
                     CASE_REFERENCE.toString(), USER_ID, List.of(CASE_ROLE_CREATOR),
-                    deleteRequests.get(0)
+                    deleteRequests.getFirst()
                 )
             );
             verify(dataStoreRepository, times(1))
@@ -342,7 +335,7 @@ public class CaseAccessOperationTest {
                 () -> assertEquals(1, deleteRequests.size()),
                 () -> assertCorrectlyPopulatedRoleAssignmentsDeleteRequest(
                     CASE_REFERENCE.toString(), USER_ID, List.of(CASE_ROLE),
-                    deleteRequests.get(0)
+                    deleteRequests.getFirst()
                 )
             );
 
@@ -406,7 +399,7 @@ public class CaseAccessOperationTest {
                 () -> assertEquals(1, deleteRequests.size()),
                 () -> assertCorrectlyPopulatedRoleAssignmentsDeleteRequest(
                     CASE_REFERENCE.toString(), USER_ID, List.of(CASE_ROLE_CREATOR),
-                    deleteRequests.get(0)
+                    deleteRequests.getFirst()
                 )
             );
 
@@ -445,7 +438,7 @@ public class CaseAccessOperationTest {
                 () -> assertEquals(1, deleteRequests.size()),
                 () -> assertCorrectlyPopulatedRoleAssignmentsDeleteRequest(
                     CASE_REFERENCE.toString(), USER_ID, List.of(CASE_ROLE, CASE_ROLE),
-                    deleteRequests.get(0)
+                    deleteRequests.getFirst()
                 )
             );
             verify(dataStoreRepository, times(1))
@@ -487,7 +480,7 @@ public class CaseAccessOperationTest {
                 () -> assertEquals(1, deleteRequests.size()),
                 () -> assertCorrectlyPopulatedRoleAssignmentsDeleteRequest(
                     CASE_REFERENCE.toString(), USER_ID, List.of(CASE_ROLE, CASE_ROLE_CREATOR),
-                    deleteRequests.get(0)
+                    deleteRequests.getFirst()
                 )
             );
             verify(dataStoreRepository, times(1))
@@ -530,7 +523,7 @@ public class CaseAccessOperationTest {
                 () -> assertEquals(1, deleteRequests.size()),
                 () -> assertCorrectlyPopulatedRoleAssignmentsDeleteRequest(
                     CASE_REFERENCE.toString(), USER_ID, List.of(CASE_ROLE),
-                    deleteRequests.get(0)
+                    deleteRequests.getFirst()
                 )
             );
             verify(dataStoreRepository, times(1))
@@ -572,7 +565,7 @@ public class CaseAccessOperationTest {
                 () -> assertEquals(1, deleteRequests.size()),
                 () -> assertCorrectlyPopulatedRoleAssignmentsDeleteRequest(
                     CASE_REFERENCE.toString(), USER_ID, List.of(CASE_ROLE_CREATOR),
-                    deleteRequests.get(0)
+                    deleteRequests.getFirst()
                 )
             );
             verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
@@ -614,7 +607,7 @@ public class CaseAccessOperationTest {
                 () -> assertEquals(1, deleteRequests.size()),
                 () -> assertCorrectlyPopulatedRoleAssignmentsDeleteRequest(
                     CASE_REFERENCE.toString(), USER_ID, List.of(CASE_ROLE),
-                    deleteRequests.get(0)
+                    deleteRequests.getFirst()
                 )
             );
             verify(dataStoreRepository, times(1)).findCaseByCaseIdUsingExternalApi(
@@ -664,7 +657,7 @@ public class CaseAccessOperationTest {
                 () -> assertEquals(2, deleteRequests.size()),
                 () -> assertCorrectlyPopulatedRoleAssignmentsDeleteRequest(
                     CASE_REFERENCE.toString(), USER_ID, List.of(CASE_ROLE, CASE_ROLE_OTHER),
-                    deleteRequests.get(0)
+                    deleteRequests.getFirst()
                 ),
                 () -> assertCorrectlyPopulatedRoleAssignmentsDeleteRequest(
                     CASE_REFERENCE.toString(), USER_ID_OTHER, List.of(CASE_ROLE),
@@ -689,7 +682,7 @@ public class CaseAccessOperationTest {
 
             assertNotNull(caseAssignedUserRoles);
             assertEquals(1, caseAssignedUserRoles.size());
-            assertEquals(CASE_ROLE, caseAssignedUserRoles.get(0).getCaseRole());
+            assertEquals(CASE_ROLE, caseAssignedUserRoles.getFirst().getCaseRole());
         }
 
         @Test
@@ -703,9 +696,7 @@ public class CaseAccessOperationTest {
         }
 
         private List<CaseAssignedUserRole> getCaseAssignedUserRoles() {
-            return Arrays.asList(
-                new CaseAssignedUserRole[]{new CaseAssignedUserRole("caseDataId", "userId", CASE_ROLE)}
-            );
+            return List.of(new CaseAssignedUserRole("caseDataId", "userId", CASE_ROLE));
         }
     }
 

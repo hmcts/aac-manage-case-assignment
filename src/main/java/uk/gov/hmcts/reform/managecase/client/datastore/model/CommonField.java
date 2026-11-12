@@ -52,8 +52,8 @@ public interface CommonField extends CommonDCPModel {
      * @return A nested CaseField or 'this' when path is blank
      */
     @JsonIgnore
-    default <T extends CommonField> Optional<T> getComplexFieldNestedField(String path) {
-        return (Optional<T>) CaseFieldPathUtils.getFieldDefinitionByPath(this, path);
+    default Optional<CommonField> getComplexFieldNestedField(String path) {
+        return CaseFieldPathUtils.getFieldDefinitionByPath(this, path);
     }
 
 }

@@ -7,7 +7,7 @@ version: 0.2.31
 maintainers:
   - name: HMCTS CDM team
 annotations:
-  hmcts.github.io/skip-publish: ccd
+  hmcts.github.io/skip-publish: ccd, elasticsearch, logstash
 dependencies:
   - name: java
     version: 6.1.1

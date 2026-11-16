@@ -169,13 +169,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private HttpStatus getHttpStatus(ResponseStatus responseStatus) {
+        if (responseStatus == null) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
         if (!HttpStatus.INTERNAL_SERVER_ERROR.equals(responseStatus.value())) {
             return responseStatus.value();
         } else if (!HttpStatus.INTERNAL_SERVER_ERROR.equals(responseStatus.code())) {
             return responseStatus.code();
         }
 
-        return null;
+        return HttpStatus.INTERNAL_SERVER_ERROR;
     }
 
     private void logFailure(Exception failure, int status) {

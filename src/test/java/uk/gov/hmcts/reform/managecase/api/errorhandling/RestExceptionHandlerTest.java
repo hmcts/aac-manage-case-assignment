@@ -48,6 +48,13 @@ class RestExceptionHandlerTest {
     }
 
     @Test
+    void shouldDefaultToInternalServerErrorWhenResponseStatusIsMissing() {
+        var response = handler.handleApiException(new CaseAssignedUserRoleException("failure") { });
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
     void shouldMapNoCErrorToStructuredBadRequest() {
         var response = handler.handleNoCException(new NoCException("invalid answers", "answers-invalid"));
 

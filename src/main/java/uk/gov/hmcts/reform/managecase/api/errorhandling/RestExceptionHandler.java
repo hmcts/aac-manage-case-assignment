@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,7 +24,6 @@ import uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidationError;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,67 +41,86 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        log.error("Method argument not valid: {}", ex.getLocalizedMessage());
+        logFailure(ex, status.value());
         String[] errors = ex.getBindingResult().getFieldErrors().stream()
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .toArray(String[]::new);
-        return toResponseEntity(HttpStatus.valueOf(status.value()), null, errors);
+        return toResponseEntity(HttpStatus.valueOf(status.value()), HttpStatus.BAD_REQUEST.getReasonPhrase(), errors);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+        HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        return handleExceptionInternal(ex, null, headers, status, request);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body,
+                                                              HttpHeaders headers, HttpStatusCode status,
+                                                              WebRequest request) {
+        logFailure(ex, status.value());
+        HttpStatus known = HttpStatus.resolve(status.value());
+        var problem = org.springframework.http.ProblemDetail.forStatusAndDetail(status,
+            known == null ? "Request failed" : known.getReasonPhrase());
+        // Preserve Spring's pre-existing ProblemDetail fields, without rejected values or parser diagnostics.
+        problem.setInstance(java.net.URI.create("/"));
+        return super.handleExceptionInternal(ex, problem, headers, status, request);
     }
 
     @ExceptionHandler({CaseAssignedUserRoleException.class})
     @ResponseBody
     public ResponseEntity<Object> handleApiException(final CaseAssignedUserRoleException ex) {
-        log.error("Case assigned user roles: {}", ex.getLocalizedMessage());
+
         var responseStatus = ex.getClass().getAnnotation(ResponseStatus.class);
-        return toResponseEntity(getHttpStatus(responseStatus), ex.getLocalizedMessage());
+        HttpStatus status = getHttpStatus(responseStatus);
+        logFailure(ex, status.value());
+        return toResponseEntity(status, ex.getCause() == null ? ex.getLocalizedMessage() : status.getReasonPhrase());
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
-        log.error("Constraint violation: {}", ex.getLocalizedMessage());
+        logFailure(ex, 400);
         String[] errors = ex.getConstraintViolations().stream()
             .map(ConstraintViolation::getMessage)
             .toArray(String[]::new);
-        return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
+        return toResponseEntity(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), errors);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
-        log.error("Access denied due to: {}", ex.getLocalizedMessage());
-        return toResponseEntity(HttpStatus.FORBIDDEN, ex.getLocalizedMessage());
+        logFailure(ex, 403);
+        return toResponseEntity(HttpStatus.FORBIDDEN, HttpStatus.FORBIDDEN.getReasonPhrase());
     }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<Object> handleValidationException(ValidationException ex) {
-        log.error("Validation exception: {}", ex.getLocalizedMessage());
-        return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
+        logFailure(ex, 400);
+        return toResponseEntity(HttpStatus.BAD_REQUEST, ex.getClass() == ValidationException.class
+            ? ex.getLocalizedMessage() : HttpStatus.BAD_REQUEST.getReasonPhrase());
     }
 
     @ExceptionHandler(CaseCouldNotBeFoundException.class)
     public ResponseEntity<Object> handleCaseCouldNotBeFoundException(CaseCouldNotBeFoundException ex) {
-        log.error("Case could not be found: {}", ex.getLocalizedMessage());
+        logFailure(ex, 404);
         return toResponseEntity(HttpStatus.NOT_FOUND, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(NoCException.class)
     public ResponseEntity<Object> handleNoCException(NoCException ex) {
-        log.error("NoC Validation:", ex);
+        logFailure(ex, 400);
         return toNoCResponseEntity(ex.getErrorMessage(), ex.getErrorCode());
     }
 
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<Object> handleFeignStatusException(FeignException ex) {
-        String errorMessage = ex.responseBody()
-            .map(res -> new String(res.array(), StandardCharsets.UTF_8))
-            .orElse(ex.getMessage());
-        log.error("Downstream service errors: {}", errorMessage);
-        return toResponseEntity(HttpStatus.BAD_GATEWAY, errorMessage);
+        logFailure(ex, 502);
+        return toResponseEntity(HttpStatus.BAD_GATEWAY, HttpStatus.BAD_GATEWAY.getReasonPhrase());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleAll(final Exception ex) {
-        log.error(ex.getMessage(), ex);
-        return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
+        logFailure(ex, 500);
+        return toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
     }
 
     private String[] convertNoCErrors(String[] errors) {
@@ -157,5 +176,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         }
 
         return null;
+    }
+
+    private void logFailure(Exception failure, int status) {
+        String businessCode = failure instanceof NoCException noc ? noc.getErrorCode() : null;
+        try (var diagnostics = FailureDiagnostics.open(failure, status, businessCode)) {
+            if (status >= 500) {
+                log.error("Request failed: status={}", status, failure);
+            } else {
+                log.warn("Request failed: status={}", status, failure);
+            }
+        }
     }
 }

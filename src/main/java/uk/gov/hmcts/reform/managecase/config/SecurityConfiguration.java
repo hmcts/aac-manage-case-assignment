@@ -60,6 +60,8 @@ public class SecurityConfiguration {
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        var authenticationErrors =
+            new uk.gov.hmcts.reform.managecase.api.errorhandling.SafeAuthenticationErrors();
         http
             .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
             .sessionManagement(s -> s.sessionCreationPolicy(STATELESS))
@@ -67,7 +69,17 @@ public class SecurityConfiguration {
             .formLogin(fl -> fl.disable())
             .logout(l -> l.disable())
             .authorizeHttpRequests(aht -> aht.anyRequest().authenticated())
-            .oauth2ResourceServer(o -> o.jwt(j -> j.jwtAuthenticationConverter(jwtAuthenticationConverter)));
+            .oauth2ResourceServer(o -> o.authenticationEntryPoint(authenticationErrors)
+                .accessDeniedHandler(authenticationErrors)
+                .jwt(j -> j.jwtAuthenticationConverter(jwtAuthenticationConverter))
+                .withObjectPostProcessor(new org.springframework.security.config.ObjectPostProcessor<
+                    BearerTokenAuthenticationFilter>() {
+                    @Override
+                    public <O extends BearerTokenAuthenticationFilter> O postProcess(O filter) {
+                        filter.setAuthenticationFailureHandler(authenticationErrors);
+                        return filter;
+                    }
+                }));
         return http.build();
     }
 

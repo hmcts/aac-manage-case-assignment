@@ -53,6 +53,7 @@
     "_extends_": "ACA_400_Response",
     "body": {
       "status" : "BAD_REQUEST",
+      "message": "Bad Request",
       "errors" : [ "Case ID has to be a valid 16-digit Luhn number", "Case ID has to be 16-digits long" ]
     }
   }

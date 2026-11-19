@@ -90,3 +90,11 @@ Scenario: (Happy Path) Successful verification that checks a NoCRequest has been
     Then a negative response is received,
     And the response has all the details as expected
 
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  @S-207.6 @callbackTests
+  Scenario: CCD ApplyNoCDecision callback payload is accepted by ACA
+
+    Given a user [Richard - with the ability to create a case for a particular jurisdiction within an organisation],
+    And a successful call [by Richard to create a rejected NoC case C1 for CCD ApplyNoCDecision callback validation] as in [S-207.6-CaseCreation_NoCRequest_Rejected],
+
+    When a call [to fetch the CCD ApplyNoCDecision event trigger and invoke the ACA callback] will get the expected response as in [F-207_Fetch_ApplyNoCDecision_Event_Trigger]

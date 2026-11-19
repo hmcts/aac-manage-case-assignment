@@ -2,6 +2,12 @@ package uk.gov.hmcts.reform.managecase.service;
 
 import com.google.common.collect.Lists;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,14 +18,18 @@ import uk.gov.hmcts.reform.managecase.ApplicationParams;
 import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequest;
 import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequestFailure;
 import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequestStatus;
+import uk.gov.hmcts.reform.managecase.domain.notify.EmailNotificationRequestSuccess;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -51,7 +61,7 @@ class NotifyServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        this.notifyService = new NotifyService(appParams, notificationClient);
+        this.notifyService = new NotifyService(appParams, notificationClient, Runnable::run);
     }
 
     @Test
@@ -164,7 +174,6 @@ class NotifyServiceTest {
                       anyString(),
                       anyString(),
                       anyMap(),
-                      anyString(),
                       anyString()
                   ))
             .willReturn(sendEmailResponse);
@@ -216,5 +225,77 @@ class NotifyServiceTest {
             anyMap(),
             anyString()
         );
+    }
+
+    @Test
+    void shouldSendNotificationsConcurrentlyAndWaitForCompletion() throws Exception {
+        given(appParams.getEmailTemplateId()).willReturn(EMAIL_TEMPLATE_ID);
+        CountDownLatch started = new CountDownLatch(2);
+        CountDownLatch release = new CountDownLatch(1);
+        SendEmailResponse sendEmailResponse = mock(SendEmailResponse.class);
+        given(notificationClient.sendEmail(anyString(), anyString(), anyMap(), anyString())).willAnswer(invocation -> {
+            started.countDown();
+            if (!release.await(5, SECONDS)) {
+                throw new IllegalStateException("Notification was not released by the test");
+            }
+            return sendEmailResponse;
+        });
+        List<EmailNotificationRequest> requests = List.of(
+            new EmailNotificationRequest(CASE_ID, TEST_EMAIL),
+            new EmailNotificationRequest("12345679", "second@hmcts.net"));
+
+        try (ExecutorService workers = Executors.newFixedThreadPool(2);
+             ExecutorService caller = Executors.newSingleThreadExecutor()) {
+            NotifyService concurrentService = new NotifyService(appParams, notificationClient, workers);
+            Future<List<EmailNotificationRequestStatus>> result = caller.submit(
+                () -> concurrentService.sendEmail(requests));
+            try {
+                assertTrue(started.await(5, SECONDS), "Both notifications must start before either completes");
+                assertFalse(result.isDone(), "The response must wait for notification completion");
+            } finally {
+                release.countDown();
+            }
+            assertThat(result.get(5, SECONDS))
+                .allMatch(EmailNotificationRequestSuccess.class::isInstance)
+                .extracting(EmailNotificationRequestStatus::getNotificationRequest)
+                .containsExactlyElementsOf(requests);
+        }
+    }
+
+    @Test
+    void shouldReturnFailureWhenExecutorRejectsNotification() {
+        RejectedExecutionException rejection = new RejectedExecutionException("Executor stopped");
+        Executor rejectingExecutor = task -> {
+            throw rejection;
+        };
+        NotifyService stoppedService = new NotifyService(appParams, notificationClient, rejectingExecutor);
+        EmailNotificationRequest request = new EmailNotificationRequest(CASE_ID, TEST_EMAIL);
+
+        List<EmailNotificationRequestStatus> results = stoppedService.sendEmail(List.of(request));
+
+        assertThat(results).singleElement().isInstanceOfSatisfying(EmailNotificationRequestFailure.class,
+            failure -> {
+                assertThat(failure.getNotificationRequest()).isSameAs(request);
+                assertThat(failure.getException()).isSameAs(rejection);
+            });
+    }
+
+    @Test
+    void shouldKeepSuccessfulResultsWhenAnotherNotificationFails() throws NotificationClientException {
+        given(appParams.getEmailTemplateId()).willReturn(EMAIL_TEMPLATE_ID);
+        SendEmailResponse sendEmailResponse = mock(SendEmailResponse.class);
+        given(notificationClient.sendEmail(anyString(), anyString(), anyMap(), anyString()))
+            .willReturn(sendEmailResponse)
+            .willThrow(new NotificationClientException("Notify unavailable"));
+        List<EmailNotificationRequest> requests = List.of(
+            new EmailNotificationRequest(CASE_ID, TEST_EMAIL),
+            new EmailNotificationRequest("12345679", "second@hmcts.net"));
+
+        List<EmailNotificationRequestStatus> results = notifyService.sendEmail(requests);
+
+        assertThat(results).extracting(EmailNotificationRequestStatus::getNotificationRequest)
+            .containsExactlyElementsOf(requests);
+        assertThat(results.get(0)).isInstanceOf(EmailNotificationRequestSuccess.class);
+        assertThat(results.get(1)).isInstanceOf(EmailNotificationRequestFailure.class);
     }
 }

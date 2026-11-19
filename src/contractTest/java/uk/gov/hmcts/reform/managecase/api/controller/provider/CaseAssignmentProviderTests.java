@@ -320,8 +320,8 @@ public class CaseAssignmentProviderTests {
             .when(challengeAnswerValidator).getMatchingCaseRole(any(), any(), any());
         given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
             .willReturn(organisationPolicyFor(organisationId));
-        given(prdRepository.findUsersByOrganisation())
-            .willReturn(usersByOrganisation());
+        given(prdRepository.findRequestingUserOrganisation())
+            .willReturn(new FindOrganisationResponse(emptyList(), ORGANIZATION_ID, TEST_APP_ORG_NAME));
         given(securityUtils.getUserInfo())
             .willReturn(new UserInfo("user-id", "test@email.com", "Test", "User", "ACTIVE",
                                      List.of("caseworker-AUTOTEST1-solicitor")));

@@ -1,0 +1,16 @@
+{
+    "request": {
+        "method": "GET",
+        "url": "/refdata/external/v1/organisations/metadata"
+    },
+    "response": {
+        "status": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "jsonBody": {
+            "name": "Invoking organisation",
+            "organisationIdentifier": "InvokingUsersOrg"
+        }
+    }
+}

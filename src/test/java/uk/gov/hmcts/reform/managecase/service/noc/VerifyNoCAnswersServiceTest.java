@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.managecase.api.payload.VerifyNoCAnswersRequest;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.datastore.model.CaseViewResource;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
-import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
+import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.domain.NoCRequestDetails;
 import uk.gov.hmcts.reform.managecase.domain.Organisation;
 import uk.gov.hmcts.reform.managecase.domain.OrganisationPolicy;
@@ -140,9 +140,9 @@ class VerifyNoCAnswersServiceTest {
     }
 
     private void mockPrdResponse(String organisationId) {
-        FindUsersByOrganisationResponse prdOrgResponse =
-            new FindUsersByOrganisationResponse(emptyList(), organisationId);
-        when(prdRepository.findUsersByOrganisation()).thenReturn(prdOrgResponse);
+        FindOrganisationResponse prdOrgResponse =
+            new FindOrganisationResponse(emptyList(), organisationId, null);
+        when(prdRepository.findRequestingUserOrganisation()).thenReturn(prdOrgResponse);
     }
 
     private CaseDetails createCase() throws JsonProcessingException {

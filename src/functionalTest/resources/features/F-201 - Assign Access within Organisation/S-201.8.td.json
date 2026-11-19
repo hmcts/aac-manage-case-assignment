@@ -20,6 +20,7 @@
 	"expectedResponse": {
 		"_extends_": "ACA_400_Response",
 		"body" : {
+			"message": "Bad Request",
 			"errors" : [
 				"Case ID has to be a valid 16-digit Luhn number"
 			]

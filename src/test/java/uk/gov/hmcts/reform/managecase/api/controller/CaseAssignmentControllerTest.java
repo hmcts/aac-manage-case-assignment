@@ -51,7 +51,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -295,9 +294,9 @@ public class CaseAssignmentControllerTest {
                 .andExpect(jsonPath("$.case_assignments[0].shared_with[0].case_roles[1]", is(TestFixtures.CASE_ROLE2)));
         }
 
-        @DisplayName("should return 500 when downstream throws FeignException for get case assignments")
+        @DisplayName("should return sanitised 502 when downstream throws FeignException for get case assignments")
         @Test
-        void shouldReturn500ErrorWhenDownstreamCallFailed() throws Exception {
+        void shouldReturn502ErrorWhenDownstreamCallFailed() throws Exception {
             String caseIds = "1588234985453946";
             Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(), null,
                                              Charset.defaultCharset(), null
@@ -307,10 +306,10 @@ public class CaseAssignmentControllerTest {
                                                        new HashMap<String, Collection<String>>()));
 
             mockMvc.perform(get(CASE_ASSIGNMENTS_PATH).queryParam("case_ids", caseIds))
-                .andExpect(status().is5xxServerError())
+                .andExpect(status().isBadGateway())
                 .andExpect(jsonPath(
                     "$.message",
-                    containsString("data store failure")
+                    is("Bad Gateway")
                 ));
 
         }
@@ -331,8 +330,9 @@ public class CaseAssignmentControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath(
                     "$.message",
-                    containsString("case_ids must be a non-empty list of proper case ids.")
-                ));
+                    is("Bad Request")
+                ))
+                .andExpect(jsonPath("$.errors", hasItem("case_ids must be a non-empty list of proper case ids.")));
         }
 
         @DisplayName("should fail with 400 bad request when caseIds is malformed or invalid")

@@ -252,7 +252,7 @@ public class ApplyNoCDecisionService {
             return prdRepository.findUsersByOrganisation(organisationId);
         } catch (FeignException e) {
             HttpStatus status = HttpStatus.resolve(e.status());
-            String reasonPhrase = status == null ? e.getMessage() : status.getReasonPhrase();
+            String reasonPhrase = status == null ? "Request failed" : status.getReasonPhrase();
 
             String errorMessage = status == HttpStatus.NOT_FOUND
                 ? String.format("Organisation with ID '%s' can not be found.", organisationId)

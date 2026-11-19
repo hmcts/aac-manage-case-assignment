@@ -1,0 +1,3 @@
+# Exclude mutable Gradle caches from the ACR upload context.
+.gradle-user-home/
+.gradle/

@@ -45,6 +45,7 @@
     "_extends_": "ACA_400_Response",
     "body": {
       "status" : "BAD_REQUEST",
+      "message": "Bad Request",
       "errors": [ "Case role name format is invalid" ]
     }
   }

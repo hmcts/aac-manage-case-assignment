@@ -12,12 +12,25 @@
 see [Run `ccd-docker` containers](#Run-ccd-docker-containers) for details
 
 ### Environment Variables
-- Ensure the relevant environment variables in `aca-docker/bin/env_variables-all.txt` are set by running
+- Create the ignored local environment file from the example and set the required local values:
 
     ```bash
-    cd aca-docker/bin
-    source env_variables_all.txt
+    cd aca-docker
+    ./bin/setup-local-secrets.sh
+    set -a
+    source .env
+    set +a
   ```
+
+  The script refuses to overwrite an existing `.env`. Do not commit `.env`; deployed values must continue to come from the service secret store.
+
+  AAC helper scripts that query the local IDAM database require the existing `IDAM_DB_PASSWORD` environment variable. Set it from the approved local IDAM database configuration before running this script; AAC does not generate or replace the value. When using the shared IDAM database provided by `ccd-docker`, this must be the matching value generated/configured by `ccd-docker`. AAC does not invoke or link to `ccd-docker`.
+
+| Value | Generated or supplied by | AAC requirement |
+|---|---|---|
+| `IDAM_DB_PASSWORD` | The setup that owns the local IDAM database, normally `ccd-docker` | Supply the matching value; AAC does not generate or replace it. |
+| Other local `.env` secrets | AAC's `setup-local-secrets.sh` | Disposable local values only; do not use for AAT or production. |
+| Deployed secrets | Service secret store and pipeline configuration | Keep using the existing deployed mappings. |
 
 
 ### IDAM Configuration

@@ -73,6 +73,8 @@ spring:
 springdoc:
   packagesToScan: uk.gov.hmcts.reform.managecase.api.controller
 idam:
+  oidc:
+    url: ${IDAM_OIDC_URL:http://localhost:5000}
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
   client:

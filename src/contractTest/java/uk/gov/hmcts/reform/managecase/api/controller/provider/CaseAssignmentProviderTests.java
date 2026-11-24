@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.managecase.api.controller.provider;
 
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
-import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
@@ -60,6 +59,8 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.CaseDetailsFixture.organisationPolicy;
 import static uk.gov.hmcts.reform.managecase.TestFixtures.ProfessionalUserFixture.user;
@@ -68,9 +69,11 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.noc.NoCValidation
 
 @ExtendWith(SpringExtension.class)
 @Provider("acc_manageCaseAssignment")
-@PactBroker(url = "${PACT_BROKER_URL:http://localhost:80}")
+@PactBroker(
+    url = "${PACT_BROKER_URL:http://localhost:9292}",
+    enablePendingPacts = "${pactbroker.enablePending:true}"
+)
 @ContextConfiguration(classes = {ContractConfig.class, MapperConfig.class})
-@IgnoreNoPactsToVerify
 public class CaseAssignmentProviderTests {
 
     private static final String ORG_POLICY_ROLE = "caseworker-probate";
@@ -128,17 +131,10 @@ public class CaseAssignmentProviderTests {
             return new SelectorBuilder().branch(consumerBranch);
         }
 
-        String providerBranch = System.getenv("CHANGE_BRANCH");
-        if (providerBranch == null || providerBranch.isBlank()) {
-            providerBranch = System.getenv("BRANCH_NAME");
-        }
-
-        SelectorBuilder selectors = new SelectorBuilder().deployedOrReleased();
-        if ("master".equals(providerBranch)) {
-            return selectors.branch("master");
-        }
-
-        return selectors.matchingBranch();
+        return new SelectorBuilder()
+            .branch("master")
+            .deployedOrReleased()
+            .matchingBranch();
     }
 
     @TestTemplate
@@ -313,15 +309,15 @@ public class CaseAssignmentProviderTests {
     public void toVerifyInvalidNoCAnswers() {
         given(noticeOfChangeQuestions.challengeQuestions(NOC_CASE_ID))
             .willReturn(noCRequestDetails(TEST_APP_ORG_ID));
-        given(challengeAnswerValidator.getMatchingCaseRole(any(), any(), any()))
-            .willThrow(new NoCException(ANSWERS_NOT_MATCH_LITIGANT));
+        doThrow(new NoCException(ANSWERS_NOT_MATCH_LITIGANT))
+            .when(challengeAnswerValidator).getMatchingCaseRole(any(), any(), any());
     }
 
     private void configureNoCAnswerVerification(String organisationId) {
         given(noticeOfChangeQuestions.challengeQuestions(NOC_CASE_ID))
             .willReturn(noCRequestDetails(organisationId));
-        given(challengeAnswerValidator.getMatchingCaseRole(any(), any(), any()))
-            .willReturn(NOC_CASE_ROLE);
+        doReturn(NOC_CASE_ROLE)
+            .when(challengeAnswerValidator).getMatchingCaseRole(any(), any(), any());
         given(jacksonUtils.convertValue(any(JsonNode.class), eq(OrganisationPolicy.class)))
             .willReturn(organisationPolicyFor(organisationId));
         given(prdRepository.findUsersByOrganisation())

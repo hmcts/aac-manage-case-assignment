@@ -65,6 +65,8 @@ Second, from the consumer repository, publish the consumer Pact to the local bro
 
 Finally, from this repository, run provider verification and publish verification results to the local Pact Broker. `PACT_CONSUMER_BRANCH` overrides branch selection for local runs. If it is unset, deployed or released Pacts are always selected. A provider build on `master` also selects the consumer `master` branch; a provider PR build selects the consumer Pact from the matching branch. CI determines the provider branch from `CHANGE_BRANCH`, falling back to `BRANCH_NAME`. The verification result is published with the provider full Git commit SHA and branch metadata.
 
+Provider verification requires at least one matching Pact from the broker. The task fails when no contracts match the configured selectors, so a passing result always means one or more interactions were verified.
+
 ```bash
 PACT_BROKER_URL=http://localhost:9292 \
 PACT_CONSUMER_BRANCH=<consumer-branch> \

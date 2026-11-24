@@ -20,6 +20,12 @@ management:
         include: health, info, prometheus
 
 spring:
+  # Temporary Boot 4 bridge: application and HMCTS client code still expose
+  # Jackson 2 databind types. Remove this and spring-boot-jackson2 after the
+  # JSON paths have been migrated and round-trip tested on Jackson 3.
+  http:
+    converters:
+      preferred-json-mapper: jackson2
   # CCD-3509 CVE-2021-22044 spring.mvc.pathmatch.matching-strategy = ant_path_matcher
   # required to fix null pointers in integration tests, conflict in Springfox after Springboot 2.6.10 upgrade
   mvc:
@@ -46,26 +52,27 @@ spring:
             issuer-uri: ${IDAM_OIDC_URL:http://localhost:5000}/o
   cloud:
     gateway:
-      mvc:
-        forwarded-request-headers-filter:
-          enabled: false
-        remove-content-length-request-headers-filter:
-          enabled: false
-        transfer-encoding-normalization-request-headers-filter:
-          enabled: false
-        http-client:
-          type: AUTODETECT
-        routes:
-          - id: data-store
-            uri: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
-            predicates:
-              - Path=/ccd/**
-            filters:
-              - AllowedRoutesFilter
-              - ValidateClientFilter
-              - RemoveResponseHeader=Cookie
-              - RemoveResponseHeader=Set-Cookie
-              - StripPrefix=1
+      server:
+        webmvc:
+          forwarded-request-headers-filter:
+            enabled: false
+          remove-content-length-request-headers-filter:
+            enabled: false
+          transfer-encoding-normalization-request-headers-filter:
+            enabled: false
+          http-client:
+            type: AUTODETECT
+          routes:
+            - id: data-store
+              uri: ${CCD_DATA_STORE_API_BASE_URL:http://localhost:4452}
+              predicates:
+                - Path=/ccd/**
+              filters:
+                - AllowedRoutesFilter
+                - ValidateClientFilter
+                - RemoveResponseHeader=Cookie
+                - RemoveResponseHeader=Set-Cookie
+                - StripPrefix=1
     discovery:
       client:
         composite-indicator:

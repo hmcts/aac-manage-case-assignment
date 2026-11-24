@@ -7,7 +7,7 @@ import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.PactBrokerConsumerVersionSelectors;
 import au.com.dius.pact.provider.junitsupport.loader.SelectorBuilder;
-import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
+import au.com.dius.pact.provider.spring.spring7.Spring7MockMvcTestTarget;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQues
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
+import uk.gov.hmcts.reform.managecase.config.JacksonObjectMapperConfig;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.data.user.UserRepository;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
@@ -147,10 +148,11 @@ public class CaseAssignmentProviderTests {
 
     @BeforeEach
     void before(PactVerificationContext context) {
-        MockMvcTestTarget testTarget = new MockMvcTestTarget();
+        Spring7MockMvcTestTarget testTarget = new Spring7MockMvcTestTarget();
         //System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(caseAssignmentController, noticeOfChangeController);
         testTarget.setControllerAdvices(new RestExceptionHandler());
+        testTarget.setMessageConverters(new JacksonObjectMapperConfig().createJackson2Converter());
         if (context != null) {
             context.setTarget(testTarget);
         }

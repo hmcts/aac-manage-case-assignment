@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQues
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.ChallengeQuestionsResult;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.FieldType;
 import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
+import uk.gov.hmcts.reform.managecase.config.JacksonObjectMapperConfig;
 import uk.gov.hmcts.reform.managecase.config.MapperConfig;
 import uk.gov.hmcts.reform.managecase.data.user.UserRepository;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
@@ -151,6 +152,7 @@ public class CaseAssignmentProviderTests {
         //System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(caseAssignmentController, noticeOfChangeController);
         testTarget.setControllerAdvices(new RestExceptionHandler());
+        testTarget.setMessageConverters(new JacksonObjectMapperConfig().createJackson2Converter());
         if (context != null) {
             context.setTarget(testTarget);
         }

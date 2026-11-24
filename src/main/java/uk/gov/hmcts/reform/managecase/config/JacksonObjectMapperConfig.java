@@ -58,7 +58,7 @@ public class JacksonObjectMapperConfig implements WebMvcConfigurer {
      * Keep the Jackson 2 converter until the application DTOs and HMCTS clients are migrated to Jackson 3.
      * Reflection isolates this temporary bridge from the deprecated Spring converter API.
      */
-    HttpMessageConverter<?> createJackson2Converter() {
+    public HttpMessageConverter<?> createJackson2Converter() {
         return createJackson2Converter(jackson2ConverterClass());
     }
 

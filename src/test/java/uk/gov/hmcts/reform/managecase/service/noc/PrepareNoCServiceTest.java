@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.managecase.client.datastore.CaseDetails;
 import uk.gov.hmcts.reform.managecase.client.definitionstore.model.CaseRole;
-import uk.gov.hmcts.reform.managecase.client.prd.FindUsersByOrganisationResponse;
+import uk.gov.hmcts.reform.managecase.client.prd.FindOrganisationResponse;
 import uk.gov.hmcts.reform.managecase.domain.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.managecase.domain.DynamicList;
 import uk.gov.hmcts.reform.managecase.domain.DynamicListElement;
@@ -90,7 +90,7 @@ class PrepareNoCServiceTest {
 
         @BeforeEach
         void setUp() {
-            mockOrgIdentifierInPrdFindUsersByOrganisation("orgName1");
+            mockRequestingUserOrganisation("orgName1");
             mockDefinitionStoreCaseRoles();
             orgPolicies = prepareOrganisationPoliciesForSolicitorTest();
         }
@@ -180,7 +180,7 @@ class PrepareNoCServiceTest {
         @DisplayName("should error when Solicitor is not recorded on an OrganisationPolicy on the case")
         void shouldErrorWhenSolicitorIsNotRecordedInAnOrganisationPolicyOnTheCase() {
             mockUserCaseRolesForSolicitor();
-            mockOrgIdentifierInPrdFindUsersByOrganisation("orgNotInPolicy");
+            mockRequestingUserOrganisation("orgNotInPolicy");
 
             Map<String, JsonNode> caseData = new HashMap<>();
             orgPolicies.forEach((key, value) -> caseData.put(key, organisationPolicyToJsonNode(value)));
@@ -387,12 +387,13 @@ class PrepareNoCServiceTest {
             given(definitionStoreRepository.caseRoles("0", JURISDICTION, CASE_TYPE)).willReturn(caseRoleList);
         }
 
-        private void mockOrgIdentifierInPrdFindUsersByOrganisation(String orgIdentifier) {
-            FindUsersByOrganisationResponse usersByOrganisation = new FindUsersByOrganisationResponse(
+        private void mockRequestingUserOrganisation(String orgIdentifier) {
+            FindOrganisationResponse organisationMetadata = new FindOrganisationResponse(
                 emptyList(),
-                orgIdentifier
+                orgIdentifier,
+                null
             );
-            given(prdRepository.findUsersByOrganisation()).willReturn(usersByOrganisation);
+            given(prdRepository.findRequestingUserOrganisation()).willReturn(organisationMetadata);
         }
 
         private void mockUserCaseRolesForSolicitor() {

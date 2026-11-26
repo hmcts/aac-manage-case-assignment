@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.managecase.service.noc.VerifyNoCAnswersService;
 import uk.gov.hmcts.reform.managecase.util.JacksonUtils;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +51,6 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointP
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.actuate.endpoint.web.EndpointMediaTypes;
 import org.springframework.boot.actuate.endpoint.web.WebEndpointsSupplier;
-import org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpointsSupplier;
 import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -147,9 +145,6 @@ public class NoticeOfChangeControllerTest {
         protected WebEndpointsSupplier webEndpointsSupplier;
 
         @MockitoBean
-        protected ControllerEndpointsSupplier controllerEndpointsSupplier;
-
-        @MockitoBean
         protected EndpointMediaTypes endpointMediaTypes;
 
         @MockitoBean
@@ -193,7 +188,7 @@ public class NoticeOfChangeControllerTest {
                     .answerField(ANSWER_FIELD)
                     .questionId("NoC").build();
                 ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
-                    Arrays.asList(challengeQuestion));
+                    List.of(challengeQuestion));
 
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
 
@@ -229,7 +224,7 @@ public class NoticeOfChangeControllerTest {
                     .answerField(ANSWER_FIELD)
                     .questionId("NoC").build();
                 ChallengeQuestionsResult challengeQuestionsResult = new ChallengeQuestionsResult(
-                    Arrays.asList(challengeQuestion));
+                    List.of(challengeQuestion));
 
 
                 given(service.getChallengeQuestions(CASE_ID)).willReturn(challengeQuestionsResult);
@@ -321,8 +316,8 @@ public class NoticeOfChangeControllerTest {
             verify(verifyNoCAnswersService).verifyNoCAnswers(captor.capture());
             assertThat(captor.getValue().getCaseId()).isEqualTo(CASE_ID);
             assertThat(captor.getValue().getAnswers().size()).isEqualTo(1);
-            assertThat(captor.getValue().getAnswers().get(0).getQuestionId()).isEqualTo(QUESTION_ID);
-            assertThat(captor.getValue().getAnswers().get(0).getValue()).isEqualTo(ANSWER_VALUE);
+            assertThat(captor.getValue().getAnswers().getFirst().getQuestionId()).isEqualTo(QUESTION_ID);
+            assertThat(captor.getValue().getAnswers().getFirst().getValue()).isEqualTo(ANSWER_VALUE);
         }
 
         @DisplayName("should fail with 400 bad request when case id is null")

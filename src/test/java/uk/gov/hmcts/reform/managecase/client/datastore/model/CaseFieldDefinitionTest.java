@@ -1,131 +1,167 @@
 package uk.gov.hmcts.reform.managecase.client.datastore.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class CaseFieldDefinitionTest {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Test
-    void shouldFindAccessControlByRoleIgnoringCase() {
-        AccessControlList acl = new AccessControlList();
-        acl.setRole("Caseworker");
+    void shouldSerialiseFormattedValue() throws JsonProcessingException {
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        JsonNode formattedValue = objectMapper.readTree("{\"code\":\"A\",\"label\":\"Accepted\"}");
+        caseFieldDefinition.setFormattedValue(formattedValue);
 
-        CaseFieldDefinition field = new CaseFieldDefinition();
-        field.setAccessControlLists(List.of(acl));
+        String json = objectMapper.writeValueAsString(caseFieldDefinition);
+        CaseFieldDefinition result = objectMapper.readValue(json, CaseFieldDefinition.class);
 
-        assertThat(field.getAccessControlListByRole("caseWORKER")).containsSame(acl);
-        assertThat(field.getAccessControlListByRole("Solicitor")).isEmpty();
+        assertThat(objectMapper.<JsonNode>valueToTree(result.getFormattedValue())).isEqualTo(formattedValue);
+    }
+
+    @Test
+    void shouldIdentifyCollectionFieldType() {
+        CaseFieldDefinition caseFieldDefinition = caseFieldDefinition("CollectionField", fieldType("Collection"));
+
+        assertAll(
+            () -> assertThat(caseFieldDefinition.isCollectionFieldType()).isTrue(),
+            () -> assertThat(caseFieldDefinition.isComplexFieldType()).isFalse(),
+            () -> assertThat(caseFieldDefinition.isCompoundFieldType()).isTrue()
+        );
+    }
+
+    @Test
+    void shouldIdentifyComplexFieldType() {
+        CaseFieldDefinition caseFieldDefinition = caseFieldDefinition("ComplexField", fieldType("Complex"));
+
+        assertAll(
+            () -> assertThat(caseFieldDefinition.isCollectionFieldType()).isFalse(),
+            () -> assertThat(caseFieldDefinition.isComplexFieldType()).isTrue(),
+            () -> assertThat(caseFieldDefinition.isCompoundFieldType()).isTrue()
+        );
+    }
+
+    @Test
+    void shouldNotIdentifySimpleFieldTypeAsCompound() {
+        CaseFieldDefinition caseFieldDefinition = caseFieldDefinition("TextField", fieldType("Text"));
+
+        assertAll(
+            () -> assertThat(caseFieldDefinition.isCollectionFieldType()).isFalse(),
+            () -> assertThat(caseFieldDefinition.isComplexFieldType()).isFalse(),
+            () -> assertThat(caseFieldDefinition.isCompoundFieldType()).isFalse()
+        );
+    }
+
+    @Test
+    void shouldReturnDisplayContextTypeWhenDisplayContextIsPresent() {
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        caseFieldDefinition.setDisplayContext("MANDATORY");
+
+        assertThat(caseFieldDefinition.displayContextType()).isEqualTo(DisplayContext.MANDATORY);
+    }
+
+    @Test
+    void shouldReturnNullDisplayContextTypeWhenDisplayContextIsHidden() {
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        caseFieldDefinition.setDisplayContext("HIDDEN");
+
+        assertThat(caseFieldDefinition.displayContextType()).isNull();
+    }
+
+    @Test
+    void shouldReturnNullDisplayContextTypeWhenDisplayContextIsMissing() {
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+
+        assertThat(caseFieldDefinition.displayContextType()).isNull();
+    }
+
+    @Test
+    void shouldRejectUnknownDisplayContextType() {
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        caseFieldDefinition.setDisplayContext("UNKNOWN");
+
+        assertThatThrownBy(caseFieldDefinition::displayContextType)
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void shouldReturnCurrentFieldWhenNestedFieldPathIsBlank() {
+        CaseFieldDefinition caseFieldDefinition = caseFieldDefinition("ComplexField", fieldType("Complex"));
+
+        Optional<CommonField> result = caseFieldDefinition.getComplexFieldNestedField(" ");
+
+        assertThat(result).contains(caseFieldDefinition);
+    }
+
+    @Test
+    void shouldFindDirectNestedFieldByPath() {
+        CaseFieldDefinition nestedField = caseFieldDefinition("NestedTextField", fieldType("Text"));
+        CaseFieldDefinition caseFieldDefinition = complexCaseFieldDefinition("ComplexField", nestedField);
+
+        Optional<CommonField> result = caseFieldDefinition.getComplexFieldNestedField("NestedTextField");
+
+        assertThat(result).contains(nestedField);
+    }
+
+    @Test
+    void shouldFindDeeplyNestedFieldByPath() {
+        CaseFieldDefinition deeplyNestedField = caseFieldDefinition("NestedNumberField", fieldType("Number"));
+        CaseFieldDefinition nestedField = complexCaseFieldDefinition("NestedComplexField", deeplyNestedField);
+        CaseFieldDefinition caseFieldDefinition = complexCaseFieldDefinition("ComplexField", nestedField);
+
+        Optional<CommonField> result = caseFieldDefinition.getComplexFieldNestedField(
+            "NestedComplexField.NestedNumberField");
+
+        assertThat(result).contains(deeplyNestedField);
+    }
+
+    @Test
+    void shouldReturnEmptyWhenNestedFieldPathDoesNotExist() {
+        CaseFieldDefinition nestedField = caseFieldDefinition("NestedTextField", fieldType("Text"));
+        CaseFieldDefinition caseFieldDefinition = complexCaseFieldDefinition("ComplexField", nestedField);
+
+        Optional<CommonField> result = caseFieldDefinition.getComplexFieldNestedField("MissingField");
+
+        assertThat(result).isEmpty();
     }
 
     @Test
     void shouldExposeComplexFieldChildren() {
-        CaseFieldDefinition child = new CaseFieldDefinition();
-        child.setId("AddressLine1");
-        FieldTypeDefinition fieldType = new FieldTypeDefinition();
-        fieldType.setType(FieldTypeDefinition.COMPLEX);
-        fieldType.setComplexFields(List.of(child));
+        CaseFieldDefinition child = caseFieldDefinition("AddressLine1", fieldType("Text"));
+        FieldTypeDefinition complexType = fieldType("Complex");
+        complexType.setComplexFields(List.of(child));
 
-        assertThat(fieldType.getChildren()).containsExactly(child);
+        assertThat(complexType.getChildren()).containsExactly(child);
     }
 
-    @Test
-    void shouldPropagateAndApplyComplexAclsToNestedFields() {
-        CaseFieldDefinition firstChild = complexChild("First");
-        CaseFieldDefinition secondChild = complexChild("Second");
-        CaseFieldDefinition root = complexChild("Root");
-        root.getFieldTypeDefinition().setComplexFields(List.of(firstChild, secondChild));
+    private CaseFieldDefinition complexCaseFieldDefinition(String id, CaseFieldDefinition... nestedFields) {
+        FieldTypeDefinition fieldTypeDefinition = fieldType("Complex");
+        fieldTypeDefinition.setComplexFields(List.of(nestedFields));
 
-        AccessControlList inheritedAcl = new AccessControlList();
-        inheritedAcl.setRole("caseworker");
-        inheritedAcl.setRead(true);
-        root.setAccessControlLists(List.of(inheritedAcl));
-
-        ComplexACL firstChildAcl = new ComplexACL();
-        firstChildAcl.setRole("caseworker");
-        firstChildAcl.setListElementCode("First");
-        firstChildAcl.setUpdate(true);
-        root.setComplexACLs(List.of(firstChildAcl));
-
-        root.propagateACLsToNestedFields();
-
-        assertThat(firstChild.getAccessControlListByRole("caseworker")).containsSame(firstChildAcl);
-        assertThat(firstChild.getAccessControlLists()).containsExactly(firstChildAcl);
-        assertThat(secondChild.getAccessControlListByRole("caseworker")).isEmpty();
+        return caseFieldDefinition(id, fieldTypeDefinition);
     }
 
-    @Test
-    void shouldRejectComplexAclForUnknownNestedField() {
-        CaseFieldDefinition root = complexChild("Root");
-        ComplexACL acl = new ComplexACL();
-        acl.setRole("caseworker");
-        acl.setListElementCode("Missing");
-        root.setComplexACLs(List.of(acl));
+    private CaseFieldDefinition caseFieldDefinition(String id, FieldTypeDefinition fieldTypeDefinition) {
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        caseFieldDefinition.setId(id);
+        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
 
-        org.assertj.core.api.Assertions.assertThatThrownBy(root::propagateACLsToNestedFields)
-            .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("has no nested elements with code Missing");
+        return caseFieldDefinition;
     }
 
-    @Test
-    void shouldApplyComplexAclToNestedDottedPathAndRemoveSiblingAcl() {
-        CaseFieldDefinition nestedFirst = complexChild("First");
-        CaseFieldDefinition nestedSecond = complexChild("Second");
-        CaseFieldDefinition parent = complexChild("Parent");
-        parent.getFieldTypeDefinition().setComplexFields(List.of(nestedFirst, nestedSecond));
+    private FieldTypeDefinition fieldType(String type) {
+        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+        fieldTypeDefinition.setType(type);
 
-        CaseFieldDefinition root = complexChild("Root");
-        root.getFieldTypeDefinition().setComplexFields(List.of(parent));
-        root.setAccessControlLists(List.of(acl("caseworker")));
-
-        ComplexACL nestedAcl = new ComplexACL();
-        nestedAcl.setRole("caseworker");
-        nestedAcl.setListElementCode("Parent.First");
-        nestedAcl.setUpdate(true);
-        root.setComplexACLs(List.of(nestedAcl));
-
-        root.propagateACLsToNestedFields();
-
-        assertThat(nestedFirst.getAccessControlLists()).containsExactly(nestedAcl);
-        assertThat(nestedSecond.getAccessControlListByRole("caseworker")).isEmpty();
-    }
-
-    @Test
-    void shouldPropagateAclsThroughCollectionComplexFields() {
-        CaseFieldDefinition collectionItem = complexChild("CollectionItem");
-        FieldTypeDefinition collectionElementType = new FieldTypeDefinition();
-        collectionElementType.setType(FieldTypeDefinition.COMPLEX);
-        collectionElementType.setComplexFields(List.of(collectionItem));
-
-        CaseFieldDefinition root = complexChild("Root");
-        FieldTypeDefinition collectionType = new FieldTypeDefinition();
-        collectionType.setType(FieldTypeDefinition.COLLECTION);
-        collectionType.setCollectionFieldTypeDefinition(collectionElementType);
-        root.setFieldTypeDefinition(collectionType);
-        root.setAccessControlLists(List.of(acl("caseworker")));
-
-        root.propagateACLsToNestedFields();
-
-        assertThat(collectionType.getChildren()).containsExactly(collectionItem);
-        assertThat(collectionItem.getAccessControlListByRole("caseworker")).isPresent();
-    }
-
-    private AccessControlList acl(String role) {
-        AccessControlList acl = new AccessControlList();
-        acl.setRole(role);
-        acl.setRead(true);
-        return acl;
-    }
-
-    private CaseFieldDefinition complexChild(String id) {
-        CaseFieldDefinition field = new CaseFieldDefinition();
-        field.setId(id);
-        FieldTypeDefinition type = new FieldTypeDefinition();
-        type.setType(FieldTypeDefinition.COMPLEX);
-        field.setFieldTypeDefinition(type);
-        field.setAccessControlLists(new java.util.ArrayList<>());
-        return field;
+        return fieldTypeDefinition;
     }
 }

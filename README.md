@@ -137,5 +137,11 @@ By default, docker-compose.yml is pointing to AAT urls of all downstream depende
 
 You can spin-up full aca docker stack locally. Instructions are available under `aca-docker/README.md`.
 
+## Support investigation
+
+For failure investigation, see the
+[support investigation guide](docs/CCD-7882-error-contract.md#support) for Application Insights
+Logs, KQL examples, correlation and local/production verification limits.
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.

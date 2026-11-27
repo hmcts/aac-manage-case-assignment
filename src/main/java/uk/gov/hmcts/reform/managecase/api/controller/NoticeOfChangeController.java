@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.NotEmpty;
@@ -62,6 +63,7 @@ import static uk.gov.hmcts.reform.managecase.api.errorhandling.ValidationError.N
 import static uk.gov.hmcts.reform.managecase.domain.ApprovalStatus.APPROVED;
 
 @RestController
+@Slf4j
 @Validated
 @RequestMapping(path = "/noc")
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
@@ -359,7 +361,9 @@ public class NoticeOfChangeController {
         try {
             result.setData(applyNoCDecisionService.applyNoCDecision(applyNoCDecisionRequest));
         } catch (ValidationException ex) {
-            result.setErrors(singletonList(ex.getMessage()));
+            log.warn("Notice of change validation failed", ex);
+            result.setErrors(singletonList(ex.getClass() == ValidationException.class
+                ? ex.getMessage() : HttpStatus.BAD_REQUEST.getReasonPhrase()));
         }
         return result;
     }

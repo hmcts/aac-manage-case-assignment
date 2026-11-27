@@ -20,6 +20,7 @@
 	"expectedResponse": {
 		"_extends_": "ACA_400_Response",
 		"body": {
+			"message": "Bad Request",
 			"errors": [
 				"Case ID can not be empty"
 			]

@@ -1,7 +1,10 @@
 server:
   port: 4454
   error:
-    include-message: always
+    include-message: never
+    include-exception: false
+    include-stacktrace: never
+    include-binding-errors: never
 management:
   endpoint:
     health:

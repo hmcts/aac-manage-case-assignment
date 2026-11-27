@@ -95,7 +95,7 @@ public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHel
 
         } catch (Exception exception) {
             final var resourceNotFoundException = new ResourceNotFoundException(
-                String.format(R_A_NOT_FOUND_FOR_CASE_AND_USER, userIds, caseIds, exception.getMessage())
+                String.format(R_A_NOT_FOUND_FOR_CASE_AND_USER, userIds, caseIds, exception.getMessage()), exception
             );
             throw mapException(exception, resourceNotFoundException);
         }
@@ -116,10 +116,10 @@ public class RoleAssignmentServiceHelperImpl implements RoleAssignmentServiceHel
         if (exception instanceof HttpClientErrorException
             && ((HttpClientErrorException) exception).getStatusCode().is4xxClientError()) {
             return new BadRequestException(
-                String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, processDescription, exception.getMessage()));
+                String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, processDescription, exception.getMessage()), exception);
         } else {
             return new ServiceException(
-                String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, processDescription, exception.getMessage()));
+                String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, processDescription, exception.getMessage()), exception);
         }
     }
 }

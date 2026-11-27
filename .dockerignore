@@ -1,0 +1,2 @@
+# Gradle downloads and caches are not needed in the container build context.
+.gradle-user-home
